@@ -27,7 +27,7 @@ void init(int argc, char **argv) {
   lastTime = glutGet(GLUT_ELAPSED_TIME);
 
   // load mesh and some animations
-  md5.loadMesh("lightning.md5mesh");
+  md5.loadMesh("lightning2.md5mesh");
   md5.loadAnim("lightning.md5anim");
   // md5.loadMesh("qshambler.md5mesh");
   // md5.loadAnim("qshambler_attack01.md5anim");

@@ -1102,4 +1102,3 @@ MD5Model::Anim::Anim():
      numAnimatedComponents(0) {
 
 }
-

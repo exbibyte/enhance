@@ -1,9 +1,12 @@
 src_files := $(wildcard ./src/*.cpp)
-inc_dir := ./src
+src_math := ./src/math/Vec.cpp
+inc_math := ./src/math
+inc_dir := ./src ./test
 build_dir := ./build
 lib:=
 
 $(shell mkdir -p $(build_dir))
 
 
-g++ -std=c++0x $(src_files) -I$(inc_dir) $(lib) -o $(build_dir)/	
+test_math:
+	g++ -std=c++0x ./test/catch_math.cpp $(src_math) -I$(inc_math) $(lib) -o $(build_dir)/test_math	
