@@ -16,18 +16,22 @@ Vec::Vec(int dim){
 }
 
 Vec::Vec(const Vec & v){
-  //set to match new vector dimension
-  if( _dim != v._dim ){
-    if( _dim == 1 || _dim == 0 )
-      delete _vec;
-    else if( _dim > 1 )
-      delete [] _vec;
-    
-    _vec = new float[_dim];
-  }
-  
+  _vec = new float[v._dim];
+  _dim = v._dim;
+
   //copy data
-  memcpy( v._vec, _vec, sizeof(float)*_dim );
+  memcpy( _vec, v._vec, sizeof(float)*_dim );
+}
+
+Vec & Vec::operator=(const Vec & v)
+{
+  _vec = new float[v._dim];
+  _dim = v._dim;
+
+  //copy data
+  memcpy( _vec, v._vec, sizeof(float)*_dim );
+
+  return *this;
 }
 
 Vec::~Vec(){

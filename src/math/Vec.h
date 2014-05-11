@@ -13,6 +13,7 @@ class Vec{
   float *       _vec; // vector data
   int           _dim; // vector dimension
   void          SetDim(int); //resize dimension and preserve existing data if possible
+  Vec &         operator = (const Vec & v);
   Vec           operator + (const Vec & v) const;
   Vec           operator - (const Vec & v) const;
   float         Dot(const Vec & v) const;
