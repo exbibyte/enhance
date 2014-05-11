@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "Vec.h"
+#include <math.h>
 
 TEST_CASE( "vector", "[vec]" ) {
 
@@ -64,4 +65,25 @@ TEST_CASE( "vector", "[vec]" ) {
     REQUIRE( c._vec[2] == 10 );
   }  
 
+  SECTION( "magnitude" ) {
+    float expected = sqrt(1+4+9);
+    REQUIRE( a.Magnitude() >= expected - expected * 0.001 );
+    REQUIRE( a.Magnitude() <= expected + expected * 0.001 );
+  }  
+
+  SECTION( "normalize" ) {
+    a.Normalize();
+    Vec c = a;
+
+    float val = 0;
+    
+    for(int i = 0; i < 4; i++){
+      val += c._vec[i]*c._vec[i];
+    }
+    
+    val = sqrt(val);
+
+    REQUIRE( val >= 0.9999 );
+    REQUIRE( val <= 1.0001 );
+  }  
 }
