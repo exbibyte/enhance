@@ -3,20 +3,59 @@
 #include "Vec.h"
 
 TEST_CASE( "vector", "[vec]" ) {
-  
-  Vec a = Vec();
+
+  Vec a = Vec(5);
   Vec b = Vec(4);
+  
+  for( int i = 0; i < 4; i++ ){ 
+    a._vec[i] = i; //0 to 3
+    b._vec[i] = i + 10; //10 to 13
+  }
+  a._vec[4] = 4;
+
+  //resize dim
   a.SetDim(4);
 
-  for( int i = 0; i < 4; i++ ){ 
-    a._vec[i] = i;
-    b._vec[i] = i + 10;
+  SECTION( "resizing dimension" ) {
+    REQUIRE( a._dim == 4 );
+    for( int i = 0; i < 4; i++ ){ 
+      REQUIRE( a._vec[i] == i );
+    }
   }
 
-  Vec c = a+b;
+  SECTION( "addition" ) {
+    Vec c = a+b;
 
-  REQUIRE( c._vec[0] == 10 );
-  REQUIRE( c._vec[1] == 12 );
-  REQUIRE( c._vec[2] == 14 );
-  REQUIRE( c._vec[3] == 16 );
+    REQUIRE( c._vec[0] == 10 );
+    REQUIRE( c._vec[1] == 12 );
+    REQUIRE( c._vec[2] == 14 );
+    REQUIRE( c._vec[3] == 16 );
+  }
+
+  SECTION( "subtraction" ) {
+    Vec c = b-a;
+
+    REQUIRE( c._vec[0] == 10 );
+    REQUIRE( c._vec[1] == 10 );
+    REQUIRE( c._vec[2] == 10 );
+    REQUIRE( c._vec[3] == 10 );
+  }
+
+  SECTION( "dot product" ) {
+    float c = b.Dot(a);
+
+    REQUIRE( c == 74 );
+  }
+
+  
+  SECTION( "cross product" ) {
+    a.SetDim(3);
+    b.SetDim(3);
+    Vec c = b.Cross(a);
+
+    REQUIRE( c._vec[0] == 10 );
+    REQUIRE( c._vec[1] == -20 );
+    REQUIRE( c._vec[2] == 10 );
+  }  
+
 }
