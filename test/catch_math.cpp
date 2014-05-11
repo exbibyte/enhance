@@ -13,18 +13,24 @@ TEST_CASE( "vector", "[vec]" ) {
   }
   a._vec[4] = 4;
 
-  //resize dim
-  a.SetDim(4);
-
   SECTION( "resizing dimension" ) {
+    a.SetDim(4);
     REQUIRE( a._dim == 4 );
     for( int i = 0; i < 4; i++ ){ 
       REQUIRE( a._vec[i] == i );
     }
   }
 
-  SECTION( "addition" ) {
-    Vec c = a+b;
+  a.SetDim(4);
+  Vec copied = a;
+  SECTION( "copy"){
+    for( int i = 0; i < 4; i++ ){ 
+      REQUIRE( copied._vec[i] == a._vec[i] );
+    }    
+  }
+
+  SECTION( "adddition" ) {
+    Vec c = copied+b;
 
     REQUIRE( c._vec[0] == 10 );
     REQUIRE( c._vec[1] == 12 );
@@ -33,7 +39,7 @@ TEST_CASE( "vector", "[vec]" ) {
   }
 
   SECTION( "subtraction" ) {
-    Vec c = b-a;
+    Vec c = b-copied;
 
     REQUIRE( c._vec[0] == 10 );
     REQUIRE( c._vec[1] == 10 );
@@ -42,16 +48,16 @@ TEST_CASE( "vector", "[vec]" ) {
   }
 
   SECTION( "dot product" ) {
-    float c = b.Dot(a);
+    float c = b.Dot(copied);
 
     REQUIRE( c == 74 );
   }
 
   
   SECTION( "cross product" ) {
-    a.SetDim(3);
+    copied.SetDim(3);
     b.SetDim(3);
-    Vec c = b.Cross(a);
+    Vec c = b.Cross(copied);
 
     REQUIRE( c._vec[0] == 10 );
     REQUIRE( c._vec[1] == -20 );
