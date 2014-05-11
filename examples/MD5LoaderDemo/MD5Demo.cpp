@@ -27,10 +27,12 @@ void init(int argc, char **argv) {
   lastTime = glutGet(GLUT_ELAPSED_TIME);
 
   // load mesh and some animations
-  md5.loadMesh("qshambler.md5mesh");
-  md5.loadAnim("qshambler_attack01.md5anim");
-  md5.loadAnim("qshambler_idle02.md5anim");
-  md5.loadAnim("qshambler_walk.md5anim");
+  md5.loadMesh("lightning.md5mesh");
+  md5.loadAnim("lightning.md5anim");
+  // md5.loadMesh("qshambler.md5mesh");
+  // md5.loadAnim("qshambler_attack01.md5anim");
+  // md5.loadAnim("qshambler_idle02.md5anim");
+  // md5.loadAnim("qshambler_walk.md5anim");
   md5.setAnim(0);
 
   // set necessary OpenGL states
