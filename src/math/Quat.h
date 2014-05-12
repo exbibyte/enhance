@@ -1,3 +1,5 @@
+// adapted from MD5 Loader Demo By A.J. Tavakoli
+
 #ifndef QUAT_H
 #define QUAT_H
 
