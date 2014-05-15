@@ -29,6 +29,46 @@ void Lex::readString(std::ifstream &fin, std::string &str) {
   } while ( c != '"' );
 }
 
+// reads in an integer terminal and returns its value
+int Lex::readInt(std::ifstream &fin) {
+  std::string str;
+  TOKEN t = getNextToken(fin, &str);
+
+  if ( t != TOKEN_INT )
+    throw Exception("Lex::readInt(): expected integer");
+
+  return atoi( str.c_str() );
+}
+
+
+// reads in a float terminal and returns its value
+float Lex::readFloat(std::ifstream &fin) {
+  std::string str;
+  TOKEN t = getNextToken(fin, &str);
+
+  // integer tokens are just numbers with out a decimal point, so they'll
+  // suffice here as well
+  if ( t != TOKEN_FLOAT && t != TOKEN_INT )
+    throw Exception("Lex::readFloat(): expected float");
+
+  float f = 0.0f;
+  sscanf(str.c_str(), "%f", &f);
+
+  return f;
+}
+
+
+// reads in sequence consisting of n floats enclosed by parentheses
+void Lex::readVec(std::ifstream &fin, float *v, int n) {
+  if ( getNextToken(fin) != TOKEN_LPAREN )
+    throw Exception("Lex::readVec(): expected '('");
+
+  for ( int i=0; i < n; i++ )
+    v[i] = readFloat(fin);
+
+  if ( getNextToken(fin) != TOKEN_RPAREN )
+    throw Exception("Lex::readVec(): expected ')'");
+}
 
 void Lex::skipComments(std::ifstream &fin) {
   char c;
@@ -180,35 +220,4 @@ Lex::TOKEN Lex::getNextToken(std::ifstream &fin, std::string *tokStr) {
   }
 
   return TOKEN_INVALID;
-}
-
-
-void Lex::LoadFile(const char *filename) {
-
-  std::cout<<"here!"<<std::endl;
-
-  // sanity check
-  if ( !filename )
-    throw Exception ("Lex::loadMesh(): filename is NULL");
-
-  // attempt to open file for reading
-  std::ifstream fin(filename, std::ifstream::in);
-
-  // was open successful?
-  if ( !fin.is_open() ) {
-    std::string msg = std::string("Lex::loadMesh(): unable to open ") +
-                      std::string(filename) + std::string(" for reading");
-    throw Exception (msg);
-  }
-
-  FileAction();
-  fin.close();
-}
-
-void Lex::FileAction() {
-
-}
-
-void Lex::CloseFile() {
-
 }

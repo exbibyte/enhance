@@ -6,7 +6,7 @@
 
 class Lex{
 
-public:
+protected:
   enum TOKEN { TOKEN_KEYWORD,
                TOKEN_INT,
                TOKEN_FLOAT,
@@ -19,13 +19,13 @@ public:
 
   // methods for lexer
   void                          readString( std::ifstream &fin, std::string &str );
+  int                           readInt(std::ifstream &fin);
+  float                         readFloat(std::ifstream &fin);
+  void                          readVec(std::ifstream &fin, float *v, int n);
+
   void                          skipComments( std::ifstream &fin );
   void                          skipWhitespace( std::ifstream &fin );
   TOKEN                         getNextToken( std::ifstream &fin, std::string *tokStr = NULL );
-
-  void                          LoadFile( const char *filename );
-  void                          CloseFile();
-  virtual void                  FileAction();
 
   class Exception : public std::runtime_error {
   public:

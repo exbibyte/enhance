@@ -7,10 +7,11 @@
 #include <stdexcept>
 #include <vector>
 #include <fstream>
+
 #include "Quat.h"
+#include "Lex.h"
 
-
-class MD5Model {
+class MD5Model : public Lex {
 public:
   MD5Model();
   ~MD5Model();
@@ -31,15 +32,6 @@ public:
   };
 
 protected:
-  enum TOKEN { TOKEN_KEYWORD,
-               TOKEN_INT,
-               TOKEN_FLOAT,
-               TOKEN_STRING,
-               TOKEN_LBRACE,
-               TOKEN_RBRACE,
-               TOKEN_LPAREN,
-               TOKEN_RPAREN,
-               TOKEN_INVALID };
 
   class Vertex {
   public:
@@ -122,15 +114,6 @@ protected:
   void  readBoundsEl(std::ifstream &fin, Anim &anim);
   void  readBaseframeEl(std::ifstream &fin, Anim &anim);
   void  readFrameEl(std::ifstream &fin, Anim &anim);
-  int   readInt(std::ifstream &fin);
-  float readFloat(std::ifstream &fin);
-  void  readVec(std::ifstream &fin, float *v, int n);
-
-  // methods for lexer
-  void readString(std::ifstream &fin, std::string &str);
-  void skipComments(std::ifstream &fin);
-  void skipWhitespace(std::ifstream &fin);
-  TOKEN getNextToken(std::ifstream &fin, std::string *tokStr=NULL);
 
   // utility method to compute w component of a normalized quaternion
   Quat buildQuat(float x, float y, float z) const;
