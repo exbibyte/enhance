@@ -8,6 +8,10 @@
 #include <vector>
 #include <fstream>
 
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glut.h> 
+
 #include "Quat.h"
 #include "Lex.h"
 
@@ -69,6 +73,9 @@ protected:
     std::vector<Vertex> verts;
     std::vector<Tri> tris;
     std::vector<Weight> weights;
+    GLuint * textureID_p;   //texture object
+    GLuint textureID;
+    void LoadTexture();
   };
   
   class Frame {
@@ -129,8 +136,6 @@ protected:
   int currFrame;
   float animTime;
   Frame interpFrame; // used to interpolate between frames
-
-  std::string textureName;
 
   std::vector<Mesh*> meshes;
   std::vector<Joint> joints;

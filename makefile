@@ -1,12 +1,14 @@
 src_files := $(wildcard ./src/*.cpp)
 src_math_folder := ./src/math
 src_file_folder := ./src/file
+src_ui_folder := ./src/ui
 
 inc_math := ./src/math
 inc_file := ./src/file
+inc_ui := ./src/ui
 
 build_dir := ./build
-lib:=
+lib:= -lGL -lGLU -lGLEW -lglut
 
 $(shell mkdir -p $(build_dir))
 
@@ -19,3 +21,6 @@ test_quat:
 
 test_lex:
 	g++ -std=c++0x ./test/testlex.cpp $(src_file_folder)/Lex.cpp -I$(inc_file) $(lib) -o $(build_dir)/test_lex	
+
+md5demo:
+	g++ -std=c++0x ./test/MD5Demo.cpp $(src_file_folder)/Lex.cpp $(src_file_folder)/MD5Model.cpp $(src_file_folder)/PPM.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/md5demo

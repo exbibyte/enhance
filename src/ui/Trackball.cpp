@@ -5,9 +5,17 @@
 
 /////////////////////////////////////
 
+
+Trackball::Trackball() {
+  lastPos.SetDim(3);
+  lastPos._vec[0] = 0.0f;
+  lastPos._vec[1] = 0.0f;
+  lastPos._vec[2] = 0.0f;
+}
+
 // move() should be called whenever the mouse is moving
 void Trackball::move(int x, int y, int w, int h) {
-   Vector3 currPos, d;
+   Vec currPos, d;
 
    // map x, y onto hemi-sphere
    pToV(x, y, w, h, currPos);
@@ -18,26 +26,26 @@ void Trackball::move(int x, int y, int w, int h) {
    // create a quaternion to represent the rotation
    Quat currQuat;
 
-   if ( fabsf(d.c[0]) > 0.01f || fabs(d.c[1]) > 0.01f || fabsf(d.c[2]) > 0.01f ) {
+   if ( fabsf(d._vec[0]) > 0.01f || fabs(d._vec[1]) > 0.01f || fabsf(d._vec[2]) > 0.01f ) {
       // compute angle
-      float angle = (float)acos( double(lastPos*currPos/(lastPos.mag()*currPos.mag())) );
+     float angle = (float)acos( double(lastPos.Dot(currPos)/(lastPos.Magnitude()*currPos.Magnitude())) );
       
       // convert angle from radians to degrees
       angle *= 180.0f/3.14f;
 
       // calculate axis to rotate about from last position vector and
       // current position vector
-      Vector3 axis;
-      axis.cross(lastPos, currPos);
+      Vec axis;
+      axis = lastPos.Cross(currPos);
 
       // set last position
       lastPos = currPos;
 
       // normalize axis of rotation
-      axis.normalize();   
+      axis.Normalize();   
 
       // build a quaternion from the axis, angle pair
-      currQuat.buildFromAxisAngle(axis.c, angle);
+      currQuat.AxisAngleDegree(axis._vec, angle);
 
       // store all rotations up to this point in
       // q
@@ -49,30 +57,30 @@ void Trackball::move(int x, int y, int w, int h) {
 
 // stores trackball's transformation matrix in mat.
 void Trackball::look(float *mat) {   
-   q.toMatrix(mat);   
+   q.ToMatrix(mat);   
 } // Trackball::look()
 
 //////////////////////////////////
 
 // project cursor position (x and y) onto trackball hemi-sphere
-void Trackball::pToV(int x, int y, int w, int h, Vector3 &p) {
+void Trackball::pToV(int x, int y, int w, int h, Vec &p) {
    float fX = (float)x, fY = (float)y,
          fW = (float)w, fH = (float)h;
 
-   p.c[0] = (2.0f*fX - fW)/fW;
-   p.c[1] = (fH - 2.0f*fY)/fH;
+   p._vec[0] = (2.0f*fX - fW)/fW;
+   p._vec[1] = (fH - 2.0f*fY)/fH;
 
    // find distance from origin to selected x, y
-   float d = (float)sqrt( double(p.c[0]*p.c[0] + p.c[1]*p.c[1]) );
+   float d = (float)sqrt( double(p._vec[0]*p._vec[0] + p._vec[1]*p._vec[1]) );
 
    // Find height of selected point on hemi-sphere.  If
    // the cursor is outside of the hemi-sphere (distance of
    // selected x, y from origin is greater than 1) just use
    // a distance of 1.  The cosine of this distance*PI/2 gives
    // the height of the selected point.
-   p.c[2] = (float)cos( double((PI/2.0f) * ( (d < 1.0f) ? d : 1.0f)) );
+   p._vec[2] = (float)cos( double((PI/2.0f) * ( (d < 1.0f) ? d : 1.0f)) );
    
-   p.normalize();
+   p.Normalize();
 } // Trackball::pToV()
 
 //////////////////////////////////

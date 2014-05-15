@@ -19,6 +19,8 @@
 
 #include "MD5Model.h"
 #include "Lex.h"
+#include "Quat.h"
+#include "PPM.hpp"
 
 #define IS_WHITESPACE(c) (' ' == c || '\t' == c || '\r' ==c || '\n' == c )
 
@@ -99,7 +101,7 @@ void MD5Model::animate(float dt) {
     interpJoint.pos[1] = pos1[1] + animTime*(pos2[1] - pos1[1]);
     interpJoint.pos[2] = pos1[2] + animTime*(pos2[2] - pos1[2]);
 
-    interpJoint.quat = slerp(frame.joints[i].quat, nextFrame.joints[i].quat, animTime);
+    interpJoint.quat = Slerp(frame.joints[i].quat, nextFrame.joints[i].quat, animTime);
   }
 
   buildVerts(interpFrame);
@@ -146,8 +148,12 @@ void MD5Model::render() {
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
 
+  glEnable( GL_TEXTURE_2D );
+
   for( size_t i=0; i < meshes.size(); i++ ) {
     const Mesh *mesh = meshes[i];
+
+    glBindTexture( GL_TEXTURE_2D, mesh->textureID);
 
     glVertexPointer(3, GL_FLOAT, GLsizei(sizeof(Vertex)), mesh->verts[0].pos);
     glNormalPointer(GL_FLOAT, GLsizei(sizeof(Vertex)), mesh->verts[0].n);
@@ -196,6 +202,11 @@ void MD5Model::loadMesh(const char *filename) {
 
   // read in all of the MD5Model elements
   readElements(fin);
+
+  //load textures
+  for(int i = 0; i < this->meshes.size(); i++) {
+    this->meshes[i]->LoadTexture();
+  }
 
   // close input file (should be done destructor anyway...)
   fin.close();
@@ -535,6 +546,9 @@ void MD5Model::readMeshEl(std::ifstream &fin) {
       std::string shader;
       if ( getNextToken(fin, &shader) != TOKEN_STRING )
         throw Exception("MD5Model::readMeshEl(): expected string to follow 'shader'");
+      
+      mesh->texture = shader;
+
     }
     else if ( str == "numverts" ) {
       if ( mesh->verts.size() > 0 )
@@ -724,7 +738,7 @@ void MD5Model::buildVerts() {
         Joint &joint = joints[w.joint];
         
         Quat q(w.pos[0], w.pos[1], w.pos[2], 0.0f);
-        Quat result = joint.quat*q*joint.quat.conjugate();
+        Quat result = joint.quat*q*joint.quat.Conjugate();
         v.pos[0] += (joint.pos[0] + result[0])*w.w;
         v.pos[1] += (joint.pos[1] + result[1])*w.w;
         v.pos[2] += (joint.pos[2] + result[2])*w.w;
@@ -745,7 +759,7 @@ void MD5Model::buildVerts(Frame &frame) {
         Joint &joint = frame.joints[w.joint];
         
         Quat q(w.pos[0], w.pos[1], w.pos[2], 0.0f);
-        Quat result = joint.quat*q*joint.quat.conjugate();
+        Quat result = joint.quat*q*joint.quat.Conjugate();
         v.pos[0] += (joint.pos[0] + result[0])*w.w;
         v.pos[1] += (joint.pos[1] + result[1])*w.w;
         v.pos[2] += (joint.pos[2] + result[2])*w.w;
@@ -855,7 +869,7 @@ void MD5Model::buildFrames(Anim &anim) {
   
         // rotate position (qp is quaternion representation of position)
         Quat qp(pos[0], pos[1], pos[2], 0.0f);
-        Quat result = parent.quat*qp*parent.quat.conjugate();
+        Quat result = parent.quat*qp*parent.quat.Conjugate();
   
         frameJoint.pos[0] = result[0] + parent.pos[0];
         frameJoint.pos[1] = result[1] + parent.pos[1];
@@ -863,7 +877,7 @@ void MD5Model::buildFrames(Anim &anim) {
   
         // store orientation of this joint
         frameJoint.quat = parent.quat*q;
-        frameJoint.quat.normalize();
+        frameJoint.quat.Normalize();
       } // else
     } // for
   } // for
@@ -876,7 +890,7 @@ Quat MD5Model::buildQuat(float x, float y, float z) const {
   w = w < 0.0 ? 0.0f : (float)-sqrt( double(w) );
 
   Quat q(x, y, z, w);
-  q.normalize();
+  q.Normalize();
 
   return q;
 }
@@ -886,5 +900,44 @@ MD5Model::Anim::Anim():
      numFrames(0),
      frameRate(0),
      numAnimatedComponents(0) {
+
+}
+
+void MD5Model::Mesh::LoadTexture()
+/**
+Load texture image files and bind to OpenGL
+*/
+{ 
+  glEnable( GL_TEXTURE_2D );
+
+  //get number of files to load
+  this->textureID_p = & this->textureID;
+
+  //generate texture holders
+  glGenTextures(1,this->textureID_p);
+
+  //get texture from file
+  std::string FileName = this->texture;
+  int width;
+  int height;
+  GLubyte * ImgData = PPM::Read(FileName, width, height);
+  
+  //bind texture to current texture holder
+  glBindTexture(GL_TEXTURE_2D, this->textureID);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  //pass texture to openGL
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ImgData);
+
+  //let opengl automatically build mipmap
+  glGenerateMipmap(GL_TEXTURE_2D);
+    
+  //delte image data
+  delete [] ImgData;
+  ImgData = NULL;
 
 }

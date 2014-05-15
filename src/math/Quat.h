@@ -24,6 +24,7 @@ class Quat{
   void              Normalize();
   Quat              Pow( float t );
   void              ToMatrix( float mat[] ) const;
+  inline Quat       Conjugate() const { return Quat(-_quat[0], -_quat[1], -_quat[2], _quat[3]); }
 };
 
 Quat                Slerp(const Quat & q1, const Quat & q2, float t);

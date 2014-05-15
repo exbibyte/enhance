@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 #include <string>
-class Vec{
+class Vec {
 
  public:
                 Vec(); // default 3D vector
@@ -18,6 +18,7 @@ class Vec{
   Vec           operator - (const Vec & v) const;
   float         Dot(const Vec & v) const;
   Vec           Cross(const Vec & v) const;
+
   float         Magnitude() const;
   bool          Normalize();
 

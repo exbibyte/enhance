@@ -5,7 +5,7 @@
 #define TRACKBALL_H
 
 #include <cmath>
-#include "Vector3.h"
+#include "Vec.h"
 #include "Quat.h"
 
 #define PI 3.14159265f
@@ -13,16 +13,16 @@
 
 class Trackball {
 public:
-   Trackball(): lastPos(0.0f, 0.0f, 0.0f) { }
-   ~Trackball() { }
+   Trackball();
+   ~Trackball() { };
 
    void move(int x, int y, int w, int h);
    void look(float *mat);   
    void startMotion(int x, int y, int w, int h);   
 private:
-   void pToV(int x, int y, int w, int h, Vector3 &p);
+   void pToV(int x, int y, int w, int h, Vec &p);
 
-   Vector3 lastPos;
+   Vec lastPos;
    Quat q;
 }; // Trackball
 
