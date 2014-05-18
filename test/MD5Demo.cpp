@@ -29,6 +29,8 @@ void init(int argc, char **argv) {
   // load mesh and some animations
   md5.loadMesh("testcase/lightning.md5mesh");
   md5.loadAnim("testcase/lightning.md5anim");
+
+  // md5.ignoreTexture = true;
   // md5.loadMesh("testcase/qshambler.md5mesh");
   // md5.loadAnim("testcase/qshambler_attack01.md5anim");
   // md5.loadAnim("testcase/qshambler_idle02.md5anim");
@@ -43,10 +45,10 @@ void init(int argc, char **argv) {
   glEnable(GL_LIGHT0);
 
   // light parameters
-  GLfloat lightAmbient []= { 0.4f,  0.4f, 0.4f, 1.0f };
-  GLfloat lightDiffuse []= { 0.7f,  0.7f, 0.7f, 1.0f };
-  GLfloat lightPosition[]= { 0.0f, -1.0f, 0.0f, 0.0f }; // direction light
-  GLfloat lightSpecular[]= { 0.3f,  0.3f, 0.3f, 1.0f };
+  GLfloat lightAmbient []= { 0.7f,  0.7f, 0.7f, 1.0f };
+  GLfloat lightDiffuse []= { 1.0f,  1.0f, 1.0f, 1.0f };
+  GLfloat lightPosition[]= { 1.0f, -1.0f, 0.0f, 0.0f }; // direction light
+  GLfloat lightSpecular[]= { 0.5f,  0.5f, 0.5f, 1.0f };
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
   glLightfv(GL_LIGHT0, GL_AMBIENT,  lightAmbient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE,  lightDiffuse);

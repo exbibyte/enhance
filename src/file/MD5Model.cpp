@@ -204,8 +204,10 @@ void MD5Model::loadMesh(const char *filename) {
   readElements(fin);
 
   //load textures
-  for(int i = 0; i < this->meshes.size(); i++) {
-    this->meshes[i]->LoadTexture();
+  if(this->ignoreTexture == false) {
+    for(int i = 0; i < this->meshes.size(); i++) {
+      this->meshes[i]->LoadTexture();
+    }
   }
 
   // close input file (should be done destructor anyway...)

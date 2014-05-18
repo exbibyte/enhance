@@ -28,6 +28,8 @@ public:
   void animate(float dt);
   void render();
 
+  bool ignoreTexture = false;
+
   inline int getNumAnims() const { return int(anims.size()); }
 
   class Exception : public std::runtime_error {
