@@ -178,8 +178,12 @@ void Quat::ToMatrix( float mat[] ) const{
 Quat Slerp( const Quat & q1, const Quat & q2, float t ){
   Quat result, p2 = q2;
 
+  //q2 = q1 * result
+  //result = conj(q1)*q2
+  //omega = half angle between the 2 quaternions 
   float cosOmega = q1._quat[3]*q2._quat[3] + q1._quat[0]*q2._quat[0] + q1._quat[1]*q2._quat[1] + q1._quat[2]*q2._quat[2];
 
+  //inverted case
   if ( cosOmega < 0.0f ) {
     p2._quat[0] = -p2._quat[0];
     p2._quat[1] = -p2._quat[1];
