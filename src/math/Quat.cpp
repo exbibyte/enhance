@@ -18,6 +18,27 @@ Quat::Quat( float x, float y, float z, float w ){
   _quat[3] = w;
 }
 
+Quat::Quat( Vec v, float w ){
+  _quat[0] = v._vec[0];
+  _quat[1] = v._vec[1];
+  _quat[2] = v._vec[2];
+  _quat[3] = w;
+}
+
+Quat::Quat( const Quat & q ){
+  _quat[0] = q[0];
+  _quat[1] = q[1];
+  _quat[2] = q[2];
+  _quat[3] = q[3];
+}
+
+Quat & Quat::operator = ( const Quat & q ) {
+  for( int i = 0; i < 4; i++ ){
+    _quat[i] = q._quat[i];
+  }
+  return *this;
+}
+
 Quat Quat::operator - ( const Quat & q ) const{
   Quat r = *this;
 
@@ -28,6 +49,15 @@ Quat Quat::operator - ( const Quat & q ) const{
   return r;
 }
 
+Quat & Quat::operator -= ( const Quat & q ) {
+
+  for( int i = 0; i < 4; i++ ){
+    _quat[i] -= q._quat[i];
+  }
+  
+  return *this;
+}
+
 Quat Quat::operator + ( const Quat & q ) const{
   Quat r = *this;
 
@@ -36,6 +66,15 @@ Quat Quat::operator + ( const Quat & q ) const{
   }
   
   return r;
+}
+
+Quat & Quat::operator += ( const Quat & q ) {
+
+  for( int i = 0; i < 4; i++ ){
+    _quat[i] += q._quat[i];
+  }
+  
+  return *this;
 }
 
 Quat Quat::operator * ( const Quat & q ) const{
@@ -49,7 +88,7 @@ Quat Quat::operator * ( const Quat & q ) const{
   return r;
 }
 
-const Quat & Quat::operator *= ( const Quat & q ) {
+Quat & Quat::operator *= ( const Quat & q ) {
   
   float w = _quat[3] * q._quat[3] - _quat[0] * q._quat[0] - _quat[1] * q._quat[1] - _quat[2] * q._quat[2];
   float x = _quat[3] * q._quat[0] + _quat[0] * q._quat[3] + _quat[1] * q._quat[2] - _quat[2] * q._quat[1];
@@ -61,7 +100,7 @@ const Quat & Quat::operator *= ( const Quat & q ) {
   _quat[2] = z;
   _quat[3] = w;
 
-  return (*this);
+  return *this;
 }
 
 void Quat::AxisAngleDegree( const float axis[], float angle ){
@@ -173,6 +212,28 @@ void Quat::ToMatrix( float mat[] ) const{
   mat[13] = 0;  
   mat[14] = 0;  
   mat[15] = 1.0f;
+}
+
+Quat Quat::Negate() const {
+  return Quat( -_quat[0], -_quat[1], -_quat[2], -_quat[3] );
+}
+
+Quat Interpolate( const Quat q1, const Quat q2, float r ){
+  Quat q;
+
+  for( int i = 0 ; i < 4; i++) {
+    q._quat[i] = (1-r) * q1._quat[i] + r * q1._quat[i];
+  }
+
+  return q;
+}
+ 
+Quat Scale( float s, const Quat q ){
+  return Quat( s * q._quat[0], s * q._quat[1], s * q._quat[2], s * q._quat[3] );
+}
+
+Quat ScaleAdd( float s, const Quat q1, const Quat q2 ){
+  return Quat( s * q1._quat[0] + q2._quat[0], s * q1._quat[1] + q2._quat[1], s * q1._quat[2] + q2._quat[2], s * q1._quat[3] + q2._quat[3] );
 }
 
 Quat Slerp( const Quat & q1, const Quat & q2, float t ){
