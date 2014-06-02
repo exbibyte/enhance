@@ -147,20 +147,42 @@ float Vec::Magnitude() const{
   return sqrt(out);
 }
 
-bool Vec::Normalize(){
+void Vec::NormalizeThis(){
+  Vec v = Normalize();
+  *this = v;
+}
+
+Vec Vec::Normalize() const {
+
+  Vec v( *this );
+
   float mag = this->Magnitude();
 
   if( mag == 0 ){
     throw Exception( "Vec::Normalize(): magnitude is 0" );
-    return false;
+    return v;
   }
 
-  float * a = _vec;
+  float * a = v._vec;
 
-  for( int i = 0; i < _dim; i++ ){
+  for( int i = 0; i < v._dim; i++ ){
     *a = *a/mag;
     a++;
   }
   
-  return true;
+  return v;
+}
+
+
+Vec ScaleVec( float s, const Vec v ){
+  Vec a;
+  a = v;
+  for( int i = 0; i < v._dim; i++ ){
+    a[i] = s * a[i];
+  }
+  return a;
+}
+Vec ScaleVecAdd( float s, const Vec v1, const Vec v2 ){
+  Vec a = ScaleVec( s, v1 );
+  return a + v2;
 }
