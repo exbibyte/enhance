@@ -16,6 +16,8 @@ class Vec {
   Vec &         operator = (const Vec & v);
   Vec           operator + (const Vec & v) const;
   Vec           operator - (const Vec & v) const;
+  inline float &    operator [] ( int i ){ return _vec[i]; };
+  inline float      operator [] ( int i ) const{ return _vec[i]; };
   float         Dot(const Vec & v) const;
   Vec           Cross(const Vec & v) const;
 
