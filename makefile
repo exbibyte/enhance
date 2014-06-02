@@ -13,8 +13,8 @@ lib:= -lGL -lGLU -lGLEW -lglut
 $(shell mkdir -p $(build_dir))
 
 
-test_math:
-	g++ -std=c++0x ./test/catch_math.cpp $(src_math_folder)/Vec.cpp -I$(inc_math) $(lib) -o $(build_dir)/test_math	
+test_vec:
+	g++ -std=c++0x ./test/catch_vec.cpp $(src_math_folder)/Vec.cpp -I$(inc_math) $(lib) -o $(build_dir)/test_vec	
 
 test_quat:
 	g++ -std=c++0x ./test/catch_quat.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp -I$(inc_math) -o $(build_dir)/test_quat	
