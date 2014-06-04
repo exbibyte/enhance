@@ -25,13 +25,16 @@ class Vec {
   void          NormalizeThis(); //normalize current vec
   Vec           Normalize() const; //return a normalize vec
 
+  void          SetFromArray(int dim, float array[] ); //copy from array
+  void          GetArray(int & dim, float * & array ) const; //copy to array
+
   class Exception : public std::runtime_error {
   public:
     Exception(const std::string &msg): std::runtime_error(msg) { }
   };
 };
 
-  Vec           ScaleVec(float s, const Vec v) //s * v
-  Vec           ScaleVecAdd(float s, const Vec v1, const Vec v2)//s * v1 + v2
+  Vec           ScaleVec(float s, const Vec v); //s * v
+  Vec           ScaleVecAdd(float s, const Vec v1, const Vec v2);//s * v1 + v2
 
 #endif

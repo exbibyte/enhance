@@ -86,4 +86,35 @@ TEST_CASE( "vector", "[vec]" ) {
     REQUIRE( val >= 0.9999 );
     REQUIRE( val <= 1.0001 );
   }  
+
+  SECTION( "copy from array" ) {
+    float test_array[5] = {4,3,2,1,0};
+    
+    Vec copiedArray;
+    copiedArray.SetFromArray( 5, test_array );
+
+    for( int i = 0; i < 5; i++ ){
+      REQUIRE( copiedArray._vec[i] == 4 - i );
+    }  
+  }
+
+  SECTION( "copy to array" ) {
+    float * test_array;
+    
+    Vec copiedArray;
+    copiedArray.SetDim(7);
+
+    for( int i = 0; i < 7; i++ ){
+      copiedArray._vec[i] = i;
+    }
+
+    int dim;
+    copiedArray.GetArray(dim, test_array );
+
+    REQUIRE( dim == 7 );
+
+    for( int i = 0; i < 7; i++ ){
+      REQUIRE( test_array[i] == i );
+    }
+  }
 }

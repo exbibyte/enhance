@@ -173,6 +173,20 @@ Vec Vec::Normalize() const {
   return v;
 }
 
+void Vec::SetFromArray(int dim, float array [] ) {
+  SetDim( dim );
+  for( int i = 0; i < dim; i++ ){
+    _vec[i] = array[i];
+  }
+}
+
+void Vec::GetArray(int & dim, float * & array ) const {
+  dim = _dim;
+  array = new float[dim];
+  for( int i = 0; i < dim; i++ ){
+    array[i] = _vec[i];
+  }
+}
 
 Vec ScaleVec( float s, const Vec v ){
   Vec a;
