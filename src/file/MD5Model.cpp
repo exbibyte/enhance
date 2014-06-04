@@ -879,7 +879,7 @@ void MD5Model::buildFrames(Anim &anim) {
   
         // store orientation of this joint
         frameJoint.quat = parent.quat*q;
-        frameJoint.quat.Normalize();
+        frameJoint.quat.NormalizeQuatCurrent();
       } // else
     } // for
   } // for
@@ -892,7 +892,7 @@ Quat MD5Model::buildQuat(float x, float y, float z) const {
   w = w < 0.0 ? 0.0f : (float)-sqrt( double(w) );
 
   Quat q(x, y, z, w);
-  q.Normalize();
+  q.NormalizeQuatCurrent();
 
   return q;
 }
