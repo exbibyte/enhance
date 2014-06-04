@@ -51,11 +51,12 @@ class DualQuat{
 
   DualQuat          Invert() const; //gets inverse where q^-1 * q = q * q^-1 = 1 + e0
 
-  /* void              ScLerp( DualQuat & q1, DualQuat & q2, float t); */
   DualQuat          PowFloat(double e) const; ///Raises the supplied quaternion to the power e according to euler's formula, this applies to unit quaternions. q = [ cos(theta/2), sin(theta/2)Screwaxis ] + eps [ -alpha/2*sin(theta/2), sin(theta/2)Moment + alpha/2*cos(theta/2)Screwaxis ]
 
   float             GetScrewParameters( Vec & screwaxix, Vec & moment, Vec & angles ); // returns norm of _A._quat's x,y,z 
   void              SetScrewParameters( Vec & screwaxis, Vec & moment, float theta, float alpha );
+
+  void              GetRigidTransform( float a [] ); //convert to rigid transform in a column major array representing 4x4 mat
 
   class Exception : public std::runtime_error {
   public:
