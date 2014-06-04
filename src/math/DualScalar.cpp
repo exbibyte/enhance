@@ -120,7 +120,7 @@ float DualScalar::Norm() const {
 DualScalar DualScalar::Sqrt() const {
   DualScalar s;
   s._a = sqrt(_a);
-  s._b = _b/(2 * s._a);
+  s._b = _b/(2 * s._a); //not sure about this equation
   return s;
 }
 

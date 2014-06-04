@@ -3,11 +3,10 @@
 /// Dual number: d = a + e*b, ported from Antonio Sanchez's Java file
 class DualScalar {
 
- private:
+ public:
   float               _a;
   float               _b;
 
- public:
                       DualScalar();
                       DualScalar( float a, float b ); //construct dual number a + e*b
 		      DualScalar( DualScalar & d ); //copy dual number
