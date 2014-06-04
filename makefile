@@ -20,7 +20,7 @@ test_quat:
 	g++ -std=c++0x ./test/catch_quat.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp -I$(inc_math) -o $(build_dir)/test_quat	
 
 test_dualquat:
-	g++ -std=c++0x ./test/catch_dualquat.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_math_folder)/DualQuat.cpp -I$(inc_math) -o $(build_dir)/test_dualquat	
+	g++ -std=c++0x ./test/catch_dualquat.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_math_folder)/DualScalar.cpp $(src_math_folder)/DualQuat.cpp -I$(inc_math) -o $(build_dir)/test_dualquat	
 
 test_lex:
 	g++ -std=c++0x ./test/testlex.cpp $(src_file_folder)/Lex.cpp -I$(inc_file) $(lib) -o $(build_dir)/test_lex	
