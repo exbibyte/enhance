@@ -84,7 +84,8 @@ void displayCallback() {
   if(count <= 100){
     float slerp_t = (float) count/100;
     cout<<"slerp time: "<<slerp_t<<endl;
-    Quat quat_current = Slerp(quat_start, quat_end, slerp_t);
+    Quat quat_current = InterpolateSlerp(quat_start, quat_end, slerp_t);
+    // Quat quat_current = InterpolateBasic(quat_start, quat_end, slerp_t);
     quat_current.ToMatrix(quat_mat);
     count++;
   }

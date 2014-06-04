@@ -43,8 +43,8 @@ class Quat{
 
 Quat                Scale( float s, const Quat q); // s*q
 Quat                ScaleAdd( float s, const Quat q1, const Quat q2 ); //s*q1 + q2
-Quat                Slerp(const Quat & q1, const Quat & q2, float t); //spherical linear interpolation
-Quat                Interpolate( const Quat q1, const Quat q2, float r ); // (1-r) * q1 + r * q2              
+Quat                InterpolateSlerp(const Quat & q1, const Quat & q2, float t); //spherical linear interpolation
+Quat                InterpolateBasic( const Quat q1, const Quat q2, float r ); // (1-r) * q1 + r * q2              
 
 
 #endif

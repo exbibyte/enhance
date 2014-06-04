@@ -260,11 +260,11 @@ Quat Quat::Negate() const {
   return Quat( -_quat[0], -_quat[1], -_quat[2], -_quat[3] );
 }
 
-Quat Interpolate( const Quat q1, const Quat q2, float r ){
+Quat InterpolateBasic( const Quat q1, const Quat q2, float r ){
   Quat q;
 
   for( int i = 0 ; i < 4; i++) {
-    q._quat[i] = (1-r) * q1._quat[i] + r * q1._quat[i];
+    q._quat[i] = (1-r) * q1._quat[i] + r * q2._quat[i];
   }
 
   return q;
@@ -278,7 +278,7 @@ Quat ScaleAdd( float s, const Quat q1, const Quat q2 ){
   return Quat( s * q1._quat[0] + q2._quat[0], s * q1._quat[1] + q2._quat[1], s * q1._quat[2] + q2._quat[2], s * q1._quat[3] + q2._quat[3] );
 }
 
-Quat Slerp( const Quat & q1, const Quat & q2, float t ){
+Quat InterpolateSlerp( const Quat & q1, const Quat & q2, float t ){
   Quat result, p2 = q2;
 
   //q2 = q1 * result
