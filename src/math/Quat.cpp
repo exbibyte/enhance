@@ -139,7 +139,11 @@ void Quat::AxisAngleDegreeVector( const Vec & v, float angle ){
 }
 
 float Quat::Length() const{
-   return (float)sqrt( double(_quat[0]*_quat[0] + _quat[1]*_quat[1] + _quat[2]*_quat[2] + _quat[3]*_quat[3]) );
+  return (float)sqrt( LengthSquared() );
+}
+
+float Quat::LengthSquared() const{
+  return (float) double(_quat[0]*_quat[0] + _quat[1]*_quat[1] + _quat[2]*_quat[2] + _quat[3]*_quat[3]);
 }
 
 void Quat::NormalizeQuatCurrent(){

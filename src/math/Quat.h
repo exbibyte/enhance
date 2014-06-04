@@ -31,6 +31,7 @@ class Quat{
   void              AxisAngleDegree( const float axis[], float angle );
   void              AxisAngleDegreeVector( const Vec & v, float angle );  
   float             Length() const;
+  float             LengthSquared() const;
   void              NormalizeQuatCurrent();
   Quat              NormalizeQuat() const;
   Quat              Log() const; //log(q) = log ||q|| + v/||v|| * arccos(a/||v||)
