@@ -86,7 +86,7 @@ void displayCallback() {
     cout<<"slerp time: "<<slerp_t<<endl;
     Quat quat_current = InterpolateSlerp(quat_start, quat_end, slerp_t);
     // Quat quat_current = InterpolateBasic(quat_start, quat_end, slerp_t);
-    quat_current.ToMatrix(quat_mat);
+    quat_current.ToMatrixRot(quat_mat);
     count++;
   }
   glMultMatrixf(quat_mat);

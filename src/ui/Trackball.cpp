@@ -57,7 +57,7 @@ void Trackball::move(int x, int y, int w, int h) {
 
 // stores trackball's transformation matrix in mat.
 void Trackball::look(float *mat) {   
-   q.ToMatrix(mat);   
+   q.ToMatrixRot(mat);   
 } // Trackball::look()
 
 //////////////////////////////////

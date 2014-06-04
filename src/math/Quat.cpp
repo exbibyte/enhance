@@ -229,7 +229,7 @@ Quat Quat::Pow( float t ){
   return result;
 }
 
-void Quat::ToMatrix( float mat[] ) const{
+void Quat::ToMatrixRot( float mat[] ) const{
 
   // column 1
   mat[ 0] = 1.0f - 2.0f * ( _quat[1] * _quat[1] + _quat[2] * _quat[2] ); 
