@@ -1,5 +1,8 @@
-#include <cmath>
+#include <math.h>
 #include <stdexcept>
+#include <iostream>
+
+using namespace std;
 
 #include "Quat.h"
 #include "Vec.h"
@@ -154,6 +157,35 @@ void Quat::NormalizeQuatCurrent(){
 Quat Quat::NormalizeQuat() const{
   Quat q = *this;
   q.NormalizeQuatCurrent();
+  return q;
+}
+
+Quat Quat::Log() const{
+  Quat q;
+  //set a of quat
+  float q_len = this->Length();
+  q._quat[3] = log( q_len );
+
+  //copy x,y,z of quat into vec
+  Vec v;
+  v.SetDim(3);
+  for( int i = 0; i < 3; i++ ){
+    v[i] = _quat[i];
+  }
+
+  //get v/||v||
+  float v_len = v.Magnitude();
+  v.NormalizeCurrent();
+
+  //get arccos(a/||v||)
+  float m = acos( _quat[3] / q_len );
+  v = ScaleVec( m, v );
+
+  //set x,y,z of quat
+  for( int i = 0; i < 3; i++ ){
+    q._quat[i] = v[i];
+  }
+
   return q;
 }
 

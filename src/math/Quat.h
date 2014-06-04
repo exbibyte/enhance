@@ -33,6 +33,7 @@ class Quat{
   float             Length() const;
   void              NormalizeQuatCurrent();
   Quat              NormalizeQuat() const;
+  Quat              Log() const; //log(q) = log ||q|| + v/||v|| * arccos(a/||v||)
   Quat              Pow( float t );
   void              ToMatrix( float mat[] ) const;
   inline Quat       Conjugate() const { return Quat(-_quat[0], -_quat[1], -_quat[2], _quat[3]); }

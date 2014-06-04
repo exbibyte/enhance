@@ -157,4 +157,36 @@ TEST_CASE( "quaternion", "[quat]" ) {
     REQUIRE( mat[14] == 0 );
     REQUIRE( mat[15] == 1 );    
   }
+
+  SECTION( "log" ) {
+    //log(q) = log ||q|| + v/||v|| * arccos(a/||v||)
+
+    for(int i = 0; i < 3; i++){
+      a._quat[i] = i + 1;
+    }
+    a._quat[3] = 2;
+
+    a = a.Log();
+    REQUIRE( a._quat[3] >= log( sqrt(18.0) ) - 0.0001);
+    REQUIRE( a._quat[3] <= log( sqrt(18.0) ) + 0.0001);
+
+    float v[3];
+    v[0] = 1;
+    v[1] = 2;
+    v[2] = 3;
+
+    Vec w;
+    w.SetFromArray( 3, v );
+    float mag = w.Magnitude();
+
+    for( int i = 0; i < 3; i++ ){
+      v[i] = v[i] / mag * acos( 2.0/sqrt(18.0) );
+    }
+
+    for( int i = 0; i < 3; i++ ){
+      REQUIRE( a._quat[i] >= v[i] - 0.0001);
+      REQUIRE( a._quat[i] <= v[i] + 0.0001);
+    }
+    
+  }
 }
