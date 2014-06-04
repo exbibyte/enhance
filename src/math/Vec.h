@@ -22,7 +22,7 @@ class Vec {
   Vec           Cross(const Vec & v) const;
 
   float         Magnitude() const;
-  void          NormalizeThis(); //normalize current vec
+  void          NormalizeCurrent(); //normalize current vec
   Vec           Normalize() const; //return a normalize vec
 
   void          SetFromArray(int dim, float array[] ); //copy from array

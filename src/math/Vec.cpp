@@ -147,7 +147,7 @@ float Vec::Magnitude() const{
   return sqrt(out);
 }
 
-void Vec::NormalizeThis(){
+void Vec::NormalizeCurrent(){
   Vec v = Normalize();
   *this = v;
 }

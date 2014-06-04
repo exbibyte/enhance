@@ -72,7 +72,7 @@ TEST_CASE( "vector", "[vec]" ) {
   }  
 
   SECTION( "normalize" ) {
-    a.NormalizeThis();
+    a.NormalizeCurrent();
     Vec c = a;
 
     float val = 0;
