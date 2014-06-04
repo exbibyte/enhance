@@ -18,11 +18,11 @@ DualQuat::DualQuat( Vec A, float a, Vec B, float b ){
   SetQuatsVecs( A, a, B, b );
 }
 
-DualQuat( DualQuat & a ){
+DualQuat::DualQuat( DualQuat & a ){
   SetQuats( a._A, a._B );
 }
 
-DualQuat::SetIdentity(){
+void DualQuat::SetIdentity(){
   _A._quat[0] = 0;
   _A._quat[1] = 0;
   _A._quat[2] = 0; 
@@ -34,7 +34,7 @@ DualQuat::SetIdentity(){
   _B._quat[3] = 0;
 }
 
-DualQuat::SetZero(){
+void DualQuat::SetZero(){
   _A._quat[0] = 0;
   _A._quat[1] = 0;
   _A._quat[2] = 0; 
@@ -46,12 +46,12 @@ DualQuat::SetZero(){
   _B._quat[3] = 0;
 }
 
-DualQuat::SetQuats( Quat & a, Quat & b ){
+void DualQuat::SetQuats( Quat & a, Quat & b ){
   _A = a;
   _B = b;
 }
 
-DualQuat::SetQuatsVecs( Vec A, float a, Vec B, float b ){
+void DualQuat::SetQuatsVecs( Vec A, float a, Vec B, float b ){
   if(A._dim < 3 || B._dim < 3){
     SetIdentity();
     cout<<"vector dimension less than 3"<<endl;
@@ -68,12 +68,12 @@ DualQuat::SetQuatsVecs( Vec A, float a, Vec B, float b ){
   }
 }
 
-void DualQuat::SetArray( float [] a ){
+void DualQuat::SetArray( float a [] ){
   _A = Quat( a[0], a[1], a[2], a[3] ); 
   _B = Quat( a[4], a[5], a[6], a[7] );
 }
 
-void DualQuat::GetArray( float [] a ){
+void DualQuat::GetArray( float a [] ) const{
   for( int i = 0; i < 4; i++){
     a[i] = _A._quat[i];
   }
@@ -156,11 +156,11 @@ Quat DualQuat::GetDual() const{
   return Quat( _B._quat[0], _B._quat[1], _B._quat[2], _B._quat[3] );
 }
 
-Quat DualQuat::SetReal( const Quat & q ){
+void DualQuat::SetReal( const Quat & q ){
   _A = q;
 }
 
-Quat DualQuat::SetDual( const Quat & q ){
+void DualQuat::SetDual( const Quat & q ){
   _B = q;
 }
 
@@ -176,7 +176,7 @@ float DualQuat::GetVal( int index ) const{
   }
 }
 
-DualScalar NormSquared() const {
+DualScalar DualQuat::NormSquared() const {
   float a = 0;
   float b = 0;
   for( int i = 0; i < 4; i++ ){
@@ -184,67 +184,76 @@ DualScalar NormSquared() const {
     b += _A._quat[i] * _B._quat[i];
   }
   b *= 2;
-  return DualScalar( a, b );
+  DualScalar d( a, b );
+  return d;
 }
 
-DualScalar Norm() const {
-  DualScalar s = NormSquared();
+DualScalar DualQuat::Norm() const {
+  DualScalar s;
+  s = NormSquared();
   s.Sqrt();
   return s;
 }
 
-DualQuat Normalize() const {
-  DualScalar n = Norm();
+DualQuat DualQuat::Normalize() const {
+  DualQuat q;
+  DualScalar n;
+  n = Norm();
   n = n.Invert();
-  
+  q = ScaleDualScalar( n, q );
+  return q;
 }
 
-/**
- * Screw Linear Interpolation ScLERP between two dual quaternions t represent
- * the normalized distance between the two (t=0.5 is half-way), q =
- * q1*(q1^-1q2)^t. For the shortest distance, q1 and q2 should have the same
- * orientation.
- * 
- */
-// void DualQuat::ScLerp( DualQuat & q1, DualQuat & q2, float t) {
-  
-//   // ScLERP = q1(q1^-1 q2)^t
-//   conjugate(q1);
-  
-//   // correct for shortest distance
-//   *this = *this * q2;
-//   // double d = q1.a * q2.a + q1.A.dot(q2.A);
-//   // if (d < 0) {
-//   // scale(-1);
-//   // }
-//   *this = this->pow(t);
-//   q1 = q1 * *this;  
-// }
+DualQuat DualQuat::Invert() const {
+  DualScalar s;
+  s = NormSquared();
+  s = s.Invert();
+  DualQuat q;
+  q = Conjugate();
+  q = ScaleDualScalar( s, q );
+  return q;
+}
 
+DualQuat ScrewLinearInterpolate( const DualQuat & q1, const DualQuat & q2, float t) { 
 
-// /**
-//  * Raises the supplied quaternion to the power e according to euler's formula
-//  * Note: only applies to unit quaternions
-//  */
+  DualQuat q;
+
+  //q1^-1 * q2
+  q = q1.Conjugate() * q2;
+  // double d = q1.a * q2.a + q1.A.dot(q2.A);
+  // if (d < 0) {
+  // scale(-1);
+  // }
+  q = q.PowFloat(t);
+  q = q1 * q;  
+
+  return q;
+}
+
 DualQuat DualQuat::PowFloat(double e) const {
 
-  DualQuat d = *this;
+  DualQuat d;
+  d = *this;
 
-  double normA = getScrewParameters(ltmp, mtmp, tmp, d);
+  Vec screwaxis;
+  Vec moment;
+  Vec angles;
+
+  double normA = d.GetScrewParameters( screwaxis, moment, angles );
 
   // pure translation
-  if (normA < 1e-15) {
-    d._B.scale(e);
-    d.normalize();
+  if ( normA < 1e-15 ) {
+    d._B = Scale( e, d._B );
+    d.Normalize();
     return d;
   }
 
   // exponentiate
-  double theta = tmp[0] * e;
-  double alpha = tmp[1] * e;
+  double theta = angles[0] * e;
+  double alpha = angles[1] * e;
 
   // convert back
-  d.setScrewParameters(ltmp, mtmp, theta, alpha);
+  d.SetScrewParameters( screwaxis, moment, theta, alpha );
 
   return d;
 }
@@ -252,17 +261,17 @@ DualQuat DualQuat::PowFloat(double e) const {
 float DualQuat::GetScrewParameters(Vec & screwaxis, Vec & moment, Vec & angles ) {
 
   angles.SetDim(2);
-  moment.setDim(3);
+  moment.SetDim(3);
 
   //get quat A.x, A.y, A.z
-  vec q_A;
+  Vec q_A;
   q_A.SetDim(3);
   for( int i = 0; i < 3; i++ ){
     q_A[i] = _A._quat[i];
   }
 
   //get quat B.x, B.y, B.z
-  vec q_B;
+  Vec q_B;
   q_B.SetDim(3);
   for( int i = 0; i < 3; i++ ){
     q_B[i] = _B._quat[i];
@@ -272,20 +281,16 @@ float DualQuat::GetScrewParameters(Vec & screwaxis, Vec & moment, Vec & angles )
 
   // pure translation
   if (normA < 1e-15) {
- 
     screwaxis = q_B.Normalize();
-
     for( int i = 0; i < 3; i++ ){
       moment[i] = 0;
     }    
-
     angles[0] = 0;
     angles[1] = 2 * q_B.Magnitude();
     return normA;
   } else {
-
     screwaxis = q_A.Normalize();
-    angles[0] = 2 * Math.atan2( normA, _A._quat[3] );
+    angles[0] = 2 * atan2( normA, _A._quat[3] );
     //      if (angles[0] > Math.PI / 2) {
     //         angles[0] -= Math.PI;
     //      }
@@ -293,9 +298,26 @@ float DualQuat::GetScrewParameters(Vec & screwaxis, Vec & moment, Vec & angles )
     Vec m1 = ScaleVec( 1.0 / normA, q_B );
     Vec m2 = ScaleVec(  _A._quat[3] * _B._quat[3] / (normA * normA), screwaxis );
     moment = m1 + m2;
-
     return normA;
   }
+}
+
+void DualQuat::SetScrewParameters(Vec & screwaxis, Vec & moment, float theta, float alpha) {
+  float cosa = cos( theta / 2 );
+  float sina = sin( theta / 2 );
+  
+  _A._quat[3] = cosa;
+  for( int i = 0; i < 3; i++ ){
+    _A._quat[i] = sina * screwaxis[i];
+  }
+  
+  _B._quat[3] = -alpha / 2 * sina;
+  for( int i = 0; i < 3; i++ ){
+    _B._quat[i] = sina * moment[i] + alpha / 2 * cosa * screwaxis[i];
+  }
+
+  *this = Normalize();
+
 }
 
 DualQuat ScaleAddDualScalar( const DualScalar & s, const DualQuat & q1, const DualQuat & q2 ) {
