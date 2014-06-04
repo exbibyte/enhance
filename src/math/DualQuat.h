@@ -35,8 +35,8 @@ class DualQuat{
   DualQuat          operator - ( const DualQuat & q ) const;
   DualQuat &        operator -= ( const DualQuat & q );
   DualQuat          operator * ( const DualQuat & q ) const; // non-transitive multiplication q1 * q2 = (q1._A*q2._A, q1._A*q2._B + q1._B*q2._A)
-  DualQuat inline   Conjugate() const{ Quat a (_A.Conjugate()); Quat b (_B.Conjugate()); DualQuat q ( a, b); return q; }
-  void inline       SetConjugate(){ _A = _A.Conjugate(); _B = _B.Conjugate(); }
+  DualQuat inline   Conjugate() const{ Quat a (_A.Conjugate()); Quat b (_B.Conjugate()); DualQuat q ( a, b); return q; } // calculates q^-1
+  void inline       SetConjugate(){ _A = _A.Conjugate(); _B = _B.Conjugate(); } //sets conjugate for current dual quaternion
 
   Quat              GetReal() const;
   Quat              GetDual() const;
@@ -44,10 +44,10 @@ class DualQuat{
   void              SetDual( const Quat & q );
   float             GetVal( int index ) const;
 
-  DualScalar        NormSquared() const;
-  DualScalar        Norm() const;
+  DualScalar        MagnitudeSquared() const; // ||q||^2 =  q * q^-1
+  DualScalar        Magnitude() const; // ||q|| = sqrt(q * q^-1)
 
-  DualQuat          Normalize() const; // normalize to ||mag|| = 1+ e*0
+  DualQuat          Normalize() const; // normalize to ||q|| = 1+ e*0
 
   DualQuat          Invert() const; //gets inverse where q^-1 * q = q * q^-1 = 1 + e0
 

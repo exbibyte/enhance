@@ -31,7 +31,7 @@ void DualQuat::SetIdentity(){
   _B._quat[0] = 0;
   _B._quat[1] = 0;
   _B._quat[2] = 0; 
-  _B._quat[3] = 0;
+  _B._quat[3] = 1;
 }
 
 void DualQuat::SetZero(){
@@ -176,29 +176,36 @@ float DualQuat::GetVal( int index ) const{
   }
 }
 
-DualScalar DualQuat::NormSquared() const {
+DualScalar DualQuat::MagnitudeSquared() const {
   float a = 0;
   float b = 0;
-  for( int i = 0; i < 4; i++ ){
-    a += _A._quat[i] * _A._quat[i];
-    b += _A._quat[i] * _B._quat[i];
-  }
-  b *= 2;
+
+  DualQuat q;
+  q = *this;
+  q = q.Conjugate();
+  
+  DualQuat p;
+  p = (*this) * q;
+  
+  a = p._A.LengthSquared();
+  b = p._B.LengthSquared();
+
   DualScalar d( a, b );
   return d;
 }
 
-DualScalar DualQuat::Norm() const {
+DualScalar DualQuat::Magnitude() const {
   DualScalar s;
-  s = NormSquared();
-  s.Sqrt();
+  s = MagnitudeSquared();
+  s._a = sqrt(s._a);
+  s._b = sqrt(s._b);
   return s;
 }
 
 DualQuat DualQuat::Normalize() const {
   DualQuat q;
   DualScalar n;
-  n = Norm();
+  n = Magnitude();
   n = n.Invert();
   q = ScaleDualScalar( n, q );
   return q;
@@ -206,7 +213,7 @@ DualQuat DualQuat::Normalize() const {
 
 DualQuat DualQuat::Invert() const {
   DualScalar s;
-  s = NormSquared();
+  s = MagnitudeSquared();
   s = s.Invert();
   DualQuat q;
   q = Conjugate();
