@@ -1,11 +1,11 @@
 enhance
 =======
 
-Experimental 3D kinematics driven game 
+Experimental 3D kinematics game
 
 Checklist:
 
-[ ] Inverse Kinematics
+[ ] Math and Physics Library Layer
 
 [ ] Integrate Graphics Engine (likely with bgfx)
 
