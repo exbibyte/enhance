@@ -52,7 +52,8 @@ class DualQuat{
   DualQuat          Invert() const; //gets inverse where q^-1 * q = q * q^-1 = 1 + e0
 
   /* void              ScLerp( DualQuat & q1, DualQuat & q2, float t); */
-  DualQuat          PowFloat(double e) const; ///Raises the supplied quaternion to the power e according to euler's formula, this applies to unit quaternions
+  DualQuat          PowFloat(double e) const; ///Raises the supplied quaternion to the power e according to euler's formula, this applies to unit quaternions. q = [ cos(theta/2), sin(theta/2)Screwaxis ] + eps [ -alpha/2*sin(theta/2), sin(theta/2)Moment + alpha/2*cos(theta/2)Screwaxis ]
+
   float             GetScrewParameters( Vec & screwaxix, Vec & moment, Vec & angles ); // returns norm of _A._quat's x,y,z 
   void              SetScrewParameters( Vec & screwaxis, Vec & moment, float theta, float alpha );
 
@@ -66,6 +67,6 @@ DualQuat          ScaleAddDualScalar( const DualScalar & s, const DualQuat & q1,
 DualQuat          ScaleAddFloat( float s, const DualQuat & q1, const DualQuat & q2 ); // returns s*q1 + q2
 DualQuat          ScaleDualScalar( const DualScalar & s, const DualQuat & q ); //( s.a*q1.a, s.a*q.b + s.b * q.a )
 DualQuat          ScaleFloat( float s, const DualQuat & q ); //s*q
-DualQuat          ScrewLinearInterpolate( const DualQuat & q1, const DualQuat & q2, float t ); ///q = q1*(q1^-1 q2)^t. For the shortest distance, q1 and q2 should have the same orientation.
+DualQuat          InterpolateSclerp( const DualQuat & q1, const DualQuat & q2, float t ); ///Screw Linear Interpolate. q = q1*(q1^-1 q2)^t. For the shortest distance, q1 and q2 should have the same orientation.
 
 #endif

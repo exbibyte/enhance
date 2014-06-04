@@ -221,7 +221,7 @@ DualQuat DualQuat::Invert() const {
   return q;
 }
 
-DualQuat ScrewLinearInterpolate( const DualQuat & q1, const DualQuat & q2, float t) { 
+DualQuat InterpolateSclerp( const DualQuat & q1, const DualQuat & q2, float t) { 
 
   DualQuat q;
 
@@ -324,7 +324,6 @@ void DualQuat::SetScrewParameters(Vec & screwaxis, Vec & moment, float theta, fl
   }
 
   *this = Normalize();
-
 }
 
 DualQuat ScaleAddDualScalar( const DualScalar & s, const DualQuat & q1, const DualQuat & q2 ) {
