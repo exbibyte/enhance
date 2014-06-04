@@ -65,7 +65,7 @@ TEST_CASE( "quaternion", "[quat]" ) {
   }
 
   SECTION( "normalize and length" ) {
-    a.Normalize();
+    a.NormalizeQuatCurrent();
     double eval = 0;
     for( int i = 0; i < 4; i++){
       eval += a._quat[i] * a._quat[i];
@@ -100,7 +100,7 @@ TEST_CASE( "quaternion", "[quat]" ) {
      a._quat[1] = 3;
      a._quat[2] = 4;
      a._quat[3] = -3;
-     // a.Normalize();
+
      c = a.Pow(3);
 
     float error = 0.0001;

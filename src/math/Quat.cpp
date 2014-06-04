@@ -110,7 +110,7 @@ void Quat::AxisAngleDegree( const float axis[], float angle ){
   v._vec[1] = axis[1];
   v._vec[2] = axis[2];
 
-  v.Normalize();
+  v.NormalizeCurrent();
 
   double radians = (angle/180.0f)*3.14159265f;
   
@@ -139,7 +139,7 @@ float Quat::Length() const{
    return (float)sqrt( double(_quat[0]*_quat[0] + _quat[1]*_quat[1] + _quat[2]*_quat[2] + _quat[3]*_quat[3]) );
 }
 
-void Quat::Normalize(){
+void Quat::NormalizeQuatCurrent(){
    float len = Length();
 
    if( len == 0 )
@@ -151,6 +151,12 @@ void Quat::Normalize(){
    _quat[3] /= len;
 }
 
+Quat Quat::NormalizeQuat() const{
+  Quat q = *this;
+  q.NormalizeQuatCurrent();
+  return q;
+}
+
 Quat Quat::Pow( float t ){
   Quat result = (*this); //copy
 
@@ -159,7 +165,7 @@ Quat Quat::Pow( float t ){
   v._vec[0] = _quat[0];
   v._vec[1] = _quat[1];
   v._vec[2] = _quat[2];
-  v.Normalize();
+  v.NormalizeCurrent();
   
   float len = this->Length();
 
