@@ -28,8 +28,8 @@ test_lex:
 md5demo:
 	g++ -std=c++0x ./test/MD5Demo.cpp $(src_file_folder)/Lex.cpp $(src_file_folder)/MD5Model.cpp $(src_file_folder)/PPM.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/md5demo
 
-test_teapot_quaternion:
-	g++ -std=c++0x ./test/teapot_quaternion.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/test_teapot_quaternion
+test_slerp:
+	g++ -std=c++0x ./test/test_slerp.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/test_slerp
 
 test_dualscalar:
 	g++ -std=c++0x ./test/catch_dualscalar.cpp $(src_math_folder)/DualScalar.cpp -I$(inc_math) -o $(build_dir)/test_dualscalar
