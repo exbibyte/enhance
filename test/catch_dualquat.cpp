@@ -80,5 +80,30 @@ TEST_CASE( "dualquaternion", "[dualquat]" ) {
     REQUIRE( c._A._quat[3] == 4 );
     REQUIRE( c._B._quat[3] == -4 );
   } 
+
+  SECTION( "magnitude" ) {
+    //magnitude = ||q|| = sqrt( q * q^-1 )
+    DualQuat d;
+    a._A = Quat(1,2,3,4);
+    a._B = Quat(5,6,7,8);
+    DualScalar s;
+    s = a.Magnitude();
+    
+    REQUIRE( s.GetReal() == 30 );
+    REQUIRE( s.GetDual() == 140 );
+  } 
  
+  SECTION( "normalization and invert" ) {
+    //normalize so that magnitude = ||q|| = 1 + 0e by q^-1 * q
+    DualQuat d;
+    a._A = Quat(1,2,3,4);
+    a._B = Quat(5,6,7,8);
+    d = d.Normalize();
+
+    DualScalar s;
+    s = d.Magnitude();
+    
+    REQUIRE( s.GetReal() == 1 );
+    REQUIRE( s.GetDual() == 0 );
+  } 
 }
