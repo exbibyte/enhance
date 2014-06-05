@@ -31,7 +31,7 @@ void DualQuat::SetIdentity(){
   _B._quat[0] = 0;
   _B._quat[1] = 0;
   _B._quat[2] = 0; 
-  _B._quat[3] = 1;
+  _B._quat[3] = 0;
 }
 
 void DualQuat::SetZero(){
@@ -204,11 +204,19 @@ DualScalar DualQuat::Magnitude() const {
 
 DualQuat DualQuat::Normalize() const {
   DualQuat q;
+  q.NormalizeCurrent();
+  // DualScalar n;
+  // n = Magnitude();
+  // n = n.Invert();
+  // q = ScaleDualScalar( n, q );
+  return q;
+}
+
+void DualQuat::NormalizeCurrent() {
   DualScalar n;
   n = Magnitude();
   n = n.Invert();
-  q = ScaleDualScalar( n, q );
-  return q;
+  (*this) = ScaleDualScalar( n, (*this) );
 }
 
 DualQuat DualQuat::Invert() const {
@@ -250,25 +258,26 @@ DualQuat DualQuat::PowFloat(double e) const {
 
   // pure translation
   if ( normA < 1e-15 ) {
-    d._B = Scale( e, d._B );
-    d.Normalize();
+    for( int i = 0; i < 3; i++ ){
+      d._B._quat[i] *= e;
+    }
+    d.NormalizeCurrent();
+    return d;
+  }else{
+    // exponentiate
+    double theta = angles[0] * e;
+    double alpha = angles[1] * e;
+    // convert back
+    d.SetScrewParameters( screwaxis, moment, theta, alpha );
     return d;
   }
-
-  // exponentiate
-  double theta = angles[0] * e;
-  double alpha = angles[1] * e;
-
-  // convert back
-  d.SetScrewParameters( screwaxis, moment, theta, alpha );
-
-  return d;
 }
 
 float DualQuat::GetScrewParameters(Vec & screwaxis, Vec & moment, Vec & angles ) {
 
   angles.SetDim(2);
   moment.SetDim(3);
+  screwaxis.SetDim(3);
 
   //get quat A.x, A.y, A.z
   Vec q_A;
@@ -323,10 +332,10 @@ void DualQuat::SetScrewParameters(Vec & screwaxis, Vec & moment, float theta, fl
     _B._quat[i] = sina * moment[i] + alpha / 2 * cosa * screwaxis[i];
   }
 
-  *this = Normalize();
+  NormalizeCurrent();
 }
 
-void DualQuat::GetRigidTransform( float trans [] ){
+void DualQuat::GetRigidTransform( float trans [] ) const{
       
   trans[0] = _A._quat[3] * _A._quat[3] + _A._quat[0] * _A._quat[0] - _A._quat[1] * _A._quat[1] - _A._quat[2] * _A._quat[2];
   trans[4] = 2*(_A._quat[0]*_A._quat[1]- _A._quat[3]*_A._quat[2]);
@@ -347,6 +356,12 @@ void DualQuat::GetRigidTransform( float trans [] ){
   trans[11] = 0;
 }
    
+void DualQuat::SetRigidTranslation(float a [] ){
+  _B._quat[0] = a[0];
+  _B._quat[1] = a[1];
+  _B._quat[2] = a[2];
+  _B._quat[3] = 0;
+}
 
 DualQuat ScaleAddDualScalar( const DualScalar & s, const DualQuat & q1, const DualQuat & q2 ) {
   float a = s.GetReal();

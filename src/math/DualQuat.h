@@ -48,6 +48,7 @@ class DualQuat{
   DualScalar        Magnitude() const; // ||q|| = sqrt(q * q^-1)
 
   DualQuat          Normalize() const; // normalize to ||q|| = 1+ e*0
+  void              NormalizeCurrent(); // normalize to ||q|| = 1+ e*0
 
   DualQuat          Invert() const; //gets inverse where q^-1 * q = q * q^-1 = 1 + e0
 
@@ -56,7 +57,8 @@ class DualQuat{
   float             GetScrewParameters( Vec & screwaxix, Vec & moment, Vec & angles ); // returns norm of _A._quat's x,y,z 
   void              SetScrewParameters( Vec & screwaxis, Vec & moment, float theta, float alpha );
 
-  void              GetRigidTransform( float a [] ); //convert to rigid transform in a column major array representing 4x4 mat
+  void              GetRigidTransform( float a [] ) const; //convert to rigid transform in a column major array representing 4x4 mat
+  void              SetRigidTranslation(float a [] ); // a = (x,y,z)
 
   class Exception : public std::runtime_error {
   public:
