@@ -36,3 +36,7 @@ test_dualscalar:
 
 test_sclerp:
 	g++ -std=c++0x ./test/test_sclerp.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_math_folder)/DualScalar.cpp $(src_math_folder)/DualQuat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/test_sclerp
+
+test_mat:
+	g++ -std=c++0x ./test/catch_mat.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Mat.cpp -I$(inc_math) -o $(build_dir)/test_mat
+
