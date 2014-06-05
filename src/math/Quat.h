@@ -30,6 +30,7 @@ class Quat{
 
   void              AxisAngleDegree( const float axis[], float angle );
   void              AxisAngleDegreeVector( const Vec & v, float angle );  
+  void              SetTranslation( const float a [] );
   float             Length() const;
   float             LengthSquared() const;
   void              NormalizeQuatCurrent();

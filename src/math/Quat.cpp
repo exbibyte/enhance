@@ -138,6 +138,13 @@ void Quat::AxisAngleDegreeVector( const Vec & v, float angle ){
   this->AxisAngleDegree( axis, angle );
 }
 
+void Quat::SetTranslation( const float a [] ){
+  _quat[0] = a[0]/2; //dx
+  _quat[1] = a[1]/2; //dy
+  _quat[2] = a[2]/2; //dz
+  _quat[3] = 0;
+}
+
 float Quat::Length() const{
   return (float)sqrt( LengthSquared() );
 }
