@@ -2,14 +2,13 @@
 
 #include <math.h>
 #include <string.h>
+#include <iostream>
+using namespace std;
 
 Mat::Mat(){
   // sets up default 4x4 dimension
-  _dim.SetDim(2);
-  _dim[0] = 4;
-  _dim[1] = 4;
-  _size = 16;
-  _mat = new float [ _size ];
+  int dim[2] = { 4, 4 };
+  ResizeInt( 2, dim );
 }
 
 void Mat::ResizeInt( int count, int dim [] ){
@@ -27,6 +26,9 @@ void Mat::ResizeInt( int count, int dim [] ){
       _dim[i] = dim[i];
     }
     _mat = new float [ _size ];
+    for( int i = 0; i < _size; i++ ){
+      _mat[i] = 0;
+    }
   }
 }
 
@@ -55,21 +57,22 @@ Mat Mat::operator * ( const Mat & m ) const{
   
   if( (int)_dim[1] != (int)m._dim[0] ){
     //size mismatch
+    cout<<"mismatch"<<endl;
     return a;
   }else{
     //new mat size after multiplication
-    a._dim.SetDim(2);
-    a._dim[0] = _dim[0];
-    a._dim[1] = m._dim[1];
-    
-    a._size = (int)a._dim[0] * (int)a._dim[1];
-    a._mat = new float [ a._size ];
-
+    int dim[2];
+    dim[0] = _dim[0];
+    dim[1] = m._dim[1];
+    a.ResizeInt( 2, dim );
+   
     //row index
     for( int i = 0; i < (int)a._dim[0]; i++){
       //column index
       for( int j = 0; j < (int)a._dim[1]; j++){
-	a._mat[ j * (int)a._dim[0] + i ] = 0;
+	// for( int x = 0; x < (int)_dim[1]; x++){
+	//   a( i, j ) += (*this)( i, x ) * m( x, j );
+	// }
 	for( int x = 0; x < (int)_dim[1]; x++){
 	  a._mat[ j * (int)a._dim[0] + i ] += _mat[ i + x * (int)_dim[0] ] * m._mat[ x + j * (int)m._dim[0] ];
 	}
@@ -83,7 +86,7 @@ float & Mat::operator ()( int m, int n ){
   if( m >= (int)_dim[0] || n >= (int)_dim[1] ){
     return _mat[0];
   }else{
-    return *( _mat + m + n * (int)_dim[0]  );
+    return _mat[ m + n * (int)_dim[0] ];
   }
 }
 
@@ -91,6 +94,6 @@ float Mat::operator ()( int m, int n ) const{
   if( m >= (int)_dim[0] || n >= (int)_dim[1] ){
     return NAN;
   }else{
-    return *( _mat + m + n * (int)_dim[0] );
+    return _mat[ m + n * (int)_dim[0] ];
   }
 }
