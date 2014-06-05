@@ -192,3 +192,22 @@ bool Mat::GetSubMat( Mat & m, int row, int col, int sizerow, int sizecol ) const
 
   return true;
 }
+
+void Mat::TransposeCurrent(){
+  (*this) = Transpose();
+}
+
+Mat Mat::Transpose() const{
+  Mat m;
+  int dim[2];
+  dim[0] = _dim[1];
+  dim[1] = _dim[0];
+  m.ResizeInt( 2, dim );
+  
+  for( int j = 0; j < dim[1]; j++ ){
+    for( int i = 0; i < dim[0]; i++ ){
+      m( i, j ) = (*this)( j, i );
+    }
+  }
+  return m;
+}

@@ -152,4 +152,20 @@ TEST_CASE( "mat", "[mat]" ) {
     REQUIRE( c(2,2) == 0 );
   }
 
+
+  SECTION( "transpose" ) {
+    int sizea[2] = { 2, 6 };
+    a.ResizeInt(2, sizea);
+    a(0,5) = 10;
+    a(1,2) = 4;
+    
+    a.TransposeCurrent();
+
+    REQUIRE( a._dim[0] == 6 );
+    REQUIRE( a._dim[1] == 2 );
+    REQUIRE( a(0,0) == 0 );
+    REQUIRE( a(4,0) == 0 );
+    REQUIRE( a(5,0) == 10 );
+    REQUIRE( a(2,1) == 4 );
+  }
 }

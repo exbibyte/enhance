@@ -22,6 +22,8 @@ class Mat{
   void          SetFromVec( const Vec & v, bool column = true); //convert from a Vec, default is a column vector
   bool          GetVec( Vec & v, int index, bool column = true ) const; //get a particular column or row of the current Mat
   bool          GetSubMat( Mat & m, int row, int col, int sizerow, int sizecol ) const; //get a sub Mat
+  void          TransposeCurrent();
+  Mat           Transpose() const;
 };
 
 #endif
