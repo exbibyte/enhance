@@ -58,7 +58,9 @@ class DualQuat{
   void              SetScrewParameters( Vec & screwaxis, Vec & moment, float theta, float alpha );
 
   void              GetRigidTransform( float a [] ) const; //convert to rigid transform in a column major array representing 4x4 mat
-  void              SetRigidTranslation(float a [] ); // a = (x,y,z)
+  void              SetTranslation( const float a [] ); //set translation quaternion by provided array (x,y,z)
+  void              AxisAngleDegree( const float axis[], float angle ); // sets rotation quaternion by provided axis and angle
+  void              AxisAngleDegreeVector( const Vec & v, float angle );  
 
   class Exception : public std::runtime_error {
   public:

@@ -347,20 +347,58 @@ void DualQuat::GetRigidTransform( float trans [] ) const{
   trans[6] = 2*(_A._quat[1]*_A._quat[2]+ _A._quat[3]*_A._quat[0]);
   trans[10] =  _A._quat[3]*_A._quat[3] - _A._quat[0]*_A._quat[0] - _A._quat[1]*_A._quat[1] + _A._quat[2]*_A._quat[2];
       
-  trans[12] = 2*(_A._quat[3]*_B._quat[0] - _A._quat[0]*_B._quat[3] + _A._quat[1]*_B._quat[2] - _A._quat[2]*_B._quat[1]);
-  trans[13] = 2*(_A._quat[3]*_B._quat[1] - _A._quat[0]*_B._quat[2] - _A._quat[1]*_B._quat[3] +_A._quat[2]*_B._quat[0]);
-  trans[14] = 2*(_A._quat[3]*_B._quat[2] + _A._quat[0]*_B._quat[1] - _A._quat[1]*_B._quat[0] - _A._quat[2]*_B._quat[3]);
+  // trans[12] = 2*(_A._quat[3]*_B._quat[0] - _A._quat[0]*_B._quat[3] + _A._quat[1]*_B._quat[2] - _A._quat[2]*_B._quat[1]);
+  // trans[13] = 2*(_A._quat[3]*_B._quat[1] - _A._quat[0]*_B._quat[2] - _A._quat[1]*_B._quat[3] +_A._quat[2]*_B._quat[0]);
+  // trans[14] = 2*(_A._quat[3]*_B._quat[2] + _A._quat[0]*_B._quat[1] - _A._quat[1]*_B._quat[0] - _A._quat[2]*_B._quat[3]);
+
+  trans[12] = 2 * _B._quat[0];
+  trans[13] = 2 * _B._quat[1];
+  trans[14] = 2 * _A._quat[2];
+
   trans[15] = 1;
   trans[3] = 0;
   trans[7] = 0;
   trans[11] = 0;
+}   
+
+void DualQuat::SetTranslation( const float trans [] ){  
+  _B.SetTranslation( trans );
 }
-   
-void DualQuat::SetRigidTranslation(float a [] ){
-  _B._quat[0] = a[0];
-  _B._quat[1] = a[1];
-  _B._quat[2] = a[2];
-  _B._quat[3] = 0;
+
+// void DualQuat::SetTranslation(const float axis [], float angle, const float trans [] ){
+  
+//   AxisAngleDegree( axis, angle );
+//   Mat m_rot[16];
+//   ToMatrixRot( m_rot );
+  
+//   //get diplacement
+  
+//   int dim_trans[2];
+//   dim_trans[0] = 4;
+//   dim_trans[1] = 1;
+//   Mat m_trans;
+//   m_trans.ResizeInt( 2, dim_trans );
+//   m_trans( 0, 0 ) = trans[0];
+//   m_trans( 1, 0 ) = trans[1];
+//   m_trans( 2, 0 ) = trans[2];
+//   m_trans( 3, 0 ) = 1;
+  
+//   Mat m_displace;
+//   m_displace = m_rot * m_trans;
+//   m_displace.TransposeCurrent();
+
+//   Mat m_trans_dif;
+//   m_trans_dif = m_trans - m_displace;
+
+//   _B.SetTranslation( a );
+// }
+
+void DualQuat::AxisAngleDegree( const float axis[], float angle ){
+  _A.AxisAngleDegree( axis, angle );
+}
+
+void DualQuat::AxisAngleDegreeVector( const Vec & v, float angle ){
+  _A.AxisAngleDegreeVector( v, angle );
 }
 
 DualQuat ScaleAddDualScalar( const DualScalar & s, const DualQuat & q1, const DualQuat & q2 ) {

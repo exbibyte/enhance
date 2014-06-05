@@ -76,19 +76,15 @@ void displayCallback() {
   DualQuat qA;
   DualQuat qB;
   float axis_start[3] = {0,0,1};
-  float axis_end[3] = {0,1,1};
+  float axis_end[3] = {0,0,1};
   qA._A.AxisAngleDegree( axis_start, 0);
   qB._A.AxisAngleDegree( axis_end, 180);
 
-  qA._B._quat[0] = 0;
-  qA._B._quat[1] = 0;
-  qA._B._quat[2] = 0;
-  qA._B._quat[3] = 0;
+  float qA_trans[3] = {0,0,0};
+  float qB_trans[3] = {48,48,-20};
 
-  qB._B._quat[0] = 30;
-  qB._B._quat[1] = 30;
-  qB._B._quat[2] = -30;
-  qB._B._quat[3] = 0;
+  qA.SetTranslation( qA_trans );
+  qB.SetTranslation( qB_trans );
 
   if(count <= 100){
     float slerp_t = (float) count/100;
