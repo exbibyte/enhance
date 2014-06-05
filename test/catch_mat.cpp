@@ -105,4 +105,51 @@ TEST_CASE( "mat", "[mat]" ) {
     REQUIRE( temp(1,2) == -4);
   }
 
+  SECTION( "addition" ) {
+    int sizea[2] = { 3, 3 };
+    a.ResizeInt(2, sizea);
+    a(1,1) = 5;
+    a(0,2) = -4;
+    
+    Mat b; 
+    int size[2] = { 3, 3 };
+    b.ResizeInt(2, size);
+    b(1,1) = 3;
+    b(1,2) = -10;
+
+    Mat c = b + a;
+
+    REQUIRE( c._size == 9 );
+    REQUIRE( c._dim[0] == 3 );
+    REQUIRE( c._dim[1] == 3 );
+    REQUIRE( c(0,0) == 0 );
+    REQUIRE( c(1,1) == 8 );
+    REQUIRE( c(0,2) == -4 );
+    REQUIRE( c(1,2) == -10 );
+  }
+
+  SECTION( "subtraction" ) {
+    int sizea[2] = { 3, 3 };
+    a.ResizeInt(2, sizea);
+    a(1,1) = 5;
+    a(0,2) = -4;
+    
+    Mat b; 
+    int size[2] = { 3, 3 };
+    b.ResizeInt(2, size);
+    b(1,1) = 3;
+    b(1,2) = -10;
+
+    Mat c = b - a;
+
+    REQUIRE( c._size == 9 );
+    REQUIRE( c._dim[0] == 3 );
+    REQUIRE( c._dim[1] == 3 );
+    REQUIRE( c(0,0) == 0 );
+    REQUIRE( c(1,1) == -2 );
+    REQUIRE( c(0,2) == 4 );
+    REQUIRE( c(1,2) == -10 );
+    REQUIRE( c(2,2) == 0 );
+  }
+
 }

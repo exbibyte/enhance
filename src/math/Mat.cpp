@@ -82,6 +82,44 @@ Mat Mat::operator * ( const Mat & m ) const{
   }
 }
 
+Mat Mat::operator + ( const Mat & a ) const{
+  Mat m;
+  int dim[2];
+  if( _dim[0] != a._dim[0] || _dim[1] != a._dim[1] ){
+    m.ResizeInt( 0, dim );
+    return m;
+  }else{
+    dim[0] = _dim[0];
+    dim[1] = _dim[1];
+    m.ResizeInt( 2, dim );
+    for( int j = 0; j < _dim[1]; j++ ){
+      for( int i = 0; i < _dim[0]; i++ ){
+	m( i, j ) = (*this)( i, j ) + a( i, j );
+      }
+    }
+    return m;
+  }
+}
+
+Mat Mat::operator - ( const Mat & a ) const{
+  Mat m;
+  int dim[2];
+  if( _dim[0] != a._dim[0] || _dim[1] != a._dim[1] ){
+    m.ResizeInt( 0, dim );
+    return m;
+  }else{
+    dim[0] = _dim[0];
+    dim[1] = _dim[1];
+    m.ResizeInt( 2, dim );
+    for( int j = 0; j < _dim[1]; j++ ){
+      for( int i = 0; i < _dim[0]; i++ ){
+	m( i, j ) = (*this)( i, j ) - a( i, j );
+      }
+    }
+    return m;
+  }
+}
+
 float & Mat::operator ()( int m, int n ){
   if( m >= (int)_dim[0] || n >= (int)_dim[1] ){
     return _mat[0];
