@@ -32,7 +32,7 @@ void Mat::ResizeInt( int count, int dim [] ){
   }
 }
 
-void Mat::ResizeVec( Vec v ){
+void Mat::ResizeVec( const Vec & v ){
   float * dim;
   int count;
   v.GetArray( count, dim );
@@ -96,4 +96,61 @@ float Mat::operator ()( int m, int n ) const{
   }else{
     return _mat[ m + n * (int)_dim[0] ];
   }
+}
+
+void Mat::SetFromVec( const Vec & v, bool column ){
+  int dim[2];
+  int len = v._dim;
+  if( column == true ){
+    dim[0] = len;
+    dim[1] = 1;
+    ResizeInt( 2, dim );
+  }else{
+    dim[0] = 1;
+    dim[1] = len;
+    ResizeInt( 2, dim );
+  }
+  for( int i = 0; i < len; i++ ){
+    _mat[i] = v[i];
+  }
+}
+
+bool Mat::GetVec( Vec & v, int index, bool column ) const{
+  if( column == true ){
+    if( index >= _dim[1] ){
+      return false;
+    }
+    v.SetDim( _dim[0] );
+    for( int i = 0; i < _dim[0]; i++ ){
+      v[i] = (*this)( i, index );
+    }
+  }else{
+    if( index >= _dim[0] ){
+      return false;
+    }
+    v.SetDim( _dim[1] );
+    for( int i = 0; i < _dim[1]; i++ ){
+      v[i] = (*this)( index, i );
+    }
+  }
+  return true;
+}
+
+bool Mat::GetSubMat( Mat & m, int row, int col, int sizerow, int sizecol ) const{
+  if( row >= _dim[0] || col >= _dim[1] || row + sizerow - 1 >= _dim[0] || col + sizecol - 1 >= _dim[1] ){
+    return false;
+  }
+
+  int dim[2];
+  dim[0] = sizerow;
+  dim[1] = sizecol;
+  m.ResizeInt( 2, dim );
+
+  for(int j = 0; j < sizecol; j++){
+    for(int i = 0; i < sizerow; i++){
+      m( i, j ) = (*this)( row + i, col + j );
+    }
+  }
+
+  return true;
 }
