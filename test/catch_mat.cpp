@@ -55,4 +55,54 @@ TEST_CASE( "mat", "[mat]" ) {
     REQUIRE( c(0,3) == -8 );
     REQUIRE( c(1,1) == -20 );
   }
+
+  SECTION( "GetVec" ) {
+    int sizea[2] = { 4, 4 };
+    a.ResizeInt(2, sizea);
+    a(1,1) = 5;
+    a(3,2) = -4;
+    
+    Vec v;
+    bool isCol = false;
+    a.GetVec( v, 3, isCol );
+    REQUIRE( v[0] == 0);
+    REQUIRE( v[1] == 0);
+    REQUIRE( v[2] == -4);
+    REQUIRE( v[3] == 0);
+  }
+
+  SECTION( "SetFromVec" ) {
+    Vec v;
+    v.SetDim(2);
+    v._vec[0] = 4;
+    v._vec[1] = 5;
+
+    bool isCol = false;
+    a.SetFromVec( v, isCol );
+    REQUIRE( a._dim[0] == 1);
+    REQUIRE( a._dim[1] == 2);
+    REQUIRE( a(0,0) == 4);
+    REQUIRE( a(0,1) == 5);
+  }
+  
+  SECTION( "GetSumMat" ) {
+    int sizea[2] = { 4, 4 };
+    a.ResizeInt(2, sizea);
+    a(2,2) = 5;
+    a(3,3) = -4;
+    
+    Mat temp;
+
+    a.GetSubMat( temp, 2, 1, 2, 3 );
+    
+    REQUIRE( temp._dim[0] == 2);
+    REQUIRE( temp._dim[1] == 3);
+    REQUIRE( temp(0,0) == 0);
+    REQUIRE( temp(0,2) == 0);
+    REQUIRE( temp(1,1) == 0);
+    REQUIRE( temp(1,0) == 0);
+    REQUIRE( temp(0,1) == 5);
+    REQUIRE( temp(1,2) == -4);
+  }
+
 }
