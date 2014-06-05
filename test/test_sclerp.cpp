@@ -21,8 +21,7 @@ int currAnim = 0;
 float zdist = -300.0f;
 int count = 0;
 
-float quat_mat[16];
-float quat_mat2[16];
+float transform_mat[16];
 
 void init(int argc, char **argv) {
   lastTime = glutGet(GLUT_ELAPSED_TIME);
@@ -77,33 +76,38 @@ void displayCallback() {
   DualQuat qA;
   DualQuat qB;
   float axis_start[3] = {0,0,1};
-  float axis_end[3] = {0,0,1};
+  float axis_end[3] = {0,1,1};
   qA._A.AxisAngleDegree( axis_start, 0);
-  qB._A.AxisAngleDegree( axis_end, -180);
+  qB._A.AxisAngleDegree( axis_end, 180);
 
   qA._B._quat[0] = 0;
   qA._B._quat[1] = 0;
   qA._B._quat[2] = 0;
+  qA._B._quat[3] = 0;
 
-  qB._B._quat[0] = 3;
-  qB._B._quat[1] = 2;
-  qB._B._quat[2] = -3;
-
+  qB._B._quat[0] = 30;
+  qB._B._quat[1] = 30;
+  qB._B._quat[2] = -30;
+  qB._B._quat[3] = 0;
 
   if(count <= 100){
     float slerp_t = (float) count/100;
     cout<<"slerp time: "<<slerp_t<<endl;
     
     DualQuat q;
-    q = ScrewLinearInterpolate( qA, qB, slerp_t );  
- 
-    q._A.ToMatrix(quat_mat);
-    q._B.ToMatrix(quat_mat2);
+    q = InterpolateSclerp( qA, qB, slerp_t );  
+    q.GetRigidTransform(transform_mat); 
     count++;
+
+    // float arr[8];
+    // q.GetArray(arr);
+    // for( int i = 0; i < 8; i++ ){
+    //   cout<<arr[i]<<" ";
+    // }
+    // cout<<endl;
   }
 
-  glMultMatrixf(quat_mat);
-  glMultMatrixf(quat_mat2);
+  glMultMatrixf(transform_mat);
 
   glutSolidTeapot(30);
   glutSwapBuffers();
