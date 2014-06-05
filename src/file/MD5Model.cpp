@@ -101,7 +101,7 @@ void MD5Model::animate(float dt) {
     interpJoint.pos[1] = pos1[1] + animTime*(pos2[1] - pos1[1]);
     interpJoint.pos[2] = pos1[2] + animTime*(pos2[2] - pos1[2]);
 
-    interpJoint.quat = Slerp(frame.joints[i].quat, nextFrame.joints[i].quat, animTime);
+    interpJoint.quat = InterpolateSlerp(frame.joints[i].quat, nextFrame.joints[i].quat, animTime);
   }
 
   buildVerts(interpFrame);
