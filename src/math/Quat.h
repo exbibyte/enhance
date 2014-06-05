@@ -36,7 +36,8 @@ class Quat{
   Quat              NormalizeQuat() const;
   Quat              Log() const; //log(q) = log ||q|| + v/||v|| * arccos(a/||v||)
   Quat              Pow( float t );
-  void              ToMatrixRot( float mat[] ) const;
+  void              ToMatrixRot( float mat[] ) const; //gets rotation 4x4 matrix
+  void              ToMatrixTrans( float mat[] ) const; //gets translation 4x4 matrix
   inline Quat       Conjugate() const { return Quat(-_quat[0], -_quat[1], -_quat[2], _quat[3]); }
   Quat              Negate() const; //negative version
 };

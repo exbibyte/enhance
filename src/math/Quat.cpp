@@ -256,6 +256,16 @@ void Quat::ToMatrixRot( float mat[] ) const{
   mat[15] = 1.0f;
 }
 
+void Quat::ToMatrixTrans( float mat[] ) const{
+  for( int i = 0; i < 12; i++ ){
+    mat[i] = 0;
+  }
+  mat[12] = 2 * _quat[0];
+  mat[13] = 2 * _quat[1]; 
+  mat[14] = 2 * _quat[2];
+  mat[15] = 1;
+}
+
 Quat Quat::Negate() const {
   return Quat( -_quat[0], -_quat[1], -_quat[2], -_quat[3] );
 }
