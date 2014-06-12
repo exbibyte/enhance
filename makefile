@@ -2,11 +2,13 @@ src_files := $(wildcard ./src/*.cpp)
 src_math_folder := ./src/math
 src_file_folder := ./src/file
 src_ui_folder := ./src/ui
+src_en_folder := ./src/enCode
 
 inc_math := ./src/math
 inc_file := ./src/file
 inc_ui := ./src/ui
 inc_catch := ./test
+inc_en := ./src/enCode
 
 build_dir := ./build
 lib:= -lGL -lGLU -lGLEW -lglut
@@ -43,3 +45,6 @@ test_mat:
 
 test_ik:
 	g++ -std=c++0x ./test/test_ik.cpp $(src_math_folder)/Vec.cpp $(src_math_folder)/Quat.cpp $(src_math_folder)/DualScalar.cpp $(src_math_folder)/DualQuat.cpp $(src_ui_folder)/Trackball.cpp -I$(inc_catch) -I$(inc_file) -I$(inc_math) -I$(inc_ui) $(lib) -o $(build_dir)/test_ik
+
+test_enTable:
+	g++ -std=c++0x ./test/enCode/test_enTable.cpp -I$(inc_catch) -I$(inc_en) -o $(build_dir)/test_enTable
