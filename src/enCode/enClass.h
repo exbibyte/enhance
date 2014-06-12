@@ -22,19 +22,18 @@ union enEventData {
 /*****************************************
 enEventDataType
 *****************************************/
-
 enum enEventDataType {
                                           INT = 0,
 					  FLOAT,
 					  DOUBLE,
 					  Str,
-					  ENTITY
+					  ENTITY,
+					  VOID
 };
 
 /*****************************************
 enEventArg
 *****************************************/
-
 class enEventArg {
  public:
   enEventData                             _value;
@@ -56,8 +55,16 @@ class enEventInfo {
  public:
   char *                                  _name;
   char *                                  _format;
+  enEventDataType                         _returnType;
   int                                     _argcount;
   size_t                                  _argsize;
+  enEventArg *                            GetArgOffset( int index );
+  static const enEventInfo *              GetEventInfo( int eventnum );
+  static const enEventInfo *              FindEventInfo( const char * name );
+ private:
+  vector< enEventArg * >                  _eventArgs;
+  static vector< enEventInfo * >          _eventInfos;
+  static int                              _numEventInfos;
 };
 
 /*****************************************
@@ -76,13 +83,13 @@ enClass
 ****************************************/
 class enClass {
  public:
-  static vector< enClassInfo * >          _classtypes;
-  static enClassInfo                      _classtype;
-  static enClassInfo *                    GetClassInfo( const char * );
+  static vector< enClassInfo * >          _infos;
+  static enClassInfo                      _info;
+  static enClassInfo *                    GetInfo( const char * );
   static enClass *                        CreateClassInstance( const char * ); 
-  bool                                    PostMsgFloat( const enEventInfo * ev, float time, ...);
-  bool                                    PostMsgMilli( const enEventInfo * ev, intt time, ...);
-  bool                                    ProcessMsg( const enEventInfo * ev, ...); 
+  bool                                    PostMsgFloat( const enEventInfo * ev, float time, ... );
+  bool                                    PostMsgMilli( const enEventInfo * ev, int time, ... );
+  bool                                    ProcessMsg( const enEventInfo * ev, ... ); 
   bool                                    SaveFile( enSave * file ) const;
   bool                                    RestoreFile( enRestore * file );
   static void                             DisplayInfo( const char * );
