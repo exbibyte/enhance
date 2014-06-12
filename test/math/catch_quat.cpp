@@ -128,14 +128,14 @@ TEST_CASE( "quaternion", "[quat]" ) {
      
   }
 
-  SECTION( "To Matrix" ) {
+  SECTION( "To Rotation Matrix" ) {
     a._quat[0] = 1;
     a._quat[1] = 2;
     a._quat[2] = 3;
     a._quat[3] = 2;
     
     float mat[16];
-    a.ToMatrix(mat);
+    a.ToMatrixRot(mat);
 
     REQUIRE( mat[0] == -25 );
     REQUIRE( mat[1] == 16 );
