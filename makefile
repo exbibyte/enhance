@@ -48,3 +48,6 @@ test_ik:
 
 test_enTable:
 	g++ -std=c++0x ./test/enCode/test_enTable.cpp -I$(inc_catch) -I$(inc_en) -o $(build_dir)/test_enTable
+
+test_std_thread:
+	g++ -std=c++0x ./test/other/test_std_thread.cpp -pthread -o $(build_dir)/test_std_thread
