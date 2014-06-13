@@ -39,6 +39,33 @@ TEST_CASE( "enTable", "[enTable]" ) {
     REQUIRE( a.Exists("notexisting") == false );
   }   
 
- 
- 
+  SECTION( "get by iterator index" ) {
+    bool exists;   
+    a("iuo", exists) = "item1";
+    a("2nd", exists) = "item2";    
+    a("another", exists) = "item3";
+   
+    string key;
+    REQUIRE( a.GetAtIndex(2, exists, key) == "item1");
+    REQUIRE( exists == true );
+    REQUIRE( key == "iuo" );
+
+    a.GetAtIndex(2, exists, key) = "changedval";
+    REQUIRE( a.GetAtIndex(2, exists, key) == "changedval");
+
+    REQUIRE( a.Size() == 3);   
+    a.GetAtIndex(3, exists, key) = "aaaaaaaaa";
+    REQUIRE( exists == false );
+    REQUIRE( a.Size() == 3);   
+  }
+
+  SECTION( "clear" ) {
+    bool exists;   
+    a("iuo", exists) = "item1";
+    a("2nd", exists) = "item2";    
+    a("another", exists) = "item3";
+    REQUIRE( a.Size() == 3);    
+    a.Clear();
+    REQUIRE( a.Size() == 0);
+  } 
 }
