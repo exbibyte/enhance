@@ -17,6 +17,9 @@ lib:= -lGL -lGLU -lGLEW -lglut
 
 $(shell mkdir -p $(build_dir))
 
+.PHONY: all
+
+all: test_vec test_quat test_dualquat test_dualscalar test_mat test_enTable test_circularbuffer test_bufferpool test_slerp test_sclerp
 
 test_vec:
 	g++ -std=c++0x ./test/math/catch_vec.cpp $(src_math_folder)/Vec.cpp -I$(inc_catch) -I$(inc_math) $(lib) -o $(build_dir)/test_vec	
