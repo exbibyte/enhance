@@ -1,21 +1,5 @@
 language: cpp
+
 compiler:
+  - clang
   - gcc
-before_install:
-before_script:
-  - travis_retry bundle
-  - travis_retry ./configure
-script: rake
-branches:
-  only:
-    - master
-notifications:
-  recipients:
-    - yuan6liu@gmail.com
-  email:
-    on_success: change
-    on_failure: always
-env:
-  - RVM=2.0.0 LANG="en_US.UTF-8"
-os:
-  - linux
