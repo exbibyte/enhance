@@ -6,9 +6,9 @@
 using namespace std;
 
 enum BufferStatus{
-  empty = 0,
-  full = 1,
-  partial = 2
+  CIRBUFFER_EMPTY = 0,
+  CIRBUFFER_FULL = 1,
+  CIRBUFFER_PARTIAL = 2
 };
 
 template < typename T >
@@ -67,12 +67,13 @@ template < typename T >
 BufferStatus CircularBuffer< T > :: GetStatus() const{
   BufferStatus status;
   if( _maxsize != -1 && _buffer.size() == _maxsize ){
-    status = full;
+    status = CIRBUFFER_FULL;
   }else if( _buffer.empty() == true ){
-    status = empty;
+    status = CIRBUFFER_EMPTY;
   }else{
-    status = partial;
+    status = CIRBUFFER_PARTIAL;
   }
+  return status;
 }
 
 template < typename T >
