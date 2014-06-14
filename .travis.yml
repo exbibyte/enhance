@@ -4,6 +4,8 @@ compiler:
   - clang
   - gcc
 
-before_script:
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libglew-dev libgl-dev 
 
 script: make
