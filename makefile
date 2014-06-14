@@ -56,3 +56,6 @@ test_std_thread:
 
 test_circularbuffer:
 	g++ -std=c++0x ./test/core/test_CircularBuffer.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_circularbuffer
+
+test_bufferpool:
+	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_bufferpool
