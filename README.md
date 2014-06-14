@@ -1,4 +1,7 @@
-enhance
+Enhance
+
+[![Build Status](https://travis-ci.org/bilbil/enhance.svg?branch=master)](https://travis-ci.org/philsquared/Catch)
+
 =======
 
 Experimental 3D kinematics game
