@@ -3,12 +3,14 @@ src_math_folder := ./src/math
 src_file_folder := ./src/file
 src_ui_folder := ./src/ui
 src_en_folder := ./src/enCode
+src_core_folder := ./src/core
 
 inc_math := ./src/math
 inc_file := ./src/file
 inc_ui := ./src/ui
 inc_catch := ./test
 inc_en := ./src/enCode
+inc_core := ./src/core
 
 build_dir := ./build
 lib:= -lGL -lGLU -lGLEW -lglut
@@ -51,3 +53,6 @@ test_enTable:
 
 test_std_thread:
 	g++ -std=c++0x ./test/other/test_std_thread.cpp -pthread -o $(build_dir)/test_std_thread
+
+test_circularbuffer:
+	g++ -std=c++0x ./test/core/test_CircularBuffer.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_circularbuffer
