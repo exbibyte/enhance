@@ -1,6 +1,6 @@
 Enhance
 
-[![Build Status](https://travis-ci.org/bilbil/enhance.svg?branch=master)](https://travis-ci.org/philsquared/Catch)
+[![Build Status](https://travis-ci.org/bilbil/enhance.svg?branch=master)](https://travis-ci.org/bilbil/enhance)
 
 =======
 
