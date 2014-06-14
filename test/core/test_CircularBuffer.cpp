@@ -76,4 +76,19 @@ TEST_CASE( "CircularBuffer", "[CircularBuffer]" ) {
     cb.Clear();
     REQUIRE( cb.GetSize() == 0 );
   }
+
+
+  SECTION( "Get Status" ) {
+    cb.SetMaxSize( 4 );
+    REQUIRE( cb.GetStatus() == CIRBUFFER_EMPTY );
+    string str1 = "i was here";
+    string str2 = "Bryan is here";
+    string str3 = "Richard is here";
+    cb.Add( str1 );
+    cb.Add( str2 );
+    cb.Add( str3 );
+    REQUIRE( cb.GetStatus() == CIRBUFFER_PARTIAL );
+    cb.Add( str3 );
+    REQUIRE( cb.GetStatus() == CIRBUFFER_FULL );
+  }
 }
