@@ -22,25 +22,25 @@ enum ThreadStacksize{
 class enThread {
 public:
                            enThread();
-			   /* ~enThread(); */
   const char *             GetName() const;
   bool                     IsBusy() const;
   int                      GetAcquirer() const;
   bool                     Acquire( int id_acquirer );
-  bool                     SetThread(const char * name, ThreadPriority priority = THREAD_PRIORITY_NORMAL, ThreadStacksize stacksize = THREAD_STACKSIZE_NORMAL );
-  void                     SetThreadTask( int e );
-  void                     StopThread( bool wait = true );
+  bool                     SetThread(int id_acquirer, const char * name, ThreadPriority priority = THREAD_PRIORITY_NORMAL, ThreadStacksize stacksize = THREAD_STACKSIZE_NORMAL );
+  bool                     SetThreadTask( int id_acquirer, int e );
   void                     WaitForThread();
-  void                     Run();
-  virtual void             Task();
-/* private: */
+  bool                     Run( int id_acquirer );
+  void                     Task();
+  virtual void             TaskImplement(){};
+  void                     SignalEnd();
+private:
   char *                   _name;
   char                     _nameStr[256];
   bool                     _isWorker;
   thread                   _thread;
-  atomic<int>              _access;
-  ThreadStacksize          _stacksize;
-  ThreadPriority           _priority;
+  atomic<int>              _access; // -1 for idle
+  ThreadStacksize          _stacksize; //ignore for now
+  ThreadPriority           _priority; //ignore for now
 };
 
 #endif

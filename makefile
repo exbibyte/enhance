@@ -65,4 +65,4 @@ test_bufferpool:
 	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_catch) -I$(inc_core) $(libjemalloc) -o $(build_dir)/test_bufferpool
 
 test_enThread:
-	g++ -std=c++0x ./test/enCode/test_enThread.cpp -pthread $(src_en_folder)/enThread.cpp -I$(inc_en) -o $(build_dir)/test_enthread
+	g++ -std=c++0x -O3 ./test/enCode/test_enThread.cpp -pthread $(src_en_folder)/enThread.cpp -I$(inc_en) -o $(build_dir)/test_enthread
