@@ -68,5 +68,5 @@ test_enThread:
 	g++ -std=c++0x -O3 ./test/enCode/test_enThread.cpp -pthread -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthread
 
 test_enThreadPool:
-	g++ -std=c++0x -O3 ./test/enCode/test_enThreadPool.cpp -pthread $(src_en_folder)/enThreadPool.cpp -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthreadpool
+	g++ -std=c++0x -O3 ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthreadpool
 
