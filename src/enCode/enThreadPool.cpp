@@ -1,23 +1,22 @@
-#include "enThreadPool.h"
-#include "BufferPool.h"
-#include "CircularBuffer.h"
-#include "enThread.h"
+#ifdef THREAD_POOL_H
 
 #include <string>
 #include <sstream>
 #include <iostream>
 using namespace std;
 
-enThreadPool::enThreadPool(){
+template< typename T, typename D >
+enThreadPool< T, D >::enThreadPool(){
   SetNumThreads( 4 );
   _access_add.store( true, std::memory_order_relaxed ); //true for free
 }
 
-void enThreadPool::SetNumThreads( int num ){
+template< typename T, typename D >
+void enThreadPool< T, D >::SetNumThreads( int num ){
   _bufferpool.SetNumBuffers( num );
   //attach consumer buffer for each thread and initialize thread 
   for( int i = 0 ; i < num; i++ ){
-    enThreadInt * t = new enThreadInt;
+    enThread< T > * t = new D; // construct a derived enThread class
     _threadpool.push_back( t );
 
     CircularBuffer< int > * bufptr;
@@ -37,7 +36,8 @@ void enThreadPool::SetNumThreads( int num ){
   }
 }
 
-bool enThreadPool::AddTask( int e ){
+template< typename T, typename D >
+bool enThreadPool< T, D >::AddTask( T e ){
 
   bool expected = true;
 
@@ -52,18 +52,20 @@ bool enThreadPool::AddTask( int e ){
   _access_add.store( true, std::memory_order_relaxed );
 }
 
-void enThreadPool::Run(){
-  for( enThreadInt * i : _threadpool ){
+template< typename T, typename D >
+void enThreadPool< T, D >::Run(){
+  for( enThread< T > * i : _threadpool ){
     int id_pool = 0;
     i->Run( id_pool );
   }
 }
 
-void enThreadPool::WaitForAllThreads(){
-  for( enThreadInt * i : _threadpool ){
+template< typename T, typename D >
+void enThreadPool< T, D >::WaitForAllThreads(){
+  for( enThread< T > * i : _threadpool ){
     int id_pool = 0;
     i->WaitForThread();
   }
 }
 
-
+#endif
