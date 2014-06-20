@@ -1,5 +1,5 @@
-#ifndef THREAD_POOL_H
-#define THREAD_POOL_H
+#ifndef BUFFER_POOL_H
+#define BUFFER_POOL_H
 
 #include "CircularBuffer.h"
 
@@ -87,7 +87,7 @@ bool BufferPool< T > :: GetBufferAtIndex(int index, CircularBuffer< T > * & bufp
     bufptr = _buffers.at( index );
     return true;
   }else{
-    bufptr = NULL;
+    bufptr = nullptr;
     return false;
   }
 }
