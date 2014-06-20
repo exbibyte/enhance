@@ -7,6 +7,8 @@
 
 #include <thread>
 #include <atomic>
+#include <iostream>
+#include <string.h>
 using namespace std;
 
 enum ThreadPriority{

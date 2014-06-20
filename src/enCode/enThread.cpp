@@ -1,9 +1,5 @@
 #ifdef EN_THREAD_H
 
-#include <thread>
-#include <atomic>
-#include <iostream>
-#include <string.h>
 using namespace std;
 
 template< typename T >
