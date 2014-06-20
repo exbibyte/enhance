@@ -27,6 +27,7 @@ template< typename T >
 class enThread {
 public:
                            enThread();
+  virtual                  ~enThread(){};
   const char *             GetName() const;
   bool                     IsBusy() const;
   int                      GetAcquirer() const;
