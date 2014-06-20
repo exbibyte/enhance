@@ -5,12 +5,13 @@
 #include <math.h>
 using namespace std;
 
-
-class enThreadDerived : public enThread {
+template < typename T >
+class enThreadDerived : public enThread <T> {
 public:
   enThreadDerived(){};
   void TaskImplement(){
-    int limit = 1000000;
+    int limit;
+    bool ret = this->GetNextTask( limit ); // get item from buffer
     int numPrime = 0;
 
     //using sieve of eratosthenes
@@ -46,12 +47,21 @@ public:
 
 int main(){
 
-  enThreadDerived t;
+  enThreadDerived<int> t;
+  CircularBuffer< int >  buffer;
+  CircularBuffer< int > * pbuffer = &buffer;
+  t.SetBuffer( pbuffer );
+
+  //add numbers to buffer
+  for(int i = 20; i < 25; i++ ){
+    int t = i * i;
+    buffer.Add( t );
+  }
+
   string name = "t1";
   ThreadPriority priori = THREAD_PRIORITY_NORMAL;
   ThreadStacksize stacksize = THREAD_STACKSIZE_NORMAL;
   
-
   cout<<"IsBusy: "<< t.IsBusy() <<endl;
   cout<<"GetAcquirer: "<< t.GetAcquirer() <<endl;
   int processID = 0;
@@ -59,13 +69,12 @@ int main(){
   cout<<"GetAcquirer: "<< t.GetAcquirer() <<endl;
   t.SetThread( processID, name.c_str(), priori, stacksize ); 
   cout<<"thread name: "<< t.GetName()<<endl;
-  t.SetThreadTask( processID, processID );
   bool ret = t.Run( 1 );
   //expect false ret
   if( ret != false ){
     cout<<"incorrect ret for Run()"<<endl;
   }
-  ret = t.Run( 0 );
+  ret = t.Run( processID );
   //expect true ret
   if( ret != true ){
     cout<<"incorrect ret for Run()"<<endl;

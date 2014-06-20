@@ -3,6 +3,8 @@
 
 /* #include "enClass.h" */
 
+#include "CircularBuffer.h"
+
 #include <thread>
 #include <atomic>
 using namespace std;
@@ -19,6 +21,7 @@ enum ThreadStacksize{
   THREAD_STACKSIZE_LARGE
 };
 
+template< typename T >
 class enThread {
 public:
                            enThread();
@@ -27,13 +30,15 @@ public:
   int                      GetAcquirer() const;
   bool                     Acquire( int id_acquirer );
   bool                     SetThread(int id_acquirer, const char * name, ThreadPriority priority = THREAD_PRIORITY_NORMAL, ThreadStacksize stacksize = THREAD_STACKSIZE_NORMAL );
-  bool                     SetThreadTask( int id_acquirer, int e );
+  bool                     GetNextTask( T & val );
   void                     WaitForThread();
   bool                     Run( int id_acquirer );
-  void                     Task();
+  void                     Task();  // keep consuming from buffer if buffer is not empty
   virtual void             TaskImplement(){};
   void                     SignalEnd();
+  void                     SetBuffer( CircularBuffer< T > * b );
 private:
+  CircularBuffer< T > *    _buffer; //consumer buffer
   char *                   _name;
   char                     _nameStr[256];
   bool                     _isWorker;
@@ -42,5 +47,7 @@ private:
   ThreadStacksize          _stacksize; //ignore for now
   ThreadPriority           _priority; //ignore for now
 };
+
+#include "enThread.cpp"
 
 #endif
