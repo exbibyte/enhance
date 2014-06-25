@@ -88,7 +88,7 @@ void enThread< T >::SignalEnd(){
 }
 
 template< typename T >
-void enThread< T >::SetBuffer( CircularBuffer< T > * b ){
+void enThread< T >::SetBuffer( CircularBufferThreadSafe< T > * b ){
   _buffer = b;
 }
 
