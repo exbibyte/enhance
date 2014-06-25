@@ -1,7 +1,7 @@
 #ifndef BUFFER_POOL_H
 #define BUFFER_POOL_H
 
-#include "CircularBuffer.h"
+#include "CircularBufferThreadSafe.h"
 
 #include <vector>
 using namespace std;
@@ -9,15 +9,15 @@ using namespace std;
 template< typename T >
 class BufferPool{
 public:
-                                   BufferPool();
-  void                             Clear(); //remove all buffers
-  void                             SetNumBuffers( int num ); // -1 removed all buffers
-  int                              GetNumBuffers() const;
-  bool                             AddToBuffers( T & a );
-  bool                             GetBufferAtIndex(int index, CircularBuffer< T > * & bufptr ) const;
+                                             BufferPool();
+  void                                       Clear(); //remove all buffers
+  void                                       SetNumBuffers( int num ); // -1 removed all buffers
+  int                                        GetNumBuffers() const;
+  bool                                       AddToBuffers( T & a );
+  bool                                       GetBufferAtIndex(int index, CircularBuffer< T > * & bufptr ) const;
 private:
-  vector< CircularBuffer< T > * >  _buffers; //vector of buffers
-  int                              _bufSelIndex;
+  vector< CircularBufferThreadSafe< T > * >  _buffers; //vector of buffers
+  int                                        _bufSelIndex;
 };
 
 template< typename T >
@@ -41,7 +41,7 @@ void BufferPool< T > :: SetNumBuffers( int num ){
     int diff = num - _buffers.size();
     if( diff > 0 ){
       while( diff > 0 ){
-	CircularBuffer< T > * cb = new CircularBuffer< T >;
+	CircularBufferThreadSafe< T > * cb = new CircularBufferThreadSafe< T >;
 	_buffers.push_back( cb );
 	--diff;
       }
