@@ -28,6 +28,8 @@ class enThread {
 public:
                            enThread();
   virtual                  ~enThread(){};
+                           enThread(const enThread &) = delete;
+  enThread &               operator=( const enThread & ) = delete;
   const char *             GetName() const;
   bool                     IsBusy() const;
   int                      GetAcquirer() const;
@@ -37,7 +39,7 @@ public:
   void                     WaitForThread();
   bool                     Run( int id_acquirer );
   void                     Task();  // keep consuming from buffer if buffer is not empty
-  virtual void             TaskImplement(){};
+  virtual void             TaskImplement( T & item ){};
   void                     SignalEnd();
   void                     SetBuffer( CircularBuffer< T > * b );
 private:

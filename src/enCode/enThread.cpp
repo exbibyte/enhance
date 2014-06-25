@@ -47,6 +47,12 @@ bool enThread< T >::GetNextTask( T & val ) {
   return ret;
 }
 
+// template< typename T >
+// bool enThread< T >::WaitAndGetNextTask( T & val ) {
+//   bool ret = _buffer->WaitAndConsume( val );
+//   return ret;
+// }
+
 template< typename T >
 void enThread< T >::WaitForThread(){
   while( _access.load(std::memory_order_relaxed) >= 0 ){
@@ -69,7 +75,9 @@ void enThread< T >::Task(){
   cout<<"Default Task Ran"<<endl;
   // keep consuming from buffer if buffer is not empty
   while( _buffer && _buffer->GetSize() > 0){ 
-    TaskImplement();
+    T nextItem;
+    bool ret = GetNextTask( nextItem ); // get item from buffer
+    TaskImplement( nextItem );
   }
   SignalEnd(); // set lock free again
 }
