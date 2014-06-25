@@ -48,8 +48,8 @@ public:
 int main(){
 
   enThreadDerived<int> t;
-  CircularBuffer< int >  buffer;
-  CircularBuffer< int > * pbuffer = &buffer;
+  CircularBufferThreadSafe< int >  buffer;
+  CircularBufferThreadSafe< int > * pbuffer = &buffer;
   t.SetBuffer( pbuffer );
 
   //add numbers to buffer
