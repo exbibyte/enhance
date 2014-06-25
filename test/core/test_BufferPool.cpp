@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "BufferPool.h"
-#include "CircularBuffer.h"
+#include "CircularBufferThreadSafe.h"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -19,7 +19,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
     REQUIRE( tpool.GetNumBuffers() == 2 );
   }
   SECTION( "Get buffer at index" ) {
-    CircularBuffer< string > * buf = NULL;
+    CircularBufferThreadSafe< string > * buf = NULL;
     tpool.SetNumBuffers(3);
     bool ret;
     for( int i = 0; i < 3; i++ ){
@@ -35,7 +35,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
     REQUIRE( buf == NULL );
   }
   SECTION( "Add To Buffers, Clear" ) {
-    CircularBuffer< string > * buf = NULL;
+    CircularBufferThreadSafe< string > * buf = NULL;
     tpool.SetNumBuffers(3);
     string str = "quartet";
     tpool.AddToBuffers( str );
@@ -79,12 +79,14 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
       tpool.GetBufferAtIndex( i, buf );
       string getstr;
       bool ret = buf->Consume(getstr);
-      stringstream ss;
-      ss << str << i;
-      string str_temp;
-      ss >> str_temp;
-      REQUIRE( getstr == str_temp );
-      REQUIRE( buf->GetSize() == 0 );
+      if( ret == true ){
+	stringstream ss;
+	ss << str << i;
+	string str_temp;
+	ss >> str_temp;
+	REQUIRE( getstr == str_temp );
+	REQUIRE( buf->GetSize() == 0 );
+      }
     }
   }
 }
