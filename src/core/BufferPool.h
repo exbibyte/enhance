@@ -14,7 +14,7 @@ public:
   void                                       SetNumBuffers( int num ); // -1 removed all buffers
   int                                        GetNumBuffers() const;
   bool                                       AddToBuffers( T & a );
-  bool                                       GetBufferAtIndex(int index, CircularBuffer< T > * & bufptr ) const;
+  bool                                       GetBufferAtIndex(int index, CircularBufferThreadSafe< T > * & bufptr ) const;
 private:
   vector< CircularBufferThreadSafe< T > * >  _buffers; //vector of buffers
   int                                        _bufSelIndex;
@@ -82,7 +82,7 @@ bool BufferPool< T > :: AddToBuffers( T & a ){
 }
 
 template< typename T >
-bool BufferPool< T > :: GetBufferAtIndex(int index, CircularBuffer< T > * & bufptr ) const{
+bool BufferPool< T > :: GetBufferAtIndex(int index, CircularBufferThreadSafe< T > * & bufptr ) const{
   if( _buffers.empty() == false && index >= 0 && index < _buffers.size() ){
     bufptr = _buffers.at( index );
     return true;
