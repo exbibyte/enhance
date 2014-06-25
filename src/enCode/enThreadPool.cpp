@@ -19,7 +19,7 @@ void enThreadPool< T, D >::SetNumThreads( int num ){
     enThread< T > * t = new D; // construct a derived enThread class
     _threadpool.push_back( t );
 
-    CircularBuffer< int > * bufptr;
+    CircularBufferThreadSafe< int > * bufptr;
     bool ret = _bufferpool.GetBufferAtIndex( i, bufptr );
     _threadpool.at(i)->SetBuffer( bufptr );
 

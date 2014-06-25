@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "BufferPool.h"
-#include "CircularBuffer.h"
+#include "CircularBufferThreadSafe.h"
 #include "enThread.h"
 /* #include "enClass.h" */
 
