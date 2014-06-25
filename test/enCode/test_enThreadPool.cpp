@@ -13,9 +13,7 @@ mutex mutex_print;
 class enThreadInt : public enThread < int > {
   public:
     ~enThreadInt(){};
-    void TaskImplement(){
-    int limit;
-    bool ret = this->GetNextTask( limit ); // get item from buffer
+    void TaskImplement( int & limit){
     int numPrime = 0;
 
     //using sieve of eratosthenes
