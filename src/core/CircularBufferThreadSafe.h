@@ -10,7 +10,7 @@ template < typename T >
 class CircularBufferThreadSafe : public CircularBuffer< T > {
 public:
   bool                  Add( T & input );
-  bool                  Wait_And_Consume( T & get );
+  bool                  WaitAndConsume( T & get );
 private:
   mutable std::mutex mut;
   std::condition_variable data_cond;
@@ -25,7 +25,7 @@ bool CircularBufferThreadSafe< T >::Add( T & input ){
 }
 
 template < typename T >
-bool CircularBufferThreadSafe< T >::Wait_And_Consume( T & get ){
+bool CircularBufferThreadSafe< T >::WaitAndConsume( T & get ){
   std::unique_lock<std::mutex> lguard(mut);
   data_cond.wait( lguard, [this]{return ( this->GetStatus() == CIRBUFFER_PARTIAL );} ); // wait until queue is not empty 
   bool ret = CircularBuffer< T >::Consume( get );
