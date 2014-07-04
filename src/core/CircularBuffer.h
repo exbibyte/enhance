@@ -1,6 +1,7 @@
 #ifndef CIRCULAR_BUFFER_H
 #define CIRCULAR_BUFFER_H
 
+#include <utility>
 #include <deque>
 
 using namespace std;
@@ -42,7 +43,7 @@ bool CircularBuffer< T > :: Consume( T & get ){
   if( _buffer.empty() == true ){
     return false;
   }else{
-    get = _buffer.front();
+    get = std::move(_buffer.front());
     _buffer.pop_front();
     return true;
   }
