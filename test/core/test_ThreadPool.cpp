@@ -6,6 +6,8 @@
 #include <thread>
 #include <math.h>
 #include <mutex>
+#include <memory>
+
 using namespace std;
 
 void test(){
@@ -20,7 +22,7 @@ int FindPrime( int limit){
   int numPrime = 0;
 
   //using sieve of eratosthenes
-  bool * array = new bool[limit + 1];
+  int * array = new int[limit + 1];
   for(int i = 0 ; i < limit + 1; i++ ){
     array[i] = true; //true for prime number
   }
@@ -46,6 +48,7 @@ int FindPrime( int limit){
       index++;
     }
   }
+  delete [] array;
   return numPrime;
 }
 
