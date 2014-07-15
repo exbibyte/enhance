@@ -39,7 +39,7 @@ template<int ...S> struct gens<0, S...>{ typedef seq<S...> type; };
 //   }
 // };
 
-//end of unpacking tuple
+//end of unpacking tuple solution
 
 class FuncWrap {
 public:
@@ -107,13 +107,17 @@ public:
     // }
   }
   template < typename FuncType, typename ... Args >
-  std::future < typename std::result_of< FuncType( Args... ) >::type > Submit( FuncType f, Args... params)
+  std::future < typename std::result_of< FuncType( Args... ) >::type > Submit( FuncType f, Args ... params)
   {
     typedef typename std::result_of< FuncType( Args... ) >::type result_type;
     std::packaged_task< result_type( Args... ) > task( std::move( f ) );
     std::future< result_type > res( task.get_future() );
-    // FuncWrap fw( std::move( task ), params... );
-    _queue.push_front(  {std::move( task ), std::forward<Args>(params)...} );
+    
+    //either this or the commented line below
+    FuncWrap fw( std::move(task), std::forward<Args>(params)... );
+    _queue.push_front( std::move(fw) );
+
+    // _queue.push_front(  {std::move( task ), std::forward<Args>(params)...} );
     return res;
   }
 };
