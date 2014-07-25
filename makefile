@@ -15,6 +15,7 @@ inc_core := ./src/core
 build_dir := ./build
 lib:= -lGL -lGLU -lGLEW -lglut
 libjemalloc := -ljemalloc
+libsfml := -lsfml-graphics -lsfml-window -lsfml-system
 
 $(shell mkdir -p $(build_dir))
 
@@ -77,4 +78,8 @@ test_Octree:
 	g++ -std=c++0x -O3 ./test/math/test_Octree.cpp -I$(inc_catch) -I$(inc_math) -o $(build_dir)/test_octree
 
 test_ThreadPool:
-	g++ -std=c++11 -O3 ./test/core/test_ThreadPool.cpp -pthread -I$(inc_core) -o $(build_dir)/test_threadpool
+	g++ -std=c++11 -O0 -g -Wall ./test/core/test_ThreadPool.cpp -pthread -I$(inc_core) -o $(build_dir)/test_threadpool
+
+test_sfml:
+	g++ ./test/other/test_sfml.cpp $(libsfml) -o $(build_dir)/test_sfml
+

@@ -22,3 +22,10 @@ Checklist:
 
 Unit test with Catch:
 https://github.com/philsquared/Catch
+
+--------------------------------------------
+
+Dependencies:
+
+sudo apt-get install libsfml-dev
+
