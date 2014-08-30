@@ -71,9 +71,6 @@ test_bufferpool:
 test_enThread:
 	g++ -std=c++0x -O3 ./test/enCode/test_enThread.cpp -pthread -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthread
 
-test_enThreadPool:
-	g++ -std=c++11 -O3 ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthreadpool
-
 test_Octree:
 	g++ -std=c++0x -O3 ./test/math/test_Octree.cpp -I$(inc_catch) -I$(inc_math) -o $(build_dir)/test_octree
 
