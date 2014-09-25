@@ -15,14 +15,14 @@ Clock::Clock()
   this->ClockScale = 1;
 }
 
-bool Clock::SetFps(float fps)
+bool Clock::SetFps(double fps)
 {
   if(fps <= 0)
     return false;
 
   this->Fps = fps;
   //milliseconds per frame
-  this->AutoDuration = (float)1.0/fps*1000;
+  this->AutoDuration = (double)1.0/fps*1000;
   this->AutoDurationScaled = this->AutoDuration / this->ClockScale;
 
   return true;
@@ -76,22 +76,22 @@ void Clock::Pause()
   this->bRunning = false;
 }
 
-float Clock::GetFps()
+double Clock::GetFps() const
 {
   return this->Fps;
 }
 
-bool Clock::IsRunning()
+bool Clock::IsRunning() const
 {
   return this->bRunning;
 }
 
-float Clock::GetTime()
+double Clock::GetTime() const
 {
   return this->TimeSinceStart;
 }
 
-void Clock::SetClockScale(float val)
+void Clock::SetClockScale(double val)
 {
   if(val<= 0)
     return;
