@@ -1,3 +1,6 @@
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
+
 #include "ThreadPool.h"
 
 #include <deque>
@@ -52,25 +55,51 @@ int FindPrime( int limit){
   return numPrime;
 }
 
-int main(){
 
-  ThreadPool tp;
+class ThreadPoolDeque : public ThreadPool {
+public:
+    std::deque < FuncWrap > _queue;
+    void TaskAction( FuncWrap & fw ){
+        _queue.push_front( std::move(fw) );
+    }
+    void PopQueueBack(){
+        _queue.pop_back();        
+    }
+    FuncWrap & GetQueueBack(){
+        return _queue.back();        
+    }
+};
+
+TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
+  
+  ThreadPoolDeque tp;
 
   std::future<void> ret = tp.Submit(test);
   std::future<void> ret2 = tp.Submit(test2, "asfasf");
   std::future<int> ret3 = tp.Submit(FindPrime, 1000);
+  std::future<int> ret4 = tp.Submit(FindPrime, 10000);
 
-  FuncWrap fw = std::move(tp._queue.back());
+  FuncWrap fw = std::move(tp.GetQueueBack());
   fw();
-  tp._queue.pop_back();
-  FuncWrap fw2 = std::move(tp._queue.back());
+  tp.PopQueueBack();
+  FuncWrap fw2 = std::move(tp.GetQueueBack());
   fw2();
-  tp._queue.pop_back();
-  FuncWrap fw3 = std::move(tp._queue.back());
+  tp.PopQueueBack();
+  FuncWrap fw3 = std::move(tp.GetQueueBack());
+  tp.PopQueueBack();
+  FuncWrap fw4 = std::move(tp.GetQueueBack());
+  tp.PopQueueBack();
   fw3();
-  int primes = ret3.get();
+  fw4();
+  int primes1 = ret3.get();
+  int primes2 = ret4.get();
+  
+  cout<<"Number of primes under 1000: "<<primes1<<endl;
+  cout<<"Number of primes under 10000: "<<primes2<<endl;
 
-  cout<<"Number of primes: "<<primes<<endl;
+  SECTION( "Task Results" ) {
+    CHECK( primes1 == 168 );
+    CHECK( primes2 == 1229 );
+  }
 
-  return 0;
 }

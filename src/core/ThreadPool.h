@@ -93,19 +93,10 @@ public:
 
 class ThreadPool {
 public:
-  std::deque < FuncWrap > _queue;
-  void                   WorkerThread()
-  {
-    // while( !done )
-    // {
-    //   FuncWrap task;
-    //   if( _queue.try_pop(task) ){
-    // 	task();
-    //   }else{
-    // 	std::this_thread::yield();
-    //   }
-    // }
-  }
+  // std::deque < FuncWrap > _queue;
+
+  virtual void TaskAction( FuncWrap & ){};
+
   template < typename FuncType, typename ... Args >
   std::future < typename std::result_of< FuncType( Args... ) >::type > Submit( FuncType f, Args ... params)
   {
@@ -115,9 +106,11 @@ public:
     
     //either this or the commented line below
     FuncWrap fw( std::move(task), std::forward<Args>(params)... );
-    _queue.push_front( std::move(fw) );
+    
+    //call implemented function
+    // _queue.push_front( std::move(fw) );
+    TaskAction( fw );
 
-    // _queue.push_front(  {std::move( task ), std::forward<Args>(params)...} );
     return res;
   }
 };
