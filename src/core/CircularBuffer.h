@@ -67,7 +67,7 @@ int CircularBuffer< T > :: GetMaxSize() const{
 template < typename T >
 BufferStatus CircularBuffer< T > :: GetStatus() const{
   BufferStatus status;
-  if( _maxsize != -1 && _buffer.size() == _maxsize ){
+  if( _maxsize != -1 && _buffer.size() >= _maxsize ){
     status = CIRBUFFER_FULL;
   }else if( _buffer.empty() == true ){
     status = CIRBUFFER_EMPTY;

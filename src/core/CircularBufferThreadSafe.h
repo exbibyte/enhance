@@ -30,7 +30,7 @@ bool CircularBufferThreadSafe< T >::Add( T & input ){
 template < typename T >
 bool CircularBufferThreadSafe< T >::WaitAndConsume( T & get ){
   std::unique_lock<std::mutex> lguard(mut);
-  data_cond.wait( lguard, [this]{return ( this->GetStatus() == CIRBUFFER_PARTIAL );} ); // wait until queue is not empty 
+  data_cond.wait( lguard, [this]{return ( this->GetStatus() != CIRBUFFER_EMPTY );} ); // wait until queue is not empty 
   CircularBuffer< T >::Consume( get );
   return true;
 }
@@ -38,7 +38,7 @@ bool CircularBufferThreadSafe< T >::WaitAndConsume( T & get ){
 template < typename T >
 bool CircularBufferThreadSafe< T >::Consume( T & get ){
   std::unique_lock<std::mutex> lguard(mut);
-  if( this->GetStatus() == CIRBUFFER_PARTIAL ){
+  if( this->GetStatus() != CIRBUFFER_EMPTY ){
     CircularBuffer< T >::Consume( get );
     return true;
   }else{
