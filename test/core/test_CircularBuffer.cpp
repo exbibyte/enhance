@@ -46,17 +46,17 @@ TEST_CASE( "CircularBuffer", "[CircularBuffer]" ) {
     bool ret = cb.Consume( getStr );
     REQUIRE( ret == true );
     REQUIRE( cb.GetSize() == 2 );
-    REQUIRE( getStr == str1 );
+    REQUIRE( getStr == "i was here" );
 
     ret = cb.Consume( getStr );
     REQUIRE( ret == true );
     REQUIRE( cb.GetSize() == 1 );
-    REQUIRE( getStr == str2 );
+    REQUIRE( getStr == "Bryan is here" );
 
     ret = cb.Consume( getStr );
     REQUIRE( ret == true );
     REQUIRE( cb.GetSize() == 0 );
-    REQUIRE( getStr == str3 );
+    REQUIRE( getStr == "Richard is here" );
 
     ret = cb.Consume( getStr );
     REQUIRE( ret == false );
