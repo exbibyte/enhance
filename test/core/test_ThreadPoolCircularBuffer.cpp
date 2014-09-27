@@ -12,6 +12,7 @@
 #include <mutex>
 #include <memory>
 #include <utility>
+#include <type_traits>
 
 using namespace std;
 
@@ -77,7 +78,8 @@ TEST_CASE( "TPCirBufThread", "[TPCirBufThread]" ) {
   std::future<void> ret = tp.Submit(test);
   std::future<void> ret2 = tp.Submit(test2, "asfasf");
   std::future<int> ret3 = tp.Submit(FindPrime, 1000);
-  std::future<int> ret4 = tp.Submit(FindPrime, 10000);
+  typedef decltype(FindPrime(100)) retType;
+  std::future< retType > ret4 = tp.Submit(FindPrime, 10000);
 
   FuncWrap fw, fw2, fw3, fw4;
   tp.GetQueueBack( fw );
@@ -89,7 +91,7 @@ TEST_CASE( "TPCirBufThread", "[TPCirBufThread]" ) {
   fw3();
   fw4();
   int primes1 = ret3.get();
-  int primes2 = ret4.get();
+  retType  primes2 = ret4.get();
   
   cout<<"Number of primes under 1000: "<<primes1<<endl;
   cout<<"Number of primes under 10000: "<<primes2<<endl;
