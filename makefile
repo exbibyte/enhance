@@ -77,11 +77,14 @@ test_Octree:
 test_ThreadPool:
 	g++ -std=c++11 -O0 -g -Wall ./test/core/test_ThreadPool.cpp -pthread -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_threadpool
 
-test_sfml:
+test_Sfml:
 	g++ ./test/other/test_sfml.cpp $(libsfml) -o $(build_dir)/test_sfml
 
-test_confignode:
+test_ConfigNode:
 	g++ -std=c++11 -g ./test/core/test_cconfignode.cpp $(src_core_folder)/ConfigNode.cpp -I$(inc_core) -o $(build_dir)/test_cconfignode
 
-test_clock:
+test_Clock:
 	g++ -std=c++11 -g ./test/core/test_Clock.cpp $(src_core_folder)/Clock.cpp -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_clock
+
+test_threadpoolcircularbuffer:
+	g++ -std=c++11 -g ./test/core/test_ThreadPoolCircularBuffer.cpp -pthread -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_threadpoolcircularbuffer

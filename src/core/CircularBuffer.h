@@ -33,7 +33,7 @@ bool CircularBuffer< T > :: Add( T & a ){
   if( _maxsize != -1 && _buffer.size() >= _maxsize ){
     return false;
   }else{
-    _buffer.push_back( a );
+      _buffer.push_back( std::move( a ) );
     return true;
   }
 }
