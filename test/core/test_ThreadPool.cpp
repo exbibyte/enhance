@@ -65,8 +65,10 @@ public:
     void PopQueueBack(){
         _queue.pop_back();        
     }
-    FuncWrap & GetQueueBack(){
-        return _queue.back();        
+    bool GetQueueBack( FuncWrap & a ){
+        a = std::move(_queue.back());     
+        PopQueueBack();   
+        return true;
     }
 };
 
@@ -79,16 +81,13 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
   std::future<int> ret3 = tp.Submit(FindPrime, 1000);
   std::future<int> ret4 = tp.Submit(FindPrime, 10000);
 
-  FuncWrap fw = std::move(tp.GetQueueBack());
+  FuncWrap fw, fw2, fw3, fw4;
+  tp.GetQueueBack( fw );
   fw();
-  tp.PopQueueBack();
-  FuncWrap fw2 = std::move(tp.GetQueueBack());
+  tp.GetQueueBack( fw2 );
   fw2();
-  tp.PopQueueBack();
-  FuncWrap fw3 = std::move(tp.GetQueueBack());
-  tp.PopQueueBack();
-  FuncWrap fw4 = std::move(tp.GetQueueBack());
-  tp.PopQueueBack();
+  tp.GetQueueBack( fw3 );
+  tp.GetQueueBack( fw4 );
   fw3();
   fw4();
   int primes1 = ret3.get();
