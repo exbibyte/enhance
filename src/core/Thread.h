@@ -6,7 +6,7 @@
 
 class Thread {
 public:
-Thread:_access(-1) ();
+                                       Thread():_access(-1) {};
     virtual                            ~Thread(){};
     Thread( const Thread &) = delete;
     Thread &                           operator=( const Thread & ) = delete;
@@ -14,8 +14,8 @@ Thread:_access(-1) ();
     bool                               Run();
     virtual void                       Task();
 private:
-    thread                             _StdThread;
-    atomic<int>                        _access; // -1 for idle
+    std::thread                        _StdThread;
+    std::atomic<int>                   _access; // -1 for idle
 };
 
 #include "Thread.cpp"
