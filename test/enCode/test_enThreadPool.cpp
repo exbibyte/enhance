@@ -3,6 +3,10 @@
 
 #include "enThreadPool.h"
 #include "ThreadPool.h"
+#include "BufferPool.h"
+#include "CircularBufferThreadSafe.h"
+#include "enThread.h"
+
 #include <iostream>
 #include <future>
 #include <thread>
@@ -11,6 +15,7 @@
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <vector>
 
 using namespace std;
 
@@ -56,23 +61,26 @@ int FindPrime( int limit){
   return numPrime;
 }
 
+class myBufferPool : public BufferPool< CircularBufferThreadSafe< FuncWrap >, FuncWrap > {};
+class myThreadPool : public enThreadPool< myBufferPool, enThread, FuncWrap >{};
+
 TEST_CASE( "enThreadPool", "[enThreadPool]" ) {
 
-  enThreadPool tp;
+  myThreadPool tp;
 
-  std::future<void> ret = tp.Submit(test);
-  std::future<void> ret2 = tp.Submit(test2, "asfasf");
-  std::future<int> ret3 = tp.Submit(FindPrime, 1000);
+  std::future<void> ret = tp.AddTask(test);
+  std::future<void> ret2 = tp.AddTask(test2, "asfasf");
+  std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
   typedef decltype(FindPrime(100)) retType;
-  std::future< retType > ret4 = tp.Submit(FindPrime, 10000);
+  std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
 
   FuncWrap fw, fw2, fw3, fw4;
-  tp.GetQueueBack( fw );
+  tp.GetTask( fw );
   fw();
-  tp.GetQueueBack( fw2 );
+  tp.GetTask( fw2 );
   fw2();
-  tp.GetQueueBack( fw3 );
-  tp.GetQueueBack( fw4 );
+  tp.GetTask( fw3 );
+  tp.GetTask( fw4 );
   fw3();
   fw4();
   int primes1 = ret3.get();
