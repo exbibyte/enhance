@@ -2,20 +2,23 @@
 #define EN_THREADPOOL_H
 
 #include "ThreadPool.h"
-#include "BufferPool.h"
-#include "CircularBufferThreadSafe.h"
+#include <vector>
 
-class enThreadPool : public ThreadPool{
+template< typename BufferType, typename ThreadType, typename TaskType >
+class enThreadPool : public ThreadPool {
 public:
-    BufferPool< CircularBufferThreadSafe< FuncWrap >, FuncWrap > _BuffPool;
-    void TaskAction( FuncWrap & fw ){
-        _BuffPool.AddToBuffers( fw );
+    bool GetTask( TaskType & fw ){
+        return _BuffPool.GetFromBuffer( fw );
     }
-    bool GetQueueBack( FuncWrap & fw ){
-        return _BuffPool.ConsumeBuffersRandom( fw );        
+    void SetNumThreads( int n ){
+
     }
-    bool GetTask( FuncWrap & fw ){
-        return GetQueueBack( fw );
+private:
+    // BufferPool< CircularBufferThreadSafe< TaskType >, TaskType >   _BuffPool;
+    BufferType                              _BuffPool;
+    std::vector< ThreadType >               _vThread;
+    void AddTaskHook( TaskType & fw ){
+        _BuffPool.AddToBuffer( fw );
     }
 };
 
