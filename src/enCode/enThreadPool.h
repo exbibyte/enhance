@@ -14,6 +14,9 @@ public:
     bool GetQueueBack( FuncWrap & fw ){
         return _BuffPool.ConsumeBuffersRandom( fw );        
     }
+    bool GetTask( FuncWrap & fw ){
+        return GetQueueBack( fw );
+    }
 };
 
 #endif

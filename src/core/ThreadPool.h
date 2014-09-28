@@ -113,6 +113,7 @@ public:
 
     return res;
   }
+  virtual bool GetTask( FuncWrap & fw ){ return false; }
 };
 
 
