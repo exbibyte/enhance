@@ -59,11 +59,11 @@ test_enTable:
 test_std_thread:
 	g++ -std=c++0x ./test/other/test_std_thread.cpp -pthread -o $(build_dir)/test_std_thread
 
-test_circularbuffer:
+test_CircularBuffer:
 	g++ -std=c++0x ./test/core/test_CircularBuffer.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_circularbuffer
 
-test_circularbuffer_threadsafe:
-	g++ -std=c++0x ./test/core/test_CircularBuffer_threadsafe.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_circularbuffer_threadsafe
+test_CircularBufferThreadSafe:
+	g++ -std=c++0x ./test/core/test_CircularBufferThreadSafe.cpp -I$(inc_catch) -I$(inc_core) -o $(build_dir)/test_circularbufferthreadsafe
 
 test_bufferpool:
 	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_catch) -I$(inc_core) $(libjemalloc) -o $(build_dir)/test_bufferpool
@@ -86,7 +86,7 @@ test_ConfigNode:
 test_Clock:
 	g++ -std=c++11 -g ./test/core/test_Clock.cpp $(src_core_folder)/Clock.cpp -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_clock
 
-test_threadpoolcircularbuffer:
+test_ThreadPoolCircularBuffer:
 	g++ -std=c++11 -g ./test/core/test_ThreadPoolCircularBuffer.cpp -pthread -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_threadpoolcircularbuffer
 
 test_enThreadPool:
