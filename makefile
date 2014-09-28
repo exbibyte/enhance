@@ -91,3 +91,6 @@ test_ThreadPoolCircularBuffer:
 
 test_enThreadPool:
 	g++ -std=c++11 -g ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_core) -I$(inc_en) -I$(inc_catch) -o $(build_dir)/test_enthreadpool
+
+test_enTPCommon:
+	g++ -std=c++11 -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_core) -I$(inc_en) -I$(inc_catch) -o $(build_dir)/test_entpcommon
