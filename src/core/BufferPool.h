@@ -13,7 +13,8 @@ public:
   void                                       Clear(); //remove all buffers
   void                                       SetNumBuffers( int num ); // -1 removed all buffers
   int                                        GetNumBuffers() const;
-  bool                                       AddToBuffers( T & a );
+  bool                                       AddToBuffer( T & a );
+  bool                                       GetFromBuffer( T & a );
   bool                                       GetBufferAtIndex(int index, Buffer * & bufptr ) const;
   void                                       ResetIndex();
   bool                                       ConsumeBuffersRandom( T & a );
@@ -61,7 +62,7 @@ int BufferPool< Buffer, T > :: GetNumBuffers() const{
 }
 
 template< typename Buffer, typename T >
-bool BufferPool< Buffer, T > :: AddToBuffers( T & a ){
+bool BufferPool< Buffer, T > :: AddToBuffer( T & a ){
   if( _bufSelIndex == -1 ){
     return false;
   }else if( _bufSelIndex >=  _buffers.size()){
@@ -119,6 +120,11 @@ bool BufferPool< Buffer, T > :: ConsumeBuffersRandom( T & a ){
     }
   }
   return false;
+}
+
+template< typename Buffer, typename T >
+bool BufferPool< Buffer, T > :: GetFromBuffer( T & a ){
+    return ConsumeBuffersRandom( a );
 }
 
 #endif
