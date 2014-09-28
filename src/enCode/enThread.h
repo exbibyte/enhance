@@ -3,19 +3,21 @@
 
 #include "Thread.h"
 
-class FuncWrap;
+#include "FuncWrap.h"
+
 class ThreadPool;
 
 class enThread : public Thread {
 public:
+    enThread() : _enTP(0) {}
     void SetThreadPool( ThreadPool * enTP ) { _enTP = enTP; }
-    void Task(){
+    void RunHook(){
         // keep consuming from buffer if buffer is not empty
         while( _enTP ){ 
-            FuncWrap nextItem;
-            bool bRet = _enTP->GetTask( nextItem ); // get item from buffer
+            FuncWrap TaskExecute;
+            bool bRet = _enTP->GetTask( TaskExecute ); // get item from buffer
             if( bRet ){
-                nextItem(); //execute task
+                TaskExecute(); //execute task
             }else{
                 break;
             }
