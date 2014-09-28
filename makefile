@@ -68,8 +68,8 @@ test_circularbuffer_threadsafe:
 test_bufferpool:
 	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_catch) -I$(inc_core) $(libjemalloc) -o $(build_dir)/test_bufferpool
 
-test_enThread:
-	g++ -std=c++0x -O3 ./test/enCode/test_enThread.cpp -pthread -I$(inc_core) -I$(inc_en) -o $(build_dir)/test_enthread
+test_Thread:
+	g++ -std=c++0x -O3 ./test/core/test_Thread.cpp -pthread -I$(inc_core) -o $(build_dir)/test_thread
 
 test_Octree:
 	g++ -std=c++0x -O3 ./test/math/test_Octree.cpp -I$(inc_catch) -I$(inc_math) -o $(build_dir)/test_octree
