@@ -76,10 +76,10 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
   
   ThreadPoolDeque tp;
 
-  std::future<void> ret = tp.Submit(test);
-  std::future<void> ret2 = tp.Submit(test2, "asfasf");
-  std::future<int> ret3 = tp.Submit(FindPrime, 1000);
-  std::future<int> ret4 = tp.Submit(FindPrime, 10000);
+  std::future<void> ret = tp.AddTask(test);
+  std::future<void> ret2 = tp.AddTask(test2, "asfasf");
+  std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
+  std::future<int> ret4 = tp.AddTask(FindPrime, 10000);
 
   FuncWrap fw, fw2, fw3, fw4;
   tp.GetQueueBack( fw );

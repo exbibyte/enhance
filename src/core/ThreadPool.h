@@ -98,7 +98,7 @@ public:
   virtual void TaskAction( FuncWrap & fw ){};
 
   template < typename FuncType, typename ... Args >
-  std::future < typename std::result_of< FuncType( Args... ) >::type > Submit( FuncType f, Args ... params)
+  std::future < typename std::result_of< FuncType( Args... ) >::type > AddTask( FuncType f, Args ... params)
   {
     typedef typename std::result_of< FuncType( Args... ) >::type result_type;
     std::packaged_task< result_type( Args... ) > task( std::move( f ) );
