@@ -95,7 +95,7 @@ class ThreadPool {
 public:
   // std::deque < FuncWrap > _queue;
 
-  virtual void TaskAction( FuncWrap & fw ){};
+  virtual void AddTaskHook( FuncWrap & fw ){};
 
   template < typename FuncType, typename ... Args >
   std::future < typename std::result_of< FuncType( Args... ) >::type > AddTask( FuncType f, Args ... params)
@@ -109,7 +109,7 @@ public:
     
     //call implemented function
     // _queue.push_front( std::move(fw) );
-    TaskAction( fw );
+    AddTaskHook( fw );
 
     return res;
   }

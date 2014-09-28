@@ -63,7 +63,7 @@ class CirBufThreadFuncWrap : public CircularBufferThreadSafe< FuncWrap > {};
 class TPThreadSafe : public ThreadPool{
 public:
     CirBufThreadFuncWrap buf;
-    void TaskAction( FuncWrap & a ){
+    void AddTaskHook( FuncWrap & a ){
         buf.Add( a );
     }
     bool GetQueueBack( FuncWrap & a ){

@@ -59,7 +59,7 @@ int FindPrime( int limit){
 class ThreadPoolDeque : public ThreadPool {
 public:
     std::deque < FuncWrap > _queue;
-    void TaskAction( FuncWrap & fw ){
+    void AddTaskHook( FuncWrap & fw ){
         _queue.push_front( std::move(fw) );
     }
     void PopQueueBack(){
