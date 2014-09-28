@@ -18,7 +18,7 @@ public:
   void                                       ResetIndex();
   bool                                       ConsumeBuffersRandom( T & a );
 private:
-  vector< Buffer * >  _buffers; //vector of buffers
+  vector< Buffer * >                         _buffers; //vector of buffers
   int                                        _bufSelIndex;
   int                                        _bufConsumeIndex;
 };
