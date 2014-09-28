@@ -1,29 +1,21 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-#include "ThreadPool.h"
-
 #include <thread>
 #include <atomic>
-#include <iostream>
-#include <string.h>
-using namespace std;
 
-class enThread {
+class Thread {
 public:
-                                     enThread:_access(-1), _globalpool(nullptr) ();
-  virtual                            ~enThread(){};
-                                     enThread( const enThread &) = delete;
-  enThread &                         operator=( const enThread & ) = delete;
-  void                               WaitForThread();
-  bool                               Run();
-  void                               Task();
-  void                               SetGlobalpool( ThreadPool * );
+Thread:_access(-1) ();
+    virtual                            ~Thread(){};
+    Thread( const Thread &) = delete;
+    Thread &                           operator=( const Thread & ) = delete;
+    void                               WaitForThread();
+    bool                               Run();
+    virtual void                       Task();
 private:
-  ThreadPool *                       _globalpool;
-  ThreadPool                         _localpool;
-  thread                             _thread;
-  atomic<int>                        _access; // -1 for idle
+    thread                             _StdThread;
+    atomic<int>                        _access; // -1 for idle
 };
 
 #include "Thread.cpp"
