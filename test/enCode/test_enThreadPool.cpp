@@ -6,6 +6,7 @@
 #include "BufferPool.h"
 #include "CircularBufferThreadSafe.h"
 #include "enThread.h"
+#include "FuncWrap.h"
 
 #include <iostream>
 #include <future>
@@ -62,11 +63,12 @@ int FindPrime( int limit){
 }
 
 class myBufferPool : public BufferPool< CircularBufferThreadSafe< FuncWrap >, FuncWrap > {};
-class myThreadPool : public enThreadPool< myBufferPool, enThread, FuncWrap >{};
+class myThreadPool : public enThreadPool< myBufferPool, enThread  >{};
 
 TEST_CASE( "enThreadPool", "[enThreadPool]" ) {
 
   myThreadPool tp;
+  tp.SetNumThreads(4);
 
   std::future<void> ret = tp.AddTask(test);
   std::future<void> ret2 = tp.AddTask(test2, "asfasf");
@@ -74,18 +76,10 @@ TEST_CASE( "enThreadPool", "[enThreadPool]" ) {
   typedef decltype(FindPrime(100)) retType;
   std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
 
-  FuncWrap fw, fw2, fw3, fw4;
-  tp.GetTask( fw );
-  fw();
-  tp.GetTask( fw2 );
-  fw2();
-  tp.GetTask( fw3 );
-  tp.GetTask( fw4 );
-  fw3();
-  fw4();
+  tp.RunThreads();
+
   int primes1 = ret3.get();
   retType  primes2 = ret4.get();
-  
   cout<<"Number of primes under 1000: "<<primes1<<endl;
   cout<<"Number of primes under 10000: "<<primes2<<endl;
 
