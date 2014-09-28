@@ -2,6 +2,7 @@
 #include "catch.hpp"
 
 #include "ThreadPool.h"
+#include "FuncWrap.h"
 
 #include <deque>
 #include <iostream>

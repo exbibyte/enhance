@@ -4,6 +4,8 @@
 #include "ThreadPool.h"
 #include "CircularBuffer.h"
 #include "CircularBufferThreadSafe.h"
+#include "FuncWrap.h"
+
 #include <deque>
 #include <iostream>
 #include <future>
