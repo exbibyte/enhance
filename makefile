@@ -88,3 +88,6 @@ test_Clock:
 
 test_threadpoolcircularbuffer:
 	g++ -std=c++11 -g ./test/core/test_ThreadPoolCircularBuffer.cpp -pthread -I$(inc_core) -I$(inc_catch) -o $(build_dir)/test_threadpoolcircularbuffer
+
+test_enThreadPool:
+	g++ -std=c++11 -g ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_core) -I$(inc_en) -I$(inc_catch) -o $(build_dir)/test_enthreadpool
