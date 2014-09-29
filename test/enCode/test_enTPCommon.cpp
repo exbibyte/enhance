@@ -56,26 +56,30 @@ int FindPrime( int limit){
   return numPrime;
 }
 
-// void PrintNum( enTPCommon & p, int & a ){
-//     cout << a << endl;
-//     ++a;
-//     if( a < 110 ){
-//         p.AddTask(PrintNum, p, a);
-//     }
-// }
+void PrintNum( int a ){
+    cout << a << endl;
+    ++a;
+    // if( a < 110 ){
+    //     p->AddTask(PrintNum, p, a);
+    // }
+}
 
 TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
 
   enTPCommon tp;
   tp.SetNumThreads(4);
+  enTPCommon * ptp = &tp;
 
-  std::future<void> ret = tp.AddTask(test);
-  std::future<void> ret2 = tp.AddTask(test2, "asfasf");
+  int testnum = 99;
+  int testnum2 = 1000;
+  int testnum3 = 10000;
+  string teststr = "asdf";
+
+  std::future<void> ret = tp.AddTask(PrintNum, 99);
+  std::future<void> ret2 = tp.AddTask(test2, teststr );
   std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
-  typedef decltype(FindPrime(100)) retType;
+  typedef decltype(FindPrime(10000)) retType;
   std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
-
-  int blah = 99;
 
   tp.RunThreads();
 
@@ -91,6 +95,15 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
 
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   
+  int temp;
+  while(cin>>temp){
+      if(temp < 0){
+          break;
+      }
+      std::future<int> ret5 = tp.AddTask(FindPrime, temp);
+      int tempprime = ret5.get();
+      cout<<"Number of primes under " << temp <<": "<< tempprime <<endl;
+  }
   tp.EndAllThreads();
 
 }
