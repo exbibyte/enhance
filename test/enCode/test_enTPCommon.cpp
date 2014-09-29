@@ -65,13 +65,19 @@ void IncreNumRef( int & a ){
     a++;
 }
 
+void IncreNumRefSelfTask( enTPCommon * b, int & a ){
+    a++;
+    auto retnum = b->AddTask(IncreNumRef, std::ref(a));
+    retnum.get();
+}
+
 TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
 
   enTPCommon tp;
   tp.SetNumThreads(4);
   enTPCommon * ptp = &tp;
 
-  int testnum = 99;
+  int testnum = 100;
   int testnum2 = 1000;
   int testnum3 = 10000;
   string teststr = "asdf";
@@ -81,7 +87,7 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
   std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
   typedef decltype(FindPrime(10000)) retType;
   std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
-  std::future<void> ret5 = tp.AddTask(IncreNumRef, std::ref(testnum));
+  std::future<void> ret5 = tp.AddTask(IncreNumRefSelfTask, ptp, std::ref(testnum));
 
   tp.RunThreads();
 
@@ -95,7 +101,7 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
   SECTION( "Task Results" ) {
     CHECK( primes1 == 168 );
     CHECK( primes2 == 1229 );
-    CHECK( testnum == 100 );
+    CHECK( testnum == 102 );
     CHECK( increRet == 121 );
   }
 
