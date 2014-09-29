@@ -33,6 +33,14 @@ public:
         for( int i = 0; i < _vThread.size(); i++ ){
             _vThread.at(i)->EndThread();
         }
+        for( int i = 0; i < _vThread.size(); i++ ){
+            _vThread.at(i)->WaitForThreadEnd();
+        }
+    }
+    ~enThreadPool(){
+        for( int i = 0; i < _vThread.size(); i++ ){
+            delete _vThread.at(i);
+        }
     }
 private:
     BufferType                              _BuffPool;
