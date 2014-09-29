@@ -9,6 +9,8 @@
 #include <utility>
 #include <type_traits>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -54,6 +56,14 @@ int FindPrime( int limit){
   return numPrime;
 }
 
+// void PrintNum( enTPCommon & p, int & a ){
+//     cout << a << endl;
+//     ++a;
+//     if( a < 110 ){
+//         p.AddTask(PrintNum, p, a);
+//     }
+// }
+
 TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
 
   enTPCommon tp;
@@ -64,6 +74,8 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
   std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
   typedef decltype(FindPrime(100)) retType;
   std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
+
+  int blah = 99;
 
   tp.RunThreads();
 
@@ -76,5 +88,9 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
     CHECK( primes1 == 168 );
     CHECK( primes2 == 1229 );
   }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  
+  tp.EndAllThreads();
 
 }
