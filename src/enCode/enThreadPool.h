@@ -29,6 +29,11 @@ public:
             _vThread.at(i)->Run();
         }
     }
+    void EndAllThreads(){
+        for( int i = 0; i < _vThread.size(); i++ ){
+            _vThread.at(i)->EndThread();
+        }
+    }
 private:
     BufferType                              _BuffPool;
     std::vector< ThreadType * >             _vThread;
