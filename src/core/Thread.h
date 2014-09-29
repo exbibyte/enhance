@@ -11,10 +11,11 @@
 #define THREAD_NOTIFY_END       3
 #define THREAD_NOTIFY_PAUSE     4
 #define THREAD_NOTIFY_CONTINUE  5
+#define THREAD_NOTIFY_NONE      6
 
 class Thread {
 public:
-                                       Thread() : _Access( THREAD_IDLE ) {};
+                                       Thread() : _Access( THREAD_IDLE ), _Notify( THREAD_NOTIFY_NONE ) {};
     virtual                            ~Thread(){};
                                        Thread( const Thread &) = delete;
     Thread &                           operator=( const Thread & ) = delete;
@@ -28,6 +29,7 @@ public:
     void                               ContinueThread();
 protected:    
     std::atomic<int>                   _Access; /// thread state indicator
+    std::atomic<int>                   _Notify; /// notify thread state
 private:
     std::thread                        _StdThread;
 };

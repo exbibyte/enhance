@@ -24,20 +24,20 @@ void Thread::RunHook(){
 }
 
 void Thread::PauseThread(){
-    if( _Access.load(std::memory_order_relaxed) != THREAD_PAUSED ){ /// flag pause state if current state is not paused
-        _Access.store( THREAD_NOTIFY_PAUSE, std::memory_order_relaxed);
+    if( _Notify.load(std::memory_order_release) != THREAD_PAUSED ){ /// flag pause state if current state is not paused
+        _Notify.store( THREAD_NOTIFY_PAUSE, std::memory_order_relaxed);
     }
 }
 
 void Thread::EndThread(){
-    if( _Access.load(std::memory_order_relaxed) != THREAD_ENDED ){ /// flag end state if current state is not ended
-        _Access.store( THREAD_NOTIFY_END, std::memory_order_relaxed);
+    if( _Notify.load(std::memory_order_release) != THREAD_ENDED ){ /// flag end state if current state is not ended
+        _Notify.store( THREAD_NOTIFY_END, std::memory_order_relaxed);
     }
 }
 
 void Thread::ContinueThread(){
-    if( _Access.load(std::memory_order_relaxed) == THREAD_PAUSED ){ /// flag continue state if current state is paused
-        _Access.store( THREAD_NOTIFY_CONTINUE, std::memory_order_relaxed);
+    if( _Notify.load(std::memory_order_relaxed) == THREAD_PAUSED ){ /// flag continue state if current state is paused
+        _Notify.store( THREAD_NOTIFY_CONTINUE, std::memory_order_relaxed);
     }
 }
 
