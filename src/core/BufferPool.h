@@ -4,6 +4,8 @@
 // #include "CircularBufferThreadSafe.h"
 
 #include <vector>
+#include <mutex>
+
 using namespace std;
 
 template< typename Buffer, typename T >
@@ -22,6 +24,7 @@ private:
   vector< Buffer * >                         _buffers; //vector of buffers
   int                                        _bufSelIndex;
   int                                        _bufConsumeIndex;
+  mutable std::mutex                         _mut;
 };
 
 template< typename Buffer, typename T >
@@ -105,6 +108,9 @@ void BufferPool< Buffer, T > :: ResetIndex(){
 
 template< typename Buffer, typename T >
 bool BufferPool< Buffer, T > :: ConsumeBuffersRandom( T & a ){
+
+  std::lock_guard<std::mutex> lguard(_mut);
+
   if( _bufConsumeIndex == -1 ){
     return false;
   }else if( _bufConsumeIndex >=  _buffers.size()){
