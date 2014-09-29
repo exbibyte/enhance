@@ -11,6 +11,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <functional>
 
 using namespace std;
 
@@ -56,12 +57,12 @@ int FindPrime( int limit){
   return numPrime;
 }
 
-void PrintNum( int a ){
-    cout << a << endl;
-    ++a;
-    // if( a < 110 ){
-    //     p->AddTask(PrintNum, p, a);
-    // }
+int IncreNum( int a ){
+    return ++a;
+}
+
+void IncreNumRef( int & a ){
+    a++;
 }
 
 TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
@@ -75,22 +76,27 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
   int testnum3 = 10000;
   string teststr = "asdf";
 
-  std::future<void> ret = tp.AddTask(PrintNum, 99);
+  std::future<int> ret1 = tp.AddTask(IncreNum, 120 );
   std::future<void> ret2 = tp.AddTask(test2, teststr );
   std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
   typedef decltype(FindPrime(10000)) retType;
   std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
+  std::future<void> ret5 = tp.AddTask(IncreNumRef, std::ref(testnum));
 
   tp.RunThreads();
 
   int primes1 = ret3.get();
   retType  primes2 = ret4.get();
+  ret5.get();
+  int increRet = ret1.get();
   cout<<"Number of primes under 1000: "<<primes1<<endl;
   cout<<"Number of primes under 10000: "<<primes2<<endl;
 
   SECTION( "Task Results" ) {
     CHECK( primes1 == 168 );
     CHECK( primes2 == 1229 );
+    CHECK( testnum == 100 );
+    CHECK( increRet == 121 );
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
