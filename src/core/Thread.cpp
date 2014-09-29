@@ -24,13 +24,13 @@ void Thread::RunHook(){
 }
 
 void Thread::PauseThread(){
-    if( _Notify.load(std::memory_order_release) != THREAD_PAUSED ){ /// flag pause state if current state is not paused
+    if( _Notify.load(std::memory_order_relaxed) != THREAD_PAUSED ){ /// flag pause state if current state is not paused
         _Notify.store( THREAD_NOTIFY_PAUSE, std::memory_order_relaxed);
     }
 }
 
 void Thread::EndThread(){
-    if( _Notify.load(std::memory_order_release) != THREAD_ENDED ){ /// flag end state if current state is not ended
+    if( _Notify.load(std::memory_order_relaxed) != THREAD_ENDED ){ /// flag end state if current state is not ended
         _Notify.store( THREAD_NOTIFY_END, std::memory_order_relaxed);
     }
 }
