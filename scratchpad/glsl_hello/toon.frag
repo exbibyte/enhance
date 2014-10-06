@@ -3,10 +3,6 @@
 
 varying vec3 normal, lightDir;
 
-varying vec4 test;
-
-varying vec3 mod_colour2;
-
 void main()
 {
 	float intensity;
@@ -25,6 +21,6 @@ void main()
 	else
 		color = vec4(0.1,0.1,0.1,1.0);		
 		
-        gl_FragColor = color * vec4(mod_colour2, 1.0);   
+        gl_FragColor = color;
 
 }

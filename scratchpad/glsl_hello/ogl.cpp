@@ -1,11 +1,3 @@
-/*
-
-
-  Simple Demo for GLSL 2.0
-
-  www.lighthouse3d.com
-
-*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +6,12 @@
 #include "textfile.h"
 
 #include "GLHelper.h"
+
+#include <glm/glm.hpp>
+using glm::mat4;
+using glm::vec3;
+using glm::gtc::matrix_transform;
+#include <glm/gtc/matrix_transform.hpp>
 
 GLuint v,f,f2,p;
 float lpos[4] = {1,0.5,1,0};
@@ -34,18 +32,8 @@ void changeSize(int w, int h) {
 
 	float ratio = 1.0* w / h;
 
-	// Reset the coordinate system before modifying
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
 	// Set the viewport to be the entire window
-    glViewport(0, 0, w, h);
-
-	// Set the correct perspective.
-	gluPerspective(45,ratio,1,1000);
-	glMatrixMode(GL_MODELVIEW);
-
-
+        glViewport(0, 0, w, h);
 }
 
 
@@ -60,7 +48,31 @@ void renderScene(void) {
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 
-        glBindVertexArray(vaoHandle);
+        glm::mat4 m_projectionMatrix = glm::perspective(60.0, 1.333, 0.1, 1000.0);
+
+        glm::mat4 m_modelViewMatrix = glm::lookat(
+            0.0,0.0,10.0, 
+            0.0,0.0,-1.0,
+            0.0f,1.0f,0.0f
+        );
+        // m_modelViewMatrix *= glm::rotate(1,1,1,1);
+        // mat4 rotationMatrix = glm::rotate(mat4(1.0f), angle, vec3(0.0f,0.0f,1.0f));
+
+        GLint loc = glGetUniformLocation(p, "modelview_matrix");
+        double dArray[16] = {0.0};
+        const float *pSource = (const float*)glm::value_ptr(m_modelViewMatrix);
+        for (int i = 0; i < 16; ++i){
+            dArray[i] = pSource[i];
+        }
+        glProgramUniformMatrix4fv(p, loc, 1, GL_FALSE, dArray);
+    
+        loc = glGetUniformLocation(p, "projection_matrix");
+        double dArray2[16] = {0.0};
+        const float *pSource2 = (const float*)glm::value_ptr(_projectionMatrix);
+        for (int i = 0; i < 16; ++i){
+            dArray2[i] = pSource2[i];
+        }
+        glProgramUniformMatrix4fv(p, loc, 1, GL_FALSE, dArray2);
 
 	glutSolidTeapot(1);
 
@@ -105,24 +117,8 @@ void setShaders() {
 	glAttachShader(p,f);
 	glAttachShader(p,v);
 
-        // Bind index 0 to the shader input variable "VertexPosition"
-        glBindAttribLocation(p, 0, "mod_colour");
-
-        glGenBuffers(2, vboHandles);
-        colorBufferHandle = vboHandles[0];
-
-        //Create and set-up the vertex array object
-        glGenVertexArrays( 1, &vaoHandle );
-        glBindVertexArray(vaoHandle);
-        //Enable the vertex attribute arrays
-        glEnableVertexAttribArray(0); // mod_colour attribute
-        //Map index 0 to the color buffer
-        //Populate the color buffer
-        glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-        glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(float), colourData,
-                     GL_STATIC_DRAW);
-
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
+        glGetUniformLocation(p, "projection_matrix");
+        glGetUniformLocation(p, "modelview_matrix");
 
 	GLLinkProgram(p);
 }
