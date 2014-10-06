@@ -13,15 +13,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+using glm::mat4;
+using glm::vec3;
+
 GLuint v,f,f2,p;
 float lpos[4] = {1,0.5,1,0};
-
 GLuint vaoHandle;
 
 //Create the buffer objects
 GLuint vboHandles[2];
 float colourData[] = { 1, 1, 1 };
 GLuint colorBufferHandle;
+
+float angle = 0;
 
 void changeSize(int w, int h) {
 
@@ -39,28 +43,19 @@ void changeSize(int w, int h) {
 
 void renderScene(void) {
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    angle+=0.01;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+    mat4 rotationMatrix = glm::rotate(mat4(1.0f), angle, vec3(0.0f,0.0f,1.0f));
+    GLuint location = glGetUniformLocation(p, "RotationMatrix");
+    if( location >= 0 )
+    {
+        glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);
+    }
+    glBindVertexArray(vaoHandle);
+    glDrawArrays(GL_TRIANGLES, 0, 3 );
 
-	// glLoadIdentity();
-	// gluLookAt(0.0,0.0,5.0, 
-	// 	      0.0,0.0,-1.0,
-	// 		  0.0,1.0,0.0);
-
-	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
-
-        // glm::mat4 m_projectionMatrix = glm::perspective(60.0f, 1.333f, 0.1f, 1000.0f);
-
-        // glm::vec3 eye = glm::vec3(0.0f, 0.0f, 10.0f);
-        // glm::vec3 target = glm::vec3(0.0f, 0.0f, -1.0f);
-        // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-        // glm::mat4 m_modelViewMatrix = glm::lookAt( eye, target, up );
-        // // m_modelViewMatrix *= glm::rotate(1,1,1,1);
-        // // mat4 rotationMatrix = glm::rotate(mat4(1.0f), angle, vec3(0.0f,0.0f,1.0f));
-
-        glBindVertexArray(vaoHandle);
-        glDrawArrays(GL_TRIANGLES, 0, 3 );
-
-	glutSwapBuffers();
+    glutSwapBuffers();
 }
 
 void processNormalKeys(unsigned char key, int x, int y) {
@@ -105,6 +100,8 @@ void setShaders() {
         glBindAttribLocation(p, 0, "VertexPosition");
         // Bind index 1 to the shader input variable "VertexColor"
         glBindAttribLocation(p, 1, "VertexColor");
+
+        glBindFragDataLocation(p, 0, "FragColor");
 
 	GLLinkProgram(p);
 
