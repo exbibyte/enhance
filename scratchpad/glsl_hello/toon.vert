@@ -1,6 +1,8 @@
+#version 330
+
 in vec3 VertexPosition;
 in vec3 VertexColor;
-out varying vec3 Color;
+out vec3 Color;
 uniform mat4 RotationMatrix;
 
 void main()

@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(processNormalKeys);
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.0,1.0,1.0,1.0);
+	glClearColor(0.1,0.1,0.1,1.0);
 //	glEnable(GL_CULL_FACE);
 
 	glewInit();
