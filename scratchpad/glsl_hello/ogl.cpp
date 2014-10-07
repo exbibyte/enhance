@@ -13,6 +13,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include<iostream>
+using namespace std;
+
 using glm::mat4;
 using glm::vec3;
 
@@ -69,32 +72,16 @@ void setShaders() {
 
 	char *vs = NULL,*fs = NULL;
 
-	v = glCreateShader(GL_VERTEX_SHADER);
-	f = glCreateShader(GL_FRAGMENT_SHADER);
-
-
-	vs = textFileRead("toon.vert");
-	fs = textFileRead("toon.frag");
-
-	const char * ff = fs;
-	const char * vv = vs;
-
-	glShaderSource(v, 1, &vv,NULL);	
-        glShaderSource(f, 1, &ff,NULL);
-
-	free(vs);
-        free(fs);
-
-	glCompileShader(v);
-	glCompileShader(f);
-
-        GLCompileShader(v);
-        GLCompileShader(f);
+	GLCompileShaderFromFile(v, "toon.vert", GLSLShader::VERTEX );
+	GLCompileShaderFromFile(f, "toon.frag", GLSLShader::FRAGMENT );
 
 	GLCreateProgram(p);
 
 	glAttachShader(p,f);
 	glAttachShader(p,v);
+
+        cout<< "f: "<<f<<endl;
+        cout<< "v: "<<v<<endl;
 
         // Bind index 0 to the shader input variable "VertexPosition"
         glBindAttribLocation(p, 0, "VertexPosition");
@@ -103,7 +90,7 @@ void setShaders() {
 
         glBindFragDataLocation(p, 0, "FragColor");
 
-	GLLinkProgram(p);
+	GLLinkUseProgram(p);
 
         float positionData[] = {
             -0.8f, -0.8f, 0.0f,
@@ -164,8 +151,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-        const char * p_glversion = (const char * ) glGetString(GL_VERSION);
-        printf("GL Version: %s\n", p_glversion);
+        GLPrintInfo();
 
 	setShaders();
 

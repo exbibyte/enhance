@@ -1,7 +1,4 @@
-// textfile.cpp
-//
-// simple reading and writing for text files
-//
+// textfile.h: interface for reading and writing text files
 // www.lighthouse3d.com
 //
 // You may use these functions freely.
@@ -9,15 +6,17 @@
 // or explicit are given
 //////////////////////////////////////////////////////////////////////
 
+#ifndef TEXTFILE_H
+#define TEXTFILE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
+char *textFileRead(char const * fn);
+int textFileWrite(char const * fn, char *s);
 
-char *textFileRead(char *fn) {
-
-
+char *textFileRead(char const * fn) {
     FILE *fp;
     char *content = NULL;
 
@@ -43,8 +42,7 @@ char *textFileRead(char *fn) {
     return content;
 }
 
-int textFileWrite(char *fn, char *s) {
-
+int textFileWrite(char const * fn, char *s) {
     FILE *fp;
     int status = 0;
 
@@ -61,9 +59,4 @@ int textFileWrite(char *fn, char *s) {
     return(status);
 }
 
-
-
-
-
-
-
+#endif
