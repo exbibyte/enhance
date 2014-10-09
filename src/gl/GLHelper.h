@@ -18,6 +18,16 @@ namespace GLSLShader {
     };
 };
 
+bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type );
+bool GLCompileShaderFromFile( GLuint & shader, char const * fileName, GLSLShader::GLSLShaderType type );
+bool GLCreateProgram( GLuint & program );
+bool GLLinkProgram( GLuint & program );
+bool GLLinkUseProgram( GLuint & program );
+void GLUseProgram( GLuint & program );
+void GLPrintInfo();
+
+///////////
+
 bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
     bool bRet;
 
