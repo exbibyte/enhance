@@ -1,33 +1,51 @@
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+
 #include "GLSLProgram.h"
 #include "GLHelper.h"
 
 GLSLProgram::GLSLProgram(){
-    _Handle = 0;
+    _HandleProgram = 0;
     _Linked = false;
     _LogString = "";
+    _vHandleShader.clear();
 }
 
 GLuint GLSLProgram::GetHandle() const{
-    return _Handle;
+    return _HandleProgram;
 }
 
 bool GLSLProgram::IsLinked() const{
     return _Linked;
 }
 bool GLSLProgram::Link(){
-    return GLLinkProgram( _Handle );
+    return GLLinkProgram( _HandleProgram );
 }
 
-bool GLSLProgram::CompileShaderFromFile( char const * FileName, GLSLShader::GLSLShaderType Type ){
-    return GLCompileShaderFromFile( _Handle, FileName, Type );
+bool GLSLProgram::CompileShaderFromFile( string FileName, GLSLShader::GLSLShaderType Type ){
+    GLuint Shader;
+    char const * FileNameConst = FileName.c_str();
+    bool bRet = GLCompileShaderFromFile( Shader, FileNameConst, Type );
+    if( bRet ){
+        _vHandleShader.push_back( Shader );
+    }
+    return bRet;
 }
 
 bool GLSLProgram::CompileShaderFromString( string const & Source, GLSLShader::GLSLShaderType Type ){
-
+    GLuint Shader;
+    char const * SourceConst = Source.c_str();
+    bool bRet = GLCompileShaderFromString( Shader, SourceConst, Type );
+    if( bRet ){
+        _vHandleShader.push_back( Shader );
+    }
+    return bRet;
 }
 
 void GLSLProgram::Use(){
-    GLUseProgram( _Handle );
+    GLUseProgram( _HandleProgram );
 }
 
 string GLSLProgram::Log() const{
