@@ -18,7 +18,7 @@ namespace GLSLShader {
     };
 };
 
-bool GLCompileShaderFromFile( GLuint & shader, char const * fileName, GLSLShader::GLSLShaderType type ){
+bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
     bool bRet;
 
     if( GLSLShader::VERTEX == type ){
@@ -27,11 +27,8 @@ bool GLCompileShaderFromFile( GLuint & shader, char const * fileName, GLSLShader
         shader = glCreateShader(GL_FRAGMENT_SHADER);
     }
 
-    char * sourceText = 0;
-    sourceText = textFileRead( fileName );
-    char const * sourceTextConst = sourceText;
+    char const * sourceTextConst = Source;
     glShaderSource( shader, 1, &sourceTextConst, NULL);	
-    free(sourceText);
     
     glCompileShader(shader);
     GLint result;
@@ -54,6 +51,16 @@ bool GLCompileShaderFromFile( GLuint & shader, char const * fileName, GLSLShader
     return bRet;
 }
 
+bool GLCompileShaderFromFile( GLuint & shader, char const * fileName, GLSLShader::GLSLShaderType type ){
+    bool bRet;
+    char * sourceText = 0;
+    sourceText = textFileRead( fileName );
+    char const * sourceTextConst = sourceText;
+    bRet = GLCompileShaderFromString( shader, sourceTextConst, type );
+    free(sourceText);
+    return bRet;
+}
+
 bool GLCreateProgram( GLuint & program ){
     program = glCreateProgram();
     if( 0 == program ){
@@ -64,7 +71,7 @@ bool GLCreateProgram( GLuint & program ){
     }
 }
 
-bool GLLinkUseProgram( GLuint & program ){
+bool GLLinkProgram( GLuint & program ){
     glLinkProgram(program);
     GLint status;
     glGetProgramiv( program, GL_LINK_STATUS, &status );
@@ -81,9 +88,20 @@ bool GLLinkUseProgram( GLuint & program ){
         }
         return false;
     }else{
-        glUseProgram(program);
         return true;
     }
+}
+bool GLLinkUseProgram( GLuint & program ){
+    if( true == GLLinkProgram( program ) ){
+        glUseProgram(program);
+        return true;
+    }else{
+        return false;
+    }
+}
+
+void GLUseProgram( GLuint & program ){
+    glUseProgram(program);
 }
 
 void GLPrintInfo(){
