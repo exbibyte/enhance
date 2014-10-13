@@ -12,8 +12,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+using glm::mat3;
 using glm::mat4;
 using glm::vec3;
+using glm::vec4;
 
 #include "GLHelper.h"
 
@@ -23,13 +25,14 @@ public:
     GLSLProgram();
     GLuint GetHandle() const;
     bool IsLinked() const;
+    void AttachShaders();
     bool Link();
     bool CompileShaderFromFile( std::string FileName, GLSLShader::GLSLShaderType Type );
     bool CompileShaderFromString( std::string const & Source, GLSLShader::GLSLShaderType Type );
     void Use();
     string Log() const;
-    void BindAttribLocation( GLuint Loc, char const * Name );
-    void BindFragDataLocation( GLuint Loc, char const * Name );
+    void BindAttribLocation( GLuint Loc, std::string Name );
+    void BindFragDataLocation( GLuint Loc, std::string Name );
     void SetUniform( char const * Name, float x, float y, float z );
     void SetUniform( char const * Name, vec3 const & v );
     void SetUniform( char const * Name, vec4 const & v );
@@ -47,5 +50,7 @@ private:
     string _LogString;
     vector<GLuint> _vHandleShader;
 };
+
+#include "GLSLProgram.cpp"
 
 #endif
