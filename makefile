@@ -13,7 +13,7 @@ inc_en := ./src/enCode
 inc_core := ./src/core
 
 build_dir := ./build
-lib:= -lGL -lGLU -lGLEW -lglut
+lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
 libjemalloc := -ljemalloc
 libsfml := -lsfml-graphics -lsfml-window -lsfml-system
 
