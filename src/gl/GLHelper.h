@@ -7,10 +7,19 @@
 #include <GL/glut.h>
 
 #include <iostream>
+using namespace std;
+
+#define GLM_FORCE_RADIANS
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+using glm::mat3;
+using glm::mat4;
+using glm::vec3;
+using glm::vec4;
 
 #include "textfile.h"
-
-using namespace std;
 
 namespace GLSLShader {
     enum GLSLShaderType {
@@ -35,8 +44,8 @@ void GLSetUniform( GLuint Program, char const * Name, mat4 const & m );
 void GLSetUniform( GLuint Program, char const * Name, float val );
 void GLSetUniform( GLuint Program, char const * Name, int val );
 void GLSetUniform( GLuint Program, char const * Name, bool val );
-void GLPrintActiveUniforms( GLuint Program ) const;
-void GLPrintActiveAttribs( GLuint Program ) const;
+void GLPrintActiveUniforms( GLuint Program );
+void GLPrintActiveAttribs( GLuint Program );
 
 ///////////
 
@@ -199,7 +208,7 @@ void GLSetUniform( GLuint Program, char const * Name, bool val ){
     }
 }
 
-void GLPrintActiveUniforms( GLuint Program ) const{}
-void GLPrintActiveAttribs( GLuint Program ) const{}
+void GLPrintActiveUniforms( GLuint Program ){}
+void GLPrintActiveAttribs( GLuint Program ){}
 
 #endif

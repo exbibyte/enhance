@@ -33,14 +33,14 @@ public:
     string Log() const;
     void BindAttribLocation( GLuint Loc, std::string Name );
     void BindFragDataLocation( GLuint Loc, std::string Name );
-    void SetUniform( char const * Name, float x, float y, float z );
-    void SetUniform( char const * Name, vec3 const & v );
-    void SetUniform( char const * Name, vec4 const & v );
-    void SetUniform( char const * Name, mat3 const & m );
-    void SetUniform( char const * Name, mat4 const & m );
-    void SetUniform( char const * Name, float val );
-    void SetUniform( char const * Name, int val );
-    void SetUniform( char const * Name, bool val );
+    void SetUniform( std::string Name, float x, float y, float z );
+    void SetUniform( std::string Name, vec3 const & v );
+    void SetUniform( std::string Name, vec4 const & v );
+    void SetUniform( std::string Name, mat3 const & m );
+    void SetUniform( std::string Name, mat4 const & m );
+    void SetUniform( std::string Name, float val );
+    void SetUniform( std::string Name, int val );
+    void SetUniform( std::string Name, bool val );
     void PrintActiveUniforms() const;
     void PrintActiveAttribs() const;
 

@@ -55,57 +55,35 @@ string GLSLProgram::Log() const{
 }
 
 void GLSLProgram::BindAttribLocation( GLuint Loc, string Name ){
-    glBindAttribLocation( _HandleProgram, Loc, (char const * ) Name.c_str() );
+    GLBindAttribLocation( _HandleProgram, Loc, ( char const * ) Name.c_str() );
 }
 void GLSLProgram::BindFragDataLocation( GLuint Loc, string Name ){
-    glBindFragDataLocation( _HandleProgram, Loc, (char const * ) Name.c_str() );
+    GLBindFragDataLocation( _HandleProgram, Loc, ( char const * ) Name.c_str() );
 }
-void GLSLProgram::SetUniform( char const * Name, float x, float y, float z ){
-    glm::vec3 data( x, y, z);
-    SetUniform( Name, (vec3 const) data );
+void GLSLProgram::SetUniform( string Name, vec3 const & v ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
 }
-void GLSLProgram::SetUniform( char const * Name, vec3 const & v ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniform3fv(location, 1, &v[0] );
-    }
+void GLSLProgram::SetUniform( string Name, vec4 const & v ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
 }
-void GLSLProgram::SetUniform( char const * Name, vec4 const & v ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniform4fv(location, 1, &v[0] );
-    }
+void GLSLProgram::SetUniform( string Name, mat3 const & m ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
 }
-void GLSLProgram::SetUniform( char const * Name, mat3 const & m ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniformMatrix3fv(location, 1, false, &m[0][0] );
-    }
+void GLSLProgram::SetUniform( string Name, mat4 const & m ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
 }
-void GLSLProgram::SetUniform( char const * Name, mat4 const & m ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniformMatrix4fv(location, 1, false, &m[0][0] );
-    }
+void GLSLProgram::SetUniform( string Name, float val ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
-void GLSLProgram::SetUniform( char const * Name, float val ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniform1f(location, val );
-    }
+void GLSLProgram::SetUniform( string Name, int val ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
-void GLSLProgram::SetUniform( char const * Name, int val ){
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniform1i(location, val );
-    }
+void GLSLProgram::SetUniform( string Name, bool val ){
+    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
-void GLSLProgram::SetUniform( char const * Name, bool val ){
-    int data = val ? 1 : 0;
-    GLuint location = glGetUniformLocation( _HandleProgram, Name );
-    if( location >= 0 ){
-        glUniform1i(location, data );
-    }
+void GLSLProgram::PrintActiveUniforms() const{
+    GLPrintActiveUniforms( _HandleProgram );
 }
-void GLSLProgram::PrintActiveUniforms() const{}
-void GLSLProgram::PrintActiveAttribs() const{}
+void GLSLProgram::PrintActiveAttribs() const{
+    GLPrintActiveAttribs( _HandleProgram );
+}
