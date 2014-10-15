@@ -10,8 +10,8 @@ class GLAttribData {
 public:
     GLAttribData(){
         glGenBuffers( & _HandleBuffer );
-        shaderAttribute = shaderAttributeGlobal;
-        ++shaderAttributeGlobal;
+        IndexVertexAttrib = IndexVertexAttribGlobal;
+        ++IndexVertexAttribGlobal;
     }
     void SetData( DataType * Data, int VertexSize, int Count ){
         _pData = Data;
@@ -22,29 +22,38 @@ public:
         //populate buffer with data
         glBufferData( GL_ARRAY_BUFFER, Count * sizeof(DataType), Data, GL_STATIC_DRAW );
 
-        glVertexAttribPointer( shaderAttribute, VertexSize, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-        glEnableVertexAttribArray( shaderAttribute );
+        glEnableVertexAttribArray( IndexVertexAttrib );
 
-        glBindBuffer(GL_ARRAY_BUFFER, _HandleBuffer);
+        glVertexAttribPointer( IndexVertexAttrib, VertexSize, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
     }
     void BindAttrib() {
-        glEnableVertexAttribArray( shaderAttribute );
+        glEnableVertexAttribArray( IndexVertexAttrib );
         glBindBuffer(GL_ARRAY_BUFFER, _HandleBuffer);
     }
-    int GetAttribIndex() const {
-        return shaderAttribute;
+    void UnBindAttrib() {
+        glDisableVertexAttribArray( IndexVertexAttrib );
+        glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
-    int GetSize() const {
-
+    int GetIndexAttrib() const {
+        return IndexVertexAttrib;
     }
-    void GetData( DataType * & Data, int
+    void GetData( DataType * & Data, int & VertexSize, int & DataCount ) const {
+        Data = _pData;
+        VertexSize = _VertexSize;
+        DataCount = _Size;
+    }
+    void Draw(){
+        glDrawArrays( GL_TRIANGLES, 0, (sizeof(_pData)/3)/sizeof(GLfloat) );
+    }
 private:
     GLuint _HandleBuffer;
     DataType * _pData;
     int _VertexSize;
     int _Size;
-    static unsigned int shaderAttributeGlobal = 0;
-    unsigned int shaderAttribute;
+    static unsigned int IndexVertexAttribGlobal;
+    unsigned int IndexVertexAttrib;
 };
+
+unsigned int GLAttribData::IndexVertexAttribGlobal = 0;
 
 #endif

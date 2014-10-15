@@ -1,7 +1,10 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<map>
 using namespace std;
+
+#include "GLSLProgram.h"
 
 GLSLProgram::GLSLProgram(){
     _HandleProgram = glCreateProgram();
@@ -86,4 +89,21 @@ void GLSLProgram::PrintActiveUniforms() const{
 }
 void GLSLProgram::PrintActiveAttribs() const{
     GLPrintActiveAttribs( _HandleProgram );
+}
+void GLSLProgram::AddMapAttrib( string AttribName, GLAttribData * AttribData ){
+    _MapAttrib[ AttribName ] = AttribData;
+}
+void GLSLProgram::GetMapAttrib( string AttribName, GLAttribData * & AttribData ) const {
+    map< string, GLAttribData * >::iterator it;
+    it = _MapAttrib.find( AttribName );
+    if( it == map::end ){
+        AttribData = 0;
+    }else{
+        AttribData = *it;
+    }
+}
+void GLSLProgram::BindMapAttrib(){
+    for(auto & i : _MapAttrib ){
+        BindAttribLocation( i.second->GetIndexAttrib(), i.first );
+    }
 }
