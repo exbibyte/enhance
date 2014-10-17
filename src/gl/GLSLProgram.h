@@ -50,12 +50,16 @@ public:
     void AddMapAttrib( string AttribName, GLAttribData<float> * AttribData );
     void GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const;
     void BindMapAttrib(); //binds all attributes in map
+    void BindVertexArray();
+    void UnBindVertexArray();
 private:
     GLuint _HandleProgram;
     bool _Linked;
     string _LogString;
-    vector<GLuint> _vHandleShader;
+    vector< GLuint > _vHandleShader;
+    GLuint _VertexArrayObj; //holding handles to individual VBO associated with GLAttribData
     map< string, GLAttribData<float> * > _MapAttrib; //mapping of attribute name and attribute index for this shader program
+    static unsigned int _mVertexArrayIndexCount;
 };
 
 #include "GLSLProgram.cpp"

@@ -6,11 +6,14 @@ using namespace std;
 
 #include "GLSLProgram.h"
 
+unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
+
 GLSLProgram::GLSLProgram(){
     _HandleProgram = glCreateProgram();
     _Linked = false;
     _LogString = "";
     _vHandleShader.clear();
+    glGenVertexArrays( 1, &_VertexArrayObj );
 }
 
 GLuint GLSLProgram::GetHandle() const{
@@ -103,7 +106,19 @@ void GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & Attri
     }
 }
 void GLSLProgram::BindMapAttrib(){
+
     for(auto & i : _MapAttrib ){
+        int CurrentVertexArrayIndex = _mVertexArrayIndexCount++;
+        i.second->SetVertexArrayIndex( _VertexArrayObj, CurrentVertexArrayIndex );
         BindAttribLocation( i.second->GetIndexAttrib(), i.first );
     }
+
+}
+void GLSLProgram::BindVertexArray()
+{
+    GLBindVertexArray( _VertexArrayObj ); 
+}
+void GLSLProgram::UnBindVertexArray()
+{
+    GLUnBindVertexArray();
 }

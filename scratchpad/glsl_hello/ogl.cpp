@@ -18,6 +18,7 @@ using glm::mat4;
 using glm::vec3;
 
 #include "GLSLProgram.h"
+#include "GLAttribData.h"
 
 GLuint v,f,f2,p;
 float lpos[4] = {1,0.5,1,0};
@@ -53,8 +54,16 @@ void renderScene(void) {
     // glLightfv(GL_LIGHT0, GL_POSITION, lpos);
     mat4 rotationMatrix = glm::rotate(mat4(1.0f), angle, vec3(0.0f,0.0f,1.0f));
     _GLSLProgram->SetUniform( "RotationMatrix", (mat4 const) rotationMatrix );
-    glBindVertexArray(vaoHandle);
-    glDrawArrays(GL_TRIANGLES, 0, 3 );
+
+    _GLSLProgram->BindVertexArray();
+
+    // GLAttribData<float> * data;
+    // _GLSLProgram->GetMapAttrib( "VertexColor", data );
+    // data->DisableVertexArray();
+
+    glDrawArrays( GL_TRIANGLES, 0, 3 );
+
+    _GLSLProgram->UnBindVertexArray();
 
     glutSwapBuffers();
 }
@@ -72,49 +81,37 @@ void setShaders() {
     _GLSLProgram->CompileShaderFromFile("toon.vert", GLSLShader::VERTEX );
     _GLSLProgram->CompileShaderFromFile("toon.frag", GLSLShader::FRAGMENT );
     _GLSLProgram->AttachShaders();
-    // Bind index 0 to the shader input variable "VertexPosition"
-    _GLSLProgram->BindAttribLocation( 0, "VertexPosition" );
-    // Bind index 1 to the shader input variable "VertexColor"
-    _GLSLProgram->BindAttribLocation( 1, "VertexColor" );
-    _GLSLProgram->BindFragDataLocation( 0, "FragColor" );
-    _GLSLProgram->Link();
-    _GLSLProgram->Use();
 
-    float positionData[] = {
+    //set buffer data
+    GLAttribData<float> * pPositionData = new GLAttribData<float>;
+    GLAttribData<float> * pColorData = new GLAttribData<float>;
+    float arrayPositionData[] = {
         -0.8f, -0.8f, 0.0f,
         0.8f, -0.8f, 0.0f,
         0.0f, 0.8f, 0.0f };
-
-    float colorData[] = {
+    float arrayColorData[] = {
         1.0f, 0.0f, 0.0f, 
         0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 1.0f };
+    
+    //save mapping of data
+    _GLSLProgram->AddMapAttrib( "VertexPosition", pPositionData );
+    _GLSLProgram->AddMapAttrib( "VertexColor", pColorData );
+    //bind attributes
+    _GLSLProgram->BindMapAttrib();
+
+    _GLSLProgram->BindFragDataLocation( 0, "FragColor" );
+
+    _GLSLProgram->Link();
 
 
-    glGenBuffers(2, vboHandles);
-    GLuint positionBufferHandle = vboHandles[0];
-    GLuint colorBufferHandle = vboHandles[1];
-    // Populate the position buffer
-    glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), positionData, GL_STATIC_DRAW);
-    // Populate the color buffer
-    glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colorData, GL_STATIC_DRAW);
+    //generate VBO, populate and bind data to vertex attribute arrays
+    pPositionData->SetData( &arrayPositionData[0], 3, 9 );
+    pColorData->SetData( &arrayColorData[0], 3, 9 );
 
-    // Create and set-up the vertex array object
-    glGenVertexArrays( 1, &vaoHandle );
-    glBindVertexArray(vaoHandle);
-    // Enable the vertex attribute arrays
-    glEnableVertexAttribArray(0); // Vertex position
-    glEnableVertexAttribArray(1); // Vertex color
-    // Map index 0 to the position buffer
-    glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-    // Map index 1 to the color buffer
-    glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-    glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
+    _GLSLProgram->Use();
 }
-
+ 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -128,7 +125,7 @@ int main(int argc, char **argv) {
     glutKeyboardFunc(processNormalKeys);
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.1,0.1,0.1,1.0);
+    glClearColor(1.0,1.0,1.0,1.0);
 //	glEnable(GL_CULL_FACE);
 
     glewInit();

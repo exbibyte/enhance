@@ -47,8 +47,10 @@ void GLSetUniform( GLuint Program, char const * Name, bool val );
 void GLPrintActiveUniforms( GLuint Program );
 void GLPrintActiveAttribs( GLuint Program );
 
-///////////
+void GLBindVertexArray( GLuint vbo );
+void GLUnBindVertexArray();
 
+///////////
 bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
     bool bRet;
 
@@ -210,5 +212,14 @@ void GLSetUniform( GLuint Program, char const * Name, bool val ){
 
 void GLPrintActiveUniforms( GLuint Program ){}
 void GLPrintActiveAttribs( GLuint Program ){}
+
+void GLBindVertexArray( GLuint vbo )
+{
+    glBindVertexArray( vbo ); 
+}
+void GLUnBindVertexArray()
+{
+    glBindVertexArray( 0 ); 
+}
 
 #endif

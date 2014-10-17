@@ -4,37 +4,56 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
+#include <algorithm>
+
+#include "GLHelper.h"
+
 template< typename DataType >
 class GLAttribData { 
 
 public:
     GLAttribData(){
         glGenBuffers( 1, &_HandleBuffer );
-        IndexVertexAttrib = IndexVertexAttribGlobal;
-        ++IndexVertexAttribGlobal;
+    }
+    void SetVertexArrayIndex( GLuint vao, GLuint Index ){
+        IndexVertexAttrib = Index;
+        _hVAO = vao;
     }
     void SetData( DataType * Data, int VertexSize, int Count ){
-        _pData = Data;
+        _pData = new DataType[ Count ];
+        std::copy ( Data, Data + Count, _pData );
         _VertexSize = VertexSize;
         _Size = Count;
 
-        glBindBuffer( GL_ARRAY_BUFFER, _HandleBuffer );
+        GLBindVertexArray( _hVAO );
+
+        BindVertexBuf();
         //populate buffer with data
-        glBufferData( GL_ARRAY_BUFFER, Count * sizeof(DataType), Data, GL_STATIC_DRAW );
+        glBufferData( GL_ARRAY_BUFFER, (unsigned int )Count * sizeof(DataType), Data, GL_STATIC_DRAW );
 
-        glEnableVertexAttribArray( IndexVertexAttrib );
-
+        //associate and bind vbo to vao index
+        EnableVertexArray();
         glVertexAttribPointer( IndexVertexAttrib, VertexSize, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-    }
-    void BindAttrib() {
+
+        UnBindVertexBuf();
+
+        GLUnBindVertexArray();
+    }    
+    void EnableVertexArray()
+    {
         glEnableVertexAttribArray( IndexVertexAttrib );
+    }
+    void DisableVertexArray()
+    {
+        glDisableVertexAttribArray( IndexVertexAttrib );
+    }
+    void BindVertexBuf() {
         glBindBuffer(GL_ARRAY_BUFFER, _HandleBuffer);
     }
-    void UnBindAttrib() {
-        glDisableVertexAttribArray( IndexVertexAttrib );
+    void UnBindVertexBuf() {
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
-    int GetIndexAttrib() const {
+    GLuint GetIndexAttrib() const {
         return IndexVertexAttrib;
     }
     void GetData( DataType * & Data, int & VertexSize, int & DataCount ) const {
@@ -43,18 +62,17 @@ public:
         DataCount = _Size;
     }
     void Draw(){
+        glBindVertexArray( IndexVertexAttrib ); 
         glDrawArrays( GL_TRIANGLES, 0, (sizeof(_pData)/3)/sizeof(DataType) );
+        glBindVertexArray( 0 ); 
     }
 private:
-    GLuint _HandleBuffer;
+    GLuint _HandleBuffer; //vbo size of 1
     DataType * _pData;
     int _VertexSize;
     int _Size;
-    static unsigned int IndexVertexAttribGlobal;
-    unsigned int IndexVertexAttrib;
+    GLuint IndexVertexAttrib;
+    GLuint _hVAO;
 };
-
-template< typename DataType >
-unsigned int GLAttribData< DataType >::IndexVertexAttribGlobal = 0;
 
 #endif
