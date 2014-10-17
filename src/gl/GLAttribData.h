@@ -9,7 +9,7 @@ class GLAttribData {
 
 public:
     GLAttribData(){
-        glGenBuffers( & _HandleBuffer );
+        glGenBuffers( 1, &_HandleBuffer );
         IndexVertexAttrib = IndexVertexAttribGlobal;
         ++IndexVertexAttribGlobal;
     }
@@ -43,7 +43,7 @@ public:
         DataCount = _Size;
     }
     void Draw(){
-        glDrawArrays( GL_TRIANGLES, 0, (sizeof(_pData)/3)/sizeof(GLfloat) );
+        glDrawArrays( GL_TRIANGLES, 0, (sizeof(_pData)/3)/sizeof(DataType) );
     }
 private:
     GLuint _HandleBuffer;
@@ -54,6 +54,7 @@ private:
     unsigned int IndexVertexAttrib;
 };
 
-unsigned int GLAttribData::IndexVertexAttribGlobal = 0;
+template< typename DataType >
+unsigned int GLAttribData< DataType >::IndexVertexAttribGlobal = 0;
 
 #endif

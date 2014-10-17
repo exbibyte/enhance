@@ -90,16 +90,16 @@ void GLSLProgram::PrintActiveUniforms() const{
 void GLSLProgram::PrintActiveAttribs() const{
     GLPrintActiveAttribs( _HandleProgram );
 }
-void GLSLProgram::AddMapAttrib( string AttribName, GLAttribData * AttribData ){
+void GLSLProgram::AddMapAttrib( string AttribName, GLAttribData<float> * AttribData ){
     _MapAttrib[ AttribName ] = AttribData;
 }
-void GLSLProgram::GetMapAttrib( string AttribName, GLAttribData * & AttribData ) const {
-    map< string, GLAttribData * >::iterator it;
-    it = _MapAttrib.find( AttribName );
-    if( it == map::end ){
+void GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const {
+    string key = AttribName;
+    map< string, GLAttribData<float> * >::const_iterator it = _MapAttrib.find( key );
+    if( it == _MapAttrib.end() ){
         AttribData = 0;
     }else{
-        AttribData = *it;
+        AttribData = it->second;
     }
 }
 void GLSLProgram::BindMapAttrib(){

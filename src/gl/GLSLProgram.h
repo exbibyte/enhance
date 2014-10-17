@@ -21,8 +21,7 @@ using glm::vec3;
 using glm::vec4;
 
 #include "GLHelper.h"
-
-class GLAttribData;
+#include "GLAttribData.h"
 
 class GLSLProgram{
 
@@ -48,15 +47,15 @@ public:
     void SetUniform( std::string Name, bool val );
     void PrintActiveUniforms() const;
     void PrintActiveAttribs() const;
-    void AddMapAttrib( string AttribName, GLAttribData * AttribData );
-    void GetMapAttrib( string AttribName, GLAttribData * & AttribData ) const;
+    void AddMapAttrib( string AttribName, GLAttribData<float> * AttribData );
+    void GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const;
     void BindMapAttrib(); //binds all attributes in map
 private:
     GLuint _HandleProgram;
     bool _Linked;
     string _LogString;
     vector<GLuint> _vHandleShader;
-    map< string, GLAttribData * > _MapAttrib; //mapping of attribute name and attribute index for this shader program
+    map< string, GLAttribData<float> * > _MapAttrib; //mapping of attribute name and attribute index for this shader program
 };
 
 #include "GLSLProgram.cpp"
