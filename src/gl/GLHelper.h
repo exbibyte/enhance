@@ -50,6 +50,10 @@ void GLPrintActiveAttribs( GLuint Program );
 void GLBindVertexArray( GLuint vbo );
 void GLUnBindVertexArray();
 
+void GLUniformSubroutinesuiv( GLenum ShaderType, GLsizei Count, GLuint const * Indices ); //loads the active subroutine uniforms
+GLint GLGetSubroutineUniformLocation( GLuint Program, GLenum Shadertype, GLchar const * Name ); //get subroutine uniform location in a program's shader stage
+GLuint GLGetSubroutineIndex(GLuint program, GLenum shadertype, const GLchar * name ); //get index of a subroutine uniform in a program's shader stage
+
 ///////////
 bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
     bool bRet;
@@ -220,6 +224,21 @@ void GLBindVertexArray( GLuint vbo )
 void GLUnBindVertexArray()
 {
     glBindVertexArray( 0 ); 
+}
+
+void GLUniformSubroutinesuiv( GLenum ShaderType, GLsizei Count, GLuint const * Indices )
+{
+    glUniformSubroutinesuiv( ShaderType, Count, Indices );
+}
+
+GLint GLGetSubroutineUniformLocation( GLuint Program, GLenum Shadertype, GLchar const * Name )
+{
+    return glGetSubroutineUniformLocation( Program, Shadertype, Name );
+}
+
+GLuint GLGetSubroutineIndex(GLuint program, GLenum shadertype, const GLchar * name )
+{
+    return glGetSubroutineIndex( program, shadertype, name );
 }
 
 #endif
