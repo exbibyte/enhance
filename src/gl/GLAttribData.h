@@ -61,11 +61,7 @@ public:
         VertexSize = _VertexSize;
         DataCount = _Size;
     }
-    void Draw(){
-        glBindVertexArray( IndexVertexAttrib ); 
-        glDrawArrays( GL_TRIANGLES, 0, (sizeof(_pData)/3)/sizeof(DataType) );
-        glBindVertexArray( 0 ); 
-    }
+
 private:
     GLuint _HandleBuffer; //vbo size of 1
     DataType * _pData;
