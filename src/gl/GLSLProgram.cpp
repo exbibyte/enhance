@@ -66,26 +66,26 @@ void GLSLProgram::BindAttribLocation( GLuint Loc, string Name ){
 void GLSLProgram::BindFragDataLocation( GLuint Loc, string Name ){
     GLBindFragDataLocation( _HandleProgram, Loc, ( char const * ) Name.c_str() );
 }
-void GLSLProgram::SetUniform( string Name, vec3 const & v ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
+bool GLSLProgram::SetUniform( string Name, vec3 const & v ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
 }
-void GLSLProgram::SetUniform( string Name, vec4 const & v ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
+bool GLSLProgram::SetUniform( string Name, vec4 const & v ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
 }
-void GLSLProgram::SetUniform( string Name, mat3 const & m ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
+bool GLSLProgram::SetUniform( string Name, mat3 const & m ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
 }
-void GLSLProgram::SetUniform( string Name, mat4 const & m ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
+bool GLSLProgram::SetUniform( string Name, mat4 const & m ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
 }
-void GLSLProgram::SetUniform( string Name, float val ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
+bool GLSLProgram::SetUniform( string Name, float val ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
-void GLSLProgram::SetUniform( string Name, int val ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
+bool GLSLProgram::SetUniform( string Name, int val ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
-void GLSLProgram::SetUniform( string Name, bool val ){
-    GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
+bool GLSLProgram::SetUniform( string Name, bool val ){
+    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
 }
 void GLSLProgram::PrintActiveUniforms() const{
     GLPrintActiveUniforms( _HandleProgram );

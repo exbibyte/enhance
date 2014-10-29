@@ -37,13 +37,13 @@ void GLPrintInfo();
 
 void GLBindAttribLocation( GLuint Program, GLuint Loc, char const * Name );
 void GLBindFragDataLocation( GLuint Program, GLuint Loc, char const * Name );
-void GLSetUniform( GLuint Program, char const * Name, vec3 const & v );
-void GLSetUniform( GLuint Program, char const * Name, vec4 const & v );
-void GLSetUniform( GLuint Program, char const * Name, mat3 const & m );
-void GLSetUniform( GLuint Program, char const * Name, mat4 const & m );
-void GLSetUniform( GLuint Program, char const * Name, float val );
-void GLSetUniform( GLuint Program, char const * Name, int val );
-void GLSetUniform( GLuint Program, char const * Name, bool val );
+bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v );
+bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v );
+bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m );
+bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m );
+bool GLSetUniform( GLuint Program, char const * Name, float val );
+bool GLSetUniform( GLuint Program, char const * Name, int val );
+bool GLSetUniform( GLuint Program, char const * Name, bool val );
 void GLPrintActiveUniforms( GLuint Program );
 void GLPrintActiveAttribs( GLuint Program );
 
@@ -154,51 +154,69 @@ void GLBindFragDataLocation( GLuint Program, GLuint Loc, char const * Name ){
     glBindFragDataLocation( Program, Loc, (GLchar const * ) Name );
 }
 
-void GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
+bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniform3fv( location, 1, &v[0]);
+        return true;
+    }
+    else{
+        return false;
     }
 }
 
-void GLSetUniform( GLuint Program, char const * Name, vec4 const & v ){
+bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniform4fv( location, 1, &v[0]);
+        return true;
+    }
+    else{
+        return false;
     }
 }
-void GLSetUniform( GLuint Program, char const * Name, mat3 const & m ){
+bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniformMatrix3fv( location, 1, GL_FALSE, &m[0][0]);
+        return true;
+    }
+    else{
+        return false;
     }
 }
-void GLSetUniform( GLuint Program, char const * Name, mat4 const & m ){
+bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniformMatrix4fv( location, 1, GL_FALSE, &m[0][0]);
+        return true;
+    }
+    else{
+        return false;
     }
 }
 
-void GLSetUniform( GLuint Program, char const * Name, float val ){
+bool GLSetUniform( GLuint Program, char const * Name, float val ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniform1f( location, val );
+        return true;
+    }
+    else{
+        return false;
     }
 }
-void GLSetUniform( GLuint Program, char const * Name, int val ){
+bool GLSetUniform( GLuint Program, char const * Name, int val ){
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniform1i( location, val );
+        return true;
+    }
+    else{
+        return false;
     }
 }
-void GLSetUniform( GLuint Program, char const * Name, bool val ){
+bool GLSetUniform( GLuint Program, char const * Name, bool val ){
     
     int ValInt;
     if(val){
@@ -208,9 +226,12 @@ void GLSetUniform( GLuint Program, char const * Name, bool val ){
     }
 
     GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 )
-    {
+    if( location >= 0 ){
         glUniform1i( location, ValInt );
+        return true;
+    }
+    else{
+        return false;
     }
 }
 
