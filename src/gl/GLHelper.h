@@ -235,8 +235,44 @@ bool GLSetUniform( GLuint Program, char const * Name, bool val ){
     }
 }
 
-void GLPrintActiveUniforms( GLuint Program ){}
-void GLPrintActiveAttribs( GLuint Program ){}
+void GLPrintActiveUniforms( GLuint Program )
+{
+    GLint nUniforms, maxLen;
+    glGetProgramiv( Program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLen);
+    glGetProgramiv( Program, GL_ACTIVE_UNIFORMS, &nUniforms);
+    GLchar * name = (GLchar *) malloc( maxLen );
+    GLint size, location;
+    GLsizei written;
+    GLenum type;
+    printf(" Location | Name\n");
+    printf("------------------------------------------------\n");
+    for( int i = 0; i < nUniforms; ++i ) {
+        glGetActiveUniform( Program, i, maxLen, &written,
+                            &size, &type, name );
+        location = glGetUniformLocation( Program, name);
+        printf(" %-8d | %s\n", location, name);
+    }
+    free(name);
+}
+
+void GLPrintActiveAttribs( GLuint Program )
+{
+    GLint maxLength, nAttribs;
+    glGetProgramiv(Program, GL_ACTIVE_ATTRIBUTES, &nAttribs);
+    glGetProgramiv(Program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
+    GLchar * name = (GLchar *) malloc( maxLength );
+    GLint written, size, location;
+    GLenum type;
+    printf(" Index | Name\n");
+    printf("------------------------------------------------\n");
+    for( int i = 0; i < nAttribs; i++ ) {
+        glGetActiveAttrib( Program, i, maxLength, &written,
+                           &size, &type, name );
+        location = glGetAttribLocation(Program, name);
+        printf(" %-5d | %s\n",location, name);
+    }
+    free(name);
+}
 
 void GLBindVertexArray( GLuint vbo )
 {

@@ -104,6 +104,9 @@ void setShaders() {
 
     _GLSLProgram->Link();
 
+    _GLSLProgram->PrintActiveUniforms();
+
+    _GLSLProgram->PrintActiveAttribs();
 
     //generate VBO, populate and bind data to vertex attribute arrays
     pPositionData->SetData( &arrayPositionData[0], 3, 9 );
