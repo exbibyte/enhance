@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform2.hpp>
 
 #include<iostream>
 using namespace std;
@@ -52,46 +53,52 @@ void renderScene(void) {
     bool bRet;
 
     angle+=0.01;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     // glLightfv(GL_LIGHT0, GL_POSITION, lpos);
     
-    mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
-    mat4 ViewMatrix = glm::rotate( glm::translate( mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f) ), angle, vec3(0.5f,0.75f,0.5f) );
-    mat4 ModelMatrix = glm::mat4( 1.0 );
-    mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    vec4 Position = vec4( 0.0f, 0.0f, -1.0f, 1.0f );
+    mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,-2.0), 
+                                   vec3(0.0,0.0,0.0),
+                                   vec3(0.0,1.0,0.0) );
+
+    mat4 Model = mat4(1.0f);
+    mat4 ModelMatrix = glm::rotate( Model, angle, vec3( 0.0f, 1.0f, 0.7f ) );
     mat4 ModelViewMatrix = ViewMatrix * ModelMatrix;
-    mat3 NormalMatrix = glm::transpose( glm::inverse( glm::mat3(ModelViewMatrix) ) );
+    mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
+    mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    mat3 NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
 
     bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MVP );
     bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrix );
     bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
     bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
 
-    bRet = _GLSLProgram->SetUniform( "Light.La", 0.5f );
-    bRet = _GLSLProgram->SetUniform( "Light.Ld", 0.5f );
-    bRet = _GLSLProgram->SetUniform( "Light.Ls", 0.5f );
-    float LightPosition[] = { 1, 1, 1, 0 };
+    vec3 LightLa = vec3( 0.3, 0.3, 0.3 );
+    vec3 LightLd = vec3( 0.5, 0.5, 0.5 );
+    vec3 LightLs = vec3( 0.2, 0.2, 0.2 );
+    bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
+    bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
+    bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
+
+    vec3 LightPosition( 1.0f, 1.0f, -1.0f );
     bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
 
-    float MaterialCoeff[] = { 0.5, 0.5, 0.5 };
-    bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeff );
-    bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeff );
-    bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeff );
-    bRet = _GLSLProgram->SetUniform( "Material.Shininess", 0.5f );
-
-    // _GLSLProgram->BindVertexArray();
-    
-    // glFrontFace(GL_CW);
-    // glutSolidTeapot( 10 );
-    // glFrontFace(GL_CCW);
+    vec3 MaterialCoeffKa( 1.0f, 1.0f, 1.0f );
+    vec3 MaterialCoeffKd( 1.0f, 1.0f, 1.0f );
+    vec3 MaterialCoeffKs( 1.0f, 1.0f, 1.0f );
+    bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
+    bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
+    bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
+    bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
 
     _GLSLProgram->BindVertexArray();
 
     glDrawArrays( GL_TRIANGLES, 0, 3 );
+    // glFrontFace(GL_CW);
+    // glutSolidTeapot( 10 );
+    // glFrontFace(GL_CCW);
 
     _GLSLProgram->UnBindVertexArray();
-
-    // _GLSLProgram->UnBindVertexArray();
 
     glutSwapBuffers();
 }
@@ -118,9 +125,9 @@ void setShaders() {
         0.8f, -0.8f, 0.0f,
         0.0f, 0.8f, 0.0f };
     float arrayNormalData[] = {
-        0.0f, 0.0f, -1.0f, 
-        0.0f, 0.0f, -1.0f,
-        0.0f, 0.0f, -1.0f };
+        0.0f, 0.0f,  1.0f, 
+        0.0f, 0.0f,  1.0f,
+        0.0f, 0.0f,  1.0f };
     
     //save mapping of data
     _GLSLProgram->AddMapAttrib( "VertexPosition", pPositionData );
@@ -156,7 +163,7 @@ int main(int argc, char **argv) {
     glutKeyboardFunc(processNormalKeys);
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.5, 0.5, 0.5, 1.0);
+    glClearColor(0.1, 0.1, 0.1, 1.0);
 //	glEnable(GL_CULL_FACE);
 
     glewInit();
