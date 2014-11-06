@@ -166,7 +166,7 @@ void GLBindFragDataLocation( GLuint Program, GLuint Loc, char const * Name ){
 }
 
 bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform3fv( location, 1, &v[0]);
         return true;
@@ -177,7 +177,7 @@ bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
 }
 
 bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform4fv( location, 1, &v[0]);
         return true;
@@ -187,7 +187,7 @@ bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v ){
     }
 }
 bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix3fv( location, 1, GL_FALSE, &m[0][0]);
         return true;
@@ -197,7 +197,7 @@ bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m ){
     }
 }
 bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix4fv( location, 1, GL_FALSE, &m[0][0]);
         return true;
@@ -208,7 +208,7 @@ bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m ){
 }
 
 bool GLSetUniform( GLuint Program, char const * Name, float val ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform1f( location, val );
         return true;
@@ -218,7 +218,7 @@ bool GLSetUniform( GLuint Program, char const * Name, float val ){
     }
 }
 bool GLSetUniform( GLuint Program, char const * Name, int val ){
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform1i( location, val );
         return true;
@@ -236,7 +236,7 @@ bool GLSetUniform( GLuint Program, char const * Name, bool val ){
         ValInt = 0;
     }
 
-    GLuint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform1i( location, ValInt );
         return true;
