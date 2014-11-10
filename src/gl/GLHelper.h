@@ -47,6 +47,8 @@ bool GLSetUniform( GLuint Program, char const * Name, bool val );
 void GLPrintActiveUniforms( GLuint Program );
 void GLPrintActiveAttribs( GLuint Program );
 
+bool GLGenTextures( int Size, GLuint * TexNames );
+bool GLSetTexture( int GLTextureUnitOffset, GLuint TexName, unsigned char const * TexData, int Width, int Height );
 void GLBindVertexArray( GLuint vbo );
 void GLUnBindVertexArray();
 
@@ -283,6 +285,30 @@ void GLPrintActiveAttribs( GLuint Program )
         printf(" %-5d | %s\n",location, name);
     }
     free(name);
+}
+
+bool GLGenTextures( int Size, GLuint * TexNames )
+{
+    if( Size <= 0 ){
+        return false;
+    }
+    else{
+        glGenTextures( Size, TexNames );
+        return true;
+    }
+}
+
+bool GLSetTexture( int GLTextureUnitOffset, GLuint TexName, unsigned char const * TexData, int Width, int Height )
+{
+    glBindTexture( GL_TEXTURE_2D, TexName );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, Width,
+                  Height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                  TexData );
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                    GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR);
+    return true;
 }
 
 void GLBindVertexArray( GLuint vbo )
