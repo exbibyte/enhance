@@ -65,11 +65,11 @@ void renderScene(void) {
 
    //first pass render for light POV    
 
-    glViewport( 0, 0, 200, 200 );
+    glViewport( 0, 0, 320, 320 );
     mat4 ViewMatrix = glm::lookAt( vec3(1.0,1.0,6.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
-    mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
+    mat4 ProjectionMatrix = glm::perspective( 20.0f, 1.0f, 0.1f, 100.0f );
     _GLTexture->BindFbo();
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
@@ -86,8 +86,8 @@ void renderScene(void) {
         0.5, 0.5, 0.5, 1.0
     );
 
-    mat4 ModelViewMatrix = ViewMatrix * ModelMatrix;
-    mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    mat4 ModelViewMatrix = ViewMatrix  * ModelMatrix;
+    mat4 MVP = ProjectionMatrix * ViewMatrix  * ModelMatrix;
     mat4 MVPB = Bias * ProjectionMatrix * ViewMatrix * ModelMatrix;
     mat3 NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
     bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
@@ -113,7 +113,6 @@ void renderScene(void) {
     _GLSLProgram->BindVertexArray();
     glDrawArrays( GL_TRIANGLES, 0, 9 );
     _GLSLProgram->UnBindVertexArray();
-//    glutSwapBuffers();
 
     //2nd pass render 
     glViewport( 0, 0, 320, 320 );
