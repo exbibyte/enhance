@@ -1,4 +1,4 @@
-#version 130
+#version 330
 // Declare any uniforms needed for the Phong shading model
 uniform sampler2DShadow ShadowMap;
 
@@ -60,16 +60,17 @@ void shadeWithShadow()
   sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 1 ) );
   sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 1 ) );
   sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, -1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 0 ) );
 
-  float shadow = sum / 8.0;
+  float shadow = sum * 0.2;
 
   vec3 DiffSpec = phongModel( Position, Normal );
 
-  FragColor = vec4( DiffSpec * shadow + ambient, 1.0 );
+  FragColor = vec4( shadow * DiffSpec + ambient, 1.0 );
 }
 
 //subroutine (RenderPassType)

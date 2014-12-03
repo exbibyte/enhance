@@ -57,27 +57,24 @@ void renderScene(void) {
 
     bool bRet;
 
-    angle+=0.01;
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    angle+=0.005;
 
     mat4 Model = mat4(1.0f);
     mat4 ModelMatrix = glm::rotate( Model, angle, vec3( 0.0f, 0.2f, 0.7f ) );
 
-   //first pass render for light POV    
-
-    bRet = _GLSLProgram->SetUniform( "ShadowMap", 0 );
-
-    glViewport( 0, 0, 1800, 1800 );
-    mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
+    //first pass render for light POV    
+    glViewport( 0, 0, 1000, 1000 );
+    mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
     mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
     _GLTexture->BindFbo();
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    bRet = _GLSLProgram->SetUniform( "ShadowMap", 0 );
     // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
     // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
     bRet = _GLSLProgram->SetUniform( "bShadeShadow", false );
-    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     //draw on first pass
     // Multiply it be the bias matrix
@@ -97,13 +94,16 @@ void renderScene(void) {
     bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrixLight );
     bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
     bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
-    vec3 LightLa = vec3( 0.3, 0.3, 0.3 );
-    vec3 LightLd = vec3( 0.5, 0.5, 0.5 );
-    vec3 LightLs = vec3( 0.2, 0.2, 0.2 );
+    vec3 LightLa;
+    vec3 LightLd;
+    vec3 LightLs;
+    LightLa = vec3( 0.05, 0.05, 0.05 );
+    LightLd = vec3( 0.5, 0.5, 0.5 );
+    LightLs = vec3( 0.45, 0.45, 0.45 );
     bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
     bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
     bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
-    vec4 LightPosition( 0.0f, 0.0f, 20.0f, 1.0 );
+    vec4 LightPosition( 5.0f, 5.0f, 20.0f, 1.0 );
     bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
     vec3 MaterialCoeffKa( 1.0f, 1.0f, 1.0f );
     vec3 MaterialCoeffKd( 1.0f, 1.0f, 1.0f );
@@ -111,17 +111,20 @@ void renderScene(void) {
     bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
     bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
     bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
-    bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
+    bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
     _GLSLProgram->BindVertexArray();
     glDrawArrays( GL_TRIANGLES, 0, 9 );
     _GLSLProgram->UnBindVertexArray();
 
     //2nd pass render 
-    glViewport( 0, 0, 600, 600 );
-    ViewMatrix = glm::lookAt( vec3(2.0,3.0,5.0), 
+    glCullFace(GL_FRONT);
+
+    glViewport( 0, 0, 500, 500 );
+    ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
     _GLTexture->UnbindFbo();
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // GLuint ShadowIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow" );
     // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &ShadowIndex );
@@ -136,9 +139,6 @@ void renderScene(void) {
     bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrix );
     bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
     bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
-    LightLa = vec3( 0.3, 0.3, 0.3 );
-    LightLd = vec3( 0.6, 0.6, 0.6 );
-    LightLs = vec3( 0.3, 0.3, 0.3 );
     bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
     bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
     bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
@@ -171,12 +171,12 @@ void setShaders() {
     GLAttribData<float> * pPositionData = new GLAttribData<float>;
     GLAttribData<float> * pNormalData = new GLAttribData<float>;
     float arrayPositionData[] = {
-        10.0f, 10.0f, -2.0f, //floor
-        -10.0f, 10.0f, -2.0f, 
-        -10.0f, -10.0f, -2.0f,
-        -10.0f, -10.0f, -2.0f, //floor
-        10.0f, -10.0f, -2.0f,
-        10.0f, 10.0f, -2.0f,
+        10.0f, 10.0f, -10.0f, //floor
+        -10.0f, 10.0f, -10.0f, 
+        -10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f, -10.0f, //floor
+        10.0f, -10.0f, -10.0f,
+        10.0f, 10.0f, -10.0f,
         -0.8f, -0.8f, 0.0f, // floating triangle
         0.8f, -0.8f, 0.0f,
         0.0f, 0.8f, 0.0f,
@@ -215,14 +215,14 @@ void setShaders() {
     _GLSLProgram->Use();
 
     _GLTexture = new GLTexture;
-    _GLTexture->SetTexture( GLTexture::DEPTH, 1800, 1800, 0, 0 );
+    _GLTexture->SetTexture( GLTexture::DEPTH, 1000, 1000, 0, 0 );
 }
  
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(100,100);
-    glutInitWindowSize(600,600);
+    glutInitWindowSize(500,500);
     glutCreateWindow("MM 2004-05");
 
     glutDisplayFunc(renderScene);
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
     glClearColor(0, 0, 0, 1.0);
 
     glewInit();
-    if (glewIsSupported("GL_VERSION_3_0"))
+    if (glewIsSupported("GL_VERSION_3_3"))
         printf("Ready for OpenGL 3.0\n");
     else {
         printf("OpenGL 3.0 not supported\n");
