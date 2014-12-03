@@ -56,7 +56,7 @@ bool GLTexture::SetTextureRgba( int iWidth, int iHeight, void * const Data, int 
 bool GLTexture::SetTextureDepth( int iWidth, int iHeight, int iActiveTexture ) {
     bool bRet = true;
 
-    GLfloat border[]={ 1.0f,0.0f,0.0f,0.0f };
+    GLfloat border[]={ 0.0f,0.0f,0.0f,0.0f };
     //The shadow maptexture
     glGenTextures( 1, &_Tex );
     glBindTexture( GL_TEXTURE_2D, _Tex );

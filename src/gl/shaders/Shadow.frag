@@ -1,4 +1,4 @@
-#version 330
+#version 130
 // Declare any uniforms needed for the Phong shading model
 uniform sampler2DShadow ShadowMap;
 
@@ -47,19 +47,28 @@ uniform int bShadeShadow;
 //subroutine (RenderPassType)
 void shadeWithShadow()
 {
-    vec3 DiffSpec = phongModel( Position, Normal );
-    // vec3 BackColor = phongModel( eyePosition, -eyeNorm );
-
-    // if( gl_FrontFacing ) {
-    //     FragColor = vec4(FrontColor, 1.0);
-    // } else {
-    //     FragColor = vec4(BackColor, 1.0);
-    // }
-
   // Do the shadow-map look-up
-  float shadow = textureProj(ShadowMap, ShadowCoord);
+//  float shadow = textureProj(ShadowMap, ShadowCoord);
   // If the fragment is in shadow, use ambient light only.
   vec3 ambient = Light.La * Material.Ka;
+
+  // The sum of the comparisons with nearby texels
+  float sum = 0; 
+
+  // Sum contributions from texels around ShadowCoord
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1,-1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, -1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
+
+  float shadow = sum / 8.0;
+
+  vec3 DiffSpec = phongModel( Position, Normal );
+
   FragColor = vec4( DiffSpec * shadow + ambient, 1.0 );
 }
 
