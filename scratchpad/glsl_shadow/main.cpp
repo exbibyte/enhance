@@ -23,22 +23,9 @@ using glm::vec3;
 #include "GLSLProgram.h"
 #include "GLAttribData.h"
 
-GLuint v, f, f2, p;
-float lpos[4] = { 1, 0.5, 1, 0 };
-GLuint vaoHandle;
-
-//Create the buffer objects
-GLuint vboHandles[2];
-float colourData[] = { 1, 1, 1 };
-GLuint colorBufferHandle;
-
-float angle = 0;
+float angle = 0; 
 
 GLSLProgram * _GLSLProgram;
-
-float PosLight[4] = { 1.0, 1.0, 6.0, 1.0 };
-
-GLTexture * _GLTexture;
 
 void changeSize(int w, int h) {
 
@@ -68,7 +55,12 @@ void renderScene(void) {
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
     mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
-    _GLTexture->BindFbo();
+
+    GLTexture * ShadowTexture;
+    if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
+        ShadowTexture->BindFbo();
+    }
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     bRet = _GLSLProgram->SetUniform( "ShadowMap", 0 );
     // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
@@ -123,7 +115,9 @@ void renderScene(void) {
     ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
-    _GLTexture->UnbindFbo();
+    if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
+        ShadowTexture->UnbindFbo();
+    }
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // GLuint ShadowIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow" );
@@ -158,7 +152,6 @@ void processNormalKeys(unsigned char key, int x, int y) {
     if (key == 27) 
         exit(0);
 }
-
 
 void setShaders() {
 
@@ -214,8 +207,7 @@ void setShaders() {
 
     _GLSLProgram->Use();
 
-    _GLTexture = new GLTexture;
-    _GLTexture->SetTexture( GLTexture::DEPTH, 1000, 1000, 0, 0 );
+    _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
 }
  
 int main(int argc, char **argv) {
@@ -234,7 +226,7 @@ int main(int argc, char **argv) {
     glClearColor(0, 0, 0, 1.0);
 
     glewInit();
-    if (glewIsSupported("GL_VERSION_3_3"))
+    if (glewIsSupported("GL_VERSION_3_0"))
         printf("Ready for OpenGL 3.0\n");
     else {
         printf("OpenGL 3.0 not supported\n");
