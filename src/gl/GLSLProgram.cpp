@@ -5,6 +5,7 @@
 using namespace std;
 
 #include "GLSLProgram.h"
+#include "GLTexture.h"
 
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 
@@ -14,6 +15,20 @@ GLSLProgram::GLSLProgram(){
     _LogString = "";
     _vHandleShader.clear();
     glGenVertexArrays( 1, &_VertexArrayObj );
+}
+
+GLSLProgram::~GLSLProgram(){
+    map< string, GLAttribData<float> * >::iterator itAttrib = _MapAttrib.begin();
+    while( itAttrib != _MapAttrib.end() ) {
+        delete itAttrib->second;
+        itAttrib->second = 0;
+    }
+
+    map< string, GLTexture * >::iterator itTexture = _MapTexture.begin();
+    while( itTexture != _MapTexture.end() ) {
+        delete itTexture->second;
+        itTexture->second = 0;
+    }
 }
 
 GLuint GLSLProgram::GetHandle() const{
@@ -93,17 +108,23 @@ void GLSLProgram::PrintActiveUniforms() const{
 void GLSLProgram::PrintActiveAttribs() const{
     GLPrintActiveAttribs( _HandleProgram );
 }
-void GLSLProgram::AddMapAttrib( string AttribName, GLAttribData<float> * AttribData ){
+bool GLSLProgram::AddMapAttrib( string AttribName, GLAttribData<float> * AttribData ){
+    bool bRet = true;
     _MapAttrib[ AttribName ] = AttribData;
+    return bRet;
 }
-void GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const {
+bool GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const {
+    bool bRet;
     string key = AttribName;
     map< string, GLAttribData<float> * >::const_iterator it = _MapAttrib.find( key );
     if( it == _MapAttrib.end() ){
         AttribData = 0;
+        bRet = false;
     }else{
         AttribData = it->second;
+        bRet = true;
     }
+    return bRet;
 }
 void GLSLProgram::BindMapAttrib(){
 
@@ -121,4 +142,31 @@ void GLSLProgram::BindVertexArray()
 void GLSLProgram::UnBindVertexArray()
 {
     GLUnBindVertexArray();
+}
+bool GLSLProgram::AddMapTexture( string TextureName, GLTexture * Texture ) {
+    bool bRet = true;
+    _MapTexture[ TextureName ] = Texture;
+    return bRet;
+}
+bool GLSLProgram::GetMapTexture( string TextureName, GLTexture * & Texture ) const {
+    bool bRet;
+    map< string, GLTexture * >::const_iterator it = _MapTexture.find( TextureName );
+    if( it == _MapTexture.end() ){
+        Texture = 0;
+        bRet = false;
+    }else{
+        Texture = it->second;
+        bRet = true;
+    }
+    return bRet;
+}
+
+bool GLSLProgram::AddNewTexture( string TextureName, GLTexture::eTextureType TextureType, int iWidth, int iHeight, void * const Data, int iActiveTexture ) {
+    bool bRet = true;
+    GLTexture * Texture = new GLTexture;
+    bRet = Texture->SetTexture( TextureType, iWidth, iHeight, Data, iActiveTexture );
+    if( bRet ) {
+        bRet = AddMapTexture( TextureName, Texture );        
+    }
+    return bRet;
 }
