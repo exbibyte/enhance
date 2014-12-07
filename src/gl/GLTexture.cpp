@@ -23,14 +23,15 @@ bool GLTexture::GetFboId( GLuint & FboId ) {
 }
 
 bool GLTexture::SetTexture( eTextureType TextureType, int iWidth, int iHeight, void * const Data, int iActiveTexture ) {
+    bool bRet = true;
 
     GLint max_textures = 0;
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_textures);
     if( iActiveTexture >= max_textures - 1 ) {
-        return false;
+        bRet = false;
+        return bRet;
     }
 
-    bool bRet = true;
     switch( TextureType ) {
     case DEPTH:
     {
