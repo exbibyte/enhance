@@ -15,6 +15,12 @@ public:
     GLAttribData(){
         glGenBuffers( 1, &_HandleBuffer );
     }
+    ~GLAttribData(){
+        if( _pData ) {
+            delete [] _pData;
+            _pData = 0;
+        }
+    }
     void SetVertexArrayIndex( GLuint vao, GLuint Index ){
         IndexVertexAttrib = Index;
         _hVAO = vao;
