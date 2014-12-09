@@ -8,8 +8,14 @@
 #include<utility>
 using namespace std;
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include <GLFW/glfw3.h>
+
+/* #include <GL/glew.h> */
+/* #ifdef MAC_OS */
+/* #include <GLUT/glut.h> */
+/* #else */
+/* #include <GL/glut.h> */
+/* #endif */
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

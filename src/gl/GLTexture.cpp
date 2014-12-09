@@ -1,5 +1,7 @@
 #include "GLTexture.h"
 
+#include <GLFW/glfw3.h>
+
 GLTexture::GLTexture() : _Tex(-1), _Fbo(-1) {
     
 }

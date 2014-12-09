@@ -1,9 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glew.h>
+//#include <gl/GLEW.h>
+
+#include <GLFW/glfw3.h>
+
+/*
+#ifdef MAC_OS
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 #include "textfile.h"
+*/
 
 #define GLM_FORCE_RADIANS
 
@@ -26,6 +35,8 @@ using glm::vec3;
 float angle = 0; 
 
 GLSLProgram * _GLSLProgram;
+
+GLFWwindow * window;
 
 void changeSize(int w, int h) {
 
@@ -50,7 +61,7 @@ void renderScene(void) {
     mat4 ModelMatrix = glm::rotate( Model, angle, vec3( 0.0f, 0.2f, 0.7f ) );
 
     //first pass render for light POV    
-    glViewport( 0, 0, 1000, 1000 );
+    glViewport( 0, 0, 3000, 3000 );
     mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
@@ -144,7 +155,9 @@ void renderScene(void) {
     _GLSLProgram->BindVertexArray();
     glDrawArrays( GL_TRIANGLES, 0, 9 );
     _GLSLProgram->UnBindVertexArray();
-    glutSwapBuffers();
+
+    glfwSwapBuffers(window);
+
 }
 
 void processNormalKeys(unsigned char key, int x, int y) {
@@ -207,39 +220,62 @@ void setShaders() {
 
     _GLSLProgram->Use();
 
-    _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
+    _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 3000, 3000, 0, 0 );
 }
- 
-int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowPosition(100,100);
-    glutInitWindowSize(500,500);
-    glutCreateWindow("MM 2004-05");
 
-    glutDisplayFunc(renderScene);
-    glutIdleFunc(renderScene);
-    glutReshapeFunc(changeSize);
-    glutKeyboardFunc(processNormalKeys);
+static void error_callback(int error, const char* description)
+{
+    fputs(description, stderr);
+}
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+int main(int argc, char **argv) {
+
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+    
+    glfwSetErrorCallback(error_callback);
+    
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // yes, 3 and 2!!!
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    //get version
+    int major, minor, rev;
+    glfwGetVersion( &major, &minor, &rev );
+
+    cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
+    
+    window = glfwCreateWindow(500, 500, "Shadow Test", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+
+    glfwSetKeyCallback(window, key_callback);
+
+    GLPrintInfo();
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0, 0, 0, 1.0);
 
-    glewInit();
-    if (glewIsSupported("GL_VERSION_3_0"))
-        printf("Ready for OpenGL 3.0\n");
-    else {
-        printf("OpenGL 3.0 not supported\n");
-        exit(1);
-    }
-
-    GLPrintInfo();
-
     setShaders();
-
-    glutMainLoop();
-
-    // just for compatibiliy purposes
+    
+    while (!glfwWindowShouldClose(window))
+    {
+        renderScene();
+        glfwPollEvents();
+    }
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
     return 0;
 }
 

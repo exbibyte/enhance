@@ -8,6 +8,7 @@
 #include <tuple>
 #include <functional>
 
+#include "FuncWrap.h"
 class FuncWrap;
 
 class ThreadPool {

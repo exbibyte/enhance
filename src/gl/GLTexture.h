@@ -1,8 +1,15 @@
 #ifndef GLTEXTURE_H
 #define GLTEXTURE_H
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+/* #include <GL/glew.h> */
+
+/* #ifdef MAC_OS */
+/* #include <GLUT/glut.h> */
+/* #else */
+/* #include <GL/glut.h> */
+/* #endif */
+
+#include <GLFW/glfw3.h>
 
 class GLTexture {
 public:
