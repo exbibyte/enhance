@@ -127,7 +127,6 @@ void GLRender::RenderScene( void ) {
     _GLSLProgram->BindVertexArray();
     glDrawArrays( GL_TRIANGLES, 0, 9 );
     _GLSLProgram->UnBindVertexArray();
-    glutSwapBuffers();
 }
 
 void GLRender::ProcessNormalKeys(unsigned char key, int x, int y) {

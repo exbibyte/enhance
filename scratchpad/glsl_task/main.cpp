@@ -1,3 +1,6 @@
+//opengl includes
+#include <GLFW/glfw3.h>
+
 //application specific
 #include "enTPCommon.h"
 #include "GLTexture.h"
@@ -5,13 +8,6 @@
 #include "GLAttribData.h"
 #include "GLRender.h"
 #include "textfile.h"
-//opengl includes
-#include <GL/glew.h>
-#ifdef MAC_OS
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
 
 //math library
 #define GLM_FORCE_RADIANS
@@ -34,42 +30,64 @@ using glm::vec3;
 #include <functional>
 using namespace std;
 
+
+GLFWwindow * window;
+
+static void error_callback(int error, const char* description)
+{
+    fputs(description, stderr);
+}
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
 void RenderTask(int argc, char **argv) {
 
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowPosition(100,100);
-    glutInitWindowSize(500,500);
-    glutCreateWindow("Render Thread Task");
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+    
+    glfwSetErrorCallback(error_callback);
+    
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // yes, 3 and 2!!!
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DEPTH_BITS,24);
 
-    glutDisplayFunc(GLRender::RenderScene);
-    glutIdleFunc(GLRender::RenderScene);
-    glutReshapeFunc(GLRender::ChangeSize);
-    glutKeyboardFunc(GLRender::ProcessNormalKeys);
+    //get version
+    int major, minor, rev;
+    glfwGetVersion( &major, &minor, &rev );
+
+    cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
+    
+    window = glfwCreateWindow(500, 500, "Shadow Test", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwMakeContextCurrent(window);
+
+    glfwSetKeyCallback(window, key_callback);
+
+    GLPrintInfo();
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0, 0, 0, 1.0);
 
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        /* Problem: glewInit failed, something is seriously wrong. */
-        cerr << "Error: " << glewGetErrorString(err) << endl;
-    }
-    cout << "Status: Using GLEW: " << glewGetString(GLEW_VERSION) << endl;
-
-    if(glewIsSupported("GL_VERSION_3_2"))
-        printf("Ready for OpenGL 3.0\n");
-    else {
-        printf("OpenGL 3.0 not supported\n");
-        exit(1);
-    }
-
-    GLPrintInfo();
-
     GLRender::SetShaders();
-
-    glutMainLoop();
+     
+    while (!glfwWindowShouldClose(window))
+    {
+        GLRender::RenderScene();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
 }
 
 void Idle( int count ){

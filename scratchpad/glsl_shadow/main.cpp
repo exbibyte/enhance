@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <unistd.h>
 //#include <gl/GLEW.h>
 
 #include <GLFW/glfw3.h>
@@ -55,13 +55,15 @@ void renderScene(void) {
 
     bool bRet;
 
+    glClearColor(0, 0, 0, 1.0);
+    
     angle+=0.005;
 
     mat4 Model = mat4(1.0f);
     mat4 ModelMatrix = glm::rotate( Model, angle, vec3( 0.0f, 0.2f, 0.7f ) );
 
     //first pass render for light POV    
-    glViewport( 0, 0, 3000, 3000 );
+    glViewport( 0, 0, 1200, 1200 );
     mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
@@ -77,8 +79,8 @@ void renderScene(void) {
     // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
     // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
     bRet = _GLSLProgram->SetUniform( "bShadeShadow", false );
-    glCullFace(GL_BACK);
-
+    //glCullFace(GL_BACK);
+    //glPolygonOffset( 1, 4 );
     //draw on first pass
     // Multiply it be the bias matrix
     glm::mat4 Bias(
@@ -121,6 +123,7 @@ void renderScene(void) {
 
     //2nd pass render 
     glCullFace(GL_FRONT);
+    //glPolygonOffset( 1.0, 4 );
 
     glViewport( 0, 0, 500, 500 );
     ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
@@ -156,7 +159,7 @@ void renderScene(void) {
     glDrawArrays( GL_TRIANGLES, 0, 9 );
     _GLSLProgram->UnBindVertexArray();
 
-    glfwSwapBuffers(window);
+    //glfwSwapBuffers(window);
 
 }
 
@@ -220,7 +223,7 @@ void setShaders() {
 
     _GLSLProgram->Use();
 
-    _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 3000, 3000, 0, 0 );
+    _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1200, 1200, 0, 0 );
 }
 
 static void error_callback(int error, const char* description)
@@ -244,6 +247,7 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DEPTH_BITS,24);
 
     //get version
     int major, minor, rev;
@@ -271,6 +275,7 @@ int main(int argc, char **argv) {
     while (!glfwWindowShouldClose(window))
     {
         renderScene();
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
     glfwDestroyWindow(window);

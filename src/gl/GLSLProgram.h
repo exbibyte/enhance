@@ -74,6 +74,4 @@ private:
     map< string, GLTexture * > _MapTexture; //texture storage
 };
 
-#include "GLSLProgram.cpp"
-
 #endif
