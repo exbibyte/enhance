@@ -20,6 +20,8 @@
 *.out
 *.app
 
+*#
+.DS_Store
 *~*
 documentation/
 build/
