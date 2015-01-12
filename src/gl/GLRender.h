@@ -38,14 +38,16 @@ void GLRender::RenderScene( void ) {
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
     mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
-
+      
     GLTexture * ShadowTexture;
     if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
         ShadowTexture->BindFbo();
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
+        int iActiveTexture;
+        ShadowTexture->GetActiveTexture( iActiveTexture );
+        bRet = _GLSLProgram->SetUniform( "ShadowMap", iActiveTexture );
     }
 
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    bRet = _GLSLProgram->SetUniform( "ShadowMap", 0 );
     // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
     // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
     bRet = _GLSLProgram->SetUniform( "bShadeShadow", false );
