@@ -90,11 +90,10 @@ void RenderTask(int argc, char **argv) {
     exit(EXIT_SUCCESS);
 }
 
-void Idle( int count ){
-    while(1) {
-        cout << count << endl;
-        ++count;
-    }
+void Idle( int count, enTPCommon * Pool ){
+    cout << count << endl;
+    ++count;
+    Pool->AddTask( Idle, count, Pool );
 }
 
 int main(int argc, char **argv) {
@@ -106,7 +105,7 @@ int main(int argc, char **argv) {
   int count = 0;
 
   std::future<void> ret1 = tp.AddTask(RenderTask, argc, argv );
-  std::future<void> ret2 = tp.AddTask( Idle, count );
+  std::future<void> ret2 = tp.AddTask( Idle, count, ptp );
 
   tp.RunThreads();
 
