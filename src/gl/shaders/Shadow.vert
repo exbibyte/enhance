@@ -1,4 +1,4 @@
-#version 330
+#version 410
 
 in vec3 VertexPosition;
 in vec3 VertexNormal;
@@ -28,9 +28,9 @@ void main()
 
     // ShadowMatrix converts from modeling coordinates to shadow map coordinates.
     ShadowCoord = ShadowMatrix * vec4( VertexPosition, 1.0 );
-    ShadowCoord.z = ShadowCoord.z - 0.0005;
-    ShadowCoord.xyz = ShadowCoord.xyz / ShadowCoord.w;
-    ShadowCoord.w = 1;
+    ShadowCoord.z = ShadowCoord.z - 0.03;
+    //ShadowCoord.xyz = ShadowCoord.xyz / ShadowCoord.w;
+    //ShadowCoord.w = 1;
 
     gl_Position = MVP * vec4( VertexPosition, 1.0 );
 }

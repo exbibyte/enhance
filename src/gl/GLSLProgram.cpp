@@ -72,7 +72,7 @@ void GLSLProgram::Use(){
 }
 
 string GLSLProgram::Log() const{
-
+    return _LogString;
 }
 
 void GLSLProgram::BindAttribLocation( GLuint Loc, string Name ){

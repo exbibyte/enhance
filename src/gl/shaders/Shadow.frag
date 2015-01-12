@@ -1,10 +1,12 @@
-#version 330
+#version 410
 // Declare any uniforms needed for the Phong shading model
 uniform sampler2DShadow ShadowMap;
-
+//uniform sampler2D Tex1;
+ 
 in vec4 Position;
 in vec3 Normal;
 in vec4 ShadowCoord;
+//in vec2 TexCoord;
 
 out vec4 FragColor;
 
@@ -56,21 +58,17 @@ void shadeWithShadow()
   float sum = 0; 
 
   // Sum contributions from texels around ShadowCoord
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1,-1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, -1 ) );
-  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
-  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
-  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
-  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 0 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
 
-  float shadow = sum * 0.2;
+  float shadow = sum * 0.25;
 
   vec3 DiffSpec = phongModel( Position, Normal );
-
-  FragColor = vec4( shadow * DiffSpec + ambient, 1.0 );
+  //vec4 texColor = texture( Tex1, TexCoord );
+  //FragColor = vec4( shadow * DiffSpec * vec3(texColor) + ambient, 1.0 );
+  FragColor = vec4( shadow * DiffSpec + ambient, 1.0 );  
 }
 
 //subroutine (RenderPassType)
