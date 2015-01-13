@@ -11,7 +11,9 @@ bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader
     }else if( GLSLShader::FRAGMENT == type ){
         shader = glCreateShader(GL_FRAGMENT_SHADER);
     }
-
+    else{
+        return false;
+    }
     char const * sourceTextConst = Source;
     glShaderSource( shader, 1, &sourceTextConst, NULL);	
     
