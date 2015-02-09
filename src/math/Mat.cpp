@@ -49,6 +49,7 @@ Mat & Mat::operator = ( const Mat & m ){
   _dim = m._dim;
   _mat = new float [ _size ];
   memcpy( _mat, m._mat, sizeof(float)*_size );
+  return *this;
 }
 
 Mat Mat::operator * ( const Mat & m ) const{
