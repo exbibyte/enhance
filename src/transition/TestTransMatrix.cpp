@@ -11,7 +11,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
 
     //set FSA initialization
     TransMatrix< string, int  > TransitionTable;
-    bool bRet = TransitionTable.SetTransition( "airplane", "bus", 1, 1 );
+    bool bRet = TransitionTable.SetTransition( "airplane", "bus", 3, 1 );
     bRet = TransitionTable.SetTransition( "bus", "car", 1, 2 );
     bRet = TransitionTable.SetTransition( "car", "library", 1, 3 );
     bRet = TransitionTable.SetTransition( "coffee", "library", 1, 4 );
@@ -29,5 +29,10 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
         CHECK( bRet == true );
         bRet = TransitionTable.GetClosure( "car", "coffee", iCost, vPath );
         CHECK( bRet == false );
+
+	int iRetCost;
+	int iTemp;
+	bRet = TransitionTable.GetTransition( "airplane", "library", iRetCost, iTemp );
+	CHECK( iRetCost == 5 );
     }
 }

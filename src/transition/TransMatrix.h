@@ -39,10 +39,10 @@ private:
 
 template< typename KeyType, typename ValueType >
 bool TransMatrix< KeyType, ValueType>::GetTransition( KeyType Current, KeyType Next, int & iCost, ValueType & Val ){
-    typename map< pair< KeyType, KeyType>, pair<bool, ValueType> >::iterator it_MapFind = _MapTransition.find( std::make_pair(Current, Next) );
+    auto it_MapFind = _MapTransition.find( std::make_pair(Current, Next) );
     if(  it_MapFind != _MapTransition.end() ){
-        iCost = it_MapFind->first;
-        Val = it_MapFind->second;
+        iCost = it_MapFind->second.first;
+        Val = it_MapFind->second.second;
         return true;
     }
     else{
