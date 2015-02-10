@@ -123,10 +123,10 @@ bool TransMatrix< KeyType, ValueType>::GetClosure( KeyType Start, KeyType End, i
     if( _MapClosure.find( std::make_pair( Start, End ) ) != _MapClosure.end() ){
         KeyType Current = Start;
         vPathSequence.push_back( Current );
-        while( Current != End ){
+        do{
 	    Current = _MapPathNext.find( std::make_pair( Current, End ) )->second;
 	    vPathSequence.push_back( Current );
-	}
+	}while( Current != End );
         bRet = true;
     }else{
         bRet = false;
