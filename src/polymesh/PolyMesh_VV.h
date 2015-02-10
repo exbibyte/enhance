@@ -2,7 +2,7 @@
 //
 // Summary:      Vertex-Vertex List
 // Notes:
-// Dependencies: Vec
+// Dependencies: Vec, TransMatrix
 //==================================
 #ifndef POLYMESH_VERTVERT_H
 #define POLYMESH_VERTVERT_H

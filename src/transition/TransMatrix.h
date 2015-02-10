@@ -22,27 +22,26 @@ public:
     }
 };
 
-template< typename KeyType, typename ValueType > 
+template< typename KeyType > 
 class TransMatrix {
 public:
     TransMatrix(){}
-    bool GetTransition( KeyType Current, KeyType Next, int & iCost, ValueType & Val ); //false if non-existent
-    bool SetTransition( KeyType Current, KeyType Next, int iCost, ValueType Val ); //false if unsuccesful
+    bool GetTransition( KeyType Current, KeyType Next, int & iCost ); //false if non-existent
+    bool SetTransition( KeyType Current, KeyType Next, int iCost ); //false if unsuccesful
     bool UpdateClosure(); //computes transitive closure and caches result
     bool GetClosure( KeyType Start, KeyType End, int & iCost, vector< KeyType > & vPathSequence ); //false if closure is empty, else returns path cost and sequence
     bool Clear();
 private:
     map< pair<KeyType, KeyType>, KeyType > _MapPathNext; // next path
     map< pair<KeyType, KeyType>, bool > _MapClosure;
-    map< pair< KeyType, KeyType >, pair< int, ValueType > > _MapTransition; //transition containing transition cost, and a stored value
+    map< pair< KeyType, KeyType >, int > _MapTransition; //transition containing transition cost
 };
 
-template< typename KeyType, typename ValueType >
-bool TransMatrix< KeyType, ValueType>::GetTransition( KeyType Current, KeyType Next, int & iCost, ValueType & Val ){
+template< typename KeyType >
+bool TransMatrix< KeyType >::GetTransition( KeyType Current, KeyType Next, int & iCost ){
     auto it_MapFind = _MapTransition.find( std::make_pair(Current, Next) );
     if(  it_MapFind != _MapTransition.end() ){
-        iCost = it_MapFind->second.first;
-        Val = it_MapFind->second.second;
+        iCost = it_MapFind->second;
         return true;
     }
     else{
@@ -50,14 +49,14 @@ bool TransMatrix< KeyType, ValueType>::GetTransition( KeyType Current, KeyType N
     }
 }
 
-template< typename KeyType, typename ValueType >
-bool TransMatrix< KeyType, ValueType>::SetTransition( KeyType Current, KeyType Next, int iCost, ValueType Val ){
-    _MapTransition[ std::make_pair(Current, Next) ] = std::make_pair( iCost, Val );
+template< typename KeyType >
+bool TransMatrix< KeyType >::SetTransition( KeyType Current, KeyType Next, int iCost ){
+    _MapTransition[ std::make_pair(Current, Next) ] = iCost;
     return true;
 }
 
-template< typename KeyType, typename ValueType >
-bool TransMatrix< KeyType, ValueType>::UpdateClosure(){
+template< typename KeyType >
+bool TransMatrix< KeyType >::UpdateClosure(){
     auto it_MapTransitionStart = _MapTransition.begin();
     _MapPathNext.clear();
     _MapClosure.clear();
@@ -91,20 +90,15 @@ bool TransMatrix< KeyType, ValueType>::UpdateClosure(){
 		    _MapClosure.find( TransitionPair_B ) != _MapClosure.end() ){ //check transivity
     
 	  	    _MapClosure[ TransitionPair_AB ] = true;
-		    int iCostA = _MapTransition[ TransitionPair_A ].first;
-		    int iCostB = _MapTransition[ TransitionPair_B ].first;
+		    int iCostA = _MapTransition[ TransitionPair_A ];
+		    int iCostB = _MapTransition[ TransitionPair_B ];
 		    int iCostAB = iCostA + iCostB;
-		    ValueType empty;
-		    if( _MapTransition.find( TransitionPair_AB ) == _MapTransition.end() ){ //if not exist, make a transition
-		        _MapTransition[ TransitionPair_AB ] = std::make_pair( iCostAB, empty );
+		    auto it_MapTransitionFind = _MapTransition.find( TransitionPair_AB );
+		    //if not exist, or if we found a path that cost less, replace the existing one
+		    if( it_MapTransitionFind == _MapTransition.end() || iCostAB < it_MapTransitionFind->second ){		    
+		        _MapTransition[ TransitionPair_AB ] = iCostAB;
 			_MapPathNext[ TransitionPair_AB ] = _MapPathNext[ TransitionPair_A ]; //update next path
-		    }else{
-		      int iExistingCost = _MapTransition.find( TransitionPair_AB )->second.first; //if current found cost less, replace the existing one
-		        if( iCostAB < iExistingCost ){
-		            _MapTransition[ TransitionPair_AB ] = std::make_pair( iCostAB, empty );
-			    _MapPathNext[ TransitionPair_AB ] = _MapPathNext[ TransitionPair_A ];
-		      }
-		    }		   
+		    }
                 }
                 it_KeySetEnd++;
             }
@@ -116,8 +110,8 @@ bool TransMatrix< KeyType, ValueType>::UpdateClosure(){
 }
 
 
-template< typename KeyType, typename ValueType >
-bool TransMatrix< KeyType, ValueType>::GetClosure( KeyType Start, KeyType End, int & iCost, vector< KeyType > & vPathSequence ){
+template< typename KeyType >
+bool TransMatrix< KeyType >::GetClosure( KeyType Start, KeyType End, int & iCost, vector< KeyType > & vPathSequence ){
     bool bRet;
     vPathSequence.clear();
     if( _MapClosure.find( std::make_pair( Start, End ) ) != _MapClosure.end() ){
@@ -134,8 +128,8 @@ bool TransMatrix< KeyType, ValueType>::GetClosure( KeyType Start, KeyType End, i
     return bRet;
 }
 
-template< typename KeyType, typename ValueType >
-bool TransMatrix< KeyType, ValueType>::Clear(){
+template< typename KeyType >
+bool TransMatrix< KeyType >::Clear(){
     _MapTransition.clear();
     _MapClosure.clear();
     _MapPathNext.clear();

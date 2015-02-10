@@ -2,6 +2,7 @@
 #include "Vec.h"
 #include <vector>
 #include <tuple>
+#include "TransMatrix.h"
 
 using namespace std;
 
@@ -66,6 +67,8 @@ bool PolyMesh_VV::CalcFaces( vector< vector<int> > & vFaceList, vector< vector<i
     vVertices.push_back( std::get<VEC>( i ) );
   }
 
-  //calculate faces
+  //TODO: calculate faces
+
+  //use transitivity to find closed path from vertex connections
   
 }
