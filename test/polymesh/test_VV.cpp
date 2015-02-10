@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "Vec.h"
 #include <math.h>
-#include "VertVert.h"
+#include "PolyMesh_VV.h"
 #include <vector>
 using namespace std;
 
