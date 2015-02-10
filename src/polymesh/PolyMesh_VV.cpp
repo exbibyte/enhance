@@ -67,4 +67,5 @@ bool PolyMesh_VV::CalcFaces( vector< vector<int> > & vFaceList, vector< vector<i
   }
 
   //calculate faces
+  
 }

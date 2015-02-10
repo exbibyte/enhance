@@ -15,6 +15,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
     bRet = TransitionTable.SetTransition( "bus", "car", 1, 2 );
     bRet = TransitionTable.SetTransition( "car", "library", 1, 3 );
     bRet = TransitionTable.SetTransition( "coffee", "library", 1, 4 );
+    bRet = TransitionTable.SetTransition( "library", "coffee", 1, 4 );
 
     //compute the transitive closure
     TransitionTable.UpdateClosure();
@@ -27,12 +28,19 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
         CHECK( bRet == true );
         bRet = TransitionTable.GetClosure( "coffee", "library", iCost, vPath );
         CHECK( bRet == true );
-        bRet = TransitionTable.GetClosure( "car", "coffee", iCost, vPath );
+        bRet = TransitionTable.GetClosure( "car", "bus", iCost, vPath );
         CHECK( bRet == false );
 
 	int iRetCost;
 	int iTemp;
 	bRet = TransitionTable.GetTransition( "airplane", "library", iRetCost, iTemp );
 	CHECK( iRetCost == 5 );
+
+	bRet = TransitionTable.GetTransition( "bus", "bus", iRetCost, iTemp );
+	CHECK( bRet == false );
+
+	bRet = TransitionTable.GetTransition( "coffee", "coffee", iRetCost, iTemp );
+	CHECK( bRet == true );
+	CHECK( iRetCost == 2 );
     }
 }
