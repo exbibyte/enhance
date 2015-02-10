@@ -57,3 +57,14 @@ bool PolyMesh_VV::GetVertex( int iIndex, Vec & v ){
   v = std::get<VEC>( _VV[ iIndex ] );
   return true;
 }
+
+bool PolyMesh_VV::CalcFaces( vector< vector<int> > & vFaceList, vector< vector<int> > & vVerticeList, vector< Vec > & vVertices )
+{
+  //copy vertices
+  vVertices.clear();
+  for( auto i : _VV ){
+    vVertices.push_back( std::get<VEC>( i ) );
+  }
+
+  //calculate faces
+}

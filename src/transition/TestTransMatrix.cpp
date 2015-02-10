@@ -11,18 +11,23 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
 
     //set FSA initialization
     TransMatrix< string, int  > TransitionTable;
-    bool bRet = TransitionTable.SetTransition( "airplane", "bus", 1 );
-    bRet = TransitionTable.SetTransition( "bus", "car", 2 );
-    bRet = TransitionTable.SetTransition( "car", "library", 3 );
-    bRet = TransitionTable.SetTransition( "coffee", "library", 4 );
+    bool bRet = TransitionTable.SetTransition( "airplane", "bus", 1, 1 );
+    bRet = TransitionTable.SetTransition( "bus", "car", 1, 2 );
+    bRet = TransitionTable.SetTransition( "car", "library", 1, 3 );
+    bRet = TransitionTable.SetTransition( "coffee", "library", 1, 4 );
+
+    //compute the transitive closure
+    TransitionTable.UpdateClosure();
 
     //do tests
     SECTION( "Transitive Closure" ) {
-        bRet = TransitionTable.GetClosure( "airplane", "library" );
+        int iCost;
+        vector<string> vPath;
+        bRet = TransitionTable.GetClosure( "airplane", "library", iCost, vPath );
         CHECK( bRet == true );
-        bRet = TransitionTable.GetClosure( "coffee", "library" );
+        bRet = TransitionTable.GetClosure( "coffee", "library", iCost, vPath );
         CHECK( bRet == true );
-        bRet = TransitionTable.GetClosure( "car", "coffee" );
+        bRet = TransitionTable.GetClosure( "car", "coffee", iCost, vPath );
         CHECK( bRet == false );
     }
 }
