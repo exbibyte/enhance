@@ -7,7 +7,7 @@ using namespace std;
 
 
 
-TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
+TEST_CASE( "Transition Matrix", "[TransMatrix]" ) {
 
     //set FSA initialization
     TransMatrix< string > TransitionTable;
