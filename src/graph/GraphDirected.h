@@ -251,7 +251,8 @@ bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int
     
     VisitNeighbourNodesHelper( SourceNode, DestinationNode ); //go through graph and calculate cumulative weights
 
-    if( SourceNode == DestinationNode ) //do an additional walk if it cycles
+    int iSelfTransition;
+    if( SourceNode == DestinationNode && !GetPathWeight( DestinationNode->mKey, DestinationNode->mKey, iSelfTransition ) ) //do an additional walk if it cycles
     {
       int iPathBestCycle = -1;
       KeyType KeyBestCycle;
