@@ -106,3 +106,6 @@ test_TransMatrix:
 
 test_VV:
 	g++ -std=c++11 -g -O0 ./test/polymesh/test_VV.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh_VV.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -o $(build_dir)/test_VV
+
+test_GraphDirected:
+	g++ -std=c++11 -g -O0 ./test/graph/TestGraphDirected.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_GraphDirected

@@ -9,8 +9,8 @@
 // Notes:               Generates and gives best path from provided weight mapping based on lowest path weight. Currently only accepts non-negative path weights
 //=============================================================================
 
-#ifndef GRAPHDIRECTED
-#define GRAPHDIRECTED
+#ifndef GRAPHDIRECTED_H
+#define GRAPHDIRECTED_H
 
 #include <map>
 #include <utility>
@@ -38,7 +38,7 @@ GraphNode< KeyType >::GraphNode( KeyType key ): mKey(key), bVisited(false), iWei
 }
 
 template < typename KeyType >
-class CGraphDirected
+class GraphDirected
 {
 public:
     bool GetShortestPath( KeyType Source, KeyType Destination, vector< KeyType > & vPath, int & Dist  ); //returns a vector of shortest path keys and distance if path exists
@@ -61,9 +61,9 @@ private:
 };
 
 template< typename KeyType >
-bool CGraphDirected<KeyType>::GetGraphNodeFromKey( KeyType Key, GraphNode<KeyType> * & Node ) const
+bool GraphDirected<KeyType>::GetGraphNodeFromKey( KeyType Key, GraphNode<KeyType> * & Node ) const
 {
-    map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.find( Key );
+    typename map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.find( Key );
     
     if( it == mMapGraphNode.end() )
     {
@@ -77,7 +77,7 @@ bool CGraphDirected<KeyType>::GetGraphNodeFromKey( KeyType Key, GraphNode<KeyTyp
 }
 
 template< typename KeyType >
-bool CGraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destination, vector< KeyType > & vPath, int & Dist )
+bool GraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destination, vector< KeyType > & vPath, int & Dist )
 {
     bool bRet = true;
 
@@ -108,7 +108,7 @@ bool CGraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destinati
 
 
 template< typename KeyType >
-bool CGraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destination, vector< KeyType > Intermediate, vector< KeyType > & vPath, int & Dist  ) //returns a vector of shortest path keys and distance if path exists
+bool GraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destination, vector< KeyType > Intermediate, vector< KeyType > & vPath, int & Dist  ) //returns a vector of shortest path keys and distance if path exists
 {
     bool bRet = true;
 
@@ -131,7 +131,7 @@ bool CGraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destinati
 
     //find intermediate nodes
     vector< GraphNode<KeyType> * > vIntermediate;
-    for( vector< KeyType >::iterator itIntermediate = Intermediate.begin(); itIntermediate != Intermediate.end(); ++itIntermediate )
+    for( typename vector< KeyType >::iterator itIntermediate = Intermediate.begin(); itIntermediate != Intermediate.end(); ++itIntermediate )
     {
         GraphNode<KeyType> * pNodeIntermediate;
         bFound = GetGraphNodeFromKey( *itIntermediate, pNodeIntermediate );
@@ -153,13 +153,13 @@ bool CGraphDirected<KeyType>::GetShortestPath( KeyType Source, KeyType Destinati
 }
 
 template< typename KeyType >
-bool CGraphDirected<KeyType>::GenerateGraphFromWeightMap( map< pair<KeyType, KeyType> , int > & MapWeight )
+bool GraphDirected<KeyType>::GenerateGraphFromWeightMap( map< pair<KeyType, KeyType> , int > & MapWeight )
 {
     mMapWeight.clear();
     mMapWeight = MapWeight; //copy weight mapping
 
     //delete existing nodes
-    map< KeyType, GraphNode<KeyType> * >::iterator itMapGraph = mMapGraphNode.begin(); 
+    typename map< KeyType, GraphNode<KeyType> * >::iterator itMapGraph = mMapGraphNode.begin(); 
     for( ; itMapGraph != mMapGraphNode.end(); ++itMapGraph )
     {
         delete itMapGraph->second;
@@ -168,7 +168,7 @@ bool CGraphDirected<KeyType>::GenerateGraphFromWeightMap( map< pair<KeyType, Key
     mMapGraphNode.clear();
     
     //go through every relation in weight mapping and get Source and Destination Keys
-    map< pair<KeyType, KeyType> , int >::const_iterator itMapWeight = mMapWeight.begin();
+    typename map< pair<KeyType, KeyType> , int >::const_iterator itMapWeight = mMapWeight.begin();
     for( ; itMapWeight != mMapWeight.end(); ++itMapWeight )
     {
         //check for negative weight
@@ -210,9 +210,9 @@ bool CGraphDirected<KeyType>::GenerateGraphFromWeightMap( map< pair<KeyType, Key
 }
 
 template< typename KeyType >
-bool CGraphDirected< typename KeyType >::GetPathWeight( KeyType Source, KeyType Destination, int & Weight ) const
+bool GraphDirected< KeyType >::GetPathWeight( KeyType Source, KeyType Destination, int & Weight ) const
 {
-    map< pair<KeyType, KeyType> , int >::const_iterator it = mMapWeight.find( std::make_pair( Source, Destination ) );
+    typename map< pair<KeyType, KeyType> , int >::const_iterator it = mMapWeight.find( std::make_pair( Source, Destination ) );
     if( it == mMapWeight.end() )
     {
         return false;
@@ -225,9 +225,9 @@ bool CGraphDirected< typename KeyType >::GetPathWeight( KeyType Source, KeyType 
 }
 
 template< typename KeyType >
-bool CGraphDirected< typename KeyType >::ResetAllVisited()
+bool GraphDirected< KeyType >::ResetAllVisited()
 {
-    map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.begin();    
+    typename map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.begin();    
     for( ; it != mMapGraphNode.end(); ++it )
     {
         it->second->bVisited = false;
@@ -239,7 +239,7 @@ bool CGraphDirected< typename KeyType >::ResetAllVisited()
 }
 
 template< typename KeyType >
-bool CGraphDirected< typename KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int & Dist, GraphNode<KeyType> * SourceNode, GraphNode<KeyType> * DestinationNode )
+bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int & Dist, GraphNode<KeyType> * SourceNode, GraphNode<KeyType> * DestinationNode )
 {
     vPath.clear(); //reset result path
     Dist = -1;
@@ -266,7 +266,7 @@ bool CGraphDirected< typename KeyType >::VisitNeighbourNodes( vector<KeyType> & 
 }
 
 template< typename KeyType >
-void CGraphDirected< typename KeyType >::VisitNeighbourNodesHelper( GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode )
+void GraphDirected< KeyType >::VisitNeighbourNodesHelper( GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode )
 {
     //return if current node has been visited
     if( CurrentNode->bVisited )
@@ -275,7 +275,7 @@ void CGraphDirected< typename KeyType >::VisitNeighbourNodesHelper( GraphNode<Ke
     }
     
     //add weight to neighbours
-    for( vector< GraphNode<KeyType> * >::iterator it = CurrentNode->vTransitionTo.begin(); it != CurrentNode->vTransitionTo.end(); ++it )
+    for( typename vector< GraphNode<KeyType> * >::iterator it = CurrentNode->vTransitionTo.begin(); it != CurrentNode->vTransitionTo.end(); ++it )
     {
         int PathWeight;
         GetPathWeight( CurrentNode->mKey, (*it)->mKey, PathWeight );
@@ -298,14 +298,14 @@ void CGraphDirected< typename KeyType >::VisitNeighbourNodesHelper( GraphNode<Ke
     CurrentNode->bVisited = true;
         
     //depth-first recurse through directed neighbours
-    for( vector< GraphNode<KeyType> * >::iterator it = CurrentNode->vTransitionTo.begin(); it != CurrentNode->vTransitionTo.end(); ++it )
+    for( typename vector< GraphNode<KeyType> * >::iterator it = CurrentNode->vTransitionTo.begin(); it != CurrentNode->vTransitionTo.end(); ++it )
     {
         VisitNeighbourNodesHelper( *it, DestinationNode );
     }
 }
 
 template< typename KeyType >
-bool CGraphDirected< typename KeyType >::VisitNeighbourNodesWithIntermediate( vector<KeyType> & vPath, int & Dist, GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode, vector< GraphNode<KeyType> * > vIntermediate )
+bool GraphDirected< KeyType >::VisitNeighbourNodesWithIntermediate( vector<KeyType> & vPath, int & Dist, GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode, vector< GraphNode<KeyType> * > vIntermediate )
 {
     vector<KeyType> vPathCurrentBranch;
     int DistCurrentBranch;
@@ -328,13 +328,13 @@ bool CGraphDirected< typename KeyType >::VisitNeighbourNodesWithIntermediate( ve
 }
 
 template< typename KeyType >
-void CGraphDirected< typename KeyType >::VisitNeighbourNodesWithIntermediateHelper( GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode, vector< GraphNode<KeyType> * > vIntermediate, vector<KeyType> & vPath, int & Dist, vector<KeyType> vPathCurrentBranch, int DistCurrentBranch )
+void GraphDirected< KeyType >::VisitNeighbourNodesWithIntermediateHelper( GraphNode<KeyType> * CurrentNode, GraphNode<KeyType> * DestinationNode, vector< GraphNode<KeyType> * > vIntermediate, vector<KeyType> & vPath, int & Dist, vector<KeyType> vPathCurrentBranch, int DistCurrentBranch )
 {  
     ResetAllVisited(); //reset all nodes
 
     if( !vIntermediate.empty() ) //check intermediate node to visit
     {
-        for( vector< GraphNode<KeyType> * >::iterator itIntermediate = vIntermediate.begin(); itIntermediate != vIntermediate.end(); ++itIntermediate )
+        for( typename vector< GraphNode<KeyType> * >::iterator itIntermediate = vIntermediate.begin(); itIntermediate != vIntermediate.end(); ++itIntermediate )
         {
             GraphNode<KeyType> * NextDestination = *itIntermediate;
 
@@ -359,14 +359,14 @@ void CGraphDirected< typename KeyType >::VisitNeighbourNodesWithIntermediateHelp
                 DistCurrentBranch += DistTemp;
 
                 //check if any remaining intermediate nodes have been visited by the last path search
-                for( vector<KeyType>::iterator itPathTemp = vPathTemp.begin(); itPathTemp != vPathTemp.end(); ++itPathTemp )
+                for( typename vector<KeyType>::iterator itPathTemp = vPathTemp.begin(); itPathTemp != vPathTemp.end(); ++itPathTemp )
                 {
                     GraphNode<KeyType> * itNode = 0;
-                    map< KeyType, GraphNode<KeyType> * >::iterator itMapNode = mMapGraphNode.find(*itPathTemp); //find node from key map
+                    typename map< KeyType, GraphNode<KeyType> * >::iterator itMapNode = mMapGraphNode.find(*itPathTemp); //find node from key map
                     if( itMapNode != mMapGraphNode.end() )
                     {
                         itNode = itMapNode->second;
-                        vector< GraphNode<KeyType> * >::iterator itNodeRepeat = find(vIntermediateNext.begin(), vIntermediateNext.end(), itNode ); //find node from remaining intermediate nodes
+                        typename vector< GraphNode<KeyType> * >::iterator itNodeRepeat = find(vIntermediateNext.begin(), vIntermediateNext.end(), itNode ); //find node from remaining intermediate nodes
                         if( itNodeRepeat != vIntermediateNext.end() )
                         {
                             vIntermediateNext.erase( itNodeRepeat );

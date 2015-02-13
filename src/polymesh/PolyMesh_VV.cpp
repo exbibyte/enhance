@@ -1,9 +1,12 @@
 #include "PolyMesh_VV.h"
 #include "Vec.h"
-#include <vector>
-#include <tuple>
 #include "TransMatrix.h"
 
+#include <vector>
+#include <tuple>
+#include <string>
+#include <utlity>
+#include <algorithm>
 using namespace std;
 
 bool PolyMesh_VV::SetVertices( vector< Vec > & vVert, vector< vector< int > > & vConnection )
@@ -61,14 +64,23 @@ bool PolyMesh_VV::GetVertex( int iIndex, Vec & v ){
 
 bool PolyMesh_VV::CalcFaces( vector< vector<int> > & vFaceList, vector< vector<int> > & vVerticeList, vector< Vec > & vVertices )
 {
-  //copy vertices
+  TransMatrix< int > _Transivity;
   vVertices.clear();
+
+  set< pair< int, int > > SetPairVertices; // stores all vertice pairs
+  
   for( auto i : _VV ){
-    vVertices.push_back( std::get<VEC>( i ) );
+    vVertices.push_back( std::get<VEC>( i ) );   //copy vertices
+    for( auto j : std::get<CON>( i ) ){
+      if( i <= j ){ //make the vertice pair ordered
+	SetPairVertices.insert( std::make_pair( i, j ) ); // add to the set of vertice pairs
+      }else{
+	SetPairVertices.insert( std::make_pair( j, i ) );
+      }
+    }				
   }
 
-  //TODO: calculate faces
-
+  std::for_each( SetPairVertices.begin(), SetPairVertices.end() [&]( std::set< pair< int, int > >::iterator & it ){ _Transivity.SetTransition( it->first, it->second, 1 ); } );
   //use transitivity to find closed path from vertex connections
   
 }
