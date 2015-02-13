@@ -24,6 +24,7 @@ class GraphNode
 {     
 public:
     GraphNode( KeyType key );
+    GraphNode();
     KeyType mKey;
     bool bVisited;                       //flag set when all directed neighbours have been visited
     vector< GraphNode * > vTransitionTo; //directed edge to another node
@@ -241,12 +242,45 @@ bool GraphDirected< KeyType >::ResetAllVisited()
 template< typename KeyType >
 bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int & Dist, GraphNode<KeyType> * SourceNode, GraphNode<KeyType> * DestinationNode )
 {
+    bool bRet = true;
+    GraphNode< KeyType > * DummyNode = 0; //deals with cycling source and destination node
+  
     vPath.clear(); //reset result path
     Dist = -1;
     SourceNode->iWeightSum = 0;
     
     VisitNeighbourNodesHelper( SourceNode, DestinationNode ); //go through graph and calculate cumulative weights
 
+    if( SourceNode == DestinationNode ) //do an additional walk if it cycles
+    {
+      int iPathBestCycle = -1;
+      KeyType KeyBestCycle;
+      for( typename map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.begin(); it != mMapGraphNode.end(); it++ )
+      {
+	int iPathWeight;
+	if( GetPathWeight( it->first, DestinationNode->mKey, iPathWeight ) ) //if path exists
+	{
+	  if( iPathBestCycle == -1 || iPathWeight < iPathBestCycle ) //found a better path
+	  {
+	    KeyBestCycle = it->first;
+	    iPathBestCycle = iPathWeight;
+	  }
+	}
+      }
+      if( iPathBestCycle == -1 ) //didn't find a path to destination
+      {
+	return false;
+      }
+
+      //make a node representing the final destination node
+      DummyNode = new GraphNode< KeyType >( DestinationNode->mKey );
+      DummyNode->bVisited = true;
+      DummyNode->PrevNode = mMapGraphNode[ KeyBestCycle ];
+      DummyNode->iWeightSum = iPathBestCycle + DummyNode->PrevNode->iWeightSum;
+
+      DestinationNode = DummyNode;
+    }
+    
     if( DestinationNode->bVisited ) //found destination and get the best path, distance
     {
         Dist = DestinationNode->iWeightSum;
@@ -258,11 +292,18 @@ bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int
             Prev = Prev->PrevNode;
         }
         std::reverse( vPath.begin(), vPath.end() ); //make items in vector start from Source and end with Destination
-        return true; 
+        bRet = true; 
     }
     else{
-        return false;
+        bRet = false;
     }
+
+    if( !DummyNode ){
+      delete DummyNode;
+      DummyNode = 0;
+    }
+
+    return bRet;
 }
 
 template< typename KeyType >

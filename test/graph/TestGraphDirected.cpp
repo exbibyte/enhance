@@ -19,13 +19,13 @@ TEST_CASE( "GraphDirected", "[GraphDirected]" ) {
   _Connections.emplace( std::pair<int,int>(3,4), 1 );
   _Connections.emplace( std::pair<int,int>(4,1), 1 );
   _Connections.emplace( std::pair<int,int>(1,0), 1 );
+  _Connections.emplace( std::pair<int,int>(1,0), 1 );
   _Connections.emplace( std::pair<int,int>(2,6), 1 );
   _Connections.emplace( std::pair<int,int>(1,6), 1 );
 
   _Optimizer.GenerateGraphFromWeightMap( _Connections );
       
   SECTION( "Shortest Path" ) {
-
     vector< int > _Path;
     int _Dist;
     _Optimizer.GetShortestPath( 0, 6, _Path, _Dist  );
@@ -36,4 +36,18 @@ TEST_CASE( "GraphDirected", "[GraphDirected]" ) {
     CHECK( 6 == _Path[2] );
   }
 
+  SECTION( "Cycle" ) {
+    vector< int > _Path;
+    int _Dist;
+    bool bRet = _Optimizer.GetShortestPath( 4, 4, _Path, _Dist  );
+    REQUIRE( true == bRet );
+    REQUIRE( 5 == _Path.size() );
+    CHECK( 4 == _Dist );
+    CHECK( 4 == _Path[0] );
+    CHECK( 1 == _Path[1] );
+    CHECK( 0 == _Path[2] );
+    CHECK( 3 == _Path[3] );
+    CHECK( 4 == _Path[4] );
+  }
+  
 }
