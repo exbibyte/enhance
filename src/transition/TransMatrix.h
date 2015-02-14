@@ -26,15 +26,15 @@ template< typename KeyType >
 class TransMatrix {
 public:
     TransMatrix(){}
-    bool GetTransition( KeyType Current, KeyType Next, int & iCost ); //false if non-existent
-    bool SetTransition( KeyType Current, KeyType Next, int iCost ); //false if unsuccesful
-    bool UpdateClosure(); //computes transitive closure and caches result
-    bool GetClosure( KeyType Start, KeyType End, int & iCost, vector< KeyType > & vPathSequence ); //false if closure is empty, else returns path cost and sequence
-    bool Clear();
+    bool GetTransition( KeyType Current, KeyType Next, int & iCost );                              //to be called after UpdateClosure(), false if closure is empty, else return path cost
+    bool SetTransition( KeyType Current, KeyType Next, int iCost );                                //sets transition and replaces any existing one
+    bool UpdateClosure();                                                                          //computes transitive closure and caches result
+    bool GetClosure( KeyType Start, KeyType End, int & iCost, vector< KeyType > & vPathSequence ); //to be called after UpdateClosure(), false if closure is empty, else returns path cost and sequence
+    bool Clear();                                                                                  //empties transitions and closures
 private:
-    map< pair<KeyType, KeyType>, KeyType > _MapPathNext; // next path
-    map< pair<KeyType, KeyType>, bool > _MapClosure;
-    map< pair< KeyType, KeyType >, int > _MapTransition; //transition containing transition cost
+    map< pair<KeyType, KeyType>, KeyType > _MapPathNext;                                           //stores the best next path step
+    map< pair<KeyType, KeyType>, bool > _MapClosure;                                               //boolean map indicating closure existence
+    map< pair< KeyType, KeyType >, int > _MapTransition;                                           //cost map of closure
 };
 
 template< typename KeyType >
@@ -121,6 +121,8 @@ bool TransMatrix< KeyType >::GetClosure( KeyType Start, KeyType End, int & iCost
 	    Current = _MapPathNext.find( std::make_pair( Current, End ) )->second;
 	    vPathSequence.push_back( Current );
 	}while( Current != End );
+	auto TransitionPair = std::make_pair( Start, End );
+	iCost = _MapTransition[ TransitionPair ];
         bRet = true;
     }else{
         bRet = false;
