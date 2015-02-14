@@ -23,6 +23,7 @@ TEST_CASE( "GraphDirected", "[GraphDirected]" ) {
   _Connections.emplace( std::pair<int,int>(2,6), 1 );
   _Connections.emplace( std::pair<int,int>(1,6), 1 );
   _Connections.emplace( std::pair<int,int>(6,6), 0 );
+  _Connections.emplace( std::pair<int,int>(7,4), 0 );
 
   _Optimizer.GenerateGraphFromWeightMap( _Connections );
       

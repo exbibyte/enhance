@@ -255,16 +255,16 @@ bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int
     if( SourceNode == DestinationNode && !GetPathWeight( DestinationNode->mKey, DestinationNode->mKey, iSelfTransition ) ) //do an additional walk if it cycles
     {
       int iPathBestCycle = -1;
+      int iPathWeight = -1;
       KeyType KeyBestCycle;
       for( typename map< KeyType, GraphNode<KeyType> * >::const_iterator it = mMapGraphNode.begin(); it != mMapGraphNode.end(); it++ )
       {
-	int iPathWeight;
-	if( GetPathWeight( it->first, DestinationNode->mKey, iPathWeight ) ) //if path exists
+	if( it->second->bVisited && GetPathWeight( it->first, DestinationNode->mKey, iPathWeight ) ) //if path exists
 	{
-	  if( iPathBestCycle == -1 || iPathWeight < iPathBestCycle ) //found a better path
+	  if( iPathBestCycle == -1 || it->second->iWeightSum + iPathWeight < iPathBestCycle ) //found a better path
 	  {
 	    KeyBestCycle = it->first;
-	    iPathBestCycle = iPathWeight;
+	    iPathBestCycle = iPathWeight + it->second->iWeightSum;
 	  }
 	}
       }
@@ -277,7 +277,7 @@ bool GraphDirected< KeyType >::VisitNeighbourNodes( vector<KeyType> & vPath, int
       DummyNode = new GraphNode< KeyType >( DestinationNode->mKey );
       DummyNode->bVisited = true;
       DummyNode->PrevNode = mMapGraphNode[ KeyBestCycle ];
-      DummyNode->iWeightSum = iPathBestCycle + DummyNode->PrevNode->iWeightSum;
+      DummyNode->iWeightSum = iPathBestCycle;
 
       DestinationNode = DummyNode;
     }
