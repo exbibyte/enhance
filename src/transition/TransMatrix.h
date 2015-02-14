@@ -7,21 +7,6 @@
 #include <set>
 using namespace std;
 
-template< typename KeyType >
-class TransMatrixDefaultComparator
-{
-public:
-    bool operator() ( pair< KeyType, KeyType > A, pair< KeyType, KeyType > B ){
-        if( A.first < B.first ){
-            return true;
-        }
-        else if( A.second < B.second ){
-            return true;
-        }
-        return false;
-    }
-};
-
 template< typename KeyType > 
 class TransMatrix {
 public:
