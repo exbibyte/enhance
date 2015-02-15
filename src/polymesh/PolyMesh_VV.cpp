@@ -162,8 +162,6 @@ bool PolyMesh_VV::CalcFaces( map< int, set<int> > & MapFaceList, map< int, set<i
 		    break;
 		}
 		//reset iterators
-		i = SetRemainIndex.begin();
-		j = SetRemainIndex.begin();
 		it_A = SetRemainIndex.end();
 		it_B = SetRemainIndex.end();
 	    }
