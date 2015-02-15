@@ -8,15 +8,21 @@ Experimental 3D kinematics game
 
 Checklist:
 
-[ ] Math and Physics Library Layer
+A = Working
+B = Partial
+C = In Progress
+D = To do
 
-[ ] Integrate Graphics Engine (likely with bgfx)
 
-[ ] Develop and Integrate Game Engine
+[B] Math and Physics Library Layer
 
-[ ] Game Content Format Design
+[C] Integrate Graphics Engine
 
-[ ] World Editor/Generator
+[D] Develop and Integrate Game Engine
+
+[D] Game Content Format Design
+
+[D] World Editor/Generator
 
 --------------------------------------------
 
