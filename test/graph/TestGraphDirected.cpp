@@ -12,18 +12,18 @@ TEST_CASE( "GraphDirected", "[GraphDirected]" ) {
   GraphDirected<int> _Optimizer;
 
   map< pair< int, int >, int > _Connections;
-  _Connections.emplace( std::pair<int,int>(0,1), 1 );
-  _Connections.emplace( std::pair<int,int>(1,2), 1 );
-  _Connections.emplace( std::pair<int,int>(2,0), 1 );
-  _Connections.emplace( std::pair<int,int>(0,3), 1 );
-  _Connections.emplace( std::pair<int,int>(3,4), 1 );
-  _Connections.emplace( std::pair<int,int>(4,1), 1 );
-  _Connections.emplace( std::pair<int,int>(1,0), 1 );
-  _Connections.emplace( std::pair<int,int>(1,0), 1 );
-  _Connections.emplace( std::pair<int,int>(2,6), 1 );
-  _Connections.emplace( std::pair<int,int>(1,6), 1 );
-  _Connections.emplace( std::pair<int,int>(6,6), 0 );
-  _Connections.emplace( std::pair<int,int>(7,4), 0 );
+  _Connections.insert( make_pair( std::pair<int,int>(0,1), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(1,2), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(2,0), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(0,3), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(3,4), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(4,1), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(1,0), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(1,0), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(2,6), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(1,6), 1 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(6,6), 0 ) );
+  _Connections.insert( make_pair( std::pair<int,int>(7,4), 0 ) );
 
   _Optimizer.GenerateGraphFromWeightMap( _Connections );
       
