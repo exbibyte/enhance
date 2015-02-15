@@ -72,7 +72,7 @@ test_CircularBufferThreadSafe:
 	g++ -std=c++0x ./test/core/test_CircularBufferThreadSafe.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_circularbufferthreadsafe
 
 test_BufferPool:
-	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_folder_catch) -I$(inc_folder_core) $(libjemalloc) -o $(build_dir)/test_bufferpool
+	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_bufferpool
 
 test_Thread:
 	g++ -std=c++0x -O3 ./test/core/test_Thread.cpp -pthread -I$(inc_folder_core) -o $(build_dir)/test_thread

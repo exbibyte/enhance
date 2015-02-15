@@ -39,10 +39,10 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
         tpool.SetNumBuffers(3);
         string str = "quartet";
         string temp = string(str);
-        tpool.AddToBuffers( temp );
+        tpool.AddToBuffer( temp );
         string str2 = "voyageur";
         temp = string(str2);
-        tpool.AddToBuffers( temp );
+        tpool.AddToBuffer( temp );
 
         int getcount = 0;
         for( int i = 0; i < 3; i++ ){
@@ -81,7 +81,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
             ss << str << i;
             string str_temp;
             ss >> str_temp;
-            bool ret = tpool.AddToBuffers( str_temp );
+            bool ret = tpool.AddToBuffer( str_temp );
             if( i == 3 ){
                 CHECK( false == ret );
             }
@@ -124,7 +124,7 @@ TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
             ss << str << i;
             string str_temp;
             ss >> str_temp;
-            tpool.AddToBuffers( str_temp );
+            tpool.AddToBuffer( str_temp );
         }  
         tpool.ResetIndex();
         for( int i = 0; i < 3; i++ ){ // consume random buffers 3 times and check results
