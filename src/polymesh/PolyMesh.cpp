@@ -34,10 +34,10 @@ bool PolyMesh::SetVertices( vector< Vec > & vVert, vector< set< int > > & vConne
 	    }
 	}
 	//insert data
-	_MapVertexVertex.emplace( i, vConnection[i] );
-	_MapVertexVec.emplace( i, vVert[i] );
+	_MapVertexVertex.insert( make_pair(i, vConnection[i]) );
+	_MapVertexVec.insert( make_pair(i, vVert[i]) );
    
-	_SetIndexVertex.emplace( i );		
+	_SetIndexVertex.insert( i );		
     }
     return true;
 }
@@ -111,17 +111,17 @@ bool PolyMesh::Calculate()
 		}
 		//save face-vertex data
 		set< int > SetFaceVertices;
-		SetFaceVertices.emplace( v1 );
-		SetFaceVertices.emplace( v2 );
-		SetFaceVertices.emplace( v3 );
+		SetFaceVertices.insert( v1 );
+		SetFaceVertices.insert( v2 );
+		SetFaceVertices.insert( v3 );
 		int iFaceIndex = _SetIndexFace.size();
 		_MapFaceVertex[ iFaceIndex ] = SetFaceVertices;
 		//save face index
-		_SetIndexFace.emplace( iFaceIndex );
+		_SetIndexFace.insert( iFaceIndex );
 		//save vertex-face data
-		_MapVertexFace[ v1 ].emplace( iFaceIndex );
-		_MapVertexFace[ v2 ].emplace( iFaceIndex );
-		_MapVertexFace[ v3 ].emplace( iFaceIndex );
+		_MapVertexFace[ v1 ].insert( iFaceIndex );
+		_MapVertexFace[ v2 ].insert( iFaceIndex );
+		_MapVertexFace[ v3 ].insert( iFaceIndex );
 		//prepate edge data for saving
 		vector< int > vVertices;
 		for( auto vert : SetFaceVertices ){
@@ -140,19 +140,19 @@ bool PolyMesh::Calculate()
 		    //check if the edge is already registered
 		    if( it_edge == _MapVertexPairToEdge.end() ){
 			int iEdgeIndex = _SetIndexEdge.size();
-			_SetIndexEdge.emplace( iEdgeIndex );
+			_SetIndexEdge.insert( iEdgeIndex );
 			_MapVertexPairToEdge[ e ] = iEdgeIndex;
 			it_edge = _MapVertexPairToEdge.find( e );
 		    }
 		    //save face-edge data
-		    _MapFaceEdge[ iFaceIndex ].emplace( it_edge->second );
+		    _MapFaceEdge[ iFaceIndex ].insert( it_edge->second );
 		    //save edge-face data
-		    _MapEdgeFace[ it_edge->second ].emplace( iFaceIndex );
+		    _MapEdgeFace[ it_edge->second ].insert( iFaceIndex );
 		}							     
                 //add vertices to the completed set
-		SetCompleteIndex.emplace( v1 );
-		SetCompleteIndex.emplace( v2 );
-		SetCompleteIndex.emplace( v3 );
+		SetCompleteIndex.insert( v1 );
+		SetCompleteIndex.insert( v2 );
+		SetCompleteIndex.insert( v3 );
 		//check if found all
 		if( SetCompleteIndex.size() == SetRemainIndex.size() ){
 		    break;
