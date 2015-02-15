@@ -102,7 +102,7 @@ test_enTPCommon:
 	g++ -std=c++0x -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_entpcommon
 
 test_TransMatrix:
-	g++ -std=c++11 -g -O0 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
+	g++ -std=gnu++11 -g -O0 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
 
 test_PolyMesh:
 	g++ -std=gnu++11 -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
