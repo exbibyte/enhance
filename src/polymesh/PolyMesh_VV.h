@@ -10,30 +10,26 @@
 #include "../Math/Vec.h"
 #include <vector>
 #include <tuple>
-
+#include <set>
+#include <map>
 using namespace std;
 
 class PolyMesh_VV{
 public:
-  enum eAccess_VV{
-    IND = 0,
-    VEC = 1,
-    CON = 2
-  };
-  //input: list of vertices, list of adjacent vertices per vertex
-  bool SetVertices( vector< Vec > & vVert, vector< vector< int > > & vConnection );
-  //Get list of all vertices
-  bool GetVertices( vector< tuple< int, Vec, vector< int > > > & VV );
-  //Changes existing vertice and/or their adjacent connections
-  bool ChangeVertex( int iIndex, Vec v );
-  bool ChangeVertex( int iIndex, vector< int > vConnect );
-  bool ChangeVertex( int iIndex, Vec v, vector< int > vConnect );
-  //Get one vertex at an existing index
-  bool GetVertex( int iIndex, Vec & v );
-  //Computes faces list, vertex list, and vertices
-  bool CalcFaces( vector< vector<int> > & vFaceList, vector< vector<int> > & vVerticeList, vector< Vec > & vVertices );
+    bool SetVertices( vector< Vec > & vVert, vector< set< int > > & vConnection );
+    bool ChangeVertex( int iIndex, Vec v );
+    bool ChangeVertex( int iIndex, set< int > vConnect );
+    bool ChangeVertex( int iIndex, Vec v, set< int > vConnect );
+    bool GetVec( int iIndex, Vec & v );
+    bool GetAllIndex( set< int > & index );
+    bool GetAllVec( map< int, Vec > & v );
+    bool GetAllConnection( map< int, set< int > > & c );
+    bool GetConnection( int iIndex, set< int > & c );
+    bool CalcFaces( map< int, set<int> > & MapFaceList, map< int, set<int> > & MapVertexList, map< int, Vec > & MapVec );     
 private:
-  vector< tuple< int, Vec, vector< int > > >  _VV;
+    map< int, set< int > > _MapConnect;    //stores all vertice connections
+    map< int, Vec >  _MapVec;              //stores all Vec elements
+    set< int > _SetIndex;                  //stores all vertex indexes
 };
 
 #endif

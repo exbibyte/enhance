@@ -4,59 +4,89 @@
 #include <math.h>
 #include "PolyMesh_VV.h"
 #include <vector>
+#include <set>
+#include <iostream>
 using namespace std;
 
 TEST_CASE( "VV", "[VV]" ) {
 
   vector< Vec > vVertex;
-  vector< vector< int > > vConnect;
+  vector< set< int > > vConnect;
 
   for( int i = 0; i < 5; i++ ){ 
     Vec a = Vec(3);
-    a._vec[0] = 0;
-    a._vec[1] = 1;
-    a._vec[2] = 2;
+    a._vec[0] = 5;
+    a._vec[1] = 5;
+    a._vec[2] = 5;
     vVertex.push_back( a );
-
-    vector< int > newconnect;
-    if( i == 0 )
-    {
-      newconnect.push_back(1);
-    }
-    else
-    {
-      for( int j = 0; j < 5; j++ )
-      {
-	if( i != j )
-	{
-	  newconnect.push_back(j);
-	}
-      }
-    }
-    vConnect.push_back( newconnect );
   }
+
+  int conn0[] = {1,2};
+  int conn1[] = {0,2};
+  int conn2[] = {0,1,4};
+  int conn3[] = {2,4};
+  int conn4[] = {3,2};
+  set<int> con0 (conn0, conn0+2);
+  set<int> con1 (conn1, conn1+2);
+  set<int> con2 (conn2, conn2+3);
+  set<int> con3 (conn3, conn3+2);
+  set<int> con4 (conn4, conn4+2);
+
+  vConnect.push_back( con0 );
+  vConnect.push_back( con1 );
+  vConnect.push_back( con2 );
+  vConnect.push_back( con3 );
+  vConnect.push_back( con4 );
 
   PolyMesh_VV MeshVV;
   MeshVV.SetVertices( vVertex, vConnect );
 
-  Vec NewVec = Vec(3);
-  NewVec._vec[0] = 99;
-  NewVec._vec[1] = 100;
-  NewVec._vec[2] = 101;
-  vector< int > NewConnect { 3, 4 };
-  MeshVV.ChangeVertex( 1, NewVec, NewConnect );
-
-  vector< tuple< int, Vec, vector<int > > > Vertices;
-  Vertices.clear();
-  bool bRet = MeshVV.GetVertices( Vertices );
-
-  Vec CheckVec;
-  bRet = MeshVV.GetVertex( 1, CheckVec );
-
   SECTION( "Check ChangeVertex()" ){
+    Vec NewVec = Vec(3);
+    NewVec._vec[0] = 99;
+    NewVec._vec[1] = 100;
+    NewVec._vec[2] = 101;
+    bool bRet = MeshVV.ChangeVertex( 1, NewVec );
+    REQUIRE( bRet == true );
+
+    Vec CheckVec;
+    bRet = MeshVV.GetVec( 1, CheckVec );
     REQUIRE( bRet == true );
     REQUIRE( CheckVec._vec[0] == 99 );
     REQUIRE( CheckVec._vec[1] == 100 );
     REQUIRE( CheckVec._vec[2] == 101 );
-  }  
+  }
+  SECTION( "Check GetAllVec()" ){
+    map< int, Vec > MapVec;
+    bool bRet = MeshVV.GetAllVec( MapVec );
+    CHECK( MapVec.size() == 5 );
+  }
+  SECTION( "Check GetAllIndex()" ){
+    set< int > SetIndex;    
+    bool bRet = MeshVV.GetAllIndex( SetIndex );
+    REQUIRE( SetIndex.size() == 5 );
+  }
+  SECTION( "Check CalcFaces()" ){
+    map< int, set<int> > MapFaceList;
+    map< int, set<int> > MapVertexList;
+    map< int, Vec > MapVec;
+    MeshVV.CalcFaces( MapFaceList, MapVertexList, MapVec );
+    REQUIRE( MapFaceList.size() == 2 );
+
+    CHECK( MapFaceList[0].find(0) != MapFaceList[0].end() );
+    CHECK( MapFaceList[0].find(1) != MapFaceList[0].end() );
+    CHECK( MapFaceList[0].find(2) != MapFaceList[0].end() );
+    CHECK( MapFaceList[0].find(3) == MapFaceList[0].end() );
+    CHECK( MapFaceList[0].find(4) == MapFaceList[0].end() );
+
+    CHECK( MapFaceList[1].find(2) != MapFaceList[1].end() );
+    CHECK( MapFaceList[1].find(3) != MapFaceList[1].end() );
+    CHECK( MapFaceList[1].find(4) != MapFaceList[1].end() );
+    CHECK( MapFaceList[1].find(0) == MapFaceList[1].end() );
+    CHECK( MapFaceList[1].find(1) == MapFaceList[1].end() );
+
+    CHECK( MapVertexList.size() == 5 );
+    
+    CHECK( MapVec.size() == 5 );
+  }
 }
