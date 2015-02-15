@@ -81,31 +81,31 @@ test_Octree:
 	g++ -std=c++0x -O3 ./test/math/test_Octree.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -o $(build_dir)/test_octree
 
 test_ThreadPool:
-	g++ -std=c++11 -O0 -g -Wall ./test/core/test_ThreadPool.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_threadpool
+	g++ -std=c++0x -O0 -g -Wall ./test/core/test_ThreadPool.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_threadpool
 
 test_Sfml:
-	g++ ./test/other/test_sfml.cpp $(libsfml) -o $(build_dir)/test_sfml
+	g++ -std=c++0x -g ./test/other/test_sfml.cpp $(libsfml) -o $(build_dir)/test_sfml
 
 test_ConfigNode:
-	g++ -std=c++11 -g ./test/core/test_cconfignode.cpp $(src_folder_core)/ConfigNode.cpp -I$(inc_folder_core) -o $(build_dir)/test_cconfignode
+	g++ -std=c++0x -g ./test/core/test_cconfignode.cpp $(src_folder_core)/ConfigNode.cpp -I$(inc_folder_core) -o $(build_dir)/test_cconfignode
 
 test_Clock:
-	g++ -std=c++11 -g ./test/core/test_Clock.cpp $(src_folder_core)/Clock.cpp -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_clock
+	g++ -std=c++0x -g ./test/core/test_Clock.cpp $(src_folder_core)/Clock.cpp -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_clock
 
 test_ThreadPoolCircularBuffer:
-	g++ -std=c++11 -g ./test/core/test_ThreadPoolCircularBuffer.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_threadpoolcircularbuffer
+	g++ -std=c++0x -g ./test/core/test_ThreadPoolCircularBuffer.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_threadpoolcircularbuffer
 
 test_enThreadPool:
-	g++ -std=c++11 -g ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_enthreadpool
+	g++ -std=c++0x -g ./test/enCode/test_enThreadPool.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_enthreadpool
 
 test_enTPCommon:
-	g++ -std=c++11 -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_entpcommon
+	g++ -std=c++0x -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_entpcommon
 
 test_TransMatrix:
-	g++ -std=c++11 -g -O3 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
+	g++ -std=c++0x -g -O0 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
 
 test_PolyMesh:
-	g++ -std=c++11 -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
+	g++ -std=c++0x -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
 
 test_GraphDirected:
-	g++ -std=c++11 -g -O0 ./test/graph/TestGraphDirected.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_GraphDirected
+	g++ -std=c++0x -g -O0 ./test/graph/TestGraphDirected.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_GraphDirected
