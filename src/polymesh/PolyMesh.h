@@ -41,6 +41,11 @@ public:
     bool GetVertexToVec_Single( int iVertex, Vec & vVec );
     bool GetFaceToEdge_Single( int iFace, set< int > & sEdge );
     bool GetEdgeToFace_Single( int iEdge, set< int > & sFace );
+
+    //shortest path:
+    bool VertexToVertex( int iStart, int iDest, vector< int > & vPath );
+    bool EdgeToEdge( int iStart, int iDest, vector< int > & vPath );
+    bool FaceToFace( int iStart, int iDest, vector< int > & vPath );
     
 private:
     map< int, set< int > > _MapVertexVertex;     //stores all vertex-vertex connections
@@ -50,6 +55,9 @@ private:
     map< int, set< int > > _MapFaceEdge;   //stores all face-edge connections
     map< int, set< int > > _MapEdgeFace;   //stores all edge-face connections
     map< pair<int,int>, int > _MapVertexPairToEdge; //stores all vertex-pairs - edge connections
+    map< int, pair<int,int> > _MapEdgeToVertexPair; //stores all edge - vertex-pairs connections
+    map< int, set< int > > _MapEdgeEdge;  //stores all edge to edge connections
+    map< int, set< int > > _MapFaceFace;  //stores all face to face connections
 	
     set< int > _SetIndexVertex;            //stores all vertex indices
     set< int > _SetIndexFace;              //stores all face indices

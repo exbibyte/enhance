@@ -155,7 +155,10 @@ bool PolyMesh::Calculate()
 		    _MapFaceEdge[ iFaceIndex ].insert( it_edge->second );
 		    //save edge-face data
 		    _MapEdgeFace[ it_edge->second ].insert( iFaceIndex );
-		}							     
+		    //save edge-VerticePair data
+		    _MapEdgeToVertexPair[ it_edge->second ] = e;
+		}		
+		
                 //add vertices to the completed set
 		SetCompleteIndex.insert( v1 );
 		SetCompleteIndex.insert( v2 );
@@ -264,4 +267,46 @@ bool PolyMesh::GetEdgeToFace_Single( int iEdge, set< int > & sFace ){
 	return false;
     sFace = i->second;
     return true;
+}
+bool PolyMesh::VertexToVertex( int iStart, int iDest, vector< int > & vPath ){
+    bool bRet;
+    TransMatrix<int> Transivity;
+    int iCost = 1;
+    for( auto i : _MapVertexVertex ){
+	for( auto j : i.second ){
+	    Transivity.SetTransition( i.first, j, iCost );
+	}
+    }
+    Transivity.UpdateClosure();
+    int iPathCost;
+    bRet = Transivity.GetClosure( iStart, iDest, iPathCost, vPath );
+    return bRet;
+}
+bool PolyMesh::EdgeToEdge( int iStart, int iDest, vector< int > & vPath ){
+    bool bRet;
+    TransMatrix<int> Transivity;
+    int iCost = 1;
+    for( auto i : _MapEdgeEdge ){
+	for( auto j : i.second ){
+	    Transivity.SetTransition( i.first, j, iCost );
+	}
+    }
+    Transivity.UpdateClosure();
+    int iPathCost;
+    bRet = Transivity.GetClosure( iStart, iDest, iPathCost, vPath );
+    return bRet;
+}
+bool PolyMesh::FaceToFace( int iStart, int iDest, vector< int > & vPath ){
+    bool bRet;
+    TransMatrix<int> Transivity;
+    int iCost = 1;
+    for( auto i : _MapFaceFace ){
+	for( auto j : i.second ){
+	    Transivity.SetTransition( i.first, j, iCost );
+	}
+    }
+    Transivity.UpdateClosure();
+    int iPathCost;
+    bRet = Transivity.GetClosure( iStart, iDest, iPathCost, vPath );
+    return bRet;    
 }
