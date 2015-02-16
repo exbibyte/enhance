@@ -27,14 +27,21 @@ bool PolyMesh::SetVertices( vector< Vec > & vVert, vector< set< int > > & vConne
     _SetIndexEdge.clear();
     
     for( int i = 0; i < vVert.size(); i++ ){
-	for( auto j = vConnection[i].begin(); j != vConnection[i].end(); j++ ){
-	    int iConnect = *j; 
+	for( auto & j : vConnection[i] ){
+	    int iConnect = j; 
 	    if( iConnect  >= vVert.size() || iConnect == i || iConnect < 0 ){ // constraint check
 		return false;
 	    }
 	}
-	//insert data
-	_MapVertexVertex.insert( make_pair(i, vConnection[i]) );
+	//saving as vertex-vertex connection
+	_MapVertexVertex.insert( make_pair( i, vConnection[i] ) );
+        //make sure both directions are saved
+	for( auto & j : vConnection[i] ){
+	    int iConnect = j; 
+	    _MapVertexVertex[ iConnect ].insert( i );	    
+	}
+
+	//save as vertex-vec mapping
 	_MapVertexVec.insert( make_pair(i, vVert[i]) );
    
 	_SetIndexVertex.insert( i );		
