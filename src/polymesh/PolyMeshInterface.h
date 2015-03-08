@@ -10,6 +10,7 @@
 #include "Vec.h"
 #include <list>
 #include <set>
+#include <vector>
 using namespace std;
 
 namespace PolyMesh {
@@ -22,6 +23,7 @@ namespace PolyMesh {
 	    DirtyFace,
 	    DirtyEdge,
 	    DirtyVec,
+	    CleanUp,
 	    Count
 	};
     };
@@ -98,31 +100,183 @@ namespace PolyMesh {
 
     class PolyMeshBase {
     pubic:
+	virtual ~PolyMeshBase(){};
 	PolyMeshBase( int const Id, PolyMeshType::Enum const PolyType ) : _Id( Id ), _PolyType( PolyType ), _Status( 0 ) {}
 	int _Id;                /// Id of the specific PolyMeshType object
 	unsigned int _Status;   /// status of the PolyMesh
 	PolyMeshType _PolyType; /// type of the object
+	virtual bool MarkForCleanUp(){};
     };
     class PolyMeshFace : PolyMeshBase {
     public:
+	~PolyMeshFace();
 	PolyMeshFace( int const Id ) : PolyMeshBase( Id, PolyMeshType::Face ){}
-	list< PolyMeshVertex * > _Vertices;
-	list< PolyMeshEdge * > _Edges;
+	set< PolyMeshVertex * > _Vertices;
+	set< PolyMeshEdge * > _Edges;
+	bool MarkForCleanUp(){
+	    if( !SetPolyMeshStatus( this->_Status, PolyMeshStatus::CleanUp, true ) ){
+		return false;
+	    }
+	    for( auto & i : _Vertices ){
+		DisconnectPolyMeshObjects( i, this );
+	    }
+	    for( auto & i : _Edges ){
+		DisconnectPolyMeshObjects( i, this );
+	    }
+	    return true;
+	};
     };
     class PolyMeshVertex : PolyMeshBase {
     public:
+	~PolyMeshVertex();
 	PolyMeshVertex( int const Id ) : PolyMeshBase( Id, PolyMeshType::Vertex ){}
 	Vec * _Vec;
-	list< PolyMeshFace * > _Faces;
-	list< PolyMeshEdge * > _Edges;
+	set< PolyMeshFace * > _Faces;
+	set< PolyMeshEdge * > _Edges;
+	bool MarkForCleanUp(){
+	    if( !SetPolyMeshStatus( this->_Status, PolyMeshStatus::CleanUp, true ) ){
+		return false;
+	    }
+	    for( auto & i : _Faces ){
+		DisconnectPolyMeshObjects( this, i );
+	    }
+	    for( auto & i : _Edges ){
+		DisconnectPolyMeshObjects( this, i );
+	    }
+	    return true;
+	}
     };
     class PolyMeshEdge : PolyMeshBase {
     pubic:
+	~PolyMeshEdge();
 	PolyMeshEdge( int const Id ) : PolyMeshBase( Id, PolyMeshType::Edge ){}
-	list< PolyMeshVertex * > _Vertices;
-	list< PolyMeshFace * > _Faces;
+	set< PolyMeshVertex * > _Vertices;
+	set< PolyMeshFace * > _Faces;
+	bool MarkForCleanUp(){
+	    if( !SetPolyMeshStatus( this->_Status, PolyMeshStatus::CleanUp, true ) ){
+		return false;
+	    }
+	    for( auto & i : _Faces ){
+		DisconnectPolyMeshObjects( this, i );
+	    }
+	    for( auto & i : _Vertices ){
+		DisconnectPolyMeshObjects( i, this );
+	    }
+	    return true;
+	}
     };
 
+    bool ConnectPolyMeshObjects( PolyMeshVertex * V, PolyMeshEdge * E ){
+
+	/// Connects PolyMeshVertex to PolyMeshEdge
+	///
+	/// @param V Target PolyMeshVertex.
+	/// @param E Target PolyMeshEdge.
+	///
+	/// @returns True if successful.
+
+	if( nullptr == V || nullptr == E ){
+	    return false;
+	}
+	V->_Edges.insert( E );
+	E->_Vertices.insert( V );
+	return true;
+    }
+    bool ConnectPolyMeshObjects( PolyMeshVertex * V, PolyMeshFace * F ){
+
+        /// Connects PolyMeshVertex to PolyMeshFace
+	///
+	/// @param V Target PolyMeshVertex.
+	/// @param F Target PolyMeshFace.
+	///
+	/// @returns True if successful.
+	
+	if( nullptr == V || nullptr == F ){
+	    return false;
+	}
+	V->_Faces.insert( F );
+	F->_Vertices.insert( V );
+	return true;
+    }
+    bool ConnectPolyMeshObjects( PolyMeshEdge * E, PolyMeshFace * F ){
+
+        /// Connects PolyMeshVertex to PolyMeshFace
+	///
+	/// @param E Target PolyMeshEdge.
+	/// @param F Target PolyMeshFace.
+	///
+	/// @returns True if successful.
+
+	if( nullptr == E || nullptr == F ){
+	    return false;
+	}
+	E->_Faces.insert( F );
+	F->_Edges.insert( E );
+	return true;
+    }
+    bool DisconnectPolyMeshObjects( PolyMeshVertex * V, PolyMeshEdge * E ){
+
+	/// Disconnects PolyMeshVertex to PolyMeshEdge
+	///
+	/// @param V Target PolyMeshVertex.
+	/// @param E Target PolyMeshEdge.
+	///
+	/// @returns True if successful.
+
+	if( nullptr == V || nullptr == E ){
+	    return false;
+	}
+	V->_Edges.erase( E );
+	E->_Vertices.erase( V );
+	return true;
+    }
+    bool DisconnectPolyMeshObjects( PolyMeshVertex * V, PolyMeshFace * F ){
+
+        /// Disconnects PolyMeshVertex to PolyMeshFace
+	///
+	/// @param V Target PolyMeshVertex.
+	/// @param F Target PolyMeshFace.
+	///
+	/// @returns True if successful.
+	
+	if( nullptr == V || nullptr == F ){
+	    return false;
+	}
+	V->_Faces.erase( F );
+	F->_Vertices.erase( V );
+	return true;
+    }
+    bool DisconnectPolyMeshObjects( PolyMeshEdge * E, PolyMeshFace * F ){
+
+        /// Disconnects PolyMeshVertex to PolyMeshFace
+	///
+	/// @param E Target PolyMeshEdge.
+	/// @param F Target PolyMeshFace.
+	///
+	/// @returns True if successful.
+
+	if( nullptr == E || nullptr == F ){
+	    return false;
+	}
+	E->_Faces.erase( F );
+	F->_Edges.erase( E );
+	return true;
+    }
+    bool MarkForCleanUp( PolyMeshBase * Obj ){
+	if( Obj == nullptr ){
+	    return false;
+	}
+	return Obj->MarkForCleanUp();
+    }
+    bool CleanUp( PolyMeshBase * Obj ){
+	if( Obj == nullptr ){
+	    return false;
+	}
+	delete Obj;
+	Obj = nullptr;
+	return true;
+    }
+    
     template< typename Impl >
     class PolyMeshInterface : public Impl {
     public:
