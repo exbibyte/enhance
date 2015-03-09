@@ -11,6 +11,7 @@
 #include <list>
 #include <set>
 #include <vector>
+#include <functional>
 using namespace std;
 
 namespace PolyMesh {
@@ -299,38 +300,84 @@ namespace PolyMesh {
 	    
 	    return Impl::CreatePolyMesh();
 	}
-	bool GetNeighbourFace( PolyMeshBase * PolyMeshObj, set< PolyMeshFace * > & sFace ){
+	bool WalkNeighbourFace( PolyMeshVertex * PolyMeshObj, std::function<bool( PolyMeshFace * )> Func ){
 
-        /// Gets all neightbouring faces of the PolyMeshObj.
+        /// Operates a function on all neightbouring faces of the PolyMeshObj.
 	///
-	/// @param PolyMeshObj PolyMesh object of interest.
-	/// @param sFace       Returning set of neighbouring PolyMeshFaces.
+	/// @param PolyMeshObj PolyMeshVertex object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshFace.
 	///
 	/// @returns           True if success.
 	    
-	    return Impl::GetNeighbourFace( PolyMeshObj, sFace );
+	    return Impl::GetNeighbourFace( PolyMeshObj, Func );
 	}
-	bool GetNeighbourVertex( PolyMeshBase * PolyMeshObj, set< PolyMeshVertex * > & sVertex ){
+	bool WalkNeighbourFace( PolyMeshEdge * PolyMeshObj, std::function<bool( PolyMeshFace * )> Func ){
 
-	/// Gets all neightbouring vertices of the PolyMeshObj.
+        /// Operates a function on all neightbouring faces of the PolyMeshObj.
 	///
-	/// @param PolyMeshObj PolyMesh object of interest.
-	/// @param sFace       Returning set of neighbouring PolyMeshVertices.
+	/// @param PolyMeshObj PolyMeshEdge object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshFace.
 	///
 	/// @returns           True if success.
 	    
-	    return Impl::GetNeighbourVertex( PolyMeshObj, sVertex );
+	    return Impl::GetNeighbourFace( PolyMeshObj, Func );
 	}
-	bool GetNeighbourEdge( PolyMeshBase * PolyMeshObj, set< PolyMeshEdge * > & sEdge ){
+	bool WalkNeighbourVertex( PolyMeshEdge * PolyMeshObj, std::function<bool( PolyMeshVertex * )> Func ){
 
-	/// Gets all neightbouring edges of the PolyMeshObj.
+        /// Operates a function on all neightbouring vertices of the PolyMeshObj.
 	///
-	/// @param PolyMeshObj PolyMesh object of interest.
-	/// @param sFace       Returning set of neighbouring PolyMeshEdges.
+	/// @param PolyMeshObj PolyMeshEdge object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshVertex.
 	///
 	/// @returns           True if success.
 	    
-	    return Impl::GetNeighbourEdge( PolyMeshObj, sEdge );
+	    return Impl::GetNeighbourVertex( PolyMeshObj, Func );
+	}
+	bool WalkNeighbourVertex( PolyMeshFace * PolyMeshObj, std::function<bool( PolyMeshVertex * )> Func ){
+
+        /// Operates a function on all neightbouring vertices of the PolyMeshObj.
+	///
+	/// @param PolyMeshObj PolyMeshFace object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshVertex.
+	///
+	/// @returns           True if success.
+	    
+	    return Impl::GetNeighbourVertex( PolyMeshObj, Func );
+	}
+	bool WalkNeighbourEdge( PolyMeshVertex * PolyMeshObj, std::function<bool( PolyMeshEdge * )> Func ){
+
+        /// Operates a function on all neightbouring edges of the PolyMeshObj.
+	///
+	/// @param PolyMeshObj PolyMeshVertex object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshEdge.
+	///
+	/// @returns           True if success.
+	    
+	    return Impl::GetNeighbourEdge( PolyMeshObj, Func );
+	}
+	bool WalkNeighbourEdge( PolyMeshFace * PolyMeshObj, std::function<bool( PolyMeshEdge * )> Func ){
+
+        /// Operates a function on all neightbouring edges of the PolyMeshObj.
+	///
+	/// @param PolyMeshObj PolyMeshFace object of interest.
+	/// @param Func        Function to operate on each neighbouring PolyMeshEdge.
+	///
+	/// @returns           True if success.
+	    
+	    return Impl::GetNeighbourEdge( PolyMeshObj, Func );
+	}
+	bool WalkNeighbourVertexToVertexViaEdge( PolyMeshVertex * PolyMeshSource, std::function<bool( PolyMeshVertex * & Neighbour, PolyMeshEdge * & PathEdge )> Func ){
+
+        /// Gets a non-trivial path from vertex to vertex through edges
+	///
+	/// @param PolyMeshSource  Source PolyMeshVetex.
+	/// @param PolyMeshDest    Destination PolyMeshVetex.
+	/// @param PathVertices    An ordered sequence of PolyMeshVertex travelled (includes the starting source)
+	/// @param PathEdges       An ordered sequence of PolyMeshEdge travelled.
+	///
+	/// @returns               True if such a path exists.
+     
+	    return Impl::WalkNeighbourVertexToVertexViaEdge( PolyMeshSource, Func );
 	}
 	bool GetLinkedPolyMeshById( PolyMeshBase * PolyMeshObjSource, PolyMeshType::Enum PolyType, int Id, PolyMeshBase * & PolyMeshFound ){
 
