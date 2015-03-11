@@ -107,5 +107,8 @@ test_TransMatrix:
 test_PolyMesh:
 	g++ -std=c++0x -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
 
+test_PolyMeshInterface:
+	g++ -std=c++0x -g -O0 ./test/polymesh/test_PolyMeshInterface.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMeshInterface.cpp $(src_folder_polymesh)/PolyMeshGraph.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -o $(build_dir)/test_PolyMeshInterface
+
 test_GraphDirected:
 	g++ -std=c++0x -g -O0 ./test/graph/TestGraphDirected.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_GraphDirected

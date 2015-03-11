@@ -4,6 +4,10 @@
 #include <set>
 #include <list>
 #include <map>
+#include <tuple>
+#include <iostream>
+#include <algorithm>
+#include <utility>
 using namespace std;
 using namespace PolyMesh;
 
@@ -14,9 +18,15 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
     }
     //reset data
     CleanUpAll();
+    //create vertices
     for( int i = 0; i < vVert.size(); i++ ){
-	PolyMeshVertex * NewVertex = new PolyMeshVertex( i );
+	PolyMeshVertex * NewVertex = new PolyMeshVertex( i, vVert[i] );
 	_GraphVertices[ i ] = NewVertex;
+    }
+
+    //create edges
+    for( int i = 0; i < vVert.size(); i++ ){
+	PolyMeshVertex * CurrentVertex = _GraphVertices[ i ];
 	for( auto & j : vConnection[i] ){
 	    int iConnect = j; 
 	    if( iConnect  >= vVert.size() || iConnect < 0 ){
@@ -30,7 +40,7 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 	    //check to see if vertices are already connected
 	    bool bConnected = false;
 	    PolyMeshVertex * FoundVertex = nullptr;
-	    for( auto & k : NewVertex->_Edges ){
+	    for( auto & k : CurrentVertex->_Edges ){
 		for( auto & l : k->_Vertices ){
 		    if( l->_Id == iConnect ){
 			bConnected = true;
@@ -43,13 +53,21 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 		}
 	    }
 	    if( !bConnected ){
+		//get vertex
+		auto it_FoundVert = _GraphVertices.find( iConnect );
+		if( it_FoundVert == _GraphVertices.end() ){		    
+		    MarkForCleanUpAll();
+		    return false;
+		}
+		FoundVertex = it_FoundVert->second;
+		
 		//create new edge connecting the vertices and link them together
-		int iSizeEdges = _Edges.size();
-		PolyMeshEdge * NewEdge = new PolyMeshEdge( iSizeEdge );
-		_GraphEdges[ iSizeEdge ] = NewEdge;
+		int iSizeEdges = _GraphEdges.size();
+		PolyMeshEdge * NewEdge = new PolyMeshEdge( iSizeEdges );
+		_GraphEdges[ iSizeEdges ] = NewEdge;
 
 		//connect 2 vertices and 1 edge
-		if( !ConnectPolyMeshObjects( NewVertex, NewEdge ) ){
+		if( !ConnectPolyMeshObjects( CurrentVertex, NewEdge ) ){
 		    MarkForCleanUpAll();
 		    return false;
 		}
@@ -60,48 +78,48 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 	    }
 	}
     }
+    // for( auto i : _GraphEdges ){
+    // 	cout << "Edge Id: " << i.second->_Id << endl;
+    // 	for( auto j : i.second->_Vertices ){
+    // 	    cout <<          "vertex id: " << j->_Id << endl;
+    // 	}
+    // }
+    
     return true;
 }
 bool PolyMeshGraph::CreatePolyMesh(){
-    //walk the edges and detect cycles to create triangles, link them together
-    list< PolyMeshVertex * > VertexList;
-    list< PolyMeshEdge * > EdgeList;
+    bool bRet = true;
 
-    //lambda function inserts found neighbouring vertices and edges to lists
-    auto Lambda_ProcessNeighbour = [&]( PolyMeshVertex * & Neighbour, PolyMeshEdge * & PathEdge ) -> bool {
-	VertexList.insert( Neighbour );
-	EdgeList.insert( PathEdge );
+    auto CompVert = []( PolyMeshVertex * const & lhs, PolyMeshVertex * const & rhs ) -> bool {
+	return lhs->_Id < rhs->_Id;
     };
     
-    for( auto & i : _GraphVertices ){
-	// for each vertex
-	WalkNeighbourVertexToVertexViaEdge( i, Lambda_ProcessNeighbour );
-	for( auto & j : VertexList ){
-	    //for each vertex
-	    WalkNeighbourVertexToVertexViaEdge( j, Lambda_ProcessNeighbour );
-	    for( auto & k : VertexList ){
-		WalkNeighbourVertexToVertexViaEdge( k, Lambda_ProcessNeighbour );
-		//check if a triangle is found by number of expected items and closure
-		if( 3 == VertexList.size() &&
-		    3 == EdgeList.size() &&
-		    VertexList.back() == i ){
-		    //create face and link it with vertex and edge
-		    int iCountFaces = _GraphFaces.size();
-		    PolyMeshFace * NewFace = new PolyMeshFace( iCountFaces );
-		    _GraphFaces[ iCountFaces ] = NewFace;		    
-		    NewFace->_Vertices.insert( VertexList.begin(), VertexList.end() );
-		    NewFace->_Edges.insert( EdgeList.begin(), EdgeList.end() );		    
-		}
-		VertexList.pop_back(); //remove last set of elements before looping to different neighbour
-		EdgeList.pop_back();
-	    }
-	    VertexList.pop_back();
-	    EdgeList.pop_back();
-	}
-	VertexList.pop_back();
-	EdgeList.pop_back();	
+    //storing already found triangles
+    set< set< PolyMeshVertex * const, decltype( CompVert ) > > SetTriangles;
+    
+    //walk the edges and detect cycles to create triangles, link them together
+    set< PolyMeshVertex * const > VertexList;
+    set< PolyMeshEdge * const > EdgeList;
+    set< PolyMeshVertex * const > VertexListFound;
+    set< PolyMeshEdge * const > EdgeListFound;
+
+    map< tuple< int, int, int >, pair< list< PolyMeshVertex * >, list< PolyMeshEdge * > > > FoundTriangles;
+    
+    for( auto i : _GraphVertices ){
+	WalkToFindTriangle( i.second, FoundTriangles );
     }
-    return true;
+    
+#ifdef DEBUG_POLYMESH_GRAPH
+    cout << "Number of triangles created: " << FoundTriangles.size() <<endl;
+#endif
+
+    // for( auto i : FoundTriangles ){
+    // 	int iCountFaces = _GraphFaces.size();
+    // 	map< tuple< int, int, int >, list < PolyMeshVertex * > >  & FoundTriangles
+    // 	_GraphFaces[ iCountFaces ] =
+    // }
+    
+    return bRet;
 }
 bool PolyMeshGraph::WalkNeighbourFace( PolyMeshVertex * PolyMeshObj, std::function<bool( PolyMeshFace * )> Func ){
     bool bRet = true;
@@ -148,42 +166,152 @@ bool PolyMeshGraph::WalkNeighbourEdge( PolyMeshFace * PolyMeshObj, std::function
 bool PolyMeshGraph::GetLinkedPolyMeshById( PolyMeshBase * PolyMeshObjSource, PolyMeshType::Enum PolyType, int Id, PolyMeshBase * & PolyMeshFound ){
     return false;
 }
-bool PolyMeshGraph::WalkNeighbourVertexToVertexViaEdge( PolyMeshVertex * PolyMeshSource, std::function<bool( PolyMeshVertex * & Neighbour, PolyMeshEdge * & PathEdge )> Func ){
+bool PolyMeshGraph::WalkNeighbourVertexToVertexViaEdge( PolyMeshVertex * PolyMeshSource, bool bEndOnTrue, std::function<bool( PolyMeshVertex * PathVertex, PolyMeshEdge * PathEdge )> Func ){
     bool bRet = true;
     //get neighbouring edges
-    for( auto & i : PolyMeshSource->_Edges ){
+    for( set< PolyMeshEdge * >::iterator i = PolyMeshSource->_Edges.begin(); i != PolyMeshSource->_Edges.end(); ++i ){
 	//get neighbouring vertices
-	for( auto & j : i->_Vertices ){	    
+	for(  set< PolyMeshVertex * >::iterator j = (*i)->_Vertices.begin(); j != (*i)->_Vertices.end(); ++j ){	    
 	    //don't get same vertex as the previous vertex
-	    if( PolyMeshSource == j ){
+	    if( PolyMeshSource == *j ){
 		continue;
 	    }else{
-		bRet &= Func( j, i );
+		bRet &= Func( *j, *i );
+		if( bRet && bEndOnTrue ){
+		    return true;
+		}
 	    }	    
 	}
     }
     return bRet;
 }
+bool PolyMeshGraph::WalkToFindTriangle( PolyMeshVertex * PolyMeshSource, map< tuple< int, int, int >, pair< list< PolyMeshVertex * >, list < PolyMeshEdge * > > >  & FoundTriangles )
+{
+    bool bRet = true;
+    
+    list< PolyMeshVertex * > NeighbourVertices;
+    list< PolyMeshEdge * > NeighbourEdges;
+
+    auto GetNeighbourVertices = [&]( PolyMeshVertex * PathVertex, PolyMeshEdge * PathEdge ) -> bool {
+	NeighbourVertices.push_back( PathVertex );
+	NeighbourEdges.push_back( PathEdge );
+	return true;
+    };
+    //get neighbouring vertices and edges
+    WalkNeighbourVertexToVertexViaEdge( PolyMeshSource, false, GetNeighbourVertices );
+    
+    for( auto i : NeighbourVertices ){
+	for( auto j : NeighbourVertices ){
+	    if( i == j ){
+			
+	    }else{
+		PolyMeshEdge * Edge_1st = nullptr;
+		PolyMeshEdge * Edge_2nd = nullptr;
+		PolyMeshEdge * Edge_3rd = nullptr;
+		bool bIsClosed = false;
+		auto IsTriangleClosed = [&]( PolyMeshVertex * PathVertex, PolyMeshEdge * PathEdge ) -> bool {
+		    if( j == PathVertex ){ //check if ending vertex is same as starting vertex
+			bIsClosed = true;
+			Edge_3rd = PathEdge; //save the 3rd edge of triangle
+			return true;
+		    }
+		    return false;
+		};
+		WalkNeighbourVertexToVertexViaEdge( i, true, IsTriangleClosed );
+		if( bIsClosed ){
+		    bool bFoundEdge1 = false;
+		    bool bFoundEdge2 = false;
+		    auto GetEdges = [&]( PolyMeshVertex * PathVertex, PolyMeshEdge * PathEdge ) -> bool {
+			if( i == PathVertex ){
+			    Edge_1st = PathEdge; //save an edge of triangle
+			    bFoundEdge1 = true;
+			}else if( j == PathVertex ){
+			    Edge_2nd = PathEdge; //save an edge of triangle
+			    bFoundEdge2 = true;
+			}
+			if( bFoundEdge1 && bFoundEdge2 ){
+			    return true;
+			}
+			return false;
+		    };		    
+		    //get other 2 edges
+		    WalkNeighbourVertexToVertexViaEdge( PolyMeshSource, true, GetEdges );
+		    
+		    vector< int > Ids;
+		    Ids.push_back( PolyMeshSource->_Id );
+		    Ids.push_back( i->_Id );
+		    Ids.push_back( j->_Id );
+		    std::sort( Ids.begin(), Ids.end() ); // sort Ids
+		    tuple< int, int, int > KeyIds = make_tuple( Ids[0], Ids[1], Ids[2] ); // make tuple key
+		    if( FoundTriangles.find( KeyIds ) == FoundTriangles.end() ){
+			// make a new triangle if it doesn't already exist
+			list < PolyMeshVertex * > FoundVertices;
+			FoundVertices.push_back( PolyMeshSource );
+			FoundVertices.push_back( i );
+			FoundVertices.push_back( j );
+
+			list < PolyMeshEdge * > FoundEdges;
+			FoundEdges.push_back( Edge_1st );
+			FoundEdges.push_back( Edge_2nd );
+			FoundEdges.push_back( Edge_3rd );
+			
+			FoundTriangles[ KeyIds ] = make_pair( FoundVertices, FoundEdges );
+#ifdef DEBUG_POLYMESH_GRAPH
+			cout << "created triangle: " << endl;
+			cout << "                  v( " << PolyMeshSource->_Id << ", " << i->_Id << ", " << j->_Id << " )" <<endl;
+			cout << "                  e( " << Edge_1st->_Id << ", " << Edge_2nd->_Id << ", " << Edge_3rd->_Id << " )" << endl;
+#endif
+		    }		   
+		}
+	    }	 
+	}
+    }
+    
+    return bRet;
+}
 bool PolyMeshGraph::MarkForCleanUpAll(){
     for( auto & i : _GraphVertices ){
-	i->MarkForCleanUp();
+	i.second->MarkForCleanUp();
     }
     for( auto & i : _GraphEdges ){
-	i->MarkForCleanUp();
+	i.second->MarkForCleanUp();
     }
     for( auto & i : _GraphFaces ){
-	i->MarkForCleanUp();
+	i.second->MarkForCleanUp();
     }
+    return true;
 }
 bool PolyMeshGraph::CleanUpAll(){
     for( auto & i : _GraphVertices ){
-	CleanUp( i );
+	PolyMesh::CleanUp( i.second );
     }
     for( auto & i : _GraphEdges ){
-	CleanUp( i );
+	PolyMesh::CleanUp( i.second );
     }
     for( auto & i : _GraphFaces ){
-	CleanUp( i );
+	PolyMesh::CleanUp( i.second );
+    }
+    _GraphVertices.clear();
+    _GraphEdges.clear();
+    _GraphFaces.clear();
+    return true;
+}
+
+bool PolyMeshGraph::GetFaces( list< PolyMeshFace * > & Faces ){
+    for( auto & i : _GraphFaces ){
+	Faces.push_back( i.second );
+    }
+    return true;
+}
+bool PolyMeshGraph::GetVertices( list< PolyMeshVertex * > & Vertices ){
+    for( auto & i : _GraphVertices ){
+	Vertices.push_back( i.second );
+    }
+    return true;
+}
+bool PolyMeshGraph::GetEdges( list< PolyMeshEdge * > & Edges ){
+    for( auto & i : _GraphEdges ){
+	Edges.push_back( i.second );
     }
     return true;
 }
