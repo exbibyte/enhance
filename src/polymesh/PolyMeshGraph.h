@@ -45,7 +45,7 @@ private:
 
     /// CleanUp queue for deleting PolyMesh objects
     
-    std::map< int, PolyMesh::PolyMeshBase * > _GraphCleanUp;
+    std::list< PolyMesh::PolyMeshBase * > _GraphCleanUp;
 };
 
 #endif

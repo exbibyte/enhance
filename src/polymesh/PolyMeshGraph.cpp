@@ -309,7 +309,7 @@ bool PolyMeshGraph::CleanUp(){
 	bool bCleanUp = false;	
 	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
 	if( bCleanUp ){
-	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    _GraphCleanUp.push_back( i->second );
 	    i = _GraphVertices.erase( i );
 	}else{
 	    ++i;
@@ -320,7 +320,7 @@ bool PolyMeshGraph::CleanUp(){
 	bool bCleanUp = false;	
 	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
 	if( bCleanUp ){
-	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    _GraphCleanUp.push_back( i->second );
 	    i = _GraphEdges.erase( i );
 	}else{
 	    ++i;
@@ -331,7 +331,7 @@ bool PolyMeshGraph::CleanUp(){
 	bool bCleanUp = false;	
 	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
 	if( bCleanUp ){
-	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    _GraphCleanUp.push_back( i->second );
 	    i = _GraphFaces.erase( i );
 	}else{
 	    ++i;
@@ -349,9 +349,9 @@ bool PolyMeshGraph::DeleteCleanUp(){
     
     for( auto i : _GraphCleanUp ){
 #ifdef DEBUG_POLYMESH_GRAPH
-	cout << "Deleted Type: " << i.second->_PolyType << ". Id: "<< i.second->_Id << endl;
+	cout << "Deleted Type: " << i->_PolyType << ". Id: "<< i->_Id << endl;
 #endif	
-    	PolyMesh::Delete( i.second );
+    	PolyMesh::Delete( i );
     }
     _GraphCleanUp.clear();
     return true;
