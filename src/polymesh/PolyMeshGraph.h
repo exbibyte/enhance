@@ -9,7 +9,7 @@
 #include <map>
 #include <tuple>
 
-#define DEBUG_POLYMESH_GRAPH
+//#define DEBUG_POLYMESH_GRAPH
 
 class PolyMeshGraph {
 public:

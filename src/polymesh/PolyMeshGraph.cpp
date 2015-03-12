@@ -113,11 +113,22 @@ bool PolyMeshGraph::CreatePolyMesh(){
     cout << "Number of triangles created: " << FoundTriangles.size() <<endl;
 #endif
 
-    // for( auto i : FoundTriangles ){
-    // 	int iCountFaces = _GraphFaces.size();
-    // 	map< tuple< int, int, int >, list < PolyMeshVertex * > >  & FoundTriangles
-    // 	_GraphFaces[ iCountFaces ] =
-    // }
+    //create faces for found triangles
+    for( auto i : FoundTriangles ){
+    	int iCountFaces = _GraphFaces.size();
+	auto vertices = i.second.first;
+	auto edges = i.second.second;
+	PolyMeshFace * NewFace = new PolyMeshFace( iCountFaces );
+    	_GraphFaces[ iCountFaces ] = NewFace;
+	//link vertices to face
+	for( auto j : vertices ){
+	    bool bConnect = ConnectPolyMeshObjects( j, NewFace );
+	}
+	//link edges to face
+	for( auto k : edges ){
+	    bool bConnect = ConnectPolyMeshObjects( k, NewFace );
+	}
+    }
     
     return bRet;
 }
