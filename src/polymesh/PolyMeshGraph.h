@@ -9,11 +9,12 @@
 #include <map>
 #include <tuple>
 
-//#define DEBUG_POLYMESH_GRAPH
+#define DEBUG_POLYMESH_GRAPH
 
 class PolyMeshGraph {
 public:
     /// Interface delegated by PolyMeshInterface class
+    virtual ~PolyMeshGraph();
     bool SetVertices( std::vector< Vec > & vVert, std::vector< std::set< int > > & vConnection );
     bool CreatePolyMesh();
     bool WalkNeighbourFace( PolyMesh::PolyMeshVertex * PolyMeshObj, std::function<bool( PolyMesh::PolyMeshFace * )> Func );
@@ -28,13 +29,23 @@ public:
     bool GetFaces( std::list< PolyMesh::PolyMeshFace * > & Faces );
     bool GetVertices( std::list< PolyMesh::PolyMeshVertex * > & Vertices );
     bool GetEdges( std::list< PolyMesh::PolyMeshEdge * > & Edges );
-    /// helper methods
-    bool MarkForCleanUpAll();
-    bool CleanUpAll();
+    
+    bool CleanUp();
+    bool DeleteCleanUp();
+
+    //helper
+    bool MarkAllForCleanUp();
 private:
+
+    /// mapping of PolyMesh _Id and data
+    
     std::map< int, PolyMesh::PolyMeshFace * > _GraphFaces;
     std::map< int, PolyMesh::PolyMeshVertex * > _GraphVertices;
     std::map< int, PolyMesh::PolyMeshEdge * > _GraphEdges;
+
+    /// CleanUp queue for deleting PolyMesh objects
+    
+    std::map< int, PolyMesh::PolyMeshBase * > _GraphCleanUp;
 };
 
 #endif

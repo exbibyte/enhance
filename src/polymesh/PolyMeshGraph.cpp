@@ -11,13 +11,20 @@
 using namespace std;
 using namespace PolyMesh;
 
+PolyMeshGraph::~PolyMeshGraph(){
+   //reset data
+    MarkAllForCleanUp();
+    CleanUp();
+    DeleteCleanUp();
+}
 bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & vConnection ){
     if( vVert.size() != vConnection.size() ){
 	//constraint check
 	return false;
     }
     //reset data
-    CleanUpAll();
+    MarkAllForCleanUp();
+    CleanUp();
     //create vertices
     for( int i = 0; i < vVert.size(); i++ ){
 	PolyMeshVertex * NewVertex = new PolyMeshVertex( i, vVert[i] );
@@ -31,7 +38,9 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 	    int iConnect = j; 
 	    if( iConnect  >= vVert.size() || iConnect < 0 ){
                 // constraint check
-		MarkForCleanUpAll();
+		MarkAllForCleanUp();
+		CleanUp();
+		DeleteCleanUp();
 		return false;
 	    }else if( iConnect == i ){
 		//ignore if 2 vertices are the same
@@ -56,7 +65,8 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 		//get vertex
 		auto it_FoundVert = _GraphVertices.find( iConnect );
 		if( it_FoundVert == _GraphVertices.end() ){		    
-		    MarkForCleanUpAll();
+		    MarkAllForCleanUp();
+		    CleanUp();	
 		    return false;
 		}
 		FoundVertex = it_FoundVert->second;
@@ -68,22 +78,18 @@ bool PolyMeshGraph::SetVertices( vector< Vec > & vVert, vector< set< int > > & v
 
 		//connect 2 vertices and 1 edge
 		if( !ConnectPolyMeshObjects( CurrentVertex, NewEdge ) ){
-		    MarkForCleanUpAll();
+		    MarkAllForCleanUp();
+		    CleanUp();
 		    return false;
 		}
 		if( !ConnectPolyMeshObjects( FoundVertex, NewEdge ) ){
-		    MarkForCleanUpAll();
+		    MarkAllForCleanUp();
+		    CleanUp();
 		    return false;
 		}
 	    }
 	}
     }
-    // for( auto i : _GraphEdges ){
-    // 	cout << "Edge Id: " << i.second->_Id << endl;
-    // 	for( auto j : i.second->_Vertices ){
-    // 	    cout <<          "vertex id: " << j->_Id << endl;
-    // 	}
-    // }
     
     return true;
 }
@@ -128,6 +134,10 @@ bool PolyMeshGraph::CreatePolyMesh(){
 	for( auto k : edges ){
 	    bool bConnect = ConnectPolyMeshObjects( k, NewFace );
 	}
+
+#ifdef DEBUG_POLYMESH_GRAPH
+	cout << "created face: id: " << NewFace->_Id << endl;
+#endif
     }
     
     return bRet;
@@ -280,31 +290,70 @@ bool PolyMeshGraph::WalkToFindTriangle( PolyMeshVertex * PolyMeshSource, map< tu
     
     return bRet;
 }
-bool PolyMeshGraph::MarkForCleanUpAll(){
+bool PolyMeshGraph::MarkAllForCleanUp(){
     for( auto & i : _GraphVertices ){
-	i.second->MarkForCleanUp();
+    	i.second->MarkForCleanUp();
     }
     for( auto & i : _GraphEdges ){
-	i.second->MarkForCleanUp();
+    	i.second->MarkForCleanUp();
     }
     for( auto & i : _GraphFaces ){
-	i.second->MarkForCleanUp();
+    	i.second->MarkForCleanUp();
     }
     return true;
 }
-bool PolyMeshGraph::CleanUpAll(){
-    for( auto & i : _GraphVertices ){
-	PolyMesh::CleanUp( i.second );
+bool PolyMeshGraph::CleanUp(){
+    bool bRet = true;   
+
+    for( auto i = _GraphVertices.begin(); i != _GraphVertices.end(); ){
+	bool bCleanUp = false;	
+	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
+	if( bCleanUp ){
+	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    i = _GraphVertices.erase( i );
+	}else{
+	    ++i;
+	}	
     }
-    for( auto & i : _GraphEdges ){
-	PolyMesh::CleanUp( i.second );
+
+    for( auto i = _GraphEdges.begin(); i != _GraphEdges.end(); ){
+	bool bCleanUp = false;	
+	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
+	if( bCleanUp ){
+	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    i = _GraphEdges.erase( i );
+	}else{
+	    ++i;
+	}	
     }
-    for( auto & i : _GraphFaces ){
-	PolyMesh::CleanUp( i.second );
+
+    for( auto i = _GraphFaces.begin(); i != _GraphFaces.end(); ){
+	bool bCleanUp = false;	
+	GetPolyMeshStatus( &i->second->_Status, PolyMeshStatus::CleanUp , &bCleanUp );
+	if( bCleanUp ){
+	    _GraphCleanUp.insert( std::pair< int, PolyMeshBase * >( i->second->_Id, i->second ) );
+	    i = _GraphFaces.erase( i );
+	}else{
+	    ++i;
+	}	
     }
-    _GraphVertices.clear();
-    _GraphEdges.clear();
-    _GraphFaces.clear();
+
+    return true;
+}
+
+bool PolyMeshGraph::DeleteCleanUp(){
+
+#ifdef DEBUG_POLYMESH_GRAPH
+    cout << "Number of PolyMesh objects to delete: " << _GraphCleanUp.size() <<endl;
+#endif
+    
+    for( auto i : _GraphCleanUp ){
+#ifdef DEBUG_POLYMESH_GRAPH
+	cout << "Deleted Type: " << i.second->_PolyType << ". Id: "<< i.second->_Id << endl;
+#endif	
+    	PolyMesh::Delete( i.second );
+    }
+    _GraphCleanUp.clear();
     return true;
 }
 

@@ -105,6 +105,55 @@ namespace PolyMesh {
 	F->_Edges.erase( E );
 	return true;
     }
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshVertex * V_Source, PolyMeshEdge * E_Remove ){
+	if( nullptr == V_Source || nullptr == E_Remove ){
+	    return false;
+	}
+	V_Source->_Edges.erase( E_Remove );
+	return true;
+    }
+    
+    bool DisconnectPolyMeshObjectFrom( PolyMeshVertex * V_Source, PolyMeshFace * F_Remove ){
+	if( nullptr == V_Source || nullptr == F_Remove ){
+	    return false;
+	}
+	V_Source->_Faces.erase( F_Remove );
+	return true;
+    }
+    
+    bool DisconnectPolyMeshObjectFrom( PolyMeshEdge * E_Source, PolyMeshVertex * V_Remove ){
+	if( nullptr == E_Source || nullptr == V_Remove ){
+	    return false;
+	}
+	E_Source->_Vertices.erase( V_Remove );
+	return true;
+    }
+    
+    bool DisconnectPolyMeshObjectFrom( PolyMeshEdge * E_Source, PolyMeshFace * F_Remove ){
+	if( nullptr == E_Source || nullptr == F_Remove ){
+	    return false;
+	}
+	E_Source->_Faces.erase( F_Remove );
+	return true;
+    }
+    
+    bool DisconnectPolyMeshObjectFrom( PolyMeshFace * F_Source, PolyMeshVertex * V_Remove ){
+	if( nullptr == F_Source || nullptr == V_Remove ){
+	    return false;
+	}
+	F_Source->_Vertices.erase( V_Remove );
+	return true;
+    }
+    
+    bool DisconnectPolyMeshObjectFrom( PolyMeshFace * F_Source, PolyMeshEdge * E_Remove ){
+	if( nullptr == F_Source || nullptr == E_Remove ){
+	    return false;
+	}
+	F_Source->_Edges.erase( E_Remove );
+	return true;
+    }
+    
     bool MarkForCleanUp( PolyMeshBase * Obj ){
 	if( Obj == nullptr ){
 	    return false;
@@ -112,7 +161,7 @@ namespace PolyMesh {
 	return Obj->MarkForCleanUp();
     }
     
-    bool CleanUp( PolyMeshBase * Obj ){
+    bool Delete( PolyMeshBase * Obj ){
 	if( Obj == nullptr ){
 	    return false;
 	}

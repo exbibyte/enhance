@@ -130,9 +130,63 @@ namespace PolyMesh {
 	///
 	/// @returns True if successful.
 
+    bool DisconnectPolyMeshObjectFrom( PolyMeshVertex * V_Source, PolyMeshEdge * E_Remove );
+
+	/// Disconnects PolyMeshEdge from PolyMeshVertex
+	///
+	/// @param V_Source Source PolyMeshVertex.
+	/// @param E_Remove Target PolyMeshEdge to remove from V_Source.
+	///
+	/// @returns True if successful.
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshVertex * V_Source, PolyMeshFace * F_Remove );
+
+	/// Disconnects PolyMeshFace from PolyMeshVertex
+	///
+	/// @param V_Source Source PolyMeshVertex.
+	/// @param F_Remove Target PolyMeshFace to remove from V_Source.
+	///
+	/// @returns True if successful.
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshEdge * E_Source, PolyMeshVertex * V_Remove );
+
+	/// Disconnects PolyMeshVertex from PolyMeshEdge
+	///
+	/// @param E_Source Source PolyMeshEdge.
+	/// @param V_Remove Target PolyMeshVertex to remove from E_Source.
+	///
+	/// @returns True if successful.
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshEdge * E_Source, PolyMeshFace * F_Remove );
+
+	/// Disconnects PolyMeshFace from PolyMeshEdge
+	///
+	/// @param E_Source Source PolyMeshEdge.
+	/// @param F_Remove Target PolyMeshFace to remove from E_Source.
+	///
+	/// @returns True if successful.
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshFace * F_Source, PolyMeshVertex * V_Remove );
+
+	/// Disconnects PolyMeshVertex from PolyMeshFace
+	///
+	/// @param F_Source Source PolyMeshFace.
+	/// @param V_Remove Target PolyMeshVertex to remove from F_Source.
+	///
+	/// @returns True if successful.
+
+    bool DisconnectPolyMeshObjectFrom( PolyMeshFace * F_Source, PolyMeshEdge * E_Remove );
+
+	/// Disconnects PolyMeshEdge from PolyMeshFace
+	///
+	/// @param F_Source Source PolyMeshFace.
+	/// @param E_Remove Target PolyMeshEdge to remove from F_Source.
+	///
+	/// @returns True if successful.
+    
     bool MarkForCleanUp( PolyMeshBase * Obj );
     
-    bool CleanUp( PolyMeshBase * Obj );
+    bool Delete( PolyMeshBase * Obj );
 
     class PolyMeshBase {
     public:
@@ -154,12 +208,14 @@ namespace PolyMesh {
 	    if( !SetPolyMeshStatus( &this->_Status, PolyMeshStatus::CleanUp, true ) ){
 		return false;
 	    }
-	    for( auto & i : _Vertices ){
-		DisconnectPolyMeshObjects( i, this );
+	    for( auto i : _Vertices ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
-	    for( auto & i : _Edges ){
-		DisconnectPolyMeshObjects( i, this );
+	    for( auto i : _Edges ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
+	    _Vertices.clear();
+	    _Edges.clear();
 	    return true;
 	};
     };
@@ -173,13 +229,15 @@ namespace PolyMesh {
 	bool MarkForCleanUp(){
 	    if( !SetPolyMeshStatus( &this->_Status, PolyMeshStatus::CleanUp, true ) ){
 		return false;
+	    }	   
+	    for( auto i : _Edges ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
-	    for( auto & i : _Faces ){
-		DisconnectPolyMeshObjects( this, i );
+	    for( auto i : _Faces ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
-	    for( auto & i : _Edges ){
-		DisconnectPolyMeshObjects( this, i );
-	    }
+	    _Edges.clear();
+	    _Faces.clear();
 	    return true;
 	}
     };
@@ -193,12 +251,14 @@ namespace PolyMesh {
 	    if( !SetPolyMeshStatus( &this->_Status, PolyMeshStatus::CleanUp, true ) ){
 		return false;
 	    }
-	    for( auto & i : _Faces ){
-		DisconnectPolyMeshObjects( this, i );
+	    for( auto i : _Vertices ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
-	    for( auto & i : _Vertices ){
-		DisconnectPolyMeshObjects( i, this );
+	    for( auto i : _Faces ){
+		DisconnectPolyMeshObjectFrom( i, this );
 	    }
+	    _Vertices.clear();
+	    _Faces.clear();
 	    return true;
 	}
     };    
@@ -206,6 +266,7 @@ namespace PolyMesh {
     template< typename Impl >
     class PolyMeshInterface : public Impl {
     public:
+	~PolyMeshInterface(){}	
 	bool SetVertices( vector< Vec > & vVert, vector< set< int > > & vConnection ){
 
 	/// Initialization of vertex data.
@@ -347,6 +408,24 @@ namespace PolyMesh {
 
 	    return Impl::GetEdges( Edges );
 	}
+	bool DeleteCleanUp(){
+
+	/// Delete all PolyMesh objects in the CleanUp queue.
+	///
+	/// @returns True if successful.
+
+	    return Impl::DeleteCleanUp();
+	}
+
+	bool CleanUp(){
+
+	/// Moves all PolyMesh objects that are marked for clean-up to a CleanUp queue.
+	///
+	/// @returns True if successful.
+	    
+	    return Impl::CleanUp();
+	}	
+
     }; // end of PolyMeshInterface class
     
 } // end of PolyMesh namespace
