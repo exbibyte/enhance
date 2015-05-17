@@ -45,32 +45,33 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 void RenderTask(int argc, char **argv) {
 
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
+    glfwMakeContextCurrent( window );
+    // if (!glfwInit())
+    //     exit(EXIT_FAILURE);
     
-    glfwSetErrorCallback(error_callback);
+    // glfwSetErrorCallback(error_callback);
     
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // yes, 3 and 2!!!
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_DEPTH_BITS,24);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // yes, 3 and 2!!!
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_DEPTH_BITS,24);
 
-    //get version
-    int major, minor, rev;
-    glfwGetVersion( &major, &minor, &rev );
+    // //get version
+    // int major, minor, rev;
+    // glfwGetVersion( &major, &minor, &rev );
 
-    cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
+    // cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
     
-    window = glfwCreateWindow(500, 500, "Shadow Test", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    glfwMakeContextCurrent(window);
+    // window = glfwCreateWindow(500, 500, "Shadow Test", NULL, NULL);
+    // if (!window)
+    // {
+    //     glfwTerminate();
+    //     exit(EXIT_FAILURE);
+    // }
+    // glfwMakeContextCurrent(window);
 
-    glfwSetKeyCallback(window, key_callback);
+    // glfwSetKeyCallback(window, key_callback);
 
     GLPrintInfo();
 
@@ -83,11 +84,11 @@ void RenderTask(int argc, char **argv) {
     {
         GLRender::RenderScene();
         glfwSwapBuffers(window);
-        glfwPollEvents();
+//        glfwPollEvents();
     }
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
+    //glfwDestroyWindow(window);
+    //glfwTerminate();
+    //exit(EXIT_SUCCESS);
 }
 
 void Idle( int count, enTPCommon * Pool ){
@@ -97,6 +98,34 @@ void Idle( int count, enTPCommon * Pool ){
 }
 
 int main(int argc, char **argv) {
+
+  if (!glfwInit())
+      exit(EXIT_FAILURE);
+
+  glfwSetErrorCallback(error_callback);
+    
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // yes, 3 and 2!!!
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_DEPTH_BITS,24);
+
+  //get version
+  int major, minor, rev;
+  glfwGetVersion( &major, &minor, &rev );
+
+  cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
+    
+  window = glfwCreateWindow(500, 500, "Shadow Test", NULL, NULL);
+  if (!window)
+  {
+      glfwTerminate();
+      exit(EXIT_FAILURE);
+  }
+
+  glfwMakeContextCurrent(window);
+
+  glfwSetKeyCallback(window, key_callback);
 
   enTPCommon tp;
   tp.SetNumThreads(4);
@@ -109,9 +138,17 @@ int main(int argc, char **argv) {
 
   tp.RunThreads();
 
+  while (!glfwWindowShouldClose(window))
+  {
+      glfwPollEvents();
+  }
+  
   ret1.get();
   ret2.get();
 
   tp.EndAllThreads();
 
+  glfwDestroyWindow(window);
+  glfwTerminate();
+  exit(EXIT_SUCCESS);
 }
