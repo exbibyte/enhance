@@ -54,14 +54,14 @@ public:
 typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
 typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex * > > MapFace;
 
-bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * Next );
-bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * Prev );
-bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * Next );
-bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * Prev );
-bool Get_Face_Left( WingedEdge * WEdge, Face * FaceLeft );
-bool Get_Face_Right( WingedEdge * WEdge, Face * FaceRight );
-bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * VertexStart );
-bool Get_Vertex_End( WingedEdge * WEdge, Vertex * VertexEnd );
+bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
+bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
+bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * & Next );
+bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
+bool Get_Face_Left( WingedEdge * WEdge, Face * & FaceLeft );
+bool Get_Face_Right( WingedEdge * WEdge, Face * & FaceRight );
+bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * & VertexStart );
+bool Get_Vertex_End( WingedEdge * WEdge, Vertex * & VertexEnd );
 
 bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated ); //generates winged edges given input edge-vertices and face-vertices (CCW) maps
 

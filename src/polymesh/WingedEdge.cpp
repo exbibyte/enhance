@@ -12,7 +12,7 @@
 
 using namespace std;
 
-bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * Next )
+bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next )
 {
     if( !WEdge ){
         return false;
@@ -24,7 +24,7 @@ bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * Next )
     return true;
 }
     
-bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * Prev )
+bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev )
 {
     if( !WEdge ){
         return false;
@@ -36,7 +36,7 @@ bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * Prev )
     return true;
 }
 
-bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * Next )
+bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * & Next )
 {
     if( !WEdge ){
         return false;
@@ -48,7 +48,7 @@ bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * Next )
     return true;
 }
 
-bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * Prev )
+bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * & Prev )
 {
     if( !WEdge ){
         return false;
@@ -60,7 +60,7 @@ bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * Prev )
     return true;
 }
 
-bool Get_Face_Left( WingedEdge * WEdge, Face * FaceLeft )
+bool Get_Face_Left( WingedEdge * WEdge, Face * & FaceLeft )
 {
     if( !WEdge ){
         return false;
@@ -72,7 +72,7 @@ bool Get_Face_Left( WingedEdge * WEdge, Face * FaceLeft )
     return true;    
 }
 
-bool Get_Face_Right( WingedEdge * WEdge, Face * FaceRight )
+bool Get_Face_Right( WingedEdge * WEdge, Face * & FaceRight )
 {
     if( !WEdge ){
         return false;
@@ -84,7 +84,7 @@ bool Get_Face_Right( WingedEdge * WEdge, Face * FaceRight )
     return true; 
 }
 
-bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * VertexStart )
+bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * & VertexStart )
 {
     if( !WEdge ){
         return false;
@@ -96,7 +96,7 @@ bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * VertexStart )
     return true; 
 }
 
-bool Get_Vertex_End( WingedEdge * WEdge, Vertex * VertexEnd )
+bool Get_Vertex_End( WingedEdge * WEdge, Vertex * & VertexEnd )
 {
     if( !WEdge ){
         return false;

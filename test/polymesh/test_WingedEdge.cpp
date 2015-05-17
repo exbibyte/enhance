@@ -90,5 +90,30 @@ TEST_CASE( "Basic", "[B]" ) {
 
     //TODO:
     SECTION( "Check entity linkage" ){
+      for( auto i : generated_wedges ){
+	if( i->E_Current->data == 0 ){
+	  vector<int> expected_data { 1, 2, 0 };
+	  WingedEdge * Current = i;
+	  WingedEdge * Next = 0;
+	  for( auto j: expected_data ){
+	    bool bRet = Get_Edge_CW_Next( Current, Next );
+	    CHECK( true == bRet );
+	    CHECK( j == Next->E_Current->data );
+	    Current = Next;
+	    Next = 0;
+	  }
+
+	  vector<int> expected_data_reverse { 2, 1, 0 };
+          Current = i;
+	  Next = 0;
+	  for( auto j: expected_data_reverse ){
+	    bool bRet = Get_Edge_CW_Prev( Current, Next );
+	    CHECK( true == bRet );
+	    CHECK( j == Next->E_Current->data );
+	    Current = Next;
+	    Next = 0;
+	  }	  
+	}       
+      }
     }
 }
