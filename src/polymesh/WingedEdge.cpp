@@ -41,7 +41,7 @@ bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * Next )
     if( !WEdge ){
         return false;
     }
-    Next = WEdge->E_CW_Next;
+    Next = WEdge->E_CCW_Next;
     if( !Next ){
         return false;
     }
@@ -53,7 +53,7 @@ bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * Prev )
     if( !WEdge ){
         return false;
     }
-    Prev = WEdge->E_CW_Prev;
+    Prev = WEdge->E_CCW_Prev;
     if( !Prev ){
         return false;
     }
