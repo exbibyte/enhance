@@ -52,7 +52,7 @@ public:
 };
 
 typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
-typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex * > > MapFace;
+typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool > > MapFace;
 
 bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
 bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );

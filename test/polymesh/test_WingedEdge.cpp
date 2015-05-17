@@ -40,8 +40,8 @@ TEST_CASE( "Basic", "[B]" ) {
     map_edge[ edges[0] ] = std::make_pair( vertices[0], vertices[1] );
     map_edge[ edges[1] ] = std::make_pair( vertices[1], vertices[2] );
     map_edge[ edges[2] ] = std::make_pair( vertices[2], vertices[0] );
-    map_edge[ edges[3] ] = std::make_pair( vertices[1], vertices[3] );
-    map_edge[ edges[4] ] = std::make_pair( vertices[3], vertices[2] );
+    map_edge[ edges[3] ] = std::make_pair( vertices[2], vertices[3] );
+    map_edge[ edges[4] ] = std::make_pair( vertices[3], vertices[1] );
 
     vector< Face * > faces;
     for( int i = 0; i < 2; i++ ){
@@ -51,8 +51,9 @@ TEST_CASE( "Basic", "[B]" ) {
     }
     
     //link faces and edges
-    map_face[ faces[0] ] = std::make_tuple( vertices[0], vertices[1], vertices[2] );
-    map_face[ faces[1] ] = std::make_tuple( vertices[1], vertices[3], vertices[2] );
+    bool bClockWise = true;
+    map_face[ faces[0] ] = std::make_tuple( vertices[0], vertices[1], vertices[2], bClockWise );
+    map_face[ faces[1] ] = std::make_tuple( vertices[1], vertices[2], vertices[3], !bClockWise );
     
     //generate winged edges
     vector< WingedEdge * > generated_wedges;
@@ -83,14 +84,15 @@ TEST_CASE( "Basic", "[B]" ) {
                 generated_faces.insert( i->F_Right );
             }
         }
-        CHECK( 1 == count_face_left ); //check number of left faces
-        CHECK( 5 == count_face_right ); //check number of right faces
-        CHECK( 2 == generated_faces.size() ); //check size of linked faces        
+        CHECK( 3 == count_face_left ); //check number of edges linked with a left face
+        CHECK( 3 == count_face_right ); //check number of edges linked with a right face
+        CHECK( 2 == generated_faces.size() ); //check number of faces        
     }
 
     //TODO:
     SECTION( "Check entity linkage" ){
       for( auto i : generated_wedges ){
+	//first trianglge
 	if( i->E_Current->data == 0 ){
 	  vector<int> expected_data { 1, 2, 0 };
 	  WingedEdge * Current = i;
@@ -113,6 +115,19 @@ TEST_CASE( "Basic", "[B]" ) {
 	    Current = Next;
 	    Next = 0;
 	  }	  
+	}
+	//second triangle
+	if( i->E_Current->data == 3 ){
+	  vector<int> expected_data { 4, 1, 3 };
+	  WingedEdge * Current = i;
+	  WingedEdge * Next = 0;
+	  for( auto j: expected_data ){
+	    bool bRet = Get_Edge_CCW_Next( Current, Next );
+	    CHECK( true == bRet );
+	    CHECK( j == Next->E_Current->data );
+	    Current = Next;
+	    Next = 0;
+	  }
 	}       
       }
     }

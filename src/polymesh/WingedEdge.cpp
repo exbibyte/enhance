@@ -138,6 +138,7 @@ bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, vector< WingedEdge
         Vertex * v1 = std::get<0>( i.second );
         Vertex * v2 = std::get<1>( i.second );
         Vertex * v3 = std::get<2>( i.second );
+	bool bClockWise = std::get<3>( i.second );
         auto e1 = std::make_pair( v1, v2 );
         auto e2 = std::make_pair( v2, v3 );
         auto e3 = std::make_pair( v3, v1 );
@@ -152,25 +153,37 @@ bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, vector< WingedEdge
         for( auto j : current_edges ){
             auto k = map_ExistingWEdges.find( j ); //find if vertice pair already exist
             if( k == map_ExistingWEdges.end() ){ //if edge doesn't exist, this function fails
-                return false;
+              for( auto z : Generated ){
+		delete z;
+	      }  
+	      return false;
             }else{
                 //link face to current winged edge depending on winged edge directionality
                 bool bDirection = k->second.second;
                 WingedEdge * winged_edge = k->second.first;
                 if( bDirection ){
-                    winged_edge->F_Right = face;
+		  //winged_edge->F_Right = face;
+		  if( bClockWise ){
+		    winged_edge->F_Right = face;
+		  }else{
+		    winged_edge->F_Left = face;
+		  }
                 }else{
-                    winged_edge->F_Left = face;
+		  //winged_edge->F_Left = face;
+		  for( auto z : Generated ){
+		    delete z;
+		  }
+		  return false;
                 }
-                triangle_winged_edges.push_back( make_pair( winged_edge, bDirection ) );
+                triangle_winged_edges.push_back( make_pair( winged_edge, bClockWise ) );
             }
         }
 
         //save neighbour winged edges depending on directionality of current winged edge
         for( auto j = triangle_winged_edges.begin(); j != triangle_winged_edges.end(); j++ ) {
             WingedEdge * winged_edge = j->first;
-            bool bDirection = j->second;
-            if( bDirection ){
+            bool bDirClockWise = j->second;
+            if( bDirClockWise ){
                 auto next = j+1;
                 if( next == triangle_winged_edges.end() ){
                     next = triangle_winged_edges.begin();
@@ -182,13 +195,13 @@ bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, vector< WingedEdge
                 winged_edge->E_CW_Next = next->first;
                 winged_edge->E_CW_Prev = prev->first;
             }else{
-                auto prev = j+1;
-                if( prev == triangle_winged_edges.end() ){
-                    prev = triangle_winged_edges.begin();
+                auto next = j+1;
+                if( next == triangle_winged_edges.end() ){
+                    next = triangle_winged_edges.begin();
                 }
-                auto next = j-1;
-                if( next < triangle_winged_edges.begin() ){
-                    next = triangle_winged_edges.end()-1;
+                auto prev = j-1;
+                if( prev < triangle_winged_edges.begin() ){
+                    prev = triangle_winged_edges.end()-1;
                 }
                 winged_edge->E_CCW_Next = next->first;
                 winged_edge->E_CCW_Prev = prev->first;
