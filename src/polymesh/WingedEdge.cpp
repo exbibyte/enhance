@@ -218,19 +218,19 @@ namespace Winged_Edge {
 	return true;
     }
 
-    bool Search_WingedEdge_Via_Edge( WingedEdge * Start, WingedEdge * End, vector< WingedEdge * > & Path ){
+    bool Search_WEdge_To_WEdge( WingedEdge * Start, WingedEdge * End, vector< WingedEdge * > & Path ){
 	set< WingedEdge * > Searched;
 	Path.clear();
 	if( !Start || !End ){
 	    return false;
 	}
-	if( Search_WingedEdge_Via_Edge_Aux( Start, End, Searched, Path ) ){
+	if( Search_WEdge_To_WEdge_Aux( Start, End, Searched, Path ) ){
 	    return true;
 	}
 	return false;
     }
 
-    bool Search_WingedEdge_Via_Edge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
+    bool Search_WEdge_To_WEdge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
 	if( !Start ){
 	    return false;
 	}
@@ -255,7 +255,7 @@ namespace Winged_Edge {
 	for( auto i : neighbours ){
 	    set< WingedEdge * > Searched_Copy = Searched;
 	    vector< WingedEdge * > Path_Copy = Path;	    
-	    if( Search_WingedEdge_Via_Edge_Aux( i, End, Searched_Copy, Path_Copy ) ){
+	    if( Search_WEdge_To_WEdge_Aux( i, End, Searched_Copy, Path_Copy ) ){
 		Searched = Searched_Copy; //save path if successful
 		Path = Path_Copy;
 		return true;
@@ -264,6 +264,64 @@ namespace Winged_Edge {
 	return false;
     }
 
+    bool Search_Face_To_Face( Face * Start, Face * End, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges ){
+	Path_Faces.clear();
+	Path_WEdges.clear();
+
+	set< Face * > Searched_Faces;
+	set< WingedEdge * > Searched_WEdges;
+	WingedEdge * Start_WEdge = 0;
+	if( Search_Face_To_Face_Aux( Start, Start_WEdge, End, Searched_Faces, Searched_WEdges, Path_Faces, Path_WEdges ) ){
+	    return true;
+	}
+	return false;
+    }
+    bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges ){
+	if( !Start_Face ){
+	    return false;
+	}	
+	//reject if searched before
+	if( Start_WEdge && 
+	    Searched_WEdges.end() != Searched_WEdges.find( Start_WEdge ) ){
+	    return false;
+	}
+	if( Searched_Faces.end() != Searched_Faces.find( Start_Face ) ){
+	    return false;
+	}
+	Searched_Faces.insert( Start_Face );
+	Path_Faces.push_back( Start_Face );
+	if( Start_WEdge ){
+	    Searched_WEdges.insert( Start_WEdge );
+	    Path_WEdges.push_back( Start_WEdge );
+	}       
+	//check if end is found as a neighbour
+	if( Start_WEdge && Is_WingedEdge_Neighour_Face( Start_WEdge, End ) ){
+	    Searched_Faces.insert( End );
+	    return true;
+	}
+
+	//choose an edge and then a face.
+	set< WingedEdge * > WEdges;
+	Get_Face_Neighbour_WingedEdges( Start_Face, WEdges );
+	for( auto i : WEdges ){
+	    set< Face * > faces;
+	    Get_WingedEdge_Neighour_Faces( i, faces );
+	    for( auto j : faces ){
+		set< Face * > Searched_Faces_Copy = Searched_Faces;
+		set< WingedEdge * > Searched_WEdges_Copy = Searched_WEdges;
+		vector< Face * > Path_Faces_Copy = Path_Faces;
+		vector< WingedEdge * > Path_WEdges_Copy = Path_WEdges;
+		if( Search_Face_To_Face_Aux( j, i, End, Searched_Faces_Copy, Searched_WEdges_Copy, Path_Faces_Copy, Path_WEdges_Copy ) ){
+		    Path_Faces = Path_Faces_Copy;
+		    Path_WEdges = Path_WEdges_Copy;
+		    Searched_Faces = Searched_Faces_Copy;
+		    Searched_WEdges = Searched_WEdges_Copy;
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }    
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 ){
 	if( !WEdge1 || !WEdge2 ){
 	    return false;

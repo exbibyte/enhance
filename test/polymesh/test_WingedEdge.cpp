@@ -136,7 +136,7 @@ TEST_CASE( "Basic", "[B]" ) {
       }
     }
 
-    SECTION( "Check size of generated entities" ){
+    SECTION( "Check winged edge linkage" ){
       WingedEdge * Start;
       WingedEdge * End;
       for( auto i : generated_wedges ){
@@ -148,13 +148,44 @@ TEST_CASE( "Basic", "[B]" ) {
 	}
       }
       std::vector< WingedEdge * > Path;
-      CHECK( Search_WingedEdge_Via_Edge( Start, End, Path ) );
+      CHECK( Search_WEdge_To_WEdge( Start, End, Path ) );
       cout << "Search path: ";
       for( auto j : Path ){
 	cout << j->E_Current->data << " ";
       }
       cout<<endl;
-      CHECK( 3 == Path.size() );
-      
+      CHECK( 3 == Path.size() );      
     }
+
+    SECTION( "Check face and winged edge linkage" ){
+      Face * Start;
+      Face * End;
+      for( auto i : generated_wedges ){
+	if( i->E_Current->data == 0 ){
+	  Start = i->F_Right;
+	}
+	if( i->E_Current->data == 4 ){
+	  End = i->F_Left;
+	}
+      }
+      std::vector< WingedEdge * > Path_WEdges;
+      std::vector< Face * > Path_Faces;
+      CHECK( Search_Face_To_Face( Start, End, Path_Faces, Path_WEdges ) );
+
+      cout << "Search path faces: ";
+      for( auto j : Path_Faces ){
+	cout << j->data << " ";
+      }
+      cout<<endl;
+
+      cout << "Search path winged edges: ";
+      for( auto j : Path_WEdges ){
+	cout << j->E_Current->data << " ";
+      }
+      cout<<endl;
+      
+      CHECK( 2 == Path_Faces.size() );
+      CHECK( 1 == Path_WEdges.size() );
+    }
+
 }

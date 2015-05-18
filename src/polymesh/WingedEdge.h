@@ -74,11 +74,20 @@ namespace Winged_Edge {
     bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * & VertexStart );
     bool Get_Vertex_End( WingedEdge * WEdge, Vertex * & VertexEnd );
 
-    bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated ); //generates winged edges given input edge-vertices and face-vertices (CCW) maps
+    ///generates winged edges given input edge-vertices and face-vertices (CCW) maps
+    bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated );
 
-    bool Search_WingedEdge_Via_Edge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Path );
-    bool Search_WingedEdge_Via_Edge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
-        
+    ///breath first search by travelling on WingedEdges only
+    bool Search_WEdge_To_WEdge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Path );
+    bool Search_WEdge_To_WEdge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
+
+    //breath first search
+    bool Search_Face_To_Face( Face * Start, Face * End, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
+    bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
+    
+    // bool Search_Vertex_To_Vertex( Face * Start, Face * End );
+    // bool Search_Vertex_To_Vertex_Aux( Vertex * Start, Vertex * End, std::set< Vertex * > & Searched_Vertices, std::set< WingedEdge * > & Searched_WEdges, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges );
+    
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 );
     bool Is_WingedEdge_Neighour_Face( WingedEdge * WEdge, Face * face );
     bool Is_WingedEdge_Neighbour_Vertex( WingedEdge * WEdge, Vertex * vertex );
