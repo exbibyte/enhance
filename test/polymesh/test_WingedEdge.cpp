@@ -148,13 +148,13 @@ TEST_CASE( "Basic", "[B]" ) {
 	}
       }
       std::vector< WingedEdge * > Path;
-      CHECK( Search_WingedEdge( Start, End, Path ) );
+      CHECK( Search_WingedEdge_Via_Edge( Start, End, Path ) );
       cout << "Search path: ";
       for( auto j : Path ){
 	cout << j->E_Current->data << " ";
       }
       cout<<endl;
-      CHECK( 4 == Path.size() );
+      CHECK( 3 == Path.size() );
       
     }
 }

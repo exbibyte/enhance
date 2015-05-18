@@ -76,7 +76,18 @@ namespace Winged_Edge {
 
     bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated ); //generates winged edges given input edge-vertices and face-vertices (CCW) maps
 
-    bool Search_WingedEdge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Searched );
-    bool Search_WingedEdge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
+    bool Search_WingedEdge_Via_Edge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Path );
+    bool Search_WingedEdge_Via_Edge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
+        
+    bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 );
+    bool Is_WingedEdge_Neighour_Face( WingedEdge * WEdge, Face * face );
+    bool Is_WingedEdge_Neighbour_Vertex( WingedEdge * WEdge, Vertex * vertex );
+    
+    bool Get_WingedEdge_Neighour_Faces( WingedEdge * WEdge, std::set< Face * > & faces );
+    bool Get_WingedEdge_Neighour_Vertices( WingedEdge * WEdge, std::set< Vertex * > & vertices );
+    bool Get_WingedEdge_Neighour_WingedEdges( WingedEdge * WEdge, std::set< WingedEdge * > & WingedEdges );
+    
+    bool Get_Face_Neighbour_WingedEdges( Face * face, std::set< WingedEdge * > & WEdges );
+    bool Get_Vertex_Neighbour_WingedEdges( Vertex * vertex, std::set< WingedEdge * > & WEdges );
 }
 #endif

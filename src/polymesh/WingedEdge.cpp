@@ -218,56 +218,45 @@ namespace Winged_Edge {
 	return true;
     }
 
-    bool Search_WingedEdge( WingedEdge * Start, WingedEdge * End, vector< WingedEdge * > & Path ){
-      set< WingedEdge * > Searched;
+    bool Search_WingedEdge_Via_Edge( WingedEdge * Start, WingedEdge * End, vector< WingedEdge * > & Path ){
+	set< WingedEdge * > Searched;
 	Path.clear();
 	if( !Start || !End ){
 	    return false;
 	}
-	Path.push_back( Start );
-	if( Search_WingedEdge_Aux( Start, End, Searched, Path ) ){
+	if( Search_WingedEdge_Via_Edge_Aux( Start, End, Searched, Path ) ){
 	    return true;
 	}
 	return false;
     }
 
-  bool Search_WingedEdge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
+    bool Search_WingedEdge_Via_Edge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
 	if( !Start ){
 	    return false;
 	}
-    
-	//search neighbouring edges
-	WingedEdge * CW_Next = Start->E_CW_Next;
-	WingedEdge * CW_Prev = Start->E_CW_Prev;
-	WingedEdge * CCW_Next = Start->E_CCW_Next;
-	WingedEdge * CCW_Prev = Start->E_CCW_Prev;
-
-	vector< WingedEdge * > neighbours;
-	neighbours.push_back( CW_Next );
-	neighbours.push_back( CW_Prev );
-	neighbours.push_back( CCW_Next );
-	neighbours.push_back( CCW_Prev );
-
-	for( auto i : neighbours ){
-	    if( !i ){
-		continue;
-	    }
-	    if( i == End ){
-		Searched.insert( i );
-		Path.push_back( i );
-		return true;
-	    }
+	//ignore if this edge was searched before
+	if( Searched.end() != Searched.find( Start ) ){
+	    return false;
 	}
+	Searched.insert( Start );
+	Path.push_back( Start );
+	//evaluate if end is found as a neighbour
+	if( Is_WingedEdge_Neighour_WingedEdge( Start, End ) ){
+	    Searched.insert( End );
+	    Path.push_back( End );
+	    return true;
+	}
+
+	set< WingedEdge * > neighbours;	
+	if( !Get_WingedEdge_Neighour_WingedEdges( Start, neighbours ) ){
+	    return false;
+	}		             
+        //search neighbouring edges
 	for( auto i : neighbours ){
-	    if( !i ){
-		continue;
-	    }
 	    set< WingedEdge * > Searched_Copy = Searched;
-	    vector< WingedEdge * > Path_Copy = Path;
-	    Searched_Copy.insert( i );
-	    Path_Copy.push_back( i );
-	    if( Search_WingedEdge_Aux( i, End, Searched_Copy, Path_Copy ) ){
-		Searched = Searched_Copy; //save path
+	    vector< WingedEdge * > Path_Copy = Path;	    
+	    if( Search_WingedEdge_Via_Edge_Aux( i, End, Searched_Copy, Path_Copy ) ){
+		Searched = Searched_Copy; //save path if successful
 		Path = Path_Copy;
 		return true;
 	    }	
@@ -275,4 +264,98 @@ namespace Winged_Edge {
 	return false;
     }
 
+    bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 ){
+	if( !WEdge1 || !WEdge2 ){
+	    return false;
+	}
+	if( WEdge2 == WEdge1->E_CW_Next ||
+	    WEdge2 == WEdge1->E_CW_Prev ||
+	    WEdge2 == WEdge1->E_CCW_Next ||
+	    WEdge2 == WEdge1->E_CCW_Prev ){
+	    return true;
+	}       
+	return false;
+    }
+    bool Is_WingedEdge_Neighour_Face( WingedEdge * WEdge, Face * face ){
+	if( !WEdge || !face ){
+	    return false;
+	}
+	if( WEdge->F_Left == face || WEdge->F_Right == face ){
+	    return true;
+	}       
+	return false;
+    }
+    bool Is_WingedEdge_Neighbour_Vertex( WingedEdge * WEdge, Vertex * vertex ){
+	if( !WEdge || !vertex ){
+	    return false;
+	}
+	if( WEdge->V_Start == vertex || WEdge->V_End == vertex ){
+	    return true;
+	}       
+	return false;
+    }
+    bool Get_WingedEdge_Neighour_Faces( WingedEdge * WEdge, set< Face * > & faces ){
+	faces.clear();
+	if( !WEdge ){
+	    return false;
+	}
+	Face * f = WEdge->F_Left;
+	if( f ){
+	    faces.insert( f );
+	}
+	f = WEdge->F_Right;
+	if( f ){
+	    faces.insert( f );
+	}
+	return true;
+    }
+    bool Get_WingedEdge_Neighour_Vertices( WingedEdge * WEdge, set< Vertex * > & vertices ){	
+	vertices.clear();
+	if( !WEdge ){
+	    return false;
+	}
+	Vertex * v = WEdge->V_Start;
+	if( v ){
+	    vertices.insert( v );
+	}
+	v = WEdge->V_End;
+	if( v ){
+	    vertices.insert( v );
+	}
+	return true;
+    }
+    bool Get_WingedEdge_Neighour_WingedEdges( WingedEdge * WEdge, set< WingedEdge * > & wedges ){
+	wedges.clear();
+	if( !WEdge ){
+	    return false;
+	}
+	WingedEdge * CW_Next = WEdge->E_CW_Next;
+	WingedEdge * CW_Prev = WEdge->E_CW_Prev;
+	WingedEdge * CCW_Next = WEdge->E_CCW_Next;
+	WingedEdge * CCW_Prev = WEdge->E_CCW_Prev;
+	wedges.insert( CW_Next );
+	wedges.insert( CW_Prev );
+	wedges.insert( CCW_Next );
+	wedges.insert( CCW_Prev );
+	//remove null pointer if previously inserted
+	wedges.erase( 0 );
+	return true;
+    }
+    bool Get_Face_Neighbour_WingedEdges( Face * face, set< WingedEdge * > & WEdges ){
+	WEdges.clear();
+	if( !face ){
+	    return false;
+	}
+	WEdges = face->Neighbour_WEdges;
+	return true;
+    }
+    bool Get_Vertex_Neighbour_WingedEdges( Vertex * vertex, set< WingedEdge * > & WEdges ){
+	WEdges.clear();
+	if( !vertex ){
+	    return false;
+	}
+	WEdges = vertex->Neighbour_WEdges;
+	return true;
+    }
+    
 }
