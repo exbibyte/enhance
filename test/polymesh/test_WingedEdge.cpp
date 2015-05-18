@@ -93,7 +93,6 @@ TEST_CASE( "Basic", "[B]" ) {
         CHECK( 2 == generated_faces.size() ); //check number of faces        
     }
 
-    //TODO:
     SECTION( "Check entity linkage" ){
       for( auto i : generated_wedges ){
 	//first trianglge
@@ -136,7 +135,7 @@ TEST_CASE( "Basic", "[B]" ) {
       }
     }
 
-    SECTION( "Check winged edge linkage" ){
+    SECTION( "Check WingedEdge-WingedEdge-... linkage" ){
       WingedEdge * Start;
       WingedEdge * End;
       for( auto i : generated_wedges ){
@@ -149,6 +148,7 @@ TEST_CASE( "Basic", "[B]" ) {
       }
       std::vector< WingedEdge * > Path;
       CHECK( Search_WEdge_To_WEdge( Start, End, Path ) );
+      cout << "WingedEdge-...-WingedEdge: " << endl;
       cout << "Search path: ";
       for( auto j : Path ){
 	cout << j->E_Current->data << " ";
@@ -157,7 +157,7 @@ TEST_CASE( "Basic", "[B]" ) {
       CHECK( 3 == Path.size() );      
     }
 
-    SECTION( "Check face and winged edge linkage" ){
+    SECTION( "Check Face-WingedEdge-...-Face linkage" ){
       Face * Start;
       Face * End;
       for( auto i : generated_wedges ){
@@ -172,12 +172,13 @@ TEST_CASE( "Basic", "[B]" ) {
       std::vector< Face * > Path_Faces;
       CHECK( Search_Face_To_Face( Start, End, Path_Faces, Path_WEdges ) );
 
+      cout << "Face-WingedEdge-...-Face: " << endl;
       cout << "Search path faces: ";
       for( auto j : Path_Faces ){
 	cout << j->data << " ";
       }
       cout<<endl;
-
+      
       cout << "Search path winged edges: ";
       for( auto j : Path_WEdges ){
 	cout << j->E_Current->data << " ";

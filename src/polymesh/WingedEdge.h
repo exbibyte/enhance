@@ -81,12 +81,14 @@ namespace Winged_Edge {
     bool Search_WEdge_To_WEdge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Path );
     bool Search_WEdge_To_WEdge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
 
-    //breath first search
+    ///breath first search by travelling on alternating Face-WingedEdge-...-Face
     bool Search_Face_To_Face( Face * Start, Face * End, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
     bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
-    
-    // bool Search_Vertex_To_Vertex( Face * Start, Face * End );
-    // bool Search_Vertex_To_Vertex_Aux( Vertex * Start, Vertex * End, std::set< Vertex * > & Searched_Vertices, std::set< WingedEdge * > & Searched_WEdges, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges );
+
+    ///TODO:
+    ///breath first search by traveling on alternating Vertex-WingedEdge-...-Vertex
+    //bool Search_Vertex_To_Vertex( Vertex * Start, Vertex * End, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges ){ return false; }
+    //bool Search_Vertex_To_Vertex_Aux( Vertex * Start_Vertex, WingedEdge * Start_WEdge, Vertex * End, std::set< Vertex * > & Searched_Vertices, std::set< WingedEdge * > & Searched_WEdges, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges ){ return false; }
     
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 );
     bool Is_WingedEdge_Neighour_Face( WingedEdge * WEdge, Face * face );
