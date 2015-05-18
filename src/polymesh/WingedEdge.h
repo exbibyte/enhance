@@ -11,58 +11,72 @@
 #include <vector>
 #include <tuple>
 #include <utility>
+#include <set>
 
-class Edge {
-public:
-    int data;
-};
+#include "Vec.h"
 
-class Face {
-public:
-    int data;
-};
+namespace Winged_Edge {
+  
+    class WingedEdge;
 
-class Vertex {
-public:
-    int data;
-};
+    class Edge {
+    public:
+	int data;
+	WingedEdge * WEdge;
+    };
+  
+    class Face {
+    public:
+	int data;
+	std::set< WingedEdge * > Neighbour_WEdges;
+    };
+  
+    class Vertex {
+    public:
+	int data;
+	Vec v;
+	std::set< WingedEdge * > Neighbour_WEdges;
+    };
+  
+    class WingedEdge {
+    public:
+	WingedEdge(){
+	    E_Current = 0;
+	    V_Start = 0;
+	    V_End = 0;
+	    E_CCW_Prev = 0;
+	    E_CCW_Next = 0;
+	    E_CW_Prev = 0;
+	    E_CW_Next = 0;
+	    F_Left = 0;
+	    F_Right = 0;
+	}
+	Edge * E_Current;
+	Vertex * V_Start;
+	Vertex * V_End;
+	WingedEdge * E_CCW_Prev;
+	WingedEdge * E_CCW_Next;
+	WingedEdge * E_CW_Prev;
+	WingedEdge * E_CW_Next;
+	Face * F_Left;
+	Face * F_Right;
+    };
 
-class WingedEdge {
-public:
-    WingedEdge(){
-        E_Current = 0;
-        V_Start = 0;
-        V_End = 0;
-        E_CCW_Prev = 0;
-        E_CCW_Next = 0;
-        E_CW_Prev = 0;
-        E_CW_Next = 0;
-        F_Left = 0;
-        F_Right = 0;
-    }
-    Edge * E_Current;
-    Vertex * V_Start;
-    Vertex * V_End;
-    WingedEdge * E_CCW_Prev;
-    WingedEdge * E_CCW_Next;
-    WingedEdge * E_CW_Prev;
-    WingedEdge * E_CW_Next;
-    Face * F_Left;
-    Face * F_Right;
-};
+    typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
+    typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool > > MapFace;
 
-typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
-typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool > > MapFace;
+    bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
+    bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
+    bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * & Next );
+    bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
+    bool Get_Face_Left( WingedEdge * WEdge, Face * & FaceLeft );
+    bool Get_Face_Right( WingedEdge * WEdge, Face * & FaceRight );
+    bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * & VertexStart );
+    bool Get_Vertex_End( WingedEdge * WEdge, Vertex * & VertexEnd );
 
-bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
-bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
-bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * & Next );
-bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
-bool Get_Face_Left( WingedEdge * WEdge, Face * & FaceLeft );
-bool Get_Face_Right( WingedEdge * WEdge, Face * & FaceRight );
-bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * & VertexStart );
-bool Get_Vertex_End( WingedEdge * WEdge, Vertex * & VertexEnd );
+    bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated ); //generates winged edges given input edge-vertices and face-vertices (CCW) maps
 
-bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, std::vector< WingedEdge * > & Generated ); //generates winged edges given input edge-vertices and face-vertices (CCW) maps
-
+    bool Search_WingedEdge( WingedEdge * Start, WingedEdge * End, std::vector< WingedEdge * > & Searched );
+    bool Search_WingedEdge_Aux( WingedEdge * Start, WingedEdge * End, std::set< WingedEdge * > & Searched, std::vector< WingedEdge * > & Path );
+}
 #endif

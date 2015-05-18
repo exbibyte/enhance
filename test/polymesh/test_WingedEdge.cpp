@@ -14,11 +14,13 @@
 #include <tuple>
 #include <utility>
 #include <set>
+#include <iostream>
 
 using namespace std;
+using namespace Winged_Edge;
 
 TEST_CASE( "Basic", "[B]" ) {
-
+  
     MapEdge map_edge;
     MapFace map_face;
     
@@ -75,13 +77,15 @@ TEST_CASE( "Basic", "[B]" ) {
         int count_face_left = 0;
         int count_face_right = 0;
         for( auto i : generated_wedges ){
-            if( 0 != i->F_Left ){
+	    Face * left_face;
+	    if( Get_Face_Left( i, left_face ) ){ 
                 count_face_left++;
-                generated_faces.insert( i->F_Left );
+                generated_faces.insert( left_face );
             }
-            if( 0 != i->F_Right ){
+	    Face * right_face;
+            if( Get_Face_Right( i, right_face ) ){
                 count_face_right++;
-                generated_faces.insert( i->F_Right );
+                generated_faces.insert( right_face );
             }
         }
         CHECK( 3 == count_face_left ); //check number of edges linked with a left face
@@ -130,5 +134,27 @@ TEST_CASE( "Basic", "[B]" ) {
 	  }
 	}       
       }
+    }
+
+    SECTION( "Check size of generated entities" ){
+      WingedEdge * Start;
+      WingedEdge * End;
+      for( auto i : generated_wedges ){
+	if( i->E_Current->data == 2 ){
+	  Start = i;
+	}
+	if( i->E_Current->data == 4 ){
+	  End = i;
+	}
+      }
+      std::vector< WingedEdge * > Path;
+      CHECK( Search_WingedEdge( Start, End, Path ) );
+      cout << "Search path: ";
+      for( auto j : Path ){
+	cout << j->E_Current->data << " ";
+      }
+      cout<<endl;
+      CHECK( 4 == Path.size() );
+      
     }
 }
