@@ -4,6 +4,7 @@
 #include <map>
 #include <functional>
 #include <bitset>
+#include <string>
 
 enum class KeyButtonWhich {
     MOUSE_L = 0,
@@ -20,26 +21,26 @@ enum class KeyButtonWhich {
 };
 
 enum class KeyButtonState {
-    Up = 0,
+    UP = 0,
     DOWN    
 };
 
 class WindowManager{
 public:
     WindowManager() : _iId(-1) {}
-    virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, string const strTitle )=0;
+    virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle )=0;
     virtual bool SetSize( unsigned int ui_width, unsigned int ui_height ) = 0;
     virtual bool GetSize( unsigned int & ui_width, unsigned int & ui_height ) = 0;
     virtual bool SetFullScreen( bool bFullScreen ) = 0;
     virtual bool CloseWindow() = 0;
     virtual bool GetCursorPos( double & xpos, double & ypos ) = 0;
     virtual bool GetCursorState( KeyButtonWhich which, KeyButtonState & state ) = 0;
-    virtual bool SetKeyCombCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<int(int,int)> cb ) = 0;
+    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ) = 0;
     virtual bool ProcessKeyButtonCombo() = 0;
 
-private:
+protected:
     int _iId;
-    std::map<std::string, std::function<bool(void)> cb > _MapKeyButtonComboCb;
+    std::map<std::string, std::function<bool(void)> > _MapKeyButtonComboCb;
     std::bitset<32> _KeyButtonComboCurrent;
 };
 
