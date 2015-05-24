@@ -8,23 +8,22 @@
 using namespace std;
 
 WindowManagerGlfw::WindowManagerGlfw(){
-
+    _Window = nullptr;    
 }
 bool WindowManagerGlfw::CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, string const strTitle ){
-    if( _MapIdWindow.end() != _MapIdWindow.find( iId ) ){
+    if( _iId == iId || _iId >= 0){
 	return false;
     }
-    _MapIdWindow[ iId ] = glfwCreateWindow( ui_width, ui_height, strTitle.c_str(), NULL, NULL );
-
-    if( !_MapIdWindow[ iId ] ){
+    GLFWwindow * window = glfwCreateWindow( ui_width, ui_height, strTitle.c_str(), NULL, NULL );
+    if( !window ){
 	return false;
     }
-
+    _iId = iId;
     return true;
 }
-bool WindowManagerGlfw::SetSize( int iId, unsigned int ui_width, unsigned int ui_height ){
+bool WindowManagerGlfw::SetSize( unsigned int ui_width, unsigned int ui_height ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
@@ -32,9 +31,9 @@ bool WindowManagerGlfw::SetSize( int iId, unsigned int ui_width, unsigned int ui
     
     return true;
 }
-bool WindowManagerGlfw::GetSize( int iId, unsigned int & ui_width, unsigned int & ui_height ){
+bool WindowManagerGlfw::GetSize( unsigned int & ui_width, unsigned int & ui_height ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
@@ -47,38 +46,41 @@ bool WindowManagerGlfw::GetSize( int iId, unsigned int & ui_width, unsigned int 
 
     return true;
 }
-bool WindowManagerGlfw::SetFullScreen( int iId, bool WindowManagerGlfw::bFullScreen ){
+bool WindowManagerGlfw::SetFullScreen( bool WindowManagerGlfw::bFullScreen ){
     //TODO
     return false;
 }
-bool WindowManagerGlfw::CloseWindow( int iId ){
-    GLFWwindow * win;
-    if( !GetWindow( iId, win ) )
+bool WindowManagerGlfw::CloseWindow(){
+    //TODO
+    GLFWwindow * window;
+    if( !GetWindow( window ) )
     {	
 	return false;
     }
-    glfwDestroyWindow( win );
-    _MapIdWindow.erase( iId );
+    glfwDestroyWindow( window );
+    _window = nullptr;
+    _iId = -1;
     return true;
 }
-bool WindowManagerGlfw::GetCursorPos( int iId, double & xpos, double & ypos ){
+bool WindowManagerGlfw::GetCursorPos( double & xpos, double & ypos ){
+    //TODO
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
     glfwGetCursorPos( window, &xpos, &ypos );
     return true;
 }
-bool WindowManagerGlfw::GetCursorState( int iId, KeyButtonWhich which, KeyButtonState state ){
+bool WindowManagerGlfw::GetCursorState( KeyButtonWhich which, KeyButtonState state ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
     return true;
 }
-bool WindowManagerGlfw::SetKeyComboCallback( int iId, std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ){
+bool WindowManagerGlfw::SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ){
     bitset<32> keycombo;
     keycombo.set();
     for( auto i : combo ){
@@ -88,30 +90,32 @@ bool WindowManagerGlfw::SetKeyComboCallback( int iId, std::map<KeyButtonWhich, K
     }
     //convert pattern to string and add callback for the pattern
     string strPattern = keycombo.to_string();
-    _MapKeyButtonComboCb[ strPattern ] = cb;    
+    _MapKeyButtonComboCb[ strPattern ] = cb;
     return true;
 }
-bool WindowManagerGlfw::GetWindow( int iId, GLFWwindow * win ){
-    auto it = _MapIdWindow.find( iId );
-    if( _MapIdWindow.end() == it ){
-	return false;
+bool WindowManagerGlfw::GetWindow( GLFWwindow * & window ){
+    if( !_Window ){
+        return false;
     }
-    win = it->second;
+    window = _Window;
     return true;
 }
-
-bool WindowManagerGlfw::SetCallbackKeyboard( int iId, void(*cb)( GLFWwindow*, int, int, int, int) ){
+bool WindowManagerGlfw::GetId( int & iId ){
+    iId = _iId;
+    return true;
+}
+bool WindowManagerGlfw::SetCallbackKeyboard( void(*cb)( GLFWwindow*, int, int, int, int) ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
     glfwSetKeyCallback( window, cb );
     return true;
 }
-bool WindowManagerGlfw::SetCallbackMouseMove( int iId, void(*cb)( GLFWwindow*, double, double ) ){
+bool WindowManagerGlfw::SetCallbackMouseMove( void(*cb)( GLFWwindow*, double, double ) ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
@@ -119,25 +123,25 @@ bool WindowManagerGlfw::SetCallbackMouseMove( int iId, void(*cb)( GLFWwindow*, d
     return true;
 }
 
-bool WindowManagerGlfw::SetCallbackMouseButton( int iId, void(*cb)( GLFWwindow*, int button, int action, int mode ) ){
+bool WindowManagerGlfw::SetCallbackMouseButton( void(*cb)( GLFWwindow*, int button, int action, int mode ) ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
     glfwSetMouseButtonCallback( window, cb );
     return true;
 }
-bool WindowManagerGlfw::SetCallbackScroll( int iId, void(*cb)( GLFWwindow*, double xoffset, double yoffset ) ){
+bool WindowManagerGlfw::SetCallbackScroll( void(*cb)( GLFWwindow*, double xoffset, double yoffset ) ){
     GLFWwindow * window;
-    if( !GetWindow( iId, window ) )
+    if( !GetWindow( window ) )
     {
 	return false;
     }
     glfwSetScrollCallback( window, cb );
     return true;
 }
-bool WindowManagerGlfw::ProcessKeyButtonCombo( int iId ){
+bool WindowManagerGlfw::ProcessKeyButtonCombo(){
     //copy current state of keys and buttons
     bitset<32> current_pattern = _KeyButtonComboCurrent;
     //reset current state
@@ -145,31 +149,39 @@ bool WindowManagerGlfw::ProcessKeyButtonCombo( int iId ){
     //find and call key combination callback if exists
     string str_current_pattern = current_pattern.to_string();
     auto it = _MapKeyButtonComboCb.find( str_current_pattern );
-    if( it != _MapKeyButtonComboCb.end() ){
-	std::function<bool(void)> cb = it->second;
-	cb();
-	return true;
+    if( it != it2->second.end() ){
+	return false;
     }    	
-    return false;
+    std::function<bool(void)> cb = it->second;
+    cb();
+    return true;
 }
-bool WindowManagerGlfw::SetDefaultCb( int iId ){
-    if( SetCallbackKeyboard( iId, &ProcessKeyboardCb ) ){
+bool WindowManagerGlfw::SetDefaultCb(){
+    if( SetCallbackKeyboard( &ProcessKeyboardCb ) ){
 	return false;
     }
-    if( SetCallbackMouseMove( iId, &ProcessMouseMoveCb ) ){
+    if( SetCallbackMouseMove( &ProcessMouseMoveCb ) ){
 	return false;
     }
-    if( SetCallbackMouseButton( iId, &ProcessMouseButtonCb ) ){
+    if( SetCallbackMouseButton( &ProcessMouseButtonCb ) ){
 	return false;
     }
-    if( SetCallbackScroll( iId, &ProcessScrollCb ) ){
+    if( SetCallbackScroll( &ProcessScrollCb ) ){
 	return false;
     }
     return true;
 }
 void WindowManagerGlfw::ProcessMouseMoveCb( GLFWwindow * window, double xpos, double ypos ){
+    if( _Window != window ){
+        return;
+    }
+    _Mousex = xpos;
+    _Mousey = ypos;
 }
 void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int scancode, int action, int mode ){
+    if( _Window != window ){
+        return;
+    }
     //get key
     KeyButtonWhich which;
     switch( key ){
@@ -197,6 +209,8 @@ void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int sca
     case GLFW_KEY_L:
 	which = KEY_L;
 	break;
+    default:
+        return;
     }
     unsigned int offset = static_cast<unsigned int>( which );
     KeyButtonState state;
@@ -207,14 +221,48 @@ void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int sca
     case GLFW_RELEASE:
 	state = UP;
 	break;
+    default:
+        return;
     }
     bool val = (bool)static_cast<unsigned int>( state );
     //set current state
     _KeyButtonComboCurrent.set( offset, val );
 }
 void WindowManagerGlfw::ProcessMouseButtonCb( GLFWwindow * window, int button, int action, int mode ){
-
+    if( _Window != window ){
+        return;
+    }
+    //get key
+    KeyButtonWhich which;
+    switch( button ){
+    case GLFW_MOUSE_BUTTON_LEFT:
+	which = MOUSE_L;
+	break;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+	which = MOUSE_R;
+	break;
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+	which = MOUSE_M;
+	break;
+    default:
+        return;
+    }
+    unsigned int offset = static_cast<unsigned int>( which );
+    KeyButtonState state;
+    switch( action ){
+    case GLFW_PRESS:
+	state = DOWN;
+	break;
+    case GLFW_RELEASE:
+	state = UP;
+	break;
+    default:
+        return;
+    }
+    bool val = (bool)static_cast<unsigned int>( state );
+    //set current state
+    _KeyButtonComboCurrent.set( offset, val );
 }
 void WindowManagerGlfw::ProcessScrollCb( GLFWwindow*, double xoffset, double yoffset ){
-
+    
 }

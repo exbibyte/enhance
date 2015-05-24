@@ -7,23 +7,25 @@
 
 class WindowManagerGlfw : public WindowManager{
 public:
+    WindowManagerGlfw();
     //base implementation
     bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, string const strTitle );
-    bool SetSize( int iId, unsigned int ui_width, unsigned int ui_height );
-    bool GetSize( int iId, unsigned int & ui_width, unsigned int & ui_height );
-    bool SetFullScreen( int iId, bool bFullScreen );
-    bool CloseWindow( int iId );
-    bool GetCursorPos( int iId, double & xpos, double & ypos );    
-    bool GetCursorState( int iId, KeyButtonWhich which, KeyButtonState & state );
-    bool SetKeyComboCallback( int iId, std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb );
-    bool ProcessKeyButtonCombo( int iId );
+    bool SetSize( unsigned int ui_width, unsigned int ui_height );
+    bool GetSize( unsigned int & ui_width, unsigned int & ui_height );
+    bool SetFullScreen( bool bFullScreen );
+    bool CloseWindow();
+    bool GetCursorPos( double & xpos, double & ypos );    
+    bool GetCursorState( KeyButtonWhich which, KeyButtonState & state );
+    bool SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb );
+    bool ProcessKeyButtonCombo();
     
     //helpers
-    bool GetWindow( int iId, GLFWwindow * win );
-    bool SetCallbackKeyboard( int iId, void(*cb)( GLFWwindow*, int key, int scancode, int action, int mode ) );
-    bool SetCallbackMouseMove( int iId, void(*cb)( GLFWwindow*, double xpos, double ypos ) );
-    bool SetCallbackMouseButton( int iId, void(*cb)( GLFWwindow*, int button, int action, int mode ) );
-    bool SetCallbackScroll( int iId, void(*cb)( GLFWwindow*, double xoffset, double yoffset ) );
+    bool GetWindow( GLFWwindow * & win );
+    bool GetId( int & iId );
+    bool SetCallbackKeyboard( void(*cb)( GLFWwindow*, int key, int scancode, int action, int mode ) );
+    bool SetCallbackMouseMove( void(*cb)( GLFWwindow*, double xpos, double ypos ) );
+    bool SetCallbackMouseButton( void(*cb)( GLFWwindow*, int button, int action, int mode ) );
+    bool SetCallbackScroll( void(*cb)( GLFWwindow*, double xoffset, double yoffset ) );
     bool SetDefaultCb();
     
     //default key and button callbacks
@@ -32,8 +34,9 @@ public:
     static void ProcessMouseButtonCb( GLFWwindow * window, int button, int action, int mode );
     static void ProcessScrollCb( GLFWwindow*, double xoffset, double yoffset );
 private:
-    std::map< int, GLFWwindow * > _MapIdWindow;
-    std::map< int, std::map< KeyButtonWhich, KeyButtonState > > _MapKeyButtonState;
+    GLFWwindow * _Window;
+    double _Mousex;
+    double _Mousey;
 };
 
 #endif

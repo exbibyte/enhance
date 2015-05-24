@@ -26,19 +26,20 @@ enum class KeyButtonState {
 
 class WindowManager{
 public:
-    WindowManager();
+    WindowManager() : _iId(-1) {}
     virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, string const strTitle )=0;
-    virtual bool SetSize( int iId, unsigned int ui_width, unsigned int ui_height ) = 0;
-    virtual bool GetSize( int iId, unsigned int & ui_width, unsigned int & ui_height ) = 0;
-    virtual bool SetFullScreen( int iId, bool bFullScreen ) = 0;
-    virtual bool CloseWindow( int iId ) = 0;
-    virtual bool GetCursorPos( int iId, double & xpos, double & ypos ) = 0;
-    virtual bool GetCursorState( int iId, KeyButtonWhich which, KeyButtonState & state ) = 0;
-    virtual bool SetKeyCombCallback( int iId, std::map<KeyButtonWhich, KeyButtonState> combo, std::function<int(int,int)> cb ) = 0;
-    virtual bool ProcessKeyButtonCombo( int iId ) = 0;
+    virtual bool SetSize( unsigned int ui_width, unsigned int ui_height ) = 0;
+    virtual bool GetSize( unsigned int & ui_width, unsigned int & ui_height ) = 0;
+    virtual bool SetFullScreen( bool bFullScreen ) = 0;
+    virtual bool CloseWindow() = 0;
+    virtual bool GetCursorPos( double & xpos, double & ypos ) = 0;
+    virtual bool GetCursorState( KeyButtonWhich which, KeyButtonState & state ) = 0;
+    virtual bool SetKeyCombCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<int(int,int)> cb ) = 0;
+    virtual bool ProcessKeyButtonCombo() = 0;
 
 private:
-    std::map<std::string, std::function<bool(void)> cb> _MapKeyButtonComboCb;
+    int _iId;
+    std::map<std::string, std::function<bool(void)> cb > _MapKeyButtonComboCb;
     std::bitset<32> _KeyButtonComboCurrent;
 };
 
