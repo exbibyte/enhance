@@ -14,15 +14,15 @@ C = In Progress
 D = To do
 
 
-[B] Math and Physics Library Layer
+[A] Math and Physics Library Layer
 
-[C] Integrate Graphics Engine
+[C] UI handling
 
-[D] Develop and Integrate Game Engine
+[C] Graphics Engine
 
-[D] Game Content Format Design
+[C] Game Engine
 
-[D] World Editor/Generator
+[D] Game Content Editor
 
 --------------------------------------------
 
@@ -33,5 +33,5 @@ https://github.com/philsquared/Catch
 
 Dependencies:
 
-sudo apt-get install libsfml-dev
+GLFW, OpenGL
 
