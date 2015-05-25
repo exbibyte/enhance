@@ -6,23 +6,55 @@
 #include <bitset>
 #include <string>
 
-enum class KeyButtonWhich {
-    MOUSE_L = 0,
-    MOUSE_R,
-    MOUSE_M,
-    KEY_W,
-    KEY_A,
-    KEY_S,
-    KEY_D,
-    KEY_SPC,	
-    KEY_J,
-    KEY_K,
-    KEY_L
-};
+typedef struct KeyButtonWhich {
+    enum Enum {
+	MOUSE_L = 0,
+	MOUSE_R,
+	MOUSE_M,
+	KEY_W,
+	KEY_A,
+	KEY_S,
+	KEY_D,
+	KEY_SPC,	
+	KEY_J,
+	KEY_K,
+	KEY_L,
+	ENUM_COUNT
+    };
+} KeyButtonWhich;
 
-enum class KeyButtonState {
-    UP = 0,
-    DOWN    
+typedef struct KeyButtonState {
+    enum  Enum {
+	UP = 0,
+	DOWN = 1,
+	REPEAT = 2,
+	ENUM_COUNT
+    }
+} KeyButtonState;
+
+class KeyButtonData {
+public:
+    union {
+	struct {
+	    unsigned char mouse_l = 0;
+	    unsigned char mouse_r = 0;
+	    unsigned char mouse_m = 0;
+	    unsigned char key_w = 0;
+	    unsigned char key_a = 0;
+	    unsigned char key_s = 0;
+	    unsigned char key_d = 0;
+	    unsigned char key_spc = 0;
+	    unsigned char key_j = 0;
+	    unsigned char key_k = 0;
+	    unsigned char key_l = 0;
+	} Single;
+	unsigned char Array [ KeyButtonWhich::ENUM_COUNT ];
+    };
+    void Clear(){
+	for( auto i : Array ){
+	    i = 0;
+	}
+    }
 };
 
 class WindowManager{
@@ -37,11 +69,12 @@ public:
     virtual bool GetCursorState( KeyButtonWhich which, KeyButtonState & state ) = 0;
     virtual bool SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ) = 0;
     virtual bool ProcessKeyButtonCombo() = 0;
+    virtual bool ProcessKeyButtonCombo_Repeat() = 0;
 
 protected:
     int _iId;
-    std::map<std::string, std::function<bool(void)> > _MapKeyButtonComboCb;
-    std::bitset<32> _KeyButtonComboCurrent;
+    //TODO: add trie data structure for storing combo key callbacks
+    KeyButtonData _KeyButtonDataCurrent; //saves current state of keys and buttons
 };
 
 #endif
