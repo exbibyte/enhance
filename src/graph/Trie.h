@@ -7,11 +7,12 @@
 
 template< typename KeyType, typename DataType >
 class NodeTrie {
+public:
     NodeTrie(){
 	_is_root = false;
 	_is_data_valid = false;
     }
-    std::map< KeyType, NodeTrie * > _MapSubNode;
+    std::map< KeyType, NodeTrie<KeyType, DataType> * > _MapSubNode;
     DataType _data;
     bool _is_root;
     bool _is_data_valid;
@@ -26,35 +27,38 @@ public:
     }
     ~Trie(){
 	for( auto i : _root._MapSubNode ){
-	    RemoveSubBranch( i );
+	    RemoveSubBranch( i.second );
 	}
     }
-    bool AddFromRoot( std::queue< KeyType > keys, DataType & data ){
+    bool AddFromRoot( std::queue< KeyType > keys, DataType data ){
 	return Add( _proot, keys, data );
     }
     void RemoveFromRoot( std::queue< KeyType > keys ){
-	return Remove( keys );
+	return Remove( _proot, keys );
     }
-    void ClearAll( NodeTrie * & node ){
+    void ClearAll(){
 	for( auto i : _proot->_MapSubNode ){	    
-	    RemoveSubBranch( i );
+	    RemoveSubBranch( i.second );
 	}
 	_proot->_MapSubNode.clear();
     }
-    bool Add( NodeTrie * node, std::queue< KeyType > keys, DataType & data ){
+    bool GetFromRoot( std::queue< KeyType > keys, DataType & data ){
+        return Get( _proot, keys, data );
+    }
+    bool Add( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType data ){
 	if( keys.empty() ){
 	    //save data
 	    node->_data = data;
 	    node->_is_data_valid = true;
 	    return true;
 	}	
-	KeyType current_key = key.front();
+	KeyType current_key = keys.front();
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie * subnode;
-	if( found == _MapSubNode.end() ){
+	NodeTrie<KeyType, DataType> * subnode;
+	if( found == node->_MapSubNode.end() ){
 	    //create new subnode if it does not exist
-	    subnode = new NodeTrie;
+	    subnode = new NodeTrie< KeyType, DataType >;
 	    node->_MapSubNode[ current_key ] = subnode;
 	}
 	else
@@ -63,17 +67,17 @@ public:
 	}
 	return Add( subnode, keys, data );
     }
-    void Remove( NodeTrie * node, std::queue< KeyType > keys ){
+    void Remove( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys ){
 	if( keys.empty() ){
 	    //save data
 	    node->_is_data_valid = false;
 	    return;
 	}	
-	KeyType current_key = key.front();
+	KeyType current_key = keys.front();
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie * subnode;
-	if( found == _MapSubNode.end() ){
+	NodeTrie<KeyType, DataType> * subnode;
+	if( found == node->_MapSubNode.end() ){
 	    //return if it does not exist
 	    return;
 	}
@@ -83,15 +87,15 @@ public:
 	}
 	return Remove( subnode, keys );
     }
-    void RemoveSubBranch( NodeTrie * & node ){	
+    void RemoveSubBranch( NodeTrie<KeyType, DataType> * node ){	
 	for( auto i : node->_MapSubNode ){
-	    RemoveChildren( i );
+	    RemoveSubBranch( i.second );
 	}
 	node->_MapSubNode.clear();
 	delete node;
-	node = 0;
+        node = 0;
     }
-    bool Get( NodeTrie * node, std::queue< KeyType > keys, DataType & data ){
+    bool Get( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType & data ){
 	if( keys.empty() ){
 	    //return data
 	    if( node->_is_data_valid ){
@@ -102,11 +106,11 @@ public:
 		return false;
 	    }
 	}	
-	KeyType current_key = key.front();
+	KeyType current_key = keys.front();
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie * subnode;
-	if( found == _MapSubNode.end() ){
+	NodeTrie<KeyType, DataType> * subnode;
+	if( found == node->_MapSubNode.end() ){
 	    //return if it does not exist
 	    return false;
 	}
@@ -114,11 +118,11 @@ public:
 	{
 	    subnode = found->second;
 	}
-	return Get( node, keys, data );
+	return Get( subnode, keys, data );
     }
 private:
-    NodeTrie _root;
-    NodeTrie * _proot;
-}
+    NodeTrie<KeyType, DataType> _root;
+    NodeTrie<KeyType, DataType> * _proot;
+};
 
 #endif

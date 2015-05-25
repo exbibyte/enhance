@@ -119,3 +119,6 @@ test_WingedEdge:
 test_WindowManager:
 	g++ -std=c++0x -g -DGLFW_INCLUDE_GLCOREARB ./test/ui/test_WindowManager.cpp -pthread $(src_folder_ui)/WindowManagerGlfw.cpp -I/usr/local/include -I$(inc_folder_ui) -I$(inc_folder_math) -I$(inc_folder_polymesh) -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework Core\
 Video -L/usr/local/lib -o $(build_dir)/test_WindowManager
+
+test_Trie:
+	g++ -std=c++0x -g -O0 ./test/graph/test_Trie.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_Trie

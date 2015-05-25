@@ -39,12 +39,16 @@ TEST_CASE( "Trie", "[Trie]" ) {
     
     queue< int > keys3;
     keys3.push(7);
-    
-    bRet = _trie.AddFromRoot( keys1, &test_callback1 );
+
+    std::function<bool(void)> f1 = test_callback1;
+    std::function<bool(void)> f2 = test_callback2;
+    std::function<bool(void)> f3 = test_callback3;
+            
+    bRet = _trie.AddFromRoot( keys1, f1 );
     CHECK( bRet );
-    bRet = _trie.AddFromRoot( keys2, &test_callback2 );
+    bRet = _trie.AddFromRoot( keys2, f2 );
     CHECK( bRet );
-    bRet = _trie.AddFromRoot( keys3, &test_callback3 );
+    bRet = _trie.AddFromRoot( keys3, f3 );
     CHECK( bRet );
     
     std::function<bool(void)> _f;
@@ -54,12 +58,12 @@ TEST_CASE( "Trie", "[Trie]" ) {
     bRet = _f();
     CHECK( bRet );
 
-    bRet = _trie.GetFromRoot( keys3, _f );
+    bRet = _trie.GetFromRoot( keys2, _f );
     CHECK( bRet );
     bRet = _f();
     CHECK( bRet );
 
-    bRet = _trie.GetFromRoot( keys2, _f );
+    bRet = _trie.GetFromRoot( keys3, _f );
     CHECK( bRet );
     bRet = _f();
     CHECK( !bRet );
@@ -82,6 +86,8 @@ TEST_CASE( "Trie", "[Trie]" ) {
     
     _trie.ClearAll();
 
+    std::function<bool(void)> _f;
+    
     bRet = _trie.GetFromRoot( keys1, _f );
     CHECK( !bRet );
     bRet = _trie.GetFromRoot( keys2, _f );
