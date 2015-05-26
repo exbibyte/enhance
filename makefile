@@ -117,7 +117,7 @@ test_WingedEdge:
 	g++ -std=c++0x -g -O0 ./test/polymesh/test_WingedEdge.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/WingedEdge.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -o $(build_dir)/test_WingedEdge
 
 test_WindowManager:
-	g++ -std=c++0x -g -DGLFW_INCLUDE_GLCOREARB ./test/ui/test_WindowManager.cpp -pthread $(src_folder_ui)/WindowManagerGlfw.cpp -I/usr/local/include -I$(inc_folder_ui) -I$(inc_folder_math) -I$(inc_folder_polymesh) -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework Core\
+	g++ -std=c++0x -g -DGLFW_INCLUDE_GLCOREARB ./test/ui/test_WindowManager.cpp -pthread $(src_folder_ui)/WindowManagerGlfw.cpp -I/usr/local/include -I$(inc_folder_ui) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_graph) -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework Core\
 Video -L/usr/local/lib -o $(build_dir)/test_WindowManager
 
 test_Trie:

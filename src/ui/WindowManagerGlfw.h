@@ -19,8 +19,8 @@ public:
     virtual bool SetFullScreen( bool bFullScreen );
     virtual bool CloseWindow();
     virtual bool GetCursorPos( double & xpos, double & ypos );    
-    virtual bool GetCursorState( KeyButtonWhich which, KeyButtonState & state );
-    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb );
+    virtual bool GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state );
+    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, std::function<bool(void)> cb );
     virtual bool ProcessKeyButtonCombo();
     
     //helpers
@@ -44,7 +44,7 @@ private:
     GLFWwindow * _Window;
     double _Mousex;
     double _Mousey;
-    Trie< pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, std::function<bool(void)> >_Trie;
+    Trie< std::pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, std::function<bool(void)> >_Trie;
 };
 
 #endif

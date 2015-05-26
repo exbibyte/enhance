@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <queue>
+#include <set>
 
 template< typename KeyType, typename DataType >
 class NodeTrie {
@@ -107,18 +108,19 @@ public:
 	    }
 	}	
 	KeyType current_key = keys.front();
-	keys.pop();	
+	keys.pop();
 	auto found = node->_MapSubNode.find( current_key );
 	NodeTrie<KeyType, DataType> * subnode;
 	if( found == node->_MapSubNode.end() ){	    
             if( !node->_is_data_valid ){
                 //return if it does not exist and current node doesn't contain valid data
                 return false;
-            }else{
+	    }else{
                 //return current node data if it is valid
-                data = node->_data;
+		data = node->_data;
                 return true;
-            }                
+            }
+		
 	}
 	else
 	{

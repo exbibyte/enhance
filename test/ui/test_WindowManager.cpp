@@ -37,15 +37,15 @@ static void error_callback(int error, const char* description)
 }
 
 bool test_key_callback0(){
-    cout<< "key press count: None" << endl;
+    cout << "callback 0" << endl;
     return true;
 }
-bool test_key_callback(){
-    cout<< "key press count: Two" << endl;
+bool test_key_callback1(){
+    cout << "callback 1" << endl;
     return true;
 }
 bool test_key_callback2(){
-    cout<< "key press count: 1" << endl;
+    cout << "callback 2" << endl;
     return true;
 }
 
@@ -79,25 +79,29 @@ int main(int argc, char **argv) {
 
   bRet = win_manager.GetWindow( window );
 
-  KeyButtonWhich key_a = KeyButtonWhich::KEY_A;
-  KeyButtonWhich key_space = KeyButtonWhich::KEY_SPC;
-  KeyButtonState state_a = KeyButtonState::DOWN;
-  KeyButtonState state_space = KeyButtonState::DOWN;
+  KeyButtonWhich::Enum key_a = KeyButtonWhich::KEY_A;
+  KeyButtonWhich::Enum key_space = KeyButtonWhich::KEY_SPC;
+  KeyButtonWhich::Enum key_j = KeyButtonWhich::KEY_J;
+  KeyButtonState::Enum state_a = KeyButtonState::DOWN;
+  KeyButtonState::Enum state_space = KeyButtonState::DOWN;
+  KeyButtonState::Enum state_j = KeyButtonState::DOWN;
 
-  map< KeyButtonWhich, KeyButtonState > map_key_combo;
-  map_key_combo[ key_a ] = state_a;
-  map_key_combo[ key_space ] = state_space;
-  std::function<bool(void)> key_cb = test_key_callback;
-  bRet = win_manager.SetKeyComboCallback( map_key_combo, key_cb );
-
-  map< KeyButtonWhich, KeyButtonState > map_key_combo2;
-  map_key_combo2[ key_a ] = state_a;
-  std::function<bool(void)> key_cb2 = test_key_callback2;
-  bRet = win_manager.SetKeyComboCallback( map_key_combo2, key_cb2 );
-
-  map< KeyButtonWhich, KeyButtonState > map_key_combo0;
   std::function<bool(void)> key_cb0 = test_key_callback0;
+  std::function<bool(void)> key_cb1 = test_key_callback1;
+  std::function<bool(void)> key_cb2 = test_key_callback2;
+    
+  map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo0;
+  map_key_combo0[ key_a ] = state_a;
+  map_key_combo0[ key_space ] = state_space;
   bRet = win_manager.SetKeyComboCallback( map_key_combo0, key_cb0 );
+
+  map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo1;
+  map_key_combo1[ key_space ] = state_space;
+//  bRet = win_manager.SetKeyComboCallback( map_key_combo1, key_cb1 );
+
+  map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo2;
+  map_key_combo2[ key_j ] = state_j;
+  bRet = win_manager.SetKeyComboCallback( map_key_combo2, key_cb2 );
 
   bRet = win_manager.SetDefaultCb();
   
@@ -111,8 +115,8 @@ int main(int argc, char **argv) {
   while (!glfwWindowShouldClose(window))
   {
       glfwPollEvents();
-      bRet = win_manager.ProcessKeyButtonCombo_Repeat();
-      //usleep(1000);
+      bRet = win_manager.ProcessKeyButtonCombo();
+      usleep(10000);
       //      glfwSwapBuffers(window);
   }
 

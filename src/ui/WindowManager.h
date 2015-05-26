@@ -5,8 +5,9 @@
 #include <functional>
 #include <bitset>
 #include <string>
+#include <vector>
 
-typedef struct KeyButtonWhich {
+struct KeyButtonWhich {
     enum Enum {
 	MOUSE_L = 0,
 	MOUSE_R,
@@ -21,19 +22,20 @@ typedef struct KeyButtonWhich {
 	KEY_L,
 	ENUM_COUNT
     };
-} KeyButtonWhich;
+};
 
-typedef struct KeyButtonState {
+struct KeyButtonState {
     enum  Enum {
 	UP = 0,
 	DOWN = 1,
 	REPEAT = 2,
 	ENUM_COUNT
-    }
-} KeyButtonState;
+    };
+};
 
 class KeyButtonData {
 public:
+    KeyButtonData(){}
     union {
 	struct {
 	    unsigned char mouse_l = 0;
@@ -59,17 +61,18 @@ public:
 
 class WindowManager{
 public:
-    WindowManager() : _iId(-1) {}
+    WindowManager() : _iId(-1) {
+	_KeyButtonDataCurrent.Clear();
+    }
     virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle )=0;
     virtual bool SetSize( unsigned int ui_width, unsigned int ui_height ) = 0;
     virtual bool GetSize( unsigned int & ui_width, unsigned int & ui_height ) = 0;
     virtual bool SetFullScreen( bool bFullScreen ) = 0;
     virtual bool CloseWindow() = 0;
     virtual bool GetCursorPos( double & xpos, double & ypos ) = 0;
-    virtual bool GetCursorState( KeyButtonWhich which, KeyButtonState & state ) = 0;
-    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ) = 0;
+    virtual bool GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state ) = 0;
+    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, std::function<bool(void)> cb ) = 0;
     virtual bool ProcessKeyButtonCombo() = 0;
-    virtual bool ProcessKeyButtonCombo_Repeat() = 0;
 
 protected:
     int _iId;

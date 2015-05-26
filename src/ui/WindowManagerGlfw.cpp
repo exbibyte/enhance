@@ -101,8 +101,8 @@ bool WindowManagerGlfw::SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyB
           }
         );
     queue<pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_queue;
-    for( auto & i : combo_pairs ){
-        combo_queue.push( i );        
+    for( auto i : combo_pairs ){
+        combo_queue.push( i );
     }
     //add to trie
     _Trie.AddFromRoot( combo_queue, cb );    
@@ -162,13 +162,13 @@ bool WindowManagerGlfw::ProcessKeyButtonCombo(){
     
     for( int i = 0; i < KeyButtonWhich::ENUM_COUNT; i++ ){
         //check if state is flagged
-        if( _KeyButtonDataCurrent.Array[ i ] ){
-            KeyButtonWhich::Enum which_key = static_cast<KeyButtonWhich::Enum>( i );
+        if( 1 < _KeyButtonDataCurrent.Array[ i ] ){
+            KeyButtonWhich::Enum which_key = (KeyButtonWhich::Enum)i;
             pair<KeyButtonWhich::Enum, KeyButtonState::Enum> active = make_pair( which_key, KeyButtonState::DOWN );
             combo_queue.push( active );
         }
         //clear state
-        _KeyButtonDataCurrent[ i ] = 0;
+        //_KeyButtonDataCurrent.Array[ i ] = 0;
     }
     //clear current state of keys and buttons
     //_KeyButtonDataCurrent.Clear();
@@ -214,7 +214,7 @@ void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int sca
     }
     WindowManagerGlfw * instance = it->second;
     //get key
-    KeyButtonWhich which;
+    KeyButtonWhich::Enum which;
     switch( key ){
     case GLFW_KEY_W:
 	which = KeyButtonWhich::KEY_W;
@@ -243,22 +243,34 @@ void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int sca
     default:
         return;
     }
-    KeyButtonState state;
+    KeyButtonState::Enum state;
     bool bRepeat = false;
     switch( action ){
     case GLFW_PRESS:
 	state = KeyButtonState::DOWN;
 	break;
     case GLFW_RELEASE:
-	state = KeyButtonState::UP;
+	state = KeyButtonState::UP;	
 	break;	
     default:      
       //GLFW_REPEAT case
       state = KeyButtonState::REPEAT;
     }
     //save state
-    unsigned char val = 1 << state;
-    instance->_KeyButtonDataCurrent.Array[ which ] |= val;    
+    unsigned char val = 1 << static_cast<int>(state);
+    int index = (int) which;
+    instance->_KeyButtonDataCurrent.Array[ index ] |= val;
+    //clear other state(s)
+    if( KeyButtonState::UP == state ){
+	val = 1 << static_cast<int>(KeyButtonState::REPEAT);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;
+	val = 1 << static_cast<int>(KeyButtonState::DOWN);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;	
+    }
+    else if( KeyButtonState::DOWN == state ){
+	val = 1 << static_cast<int>(KeyButtonState::UP);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;
+    }
 }
 void WindowManagerGlfw::ProcessMouseButtonCb( GLFWwindow * window, int button, int action, int mode ){
     auto it = _MapInstance.find( window );
