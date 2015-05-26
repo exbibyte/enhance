@@ -2,9 +2,12 @@
 #define WINDOW_MANAGER_GLFW_H
 
 #include <vector>
-#include <WindowManager.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <functional>
+
+#include "WindowManager.h"
+#include "Trie.h"
 
 class WindowManagerGlfw : public WindowManager{
 public:
@@ -37,10 +40,11 @@ public:
     static void ProcessMouseButtonCb( GLFWwindow * window, int button, int action, int mode );
     static void ProcessScrollCb( GLFWwindow*, double xoffset, double yoffset );
 
-private:
+private:    
     GLFWwindow * _Window;
     double _Mousex;
     double _Mousey;
+    Trie< pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, std::function<bool(void)> >_Trie;
 };
 
 #endif

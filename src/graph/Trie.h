@@ -110,9 +110,15 @@ public:
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
 	NodeTrie<KeyType, DataType> * subnode;
-	if( found == node->_MapSubNode.end() ){
-	    //return if it does not exist
-	    return false;
+	if( found == node->_MapSubNode.end() ){	    
+            if( !node->_is_data_valid ){
+                //return if it does not exist and current node doesn't contain valid data
+                return false;
+            }else{
+                //return current node data if it is valid
+                data = node->_data;
+                return true;
+            }                
 	}
 	else
 	{

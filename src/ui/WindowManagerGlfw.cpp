@@ -6,6 +6,10 @@
 #include <bitset>
 #include <mutex>
 #include <string>
+#include <algorithm>
+#include <utility>
+#include <iterator>
+#include <queue>
 
 using namespace std;
 
@@ -79,7 +83,7 @@ bool WindowManagerGlfw::GetCursorPos( double & xpos, double & ypos ){
     glfwGetCursorPos( window, &xpos, &ypos );
     return true;
 }
-bool WindowManagerGlfw::GetCursorState( KeyButtonWhich which, KeyButtonState & state ){
+bool WindowManagerGlfw::GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state ){
     GLFWwindow * window;
     if( !GetWindow( window ) )
     {
@@ -87,12 +91,21 @@ bool WindowManagerGlfw::GetCursorState( KeyButtonWhich which, KeyButtonState & s
     }
     return true;
 }
-bool WindowManagerGlfw::SetKeyComboCallback( std::map<KeyButtonWhich, KeyButtonState> combo, std::function<bool(void)> cb ){
-    //TODO: save callback into a trie data structure
-    for( auto i : combo ){
-	unsigned int button_type = i.first;
-	unsigned char val = 1 << i.second;	
+bool WindowManagerGlfw::SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, std::function<bool(void)> cb ){
+    //sort
+    vector< pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_pairs;
+    std::copy( combo.begin(), combo.end(), back_inserter( combo_pairs ) );
+    sort( combo_pairs.begin(), combo_pairs.end(),
+          []( const pair<KeyButtonWhich::Enum, KeyButtonState::Enum> & p1, const pair<KeyButtonWhich::Enum, KeyButtonState::Enum> & p2 )->bool {
+              return p1.first < p2.first;
+          }
+        );
+    queue<pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_queue;
+    for( auto & i : combo_pairs ){
+        combo_queue.push( i );        
     }
+    //add to trie
+    _Trie.AddFromRoot( combo_queue, cb );    
     return true;
 }
 bool WindowManagerGlfw::GetWindow( GLFWwindow * & window ){
@@ -145,13 +158,29 @@ bool WindowManagerGlfw::SetCallbackScroll( void(*cb)( GLFWwindow*, double xoffse
 }
 bool WindowManagerGlfw::ProcessKeyButtonCombo(){
     //copy current state of keys and buttons
+    queue<pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_queue;
     
+    for( int i = 0; i < KeyButtonWhich::ENUM_COUNT; i++ ){
+        //check if state is flagged
+        if( _KeyButtonDataCurrent.Array[ i ] ){
+            KeyButtonWhich::Enum which_key = static_cast<KeyButtonWhich::Enum>( i );
+            pair<KeyButtonWhich::Enum, KeyButtonState::Enum> active = make_pair( which_key, KeyButtonState::DOWN );
+            combo_queue.push( active );
+        }
+        //clear state
+        _KeyButtonDataCurrent[ i ] = 0;
+    }
     //clear current state of keys and buttons
-    _KeyButtonDataCurrent.Clear();
+    //_KeyButtonDataCurrent.Clear();
+    
     //TODO: find key combinations and get callback
-    //call callback
-    //std::function<bool(void)> cb;
-    //cb();
+    //get and call callback
+    std::function<bool(void)> cb;
+    bool bRet = _Trie.GetFromRoot( combo_queue, cb );
+    if( bRet ){
+        //call callback function if found
+        cb();
+    }    
     return true;
 }
 bool WindowManagerGlfw::SetDefaultCb(){
@@ -238,7 +267,7 @@ void WindowManagerGlfw::ProcessMouseButtonCb( GLFWwindow * window, int button, i
     }
     WindowManagerGlfw * instance = it->second;
     //get key
-    KeyButtonWhich which;
+    KeyButtonWhich::Enum which;
     switch( button ){
     case GLFW_MOUSE_BUTTON_LEFT:
 	which = KeyButtonWhich::MOUSE_L;
@@ -252,7 +281,7 @@ void WindowManagerGlfw::ProcessMouseButtonCb( GLFWwindow * window, int button, i
     default:
         return;
     }
-    KeyButtonState state;
+    KeyButtonState::Enum state;
     switch( action ){
     case GLFW_PRESS:
 	state = KeyButtonState::DOWN;	
