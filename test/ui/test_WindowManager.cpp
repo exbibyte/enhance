@@ -36,18 +36,21 @@ static void error_callback(int error, const char* description)
     fputs(description, stderr);
 }
 
-bool test_key_callback0(){
-    cout << "callback 0" << endl;
-    return true;
-}
-bool test_key_callback1(){
-    cout << "callback 1" << endl;
-    return true;
-}
-bool test_key_callback2(){
-    cout << "callback 2" << endl;
-    return true;
-}
+class test_callback_class {
+public:
+    bool test_key_callback0(){
+	cout << "callback 0" << endl;
+	return true;
+    }
+    bool test_key_callback1(){
+	cout << "callback 1" << endl;
+	return true;
+    }
+    bool test_key_callback2(){
+	cout << "callback 2" << endl;
+	return true;
+    }
+};
 
 int main(int argc, char **argv) {
 
@@ -86,9 +89,11 @@ int main(int argc, char **argv) {
   KeyButtonState::Enum state_space = KeyButtonState::DOWN;
   KeyButtonState::Enum state_j = KeyButtonState::DOWN;
 
-  std::function<bool(void)> key_cb0 = test_key_callback0;
-  std::function<bool(void)> key_cb1 = test_key_callback1;
-  std::function<bool(void)> key_cb2 = test_key_callback2;
+  test_callback_class _cbs;
+  
+  std::function<bool(void)> key_cb0 = bind( &test_callback_class::test_key_callback0, &_cbs );
+  std::function<bool(void)> key_cb1 = bind( &test_callback_class::test_key_callback1, &_cbs );
+  std::function<bool(void)> key_cb2 = bind( &test_callback_class::test_key_callback2, &_cbs );
     
   map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo0;
   map_key_combo0[ key_a ] = state_a;
@@ -97,7 +102,7 @@ int main(int argc, char **argv) {
 
   map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo1;
   map_key_combo1[ key_space ] = state_space;
-//  bRet = win_manager.SetKeyComboCallback( map_key_combo1, key_cb1 );
+  bRet = win_manager.SetKeyComboCallback( map_key_combo1, key_cb1 );
 
   map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo2;
   map_key_combo2[ key_j ] = state_j;
@@ -116,7 +121,7 @@ int main(int argc, char **argv) {
   {
       glfwPollEvents();
       bRet = win_manager.ProcessKeyButtonCombo();
-      usleep(10000);
+      //usleep(10000);
       //      glfwSwapBuffers(window);
   }
 

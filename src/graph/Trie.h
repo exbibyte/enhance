@@ -119,8 +119,7 @@ public:
                 //return current node data if it is valid
 		data = node->_data;
                 return true;
-            }
-		
+            }		
 	}
 	else
 	{

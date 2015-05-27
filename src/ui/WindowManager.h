@@ -35,26 +35,28 @@ struct KeyButtonState {
 
 class KeyButtonData {
 public:
-    KeyButtonData(){}
     union {
 	struct {
-	    unsigned char mouse_l = 0;
-	    unsigned char mouse_r = 0;
-	    unsigned char mouse_m = 0;
-	    unsigned char key_w = 0;
-	    unsigned char key_a = 0;
-	    unsigned char key_s = 0;
-	    unsigned char key_d = 0;
-	    unsigned char key_spc = 0;
-	    unsigned char key_j = 0;
-	    unsigned char key_k = 0;
-	    unsigned char key_l = 0;
+	    unsigned char mouse_l;
+	    unsigned char mouse_r;
+	    unsigned char mouse_m;
+	    unsigned char key_w;
+	    unsigned char key_a;
+	    unsigned char key_s;
+	    unsigned char key_d;
+	    unsigned char key_spc;
+	    unsigned char key_j;
+	    unsigned char key_k;
+	    unsigned char key_l;
 	} Single;
 	unsigned char Array [ KeyButtonWhich::ENUM_COUNT ];
     };
+    KeyButtonData(){
+	Clear();
+    }
     void Clear(){
-	for( auto i : Array ){
-	    i = 0;
+	for( int i = 0; i < KeyButtonWhich::ENUM_COUNT; i++ ){
+	    Array[i] = 0;
 	}
     }
 };
