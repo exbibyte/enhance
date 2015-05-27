@@ -158,29 +158,34 @@ bool WindowManagerGlfw::SetCallbackScroll( void(*cb)( GLFWwindow*, double xoffse
 }
 bool WindowManagerGlfw::ProcessKeyButtonCombo(){
     //copy current state of keys and buttons
-    queue<pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_queue;
+//    queue<pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_queue;
+
+    set< pair<KeyButtonWhich::Enum, KeyButtonState::Enum> > combo_set;
     
     for( int i = 0; i < KeyButtonWhich::ENUM_COUNT; i++ ){
         //check if state is flagged
         if( 1 < _KeyButtonDataCurrent.Array[ i ] ){
             KeyButtonWhich::Enum which_key = (KeyButtonWhich::Enum)i;
             pair<KeyButtonWhich::Enum, KeyButtonState::Enum> active = make_pair( which_key, KeyButtonState::DOWN );
-            combo_queue.push( active );
+//            combo_queue.push( active );
+	    combo_set.insert( active );
         }
-        //clear state
-        //_KeyButtonDataCurrent.Array[ i ] = 0;
     }
-    //clear current state of keys and buttons
-    //_KeyButtonDataCurrent.Clear();
+    //find key combinations and get callback
+    //std::function<bool(void)> cb;
+    // bool bRet = _Trie.GetFromRoot( combo_queue, cb );
+    // if( bRet ){
+    //     //call callback function if found
+    //     cb();
+    // }
+
+    vector< std::function<bool(void)> > cb_vec;
+    _Trie.GetPartialFromRoot( combo_set, cb_vec );
+
+    for( auto & i_cb : cb_vec ){
+	i_cb();
+    }
     
-    //TODO: find key combinations and get callback
-    //get and call callback
-    std::function<bool(void)> cb;
-    bool bRet = _Trie.GetFromRoot( combo_queue, cb );
-    if( bRet ){
-        //call callback function if found
-        cb();
-    }    
     return true;
 }
 bool WindowManagerGlfw::SetDefaultCb(){

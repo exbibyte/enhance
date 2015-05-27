@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "Trie.h"
+
 struct KeyButtonWhich {
     enum Enum {
 	MOUSE_L = 0,
@@ -61,6 +63,7 @@ public:
     }
 };
 
+template< typename Cb_Type >
 class WindowManager{
 public:
     WindowManager() : _iId(-1) {
@@ -73,12 +76,13 @@ public:
     virtual bool CloseWindow() = 0;
     virtual bool GetCursorPos( double & xpos, double & ypos ) = 0;
     virtual bool GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state ) = 0;
-    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, std::function<bool(void)> cb ) = 0;
+    virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, Cb_Type cb ) = 0;
     virtual bool ProcessKeyButtonCombo() = 0;
 
 protected:
     int _iId;
-    //TODO: add trie data structure for storing combo key callbacks
+    //trie data structure for storing callbacks/data
+    Trie< std::pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, Cb_Type >_Trie;
     KeyButtonData _KeyButtonDataCurrent; //saves current state of keys and buttons
 };
 

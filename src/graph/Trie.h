@@ -95,7 +95,7 @@ public:
 	node->_MapSubNode.clear();
 	delete node;
         node = 0;
-    }
+    }    
     bool Get( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType & data ){
 	if( keys.empty() ){
 	    //return data
@@ -126,6 +126,33 @@ public:
 	    subnode = found->second;
 	}
 	return Get( subnode, keys, data );
+    }
+    void GetPartialFromRoot( std::set< KeyType > keys, std::vector< DataType > & data ){
+	data.clear();
+	GetPartial( _proot, keys, data );
+    }
+    void GetPartial( NodeTrie<KeyType, DataType> * node, std::set< KeyType > keys, std::vector< DataType > & data ){
+	if( node->_is_data_valid ){
+	    //save data if node stores valid data
+	    data.push_back( node->_data );
+	}
+	if( keys.empty() ){	    
+	    return;
+	}
+	//find if key(s) to next sub-branch(es) exist
+	for( auto i : node->_MapSubNode ){
+	    KeyType search_key = i.first;
+	    std::set< KeyType > keys_copy = keys;
+	    auto j = keys_copy.find( search_key );
+	    if( j != keys_copy.end() ){
+		//found, remove the found key in set
+		KeyType found_key = *j;
+		keys_copy.erase(j);
+		//search in sub-branch
+		NodeTrie<KeyType, DataType> * subnode = i.second;
+		GetPartial( subnode, keys_copy, data );
+	    }
+	}
     }
 private:
     NodeTrie<KeyType, DataType> _root;

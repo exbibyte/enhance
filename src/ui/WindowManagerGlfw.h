@@ -7,9 +7,8 @@
 #include <functional>
 
 #include "WindowManager.h"
-#include "Trie.h"
 
-class WindowManagerGlfw : public WindowManager{
+class WindowManagerGlfw : public WindowManager< std::function<bool(void)> > {
 public:
     WindowManagerGlfw();
     //base implementation
@@ -31,8 +30,6 @@ public:
     bool SetCallbackMouseButton( void(*cb)( GLFWwindow*, int button, int action, int mode ) );
     bool SetCallbackScroll( void(*cb)( GLFWwindow*, double xoffset, double yoffset ) );
     bool SetDefaultCb();
-
-    static std::map< GLFWwindow *, WindowManagerGlfw * > _MapInstance;
     
     //default key and button callbacks
     static void ProcessMouseMoveCb( GLFWwindow * window, double xpos, double ypos );
@@ -44,7 +41,7 @@ private:
     GLFWwindow * _Window;
     double _Mousex;
     double _Mousey;
-    Trie< std::pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, std::function<bool(void)> >_Trie;
+    static std::map< GLFWwindow *, WindowManagerGlfw * > _MapInstance;
 };
 
 #endif
