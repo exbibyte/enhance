@@ -18,7 +18,7 @@ map< GLFWwindow *, WindowManagerGlfw * > WindowManagerGlfw::_MapInstance;
 WindowManagerGlfw::WindowManagerGlfw() : WindowManager() {
     _Window = nullptr;    
 }
-bool WindowManagerGlfw::CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, string const strTitle ){
+bool WindowManagerGlfw::CreateWindow( int iId, unsigned int ui_width, unsigned int ui_height, string const strTitle ){
     if( _iId == iId || _iId >= 0){
 	return false;
     }
