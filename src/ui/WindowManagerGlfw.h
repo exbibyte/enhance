@@ -20,7 +20,11 @@ public:
     virtual bool GetCursorPos( double & xpos, double & ypos );    
     virtual bool GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state );
     virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, std::function<bool(void)> cb );
+    virtual bool SetMouseMoveCallback( std::function<bool(int,int)> cb );
+    virtual bool SetScrollCallback( std::function<bool(int,int)> cb );
     virtual bool ProcessKeyButtonCombo();
+    virtual bool ProcessMouseMoveCombo();
+    virtual bool ProcessScrollCombo();
     
     //helpers
     bool GetWindow( GLFWwindow * & win );
@@ -41,6 +45,10 @@ private:
     GLFWwindow * _Window;
     double _Mousex;
     double _Mousey;
+    bool _bMouseMoved;
+    double _Scrollx;
+    double _Scrolly;
+    bool _bScrolled;
     static std::map< GLFWwindow *, WindowManagerGlfw * > _MapInstance;
 };
 

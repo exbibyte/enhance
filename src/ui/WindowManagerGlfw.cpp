@@ -16,7 +16,11 @@ using namespace std;
 map< GLFWwindow *, WindowManagerGlfw * > WindowManagerGlfw::_MapInstance;
 
 WindowManagerGlfw::WindowManagerGlfw() : WindowManager() {
-    _Window = nullptr;    
+    _Window = nullptr;
+    _Cb_MouseMove = nullptr;
+    _Cb_Scroll = nullptr;
+    _bMouseMoved = false;
+    _bScrolled = false;
 }
 bool WindowManagerGlfw::CreateWindow( int iId, unsigned int ui_width, unsigned int ui_height, string const strTitle ){
     if( _iId == iId || _iId >= 0){
@@ -108,6 +112,14 @@ bool WindowManagerGlfw::SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyB
     _Trie.AddFromRoot( combo_queue, cb );    
     return true;
 }
+bool WindowManagerGlfw::SetMouseMoveCallback( std::function<bool(int,int)> cb ){
+    _Cb_MouseMove = cb;
+    return true;
+}
+bool WindowManagerGlfw::SetScrollCallback( std::function<bool(int,int)> cb ){
+    _Cb_Scroll = cb;
+    return true;
+}
 bool WindowManagerGlfw::GetWindow( GLFWwindow * & window ){
     if( !_Window ){
         return false;
@@ -188,19 +200,33 @@ bool WindowManagerGlfw::ProcessKeyButtonCombo(){
     
     return true;
 }
+bool WindowManagerGlfw::ProcessMouseMoveCombo(){
+    if( _bMouseMoved && nullptr != _Cb_MouseMove ){
+	_bMouseMoved = false;
+	_Cb_MouseMove( _Mousex, _Mousey );
+    }
+    return true;
+}
+bool WindowManagerGlfw::ProcessScrollCombo(){
+    if( _bScrolled && nullptr != _Cb_Scroll ){
+	_bScrolled = false;
+	_Cb_Scroll( _Scrollx, _Scrolly );
+    }
+    return true;
+}
 bool WindowManagerGlfw::SetDefaultCb(){
     if( !SetCallbackKeyboard( &ProcessKeyboardCb ) ){
 	return false;
     }
-//     if( !SetCallbackMouseMove( &ProcessMouseMoveCb ) ){
-// 	return false;
-//     }
-//     if( !SetCallbackMouseButton( &ProcessMouseButtonCb ) ){
-// 	return false;
-//     }
-//     if( !SetCallbackScroll( &ProcessScrollCb ) ){
-// 	return false;
-//     }
+    if( !SetCallbackMouseMove( &ProcessMouseMoveCb ) ){
+	return false;
+    }
+    if( !SetCallbackMouseButton( &ProcessMouseButtonCb ) ){
+	return false;
+    }
+    if( !SetCallbackScroll( &ProcessScrollCb ) ){
+	return false;
+    }
     return true;
 }
 void WindowManagerGlfw::ProcessMouseMoveCb( GLFWwindow * window, double xpos, double ypos ){
@@ -211,6 +237,7 @@ void WindowManagerGlfw::ProcessMouseMoveCb( GLFWwindow * window, double xpos, do
     WindowManagerGlfw * instance = it->second;
     instance->_Mousex = xpos;
     instance->_Mousey = ypos;
+    instance->_bMouseMoved = true;
 }
 void WindowManagerGlfw::ProcessKeyboardCb( GLFWwindow * window, int key, int scancode, int action, int mode ){
     auto it = _MapInstance.find( window );
@@ -311,9 +338,28 @@ void WindowManagerGlfw::ProcessMouseButtonCb( GLFWwindow * window, int button, i
 	state = KeyButtonState::REPEAT;
     }
     //save state
-    unsigned char val = 1 << state;
-    instance->_KeyButtonDataCurrent.Array[ which ] |= val;
+    unsigned char val = 1 << static_cast<int>(state);
+    int index = (int) which;
+    instance->_KeyButtonDataCurrent.Array[ index ] |= val;
+    //clear other state(s)
+    if( KeyButtonState::UP == state ){
+	val = 1 << static_cast<int>(KeyButtonState::REPEAT);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;
+	val = 1 << static_cast<int>(KeyButtonState::DOWN);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;	
+    }
+    else if( KeyButtonState::DOWN == state ){
+	val = 1 << static_cast<int>(KeyButtonState::UP);
+	instance->_KeyButtonDataCurrent.Array[ index ] &= ~val;
+    }
 }
-void WindowManagerGlfw::ProcessScrollCb( GLFWwindow*, double xoffset, double yoffset ){
-    
+void WindowManagerGlfw::ProcessScrollCb( GLFWwindow * window, double xoffset, double yoffset ){
+    auto it = _MapInstance.find( window );
+    if( it == _MapInstance.end() ){
+        return;
+    }
+    WindowManagerGlfw * instance = it->second;
+    instance->_Scrollx = xoffset;
+    instance->_Scrolly = yoffset;
+    instance->_bScrolled = true;
 }
