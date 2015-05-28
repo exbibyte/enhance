@@ -159,6 +159,7 @@ int main(int argc, char **argv) {
       glfwPollEvents();
       bRet = win_manager.ProcessKeyButtonCombo();
       bRet = win_manager.ProcessMouseMoveCombo();
+      bRet = win_manager.ProcessScrollCombo();
       //usleep(10000);
       //      glfwSwapBuffers(window);
   }
