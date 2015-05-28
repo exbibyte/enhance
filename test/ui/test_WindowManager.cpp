@@ -50,6 +50,22 @@ public:
 	cout << "callback 2" << endl;
 	return true;
     }
+    bool test_mousebutton_callback0(){
+	cout << "mouse button 0" << endl;
+	return true;
+    }
+    bool test_mousebutton_callback1(){
+	cout << "mouse button 1" << endl;
+	return true;
+    }
+    bool test_mousemove_callback( int x, int y ){
+	cout << "mouse move: " << x <<", " << y << endl;
+	return true;
+    }
+    bool test_scroll_callback( int x, int y ){
+	cout << "scroll: " << x <<", " << y << endl;
+	return true;
+    }
 };
 
 int main(int argc, char **argv) {
@@ -85,15 +101,22 @@ int main(int argc, char **argv) {
   KeyButtonWhich::Enum key_a = KeyButtonWhich::KEY_A;
   KeyButtonWhich::Enum key_space = KeyButtonWhich::KEY_SPC;
   KeyButtonWhich::Enum key_j = KeyButtonWhich::KEY_J;
+  KeyButtonWhich::Enum mouse_l = KeyButtonWhich::MOUSE_L;
+  KeyButtonWhich::Enum mouse_r = KeyButtonWhich::MOUSE_R;
+  
   KeyButtonState::Enum state_a = KeyButtonState::DOWN;
   KeyButtonState::Enum state_space = KeyButtonState::DOWN;
   KeyButtonState::Enum state_j = KeyButtonState::DOWN;
-
+  KeyButtonState::Enum state_mouse_l = KeyButtonState::DOWN;
+  KeyButtonState::Enum state_mouse_r = KeyButtonState::DOWN;
+  
   test_callback_class _cbs;
   
   std::function<bool(void)> key_cb0 = bind( &test_callback_class::test_key_callback0, &_cbs );
   std::function<bool(void)> key_cb1 = bind( &test_callback_class::test_key_callback1, &_cbs );
   std::function<bool(void)> key_cb2 = bind( &test_callback_class::test_key_callback2, &_cbs );
+  std::function<bool(void)> mousebutton_cb0 = bind( &test_callback_class::test_mousebutton_callback0, &_cbs );
+  std::function<bool(void)> mousebutton_cb1 = bind( &test_callback_class::test_mousebutton_callback1, &_cbs );
     
   map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_key_combo0;
   map_key_combo0[ key_a ] = state_a;
@@ -108,6 +131,20 @@ int main(int argc, char **argv) {
   map_key_combo2[ key_j ] = state_j;
   bRet = win_manager.SetKeyComboCallback( map_key_combo2, key_cb2 );
 
+  map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_mousebutton_combo0;
+  map_mousebutton_combo0[ mouse_l ] = state_mouse_l;
+  bRet = win_manager.SetKeyComboCallback( map_mousebutton_combo0, mousebutton_cb0 );
+
+  map< KeyButtonWhich::Enum, KeyButtonState::Enum > map_mousebutton_combo1;
+  map_mousebutton_combo1[ mouse_r ] = state_mouse_r;
+  bRet = win_manager.SetKeyComboCallback( map_mousebutton_combo1, mousebutton_cb1 );
+
+  std::function<bool(int,int)> mouse_move_cb = bind( &test_callback_class::test_mousemove_callback, &_cbs, std::placeholders::_1, std::placeholders::_2 );
+  bRet = win_manager.SetMouseMoveCallback( mouse_move_cb );
+
+  std::function<bool(int,int)> scroll_cb = bind( &test_callback_class::test_scroll_callback, &_cbs, std::placeholders::_1, std::placeholders::_2 );
+  bRet = win_manager.SetScrollCallback( scroll_cb );
+  
   bRet = win_manager.SetDefaultCb();
   
   glfwMakeContextCurrent(window);
@@ -121,6 +158,7 @@ int main(int argc, char **argv) {
   {
       glfwPollEvents();
       bRet = win_manager.ProcessKeyButtonCombo();
+      bRet = win_manager.ProcessMouseMoveCombo();
       //usleep(10000);
       //      glfwSwapBuffers(window);
   }

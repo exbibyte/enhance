@@ -77,13 +77,19 @@ public:
     virtual bool GetCursorPos( double & xpos, double & ypos ) = 0;
     virtual bool GetCursorState( KeyButtonWhich::Enum which, KeyButtonState::Enum & state ) = 0;
     virtual bool SetKeyComboCallback( std::map<KeyButtonWhich::Enum, KeyButtonState::Enum> combo, Cb_Type cb ) = 0;
+    virtual bool SetMouseMoveCallback( std::function<bool(int,int)> cb ) = 0;
+    virtual bool SetScrollCallback( std::function<bool(int,int)> cb ) = 0;
     virtual bool ProcessKeyButtonCombo() = 0;
+    virtual bool ProcessMouseMoveCombo() = 0;
+    virtual bool ProcessScrollCombo() = 0;
 
 protected:
     int _iId;
     //trie data structure for storing callbacks/data
     Trie< std::pair<KeyButtonWhich::Enum, KeyButtonState::Enum>, Cb_Type >_Trie;
     KeyButtonData _KeyButtonDataCurrent; //saves current state of keys and buttons
+    std::function<bool(int,int)> _Cb_MouseMove;
+    std::function<bool(int,int)> _Cb_Scroll;
 };
 
 #endif
