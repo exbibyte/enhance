@@ -69,7 +69,7 @@ public:
     WindowManager() : _iId(-1) {
 	_KeyButtonDataCurrent.Clear();
     }
-    virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle )=0;
+    virtual bool CreateWindow( int iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle )=0;
     virtual bool SetSize( unsigned int ui_width, unsigned int ui_height ) = 0;
     virtual bool GetSize( unsigned int & ui_width, unsigned int & ui_height ) = 0;
     virtual bool SetFullScreen( bool bFullScreen ) = 0;

@@ -12,7 +12,7 @@ class WindowManagerGlfw : public WindowManager< std::function<bool(void)> > {
 public:
     WindowManagerGlfw();
     //base implementation
-    virtual bool CreateWindow( int & iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle );
+    virtual bool CreateWindow( int iId, unsigned int ui_width, unsigned int ui_height, std::string const strTitle );
     virtual bool SetSize( unsigned int ui_width, unsigned int ui_height );
     virtual bool GetSize( unsigned int & ui_width, unsigned int & ui_height );
     virtual bool SetFullScreen( bool bFullScreen );
