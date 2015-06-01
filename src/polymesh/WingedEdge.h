@@ -22,19 +22,21 @@ namespace Winged_Edge {
     class Edge {
     public:
 	int data;
+	Vec magnitude;
 	WingedEdge * WEdge;
     };
   
     class Face {
     public:
 	int data;
+	Vec normal;
 	std::set< WingedEdge * > Neighbour_WEdges;
     };
   
     class Vertex {
     public:
 	int data;
-	Vec v;
+	Vec pos;
 	std::set< WingedEdge * > Neighbour_WEdges;
     };
   
@@ -104,5 +106,10 @@ namespace Winged_Edge {
     bool GetAllLinked( WingedEdge * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
     bool GetAllLinked( Face * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
     bool GetAllLinked( Vertex * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
+
+    // gets triangles back in a contiguous array
+    bool GetTriangles( std::set< Face * > faces, std::vector< Vec * > & vertices_pos, std::vector< Vec * > & vertices_normal ){ return false; }
+    //update face normal from associated vertices
+    bool UpdateFaceNormal( Face * face, Vec & normal ){ return false; }
 }
 #endif
