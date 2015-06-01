@@ -30,6 +30,7 @@ namespace Winged_Edge {
     public:
 	int data;
 	Vec normal;
+	bool bIsCCW;
 	std::set< WingedEdge * > Neighbour_WEdges;
     };
   
@@ -65,7 +66,7 @@ namespace Winged_Edge {
     };
 
     typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
-    typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool > > MapFace;
+    typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool/*isCW*/ > > MapFace;
 
     bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
     bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );
@@ -108,8 +109,8 @@ namespace Winged_Edge {
     bool GetAllLinked( Vertex * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
 
     // gets triangles back in a contiguous array
-    bool GetTriangles( std::set< Face * > faces, std::vector< Vec * > & vertices_pos, std::vector< Vec * > & vertices_normal ){ return false; }
+    bool GetTriangles( std::set< Face * > faces, std::vector< Vec > & vertices_pos, std::vector< Vec > & vertices_normal );
     //update face normal from associated vertices
-    bool UpdateFaceNormal( Face * face, Vec & normal ){ return false; }
+    bool UpdateFaceNormal( Face * face, Vec & normal );
 }
 #endif

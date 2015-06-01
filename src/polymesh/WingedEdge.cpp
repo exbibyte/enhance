@@ -140,11 +140,12 @@ namespace Winged_Edge {
 	//for each face
 	for( auto i : map_face ){
 	    Face * face = i.first;
-	    //get vertices of the face, assuming CCW order
+	    //get vertices of the face, and CCW/CW order
 	    Vertex * v1 = std::get<0>( i.second );
 	    Vertex * v2 = std::get<1>( i.second );
 	    Vertex * v3 = std::get<2>( i.second );
 	    bool bClockWise = std::get<3>( i.second );
+	    face->bIsCCW = !bClockWise;
 	    auto e1 = std::make_pair( v1, v2 );
 	    auto e2 = std::make_pair( v2, v3 );
 	    auto e3 = std::make_pair( v3, v1 );
@@ -200,7 +201,7 @@ namespace Winged_Edge {
 			prev = triangle_winged_edges.end()-1;
 		    }
 		    winged_edge->E_CW_Next = next->first;
-		    winged_edge->E_CW_Prev = prev->first;
+		    winged_edge->E_CW_Prev = prev->first;		    
 		}else{
 		    auto next = j+1;
 		    if( next == triangle_winged_edges.end() ){
@@ -211,7 +212,7 @@ namespace Winged_Edge {
 			prev = triangle_winged_edges.end()-1;
 		    }
 		    winged_edge->E_CCW_Next = next->first;
-		    winged_edge->E_CCW_Prev = prev->first;
+		    winged_edge->E_CCW_Prev = prev->first;		    
 		}
 	    }   
 	}
@@ -525,5 +526,77 @@ namespace Winged_Edge {
 	auto i = neighbour_edges.begin();
 	WingedEdge * edge = *i;
 	return GetAllLinked( edge, faces, WEdges, vertices );
+    }
+
+    bool GetTriangles( std::set< Face * > faces, std::vector< Vec > & vertices_pos, std::vector< Vec > & vertices_normal ){
+	vertices_normal.clear();
+	vertices_pos.clear();
+	for( auto i : faces ){
+	    Vec normal;
+	    if( !UpdateFaceNormal( i, normal ) ){
+		return false;
+	    }
+	    set< WingedEdge * > edges;
+	    Get_Face_Neighbour_WingedEdges( i, edges );
+	    if( edges.empty() ){
+		return false;
+	    }	    
+	    auto j = edges.begin();
+	    WingedEdge * WEdge = *j;
+	    Vertex * vertex_start = WEdge->V_Start;
+	    for( int k = 0; k < 3; k++ ){
+		Vertex * vertex = WEdge->V_Start;
+		vertices_pos.push_back( vertex->pos ); //save position of each vertex
+		//go to next vertex based on CCW/CW order
+		if( i->bIsCCW ){
+		    WEdge = WEdge->E_CCW_Next;
+		}else{
+		    WEdge = WEdge->E_CW_Next;
+		}
+	    }
+	    if( WEdge->V_Start != vertex_start ){
+		//not a valid triangle
+		return false;
+	    }
+	    //update normals using a face normal obtained earlier
+	    for( int k = 0; k < 3; k++ ){		
+		vertices_normal.push_back( normal ); //save normal of each vertex
+	    }
+	}
+	return true;
+    }
+    bool UpdateFaceNormal( Face * face, Vec & normal ){
+	set< WingedEdge * > edges;
+	Get_Face_Neighbour_WingedEdges( face, edges );
+	if( edges.empty() ){
+	    return false;
+	}
+	auto j = edges.begin();
+	WingedEdge * WEdge = *j;
+	Vertex * vertex1 = WEdge->V_Start;
+	//go to next vertex based on CCW/CW order
+	if( face->bIsCCW ){
+	    WEdge = WEdge->E_CCW_Next;
+	}else{
+	    WEdge = WEdge->E_CW_Next;
+	}
+	Vertex * vertex2 = WEdge->V_Start;
+	if( face->bIsCCW ){
+	    WEdge = WEdge->E_CCW_Next;
+	}else{
+	    WEdge = WEdge->E_CW_Next;
+	}
+	Vertex * vertex3 = WEdge->V_Start;
+	if( WEdge->V_End != vertex1 ){
+	    //not a valid triangle
+	    return false;
+	}
+	//calculate face normal
+	Vec line_1_2 = vertex2->pos - vertex1->pos;
+	Vec line_1_3 = vertex3->pos - vertex1->pos;
+	normal = line_1_2.Cross( line_1_3 );
+	normal.NormalizeCurrent();
+	face->normal = normal;
+	return true;
     }
 }

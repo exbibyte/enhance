@@ -8,6 +8,7 @@
 #include "catch.hpp"
 
 #include "WingedEdge.h"
+#include "Vec.h"
 
 #include <map>
 #include <vector>
@@ -34,6 +35,11 @@ TEST_CASE( "Basic", "[B]" ) {
     vector< Vertex * > vertices;
     for( int i = 0; i < 4; i++ ){
         Vertex * v = new Vertex;
+	float vec_position[3];
+	vec_position[0] = i;
+	vec_position[1] = (i*2-5)^3;
+	vec_position[2] = i*3-4;
+	v->pos.SetFromArray( 3, vec_position );
         v->data = i;
         vertices.push_back( v );
     }
@@ -95,7 +101,7 @@ TEST_CASE( "Basic", "[B]" ) {
 
     SECTION( "Check entity linkage" ){
       for( auto i : generated_wedges ){
-	//first trianglge
+	//first triangle
 	if( i->E_Current->data == 0 ){
 	  vector<int> expected_data { 1, 2, 0 };
 	  WingedEdge * Current = i;
@@ -261,4 +267,23 @@ TEST_CASE( "Basic", "[B]" ) {
       CHECK( 5 == linked_WEdges.size() );
       CHECK( 4 == linked_vertices.size() );
     }
+    SECTION( "Check GetTriangles()" ){
+      cout << "Get Triangles: " << endl;
+      set< Face * > allfaces( faces.begin(), faces.end() );
+      vector< Vec > vertices_pos;
+      vector< Vec > vertices_normal;
+      bool bRet = GetTriangles( allfaces, vertices_pos, vertices_normal );
+      CHECK( bRet );
+      CHECK( 6 == vertices_pos.size() );
+      CHECK( 6 == vertices_normal.size() );
+
+      cout << "Vertex Position: " << endl;
+      for( auto i : vertices_pos ){
+	  cout << i._vec[0] << ", " << i._vec[1] << ", " << i._vec[2] << endl;
+      }
+      cout << "Vertex Normals: " << endl;
+      for( auto i : vertices_normal ){
+	  cout << i._vec[0] << ", " << i._vec[1] << ", " << i._vec[2] << endl;
+      }      
+    }    
 }
