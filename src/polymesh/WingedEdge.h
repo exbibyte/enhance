@@ -85,10 +85,10 @@ namespace Winged_Edge {
     bool Search_Face_To_Face( Face * Start, Face * End, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
     bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges );
 
-    ///TODO:
-    ///breath first search by traveling on alternating Vertex-WingedEdge-...-Vertex
-    //bool Search_Vertex_To_Vertex( Vertex * Start, Vertex * End, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges ){ return false; }
-    //bool Search_Vertex_To_Vertex_Aux( Vertex * Start_Vertex, WingedEdge * Start_WEdge, Vertex * End, std::set< Vertex * > & Searched_Vertices, std::set< WingedEdge * > & Searched_WEdges, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges ){ return false; }
+    //TODO:
+    //breath first search by traveling on alternating Vertex-WingedEdge-...-Vertex
+    bool Search_Vertex_To_Vertex( Vertex * Start, Vertex * End, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges );
+    bool Search_Vertex_To_Vertex_Aux( Vertex * Start_Vertex, WingedEdge * Start_WEdge, Vertex * End, std::set< Vertex * > & Searched_Vertices, std::set< WingedEdge * > & Searched_WEdges, std::vector< Vertex * > & Path_Vertices, std::vector< WingedEdge * > & Path_WEdges );
     
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 );
     bool Is_WingedEdge_Neighour_Face( WingedEdge * WEdge, Face * face );
@@ -100,5 +100,9 @@ namespace Winged_Edge {
     
     bool Get_Face_Neighbour_WingedEdges( Face * face, std::set< WingedEdge * > & WEdges );
     bool Get_Vertex_Neighbour_WingedEdges( Vertex * vertex, std::set< WingedEdge * > & WEdges );
+
+    bool GetAllLinked( WingedEdge * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
+    bool GetAllLinked( Face * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
+    bool GetAllLinked( Vertex * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices );
 }
 #endif

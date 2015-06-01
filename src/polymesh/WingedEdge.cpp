@@ -231,7 +231,7 @@ namespace Winged_Edge {
     }
 
     bool Search_WEdge_To_WEdge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
-	if( !Start ){
+	if( !Start || !End ){
 	    return false;
 	}
 	//ignore if this edge was searched before
@@ -277,9 +277,9 @@ namespace Winged_Edge {
 	return false;
     }
     bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges ){
-	if( !Start_Face ){
+	if( !Start_Face || !End ){
 	    return false;
-	}	
+	}
 	//reject if searched before
 	if( Start_WEdge && 
 	    Searched_WEdges.end() != Searched_WEdges.find( Start_WEdge ) ){
@@ -297,6 +297,8 @@ namespace Winged_Edge {
 	//check if end is found as a neighbour
 	if( Start_WEdge && Is_WingedEdge_Neighour_Face( Start_WEdge, End ) ){
 	    Searched_Faces.insert( End );
+	    return true;
+	}else if( !Start_WEdge && Start_Face == End ){
 	    return true;
 	}
 
@@ -321,7 +323,69 @@ namespace Winged_Edge {
 	    }
 	}
 	return false;
-    }    
+    }
+
+    bool Search_Vertex_To_Vertex( Vertex * Start, Vertex * End, vector< Vertex * > & Path_Vertices, vector< WingedEdge * > & Path_WEdges ){
+	Path_Vertices.clear();
+	Path_WEdges.clear();
+
+	set< Vertex * > Searched_Vertices;
+	set< WingedEdge * > Searched_WEdges;
+	WingedEdge * Start_WEdge = 0;
+	if( Search_Vertex_To_Vertex_Aux( Start, Start_WEdge, End, Searched_Vertices, Searched_WEdges, Path_Vertices, Path_WEdges ) ){
+	    return true;
+	}
+	return false;
+    }
+    bool Search_Vertex_To_Vertex_Aux( Vertex * Start_Vertex, WingedEdge * Start_WEdge, Vertex * End, set< Vertex * > & Searched_Vertices, set< WingedEdge * > & Searched_WEdges, vector< Vertex * > & Path_Vertices, vector< WingedEdge * > & Path_WEdges ){
+	if( !Start_Vertex || !End ){
+	    return false;
+	}
+	//reject if searched before
+	if( Start_WEdge && 
+	    Searched_WEdges.end() != Searched_WEdges.find( Start_WEdge ) ){
+	    return false;
+	}
+	if( Searched_Vertices.end() != Searched_Vertices.find( Start_Vertex ) ){
+	    return false;
+	}
+	Searched_Vertices.insert( Start_Vertex );
+	Path_Vertices.push_back( Start_Vertex );
+	if( Start_WEdge ){
+	    Searched_WEdges.insert( Start_WEdge );
+	    Path_WEdges.push_back( Start_WEdge );
+	}       
+	//check if end is found as a neighbour
+	if( Start_WEdge && Is_WingedEdge_Neighbour_Vertex( Start_WEdge, End ) ){
+	    Searched_Vertices.insert( End );
+	    return true;
+	}else if( !Start_WEdge && Start_Vertex == End ){
+	    return true;
+	}
+
+	//choose an edge and then a vertex.
+	set< WingedEdge * > WEdges;
+	Get_Vertex_Neighbour_WingedEdges( Start_Vertex, WEdges );
+	for( auto i : WEdges ){
+	    set< Vertex * > vertices;
+	    Get_WingedEdge_Neighour_Vertices( i, vertices );
+	    for( auto j : vertices ){
+		set< Vertex * > Searched_Vertices_Copy = Searched_Vertices;
+		set< WingedEdge * > Searched_WEdges_Copy = Searched_WEdges;
+		vector< Vertex * > Path_Vertices_Copy = Path_Vertices;
+		vector< WingedEdge * > Path_WEdges_Copy = Path_WEdges;
+		if( Search_Vertex_To_Vertex_Aux( j, i, End, Searched_Vertices_Copy, Searched_WEdges_Copy, Path_Vertices_Copy, Path_WEdges_Copy ) ){
+		    Path_Vertices = Path_Vertices_Copy;
+		    Path_WEdges = Path_WEdges_Copy;
+		    Searched_Vertices = Searched_Vertices_Copy;
+		    Searched_WEdges = Searched_WEdges_Copy;
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }	
+    
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 ){
 	if( !WEdge1 || !WEdge2 ){
 	    return false;
@@ -415,5 +479,51 @@ namespace Winged_Edge {
 	WEdges = vertex->Neighbour_WEdges;
 	return true;
     }
-    
+    bool GetAllLinked( WingedEdge * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	if( WEdges.end() != WEdges.find( Start ) ){
+	    //already processed
+	    return true;
+	}
+	WEdges.insert( Start );	
+
+	std::set< Face * > current_faces;
+	Get_WingedEdge_Neighour_Faces( Start, current_faces );
+	for( auto i : current_faces ){
+	    faces.insert( i );
+	}
+	std::set< Vertex * > current_vertices;
+	Get_WingedEdge_Neighour_Vertices( Start, current_vertices );	
+	for( auto i : current_vertices ){
+	    vertices.insert( i );
+	}
+	//process other neighbouring edges
+	set< WingedEdge * > neighbour_wedges;
+	Get_WingedEdge_Neighour_WingedEdges( Start, neighbour_wedges );
+	for( auto i : neighbour_wedges ){
+	    GetAllLinked( i, faces, WEdges, vertices );
+	}
+	return true;
+    }
+    bool GetAllLinked( Face * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	set< WingedEdge * > neighbour_edges;
+	Get_Face_Neighbour_WingedEdges( Start, neighbour_edges );
+        if( neighbour_edges.empty() )
+	{
+	    return true;
+	}
+	auto i = neighbour_edges.begin();
+	WingedEdge * edge = *i;
+	return GetAllLinked( edge, faces, WEdges, vertices );
+    }
+    bool GetAllLinked( Vertex * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	set< WingedEdge * > neighbour_edges;
+	Get_Vertex_Neighbour_WingedEdges( Start, neighbour_edges );
+        if( neighbour_edges.empty() )
+	{
+	    return true;
+	}
+	auto i = neighbour_edges.begin();
+	WingedEdge * edge = *i;
+	return GetAllLinked( edge, faces, WEdges, vertices );
+    }
 }
