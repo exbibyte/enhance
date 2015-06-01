@@ -140,11 +140,12 @@ namespace Winged_Edge {
 	//for each face
 	for( auto i : map_face ){
 	    Face * face = i.first;
-	    //get vertices of the face, assuming CCW order
+	    //get vertices of the face, and CCW/CW order
 	    Vertex * v1 = std::get<0>( i.second );
 	    Vertex * v2 = std::get<1>( i.second );
 	    Vertex * v3 = std::get<2>( i.second );
 	    bool bClockWise = std::get<3>( i.second );
+	    face->bIsCCW = !bClockWise;
 	    auto e1 = std::make_pair( v1, v2 );
 	    auto e2 = std::make_pair( v2, v3 );
 	    auto e3 = std::make_pair( v3, v1 );
@@ -200,7 +201,7 @@ namespace Winged_Edge {
 			prev = triangle_winged_edges.end()-1;
 		    }
 		    winged_edge->E_CW_Next = next->first;
-		    winged_edge->E_CW_Prev = prev->first;
+		    winged_edge->E_CW_Prev = prev->first;		    
 		}else{
 		    auto next = j+1;
 		    if( next == triangle_winged_edges.end() ){
@@ -211,7 +212,7 @@ namespace Winged_Edge {
 			prev = triangle_winged_edges.end()-1;
 		    }
 		    winged_edge->E_CCW_Next = next->first;
-		    winged_edge->E_CCW_Prev = prev->first;
+		    winged_edge->E_CCW_Prev = prev->first;		    
 		}
 	    }   
 	}
@@ -231,7 +232,7 @@ namespace Winged_Edge {
     }
 
     bool Search_WEdge_To_WEdge_Aux( WingedEdge * Start, WingedEdge * End, set< WingedEdge * > & Searched, vector< WingedEdge * > & Path ){
-	if( !Start ){
+	if( !Start || !End ){
 	    return false;
 	}
 	//ignore if this edge was searched before
@@ -277,9 +278,9 @@ namespace Winged_Edge {
 	return false;
     }
     bool Search_Face_To_Face_Aux( Face * Start_Face, WingedEdge * Start_WEdge, Face * End, std::set< Face * > & Searched_Faces, std::set< WingedEdge * > & Searched_WEdges, std::vector< Face * > & Path_Faces, std::vector< WingedEdge * > & Path_WEdges ){
-	if( !Start_Face ){
+	if( !Start_Face || !End ){
 	    return false;
-	}	
+	}
 	//reject if searched before
 	if( Start_WEdge && 
 	    Searched_WEdges.end() != Searched_WEdges.find( Start_WEdge ) ){
@@ -297,6 +298,8 @@ namespace Winged_Edge {
 	//check if end is found as a neighbour
 	if( Start_WEdge && Is_WingedEdge_Neighour_Face( Start_WEdge, End ) ){
 	    Searched_Faces.insert( End );
+	    return true;
+	}else if( !Start_WEdge && Start_Face == End ){
 	    return true;
 	}
 
@@ -321,7 +324,69 @@ namespace Winged_Edge {
 	    }
 	}
 	return false;
-    }    
+    }
+
+    bool Search_Vertex_To_Vertex( Vertex * Start, Vertex * End, vector< Vertex * > & Path_Vertices, vector< WingedEdge * > & Path_WEdges ){
+	Path_Vertices.clear();
+	Path_WEdges.clear();
+
+	set< Vertex * > Searched_Vertices;
+	set< WingedEdge * > Searched_WEdges;
+	WingedEdge * Start_WEdge = 0;
+	if( Search_Vertex_To_Vertex_Aux( Start, Start_WEdge, End, Searched_Vertices, Searched_WEdges, Path_Vertices, Path_WEdges ) ){
+	    return true;
+	}
+	return false;
+    }
+    bool Search_Vertex_To_Vertex_Aux( Vertex * Start_Vertex, WingedEdge * Start_WEdge, Vertex * End, set< Vertex * > & Searched_Vertices, set< WingedEdge * > & Searched_WEdges, vector< Vertex * > & Path_Vertices, vector< WingedEdge * > & Path_WEdges ){
+	if( !Start_Vertex || !End ){
+	    return false;
+	}
+	//reject if searched before
+	if( Start_WEdge && 
+	    Searched_WEdges.end() != Searched_WEdges.find( Start_WEdge ) ){
+	    return false;
+	}
+	if( Searched_Vertices.end() != Searched_Vertices.find( Start_Vertex ) ){
+	    return false;
+	}
+	Searched_Vertices.insert( Start_Vertex );
+	Path_Vertices.push_back( Start_Vertex );
+	if( Start_WEdge ){
+	    Searched_WEdges.insert( Start_WEdge );
+	    Path_WEdges.push_back( Start_WEdge );
+	}       
+	//check if end is found as a neighbour
+	if( Start_WEdge && Is_WingedEdge_Neighbour_Vertex( Start_WEdge, End ) ){
+	    Searched_Vertices.insert( End );
+	    return true;
+	}else if( !Start_WEdge && Start_Vertex == End ){
+	    return true;
+	}
+
+	//choose an edge and then a vertex.
+	set< WingedEdge * > WEdges;
+	Get_Vertex_Neighbour_WingedEdges( Start_Vertex, WEdges );
+	for( auto i : WEdges ){
+	    set< Vertex * > vertices;
+	    Get_WingedEdge_Neighour_Vertices( i, vertices );
+	    for( auto j : vertices ){
+		set< Vertex * > Searched_Vertices_Copy = Searched_Vertices;
+		set< WingedEdge * > Searched_WEdges_Copy = Searched_WEdges;
+		vector< Vertex * > Path_Vertices_Copy = Path_Vertices;
+		vector< WingedEdge * > Path_WEdges_Copy = Path_WEdges;
+		if( Search_Vertex_To_Vertex_Aux( j, i, End, Searched_Vertices_Copy, Searched_WEdges_Copy, Path_Vertices_Copy, Path_WEdges_Copy ) ){
+		    Path_Vertices = Path_Vertices_Copy;
+		    Path_WEdges = Path_WEdges_Copy;
+		    Searched_Vertices = Searched_Vertices_Copy;
+		    Searched_WEdges = Searched_WEdges_Copy;
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }	
+    
     bool Is_WingedEdge_Neighour_WingedEdge( WingedEdge * WEdge1, WingedEdge * WEdge2 ){
 	if( !WEdge1 || !WEdge2 ){
 	    return false;
@@ -415,5 +480,123 @@ namespace Winged_Edge {
 	WEdges = vertex->Neighbour_WEdges;
 	return true;
     }
-    
+    bool GetAllLinked( WingedEdge * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	if( WEdges.end() != WEdges.find( Start ) ){
+	    //already processed
+	    return true;
+	}
+	WEdges.insert( Start );	
+
+	std::set< Face * > current_faces;
+	Get_WingedEdge_Neighour_Faces( Start, current_faces );
+	for( auto i : current_faces ){
+	    faces.insert( i );
+	}
+	std::set< Vertex * > current_vertices;
+	Get_WingedEdge_Neighour_Vertices( Start, current_vertices );	
+	for( auto i : current_vertices ){
+	    vertices.insert( i );
+	}
+	//process other neighbouring edges
+	set< WingedEdge * > neighbour_wedges;
+	Get_WingedEdge_Neighour_WingedEdges( Start, neighbour_wedges );
+	for( auto i : neighbour_wedges ){
+	    GetAllLinked( i, faces, WEdges, vertices );
+	}
+	return true;
+    }
+    bool GetAllLinked( Face * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	set< WingedEdge * > neighbour_edges;
+	Get_Face_Neighbour_WingedEdges( Start, neighbour_edges );
+        if( neighbour_edges.empty() )
+	{
+	    return true;
+	}
+	auto i = neighbour_edges.begin();
+	WingedEdge * edge = *i;
+	return GetAllLinked( edge, faces, WEdges, vertices );
+    }
+    bool GetAllLinked( Vertex * Start, std::set< Face * > & faces, std::set< WingedEdge * > & WEdges, std::set< Vertex * > & vertices ){
+	set< WingedEdge * > neighbour_edges;
+	Get_Vertex_Neighbour_WingedEdges( Start, neighbour_edges );
+        if( neighbour_edges.empty() )
+	{
+	    return true;
+	}
+	auto i = neighbour_edges.begin();
+	WingedEdge * edge = *i;
+	return GetAllLinked( edge, faces, WEdges, vertices );
+    }
+
+    bool GetTriangles( std::set< Face * > faces, std::vector< Vec > & vertices_pos, std::vector< Vec > & vertices_normal ){
+	vertices_normal.clear();
+	vertices_pos.clear();
+	for( auto i : faces ){
+	    Vec normal;
+	    if( !UpdateFaceNormal( i, normal ) ){
+		return false;
+	    }
+	    set< WingedEdge * > edges;
+	    Get_Face_Neighbour_WingedEdges( i, edges );
+	    if( edges.empty() ){
+		return false;
+	    }	    
+	    auto j = edges.begin();
+	    WingedEdge * WEdge = *j;
+	    Vertex * vertex_start = WEdge->V_Start;
+	    for( int k = 0; k < 3; k++ ){
+		Vertex * vertex = WEdge->V_Start;
+		vertices_pos.push_back( vertex->pos ); //save position of each vertex
+		//go to next vertex based on CCW/CW order
+		if( i->bIsCCW ){
+		    WEdge = WEdge->E_CCW_Next;
+		}else{
+		    WEdge = WEdge->E_CW_Next;
+		}
+	    }
+	    if( WEdge->V_Start != vertex_start ){
+		//not a valid triangle
+		return false;
+	    }
+	    //update normals using a face normal obtained earlier
+	    for( int k = 0; k < 3; k++ ){		
+		vertices_normal.push_back( normal ); //save normal of each vertex
+	    }
+	}
+	return true;
+    }
+    bool UpdateFaceNormal( Face * face, Vec & normal ){
+	set< WingedEdge * > edges;
+	Get_Face_Neighbour_WingedEdges( face, edges );
+	if( edges.empty() ){
+	    return false;
+	}
+	auto j = edges.begin();
+	WingedEdge * WEdge = *j;
+	Vertex * vertex1 = WEdge->V_Start;
+	//go to next vertex based on CCW/CW order
+	if( face->bIsCCW ){
+	    WEdge = WEdge->E_CCW_Next;
+	}else{
+	    WEdge = WEdge->E_CW_Next;
+	}
+	Vertex * vertex2 = WEdge->V_Start;
+	if( face->bIsCCW ){
+	    WEdge = WEdge->E_CCW_Next;
+	}else{
+	    WEdge = WEdge->E_CW_Next;
+	}
+	Vertex * vertex3 = WEdge->V_Start;
+	if( WEdge->V_End != vertex1 ){
+	    //not a valid triangle
+	    return false;
+	}
+	//calculate face normal
+	Vec line_1_2 = vertex2->pos - vertex1->pos;
+	Vec line_1_3 = vertex3->pos - vertex1->pos;
+	normal = line_1_2.Cross( line_1_3 );
+	normal.NormalizeCurrent();
+	face->normal = normal;
+	return true;
+    }
 }
