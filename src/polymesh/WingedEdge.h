@@ -21,51 +21,60 @@ namespace Winged_Edge {
 
     class Edge {
     public:
-	int data;
-	Vec magnitude;
-	WingedEdge * WEdge;
+        int data;
+        Vec magnitude;
+        WingedEdge * WEdge;
     };
   
     class Face {
     public:
-	int data;
-	Vec normal;
-	bool bIsCCW;
-	bool bIsNormalCCW; //true if normal is aligned with CCW right-hand rule, false if opposite direction.
-	std::set< WingedEdge * > Neighbour_WEdges;
+        int data;
+        Vec normal;
+        bool bIsCCW;
+        bool bIsNormalCCW; //true if normal is aligned with CCW right-hand rule, false if opposite direction.
+        std::set< WingedEdge * > Neighbour_WEdges;
     };
   
     class Vertex {
     public:
-	int data;
-	Vec pos;
-	std::set< WingedEdge * > Neighbour_WEdges;
+        int data;
+        Vec pos;
+        std::set< WingedEdge * > Neighbour_WEdges;
     };
   
     class WingedEdge {
     public:
-	WingedEdge(){
-	    E_Current = 0;
-	    V_Start = 0;
-	    V_End = 0;
-	    E_CCW_Prev = 0;
-	    E_CCW_Next = 0;
-	    E_CW_Prev = 0;
-	    E_CW_Next = 0;
-	    F_Left = 0;
-	    F_Right = 0;
-	}
-	Edge * E_Current;
-	Vertex * V_Start;
-	Vertex * V_End;
-	WingedEdge * E_CCW_Prev;
-	WingedEdge * E_CCW_Next;
-	WingedEdge * E_CW_Prev;
-	WingedEdge * E_CW_Next;
-	Face * F_Left;
-	Face * F_Right;
+        WingedEdge(){
+            E_Current = 0;
+            V_Start = 0;
+            V_End = 0;
+            E_CCW_Prev = 0;
+            E_CCW_Next = 0;
+            E_CW_Prev = 0;
+            E_CW_Next = 0;
+            F_Left = 0;
+            F_Right = 0;
+        }
+        Edge * E_Current;
+        Vertex * V_Start;
+        Vertex * V_End;
+        WingedEdge * E_CCW_Prev;
+        WingedEdge * E_CCW_Next;
+        WingedEdge * E_CW_Prev;
+        WingedEdge * E_CW_Next;
+        Face * F_Left;
+        Face * F_Right;
     };
 
+    struct MapFaceData{
+        enum Enum{
+            V1 = 0,
+            V2,
+            V3,
+            VERT_DIR,
+            NORM_DIR,
+        };
+    };
     typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
     typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool/*isCCW*/, bool /*isNormalCCW*/ > > MapFace;
 

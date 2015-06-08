@@ -141,12 +141,12 @@ namespace Winged_Edge {
 	for( auto i : map_face ){
 	    Face * face = i.first;
 	    //get vertices of the face, and CCW/CW order
-	    Vertex * v1 = std::get<0>( i.second );
-	    Vertex * v2 = std::get<1>( i.second );
-	    Vertex * v3 = std::get<2>( i.second );
-	    bool bCounterClockWise = std::get<3>( i.second );
+	    Vertex * v1 = std::get<MapFaceData::V1>( i.second );
+	    Vertex * v2 = std::get<MapFaceData::V2>( i.second );
+	    Vertex * v3 = std::get<MapFaceData::V3>( i.second );
+	    bool bCounterClockWise = std::get<MapFaceData::VERT_DIR>( i.second );
 	    face->bIsCCW = bCounterClockWise;
-	    bool bNormalCounterClockWise = std::get<4>( i.second );
+	    bool bNormalCounterClockWise = std::get<MapFaceData::NORM_DIR>( i.second );
 	    face->bIsNormalCCW = bNormalCounterClockWise;
 	    auto e1 = std::make_pair( v1, v2 );
 	    auto e2 = std::make_pair( v2, v3 );
