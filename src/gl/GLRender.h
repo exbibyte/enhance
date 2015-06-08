@@ -1,6 +1,14 @@
 #ifndef GLRENDER_H
 #define GLRENDER_H
 
+#include "WingedEdge.h"
+#include <vector>
+#include <tuple>
+#include <set>
+#include <algorithm>
+using namespace Winged_Edge;
+using namespace std;
+
 namespace GLRender {
     float Angle = 0;
     GLSLProgram * _GLSLProgram;
@@ -146,29 +154,126 @@ void GLRender::SetShaders() {
     //set buffer data
     GLAttribData<float> * pPositionData = new GLAttribData<float>;
     GLAttribData<float> * pNormalData = new GLAttribData<float>;
-    float arrayPositionData[] = {
-        10.0f, 10.0f, -10.0f, //floor
-        -10.0f, 10.0f, -10.0f, 
-        -10.0f, -10.0f, -10.0f,
-        -10.0f, -10.0f, -10.0f, //floor
-        10.0f, -10.0f, -10.0f,
-        10.0f, 10.0f, -10.0f,
-        -0.8f, -0.8f, 0.0f, // floating triangle
-        0.8f, -0.8f, 0.0f,
-        0.0f, 0.8f, 0.0f,
-    };
 
-    float arrayNormalData[] = {
-        0.0f, 0.0f,  1.0f, //floor
-        0.0f, 0.0f,  1.0f,
-        0.0f, 0.0f,  1.0f, 
-        0.0f, 0.0f,  1.0f, //floor
-        0.0f, 0.0f,  1.0f,
-        0.0f, 0.0f,  1.0f,
-        0.0f, 0.0f,  1.0f, //floating triangle
-        0.0f, 0.0f,  1.0f,
-        0.0f, 0.0f,  1.0f,
-    };
+    float vec_position[3];
+    Vertex v0, v1, v2, v3, v4, v5, v6; //v0 to v3 corresponds to a sqaure, v4 to v6 correspoonds to a triangle
+    //square
+    vec_position[0] = 10.0f;
+    vec_position[1] = 10.0f;
+    vec_position[2] = -10.0f;
+    v0.pos.SetFromArray( 3, vec_position );
+    vec_position[0] = -10.0f;
+    vec_position[1] = 10.0f;
+    vec_position[2] = -10.0f;
+    v1.pos.SetFromArray( 3, vec_position );
+    vec_position[0] = -10.0f;
+    vec_position[1] = -10.0f;
+    vec_position[2] = -10.0f;
+    v2.pos.SetFromArray( 3, vec_position );
+    vec_position[0] = 10.0f;
+    vec_position[1] = -10.0f;
+    vec_position[2] = -10.0f;
+    v3.pos.SetFromArray( 3, vec_position );
+    //triangle
+    vec_position[0] = -0.8f;
+    vec_position[1] = -0.8f;
+    vec_position[2] = 0.0f;
+    v4.pos.SetFromArray( 3, vec_position );
+    vec_position[0] = 0.8f;
+    vec_position[1] = -0.8f;
+    vec_position[2] = 0.0f;
+    v5.pos.SetFromArray( 3, vec_position );
+    vec_position[0] = 0.0f;
+    vec_position[1] = 0.8f;
+    vec_position[2] = 0.0f;
+    v6.pos.SetFromArray( 3, vec_position );
+
+    Edge e0, e1, e2, e3, e4, e5, e6, e7; // e0 to e4 makes a square, e5 to e7 makes a triangle
+    MapEdge edge_map;
+    edge_map[ &e0 ] = std::make_pair( &v0, &v1  );
+    edge_map[ &e1 ] = std::make_pair( &v1, &v2  );
+    edge_map[ &e2 ] = std::make_pair( &v2, &v0  );
+    edge_map[ &e3 ] = std::make_pair( &v3, &v2  );
+    edge_map[ &e4 ] = std::make_pair( &v0, &v3  );
+    edge_map[ &e5 ] = std::make_pair( &v4, &v5  );
+    edge_map[ &e6 ] = std::make_pair( &v5, &v6  );
+    edge_map[ &e7 ] = std::make_pair( &v6, &v4  );
+
+    Face f0, f1, f2; //f0 to f1 corresponds to square, f2 corresponds to triangle
+    vector< Face * > faces { &f0, &f1, &f2 };
+    
+    MapFace face_map;
+    bool bVerticeCCW = true;
+    bool bNormalCCW = true;
+    face_map[ &f0 ] = std::make_tuple( &v0, &v1, &v2, bVerticeCCW, bNormalCCW );
+    face_map[ &f1 ] = std::make_tuple( &v0, &v3, &v2, !bVerticeCCW, !bNormalCCW );
+    face_map[ &f2 ] = std::make_tuple( &v4, &v5, &v6, bVerticeCCW, bNormalCCW );
+
+    vector< WingedEdge * > generated_wedges;
+    bool bRet = Generate_WingedEdge( edge_map, face_map, generated_wedges ); 
+
+    cout << "Get Triangles: " << endl;
+    set< Face * > allfaces( faces.begin(), faces.end() );
+    vector< Vec > vertices_pos;
+    vector< Vec > vertices_normal;
+    bRet = GetTriangles( allfaces, vertices_pos, vertices_normal );
+
+    cout << "Generated number of vertice positions: " << vertices_pos.size() << endl;
+    cout << "Generated number of vertice normals: " << vertices_normal.size() << endl;
+
+    cout << "Vertex Position: " << endl;
+    for( auto i : vertices_pos ){
+	cout << i._vec[0] << ", " << i._vec[1] << ", " << i._vec[2] << endl;
+    }
+    cout << "Vertex Normals: " << endl;
+    for( auto i : vertices_normal ){
+	cout << i._vec[0] << ", " << i._vec[1] << ", " << i._vec[2] << endl;
+    }      
+
+    float * arrayPositionData = new float [ vertices_pos.size() * 3 ];
+    float * arrayNormalData = new float[ vertices_normal.size() * 3 ];
+    float * it = &arrayPositionData[0];
+    for( auto i : vertices_pos ){
+	*it = i._vec[0];
+	it++;
+	*it = i._vec[1];
+	it++;
+	*it = i._vec[2];
+	it++;
+    }
+    it = &arrayNormalData[0];
+    for( auto i : vertices_normal ){
+	*it = i._vec[0];
+	it++;
+	*it = i._vec[1];
+	it++;
+	*it = i._vec[2];
+	it++;
+    }
+    
+    // float arrayPositionData[] = {
+    //     10.0f, 10.0f, -10.0f, //floor
+    //     -10.0f, 10.0f, -10.0f, 
+    //     -10.0f, -10.0f, -10.0f,
+    //     -10.0f, -10.0f, -10.0f, //floor
+    //     10.0f, -10.0f, -10.0f,
+    //     10.0f, 10.0f, -10.0f,
+    //     -0.8f, -0.8f, 0.0f, // floating triangle
+    //     0.8f, -0.8f, 0.0f,
+    //     0.0f, 0.8f, 0.0f,
+    // };
+
+    // float arrayNormalData[] = {
+    //     0.0f, 0.0f,  1.0f, //floor
+    //     0.0f, 0.0f,  1.0f,
+    //     0.0f, 0.0f,  1.0f, 
+    //     0.0f, 0.0f,  1.0f, //floor
+    //     0.0f, 0.0f,  1.0f,
+    //     0.0f, 0.0f,  1.0f,
+    //     0.0f, 0.0f,  1.0f, //floating triangle
+    //     0.0f, 0.0f,  1.0f,
+    //     0.0f, 0.0f,  1.0f,
+    // };
     
     //save mapping of data
     _GLSLProgram->AddMapAttrib( "VertexPosition", pPositionData );
@@ -191,6 +296,12 @@ void GLRender::SetShaders() {
     _GLSLProgram->Use();
 
     _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
+
+    //deallocate data
+    delete arrayPositionData;
+    arrayPositionData = 0;
+    delete arrayNormalData;
+    arrayNormalData = 0;
 }
 
 

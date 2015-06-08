@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
   int count = 0;
 
   std::future<void> ret1 = tp.AddTask(RenderTask, argc, argv );
-  std::future<void> ret2 = tp.AddTask( Idle, count, ptp );
+//  std::future<void> ret2 = tp.AddTask( Idle, count, ptp );
 
   tp.RunThreads();
 
@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
   }
   
   ret1.get();
-  ret2.get();
+//  ret2.get();
 
   tp.EndAllThreads();
 

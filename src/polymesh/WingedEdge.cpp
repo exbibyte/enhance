@@ -106,7 +106,7 @@ namespace Winged_Edge {
 	if( !VertexEnd ){
 	    return false;
 	}
-	return true; 
+	return true;
     }
 
     bool Generate_WingedEdge( MapEdge map_edge, MapFace map_face, vector< WingedEdge * > & Generated )
@@ -141,11 +141,13 @@ namespace Winged_Edge {
 	for( auto i : map_face ){
 	    Face * face = i.first;
 	    //get vertices of the face, and CCW/CW order
-	    Vertex * v1 = std::get<0>( i.second );
-	    Vertex * v2 = std::get<1>( i.second );
-	    Vertex * v3 = std::get<2>( i.second );
-	    bool bClockWise = std::get<3>( i.second );
-	    face->bIsCCW = !bClockWise;
+	    Vertex * v1 = std::get<MapFaceData::V1>( i.second );
+	    Vertex * v2 = std::get<MapFaceData::V2>( i.second );
+	    Vertex * v3 = std::get<MapFaceData::V3>( i.second );
+	    bool bCounterClockWise = std::get<MapFaceData::VERT_DIR>( i.second );
+	    face->bIsCCW = bCounterClockWise;
+	    bool bNormalCounterClockWise = std::get<MapFaceData::NORM_DIR>( i.second );
+	    face->bIsNormalCCW = bNormalCounterClockWise;
 	    auto e1 = std::make_pair( v1, v2 );
 	    auto e2 = std::make_pair( v2, v3 );
 	    auto e3 = std::make_pair( v3, v1 );
@@ -170,10 +172,10 @@ namespace Winged_Edge {
 		    WingedEdge * winged_edge = k->second.first;
 		    if( bDirection ){
 			//winged_edge->F_Right = face;
-			if( bClockWise ){
-			    winged_edge->F_Right = face;
-			}else{
+			if( bCounterClockWise ){
 			    winged_edge->F_Left = face;
+			}else{
+			    winged_edge->F_Right = face;
 			}
 			face->Neighbour_WEdges.insert( winged_edge );
 		    }else{
@@ -183,26 +185,15 @@ namespace Winged_Edge {
 			}
 			return false;
 		    }
-		    triangle_winged_edges.push_back( make_pair( winged_edge, bClockWise ) );
+		    triangle_winged_edges.push_back( make_pair( winged_edge, bCounterClockWise ) );
 		}
 	    }
 
 	    //save neighbour winged edges depending on directionality of current winged edge
 	    for( auto j = triangle_winged_edges.begin(); j != triangle_winged_edges.end(); j++ ) {
 		WingedEdge * winged_edge = j->first;
-		bool bDirClockWise = j->second;
-		if( bDirClockWise ){
-		    auto next = j+1;
-		    if( next == triangle_winged_edges.end() ){
-			next = triangle_winged_edges.begin();
-		    }
-		    auto prev = j-1;
-		    if( prev < triangle_winged_edges.begin() ){
-			prev = triangle_winged_edges.end()-1;
-		    }
-		    winged_edge->E_CW_Next = next->first;
-		    winged_edge->E_CW_Prev = prev->first;		    
-		}else{
+		bool bDirCounterClockWise = j->second;
+		if( bDirCounterClockWise ){
 		    auto next = j+1;
 		    if( next == triangle_winged_edges.end() ){
 			next = triangle_winged_edges.begin();
@@ -213,6 +204,17 @@ namespace Winged_Edge {
 		    }
 		    winged_edge->E_CCW_Next = next->first;
 		    winged_edge->E_CCW_Prev = prev->first;		    
+		}else{		   
+		    auto next = j+1;
+		    if( next == triangle_winged_edges.end() ){
+			next = triangle_winged_edges.begin();
+		    }
+		    auto prev = j-1;
+		    if( prev < triangle_winged_edges.begin() ){
+			prev = triangle_winged_edges.end()-1;
+		    }
+		    winged_edge->E_CW_Next = next->first;
+		    winged_edge->E_CW_Prev = prev->first;
 		}
 	    }   
 	}
@@ -594,7 +596,15 @@ namespace Winged_Edge {
 	//calculate face normal
 	Vec line_1_2 = vertex2->pos - vertex1->pos;
 	Vec line_1_3 = vertex3->pos - vertex1->pos;
-	normal = line_1_2.Cross( line_1_3 );
+	//calculate normal direction based on if normal is aligned with CCW/CW direction
+	if( face->bIsNormalCCW )
+	{	
+	    normal = line_1_2.Cross( line_1_3 );
+	}
+	else
+	{
+	    normal = line_1_3.Cross( line_1_2 );
+	}
 	normal.NormalizeCurrent();
 	face->normal = normal;
 	return true;

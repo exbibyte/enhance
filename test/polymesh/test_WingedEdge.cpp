@@ -59,23 +59,14 @@ TEST_CASE( "Basic", "[B]" ) {
     }
     
     //link faces and edges
-    bool bClockWise = true;
-    map_face[ faces[0] ] = std::make_tuple( vertices[0], vertices[1], vertices[2], bClockWise );
-    map_face[ faces[1] ] = std::make_tuple( vertices[1], vertices[2], vertices[3], !bClockWise );
+    bool bCounterClockWise = true;
+    bool bNormalCCW = true;
+    map_face[ faces[0] ] = std::make_tuple( vertices[0], vertices[1], vertices[2], !bCounterClockWise, !bNormalCCW );
+    map_face[ faces[1] ] = std::make_tuple( vertices[1], vertices[2], vertices[3], bCounterClockWise, bNormalCCW );
     
     //generate winged edges
     vector< WingedEdge * > generated_wedges;
     Generate_WingedEdge( map_edge, map_face, generated_wedges );
-
-    //verify generated wedges    
-    // bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * Next );
-    // bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * Prev );
-    // bool Get_Edge_CCW_Next( WingedEdge * WEdge, WingedEdge * Next );
-    // bool Get_Edge_CCW_Prev( WingedEdge * WEdge, WingedEdge * Prev );
-    // bool Get_Face_Left( WingedEdge * WEdge, Face * FaceLeft );
-    // bool Get_Face_Right( WingedEdge * WEdge, Face * FaceRight );
-    // bool Get_Vertex_Start( WingedEdge * WEdge, Vertex * VertexStart );
-    // bool Get_Vertex_End( WingedEdge * WEdge, Vertex * VertexEnd );
 
     SECTION( "Check size of generated entities" ){
         CHECK( 5 == generated_wedges.size() ); //check size of winged edges
