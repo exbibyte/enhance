@@ -1,3 +1,4 @@
+
 #ifndef EN_THREAD_H
 #define EN_THREAD_H
 
@@ -18,7 +19,7 @@ public:
             /// condition for pause or end
             if( _Notify.load(std::memory_order_relaxed) == THREAD_NOTIFY_END ){
                 _Notify.store( THREAD_NOTIFY_NONE, std::memory_order_relaxed);
-                cout << "ending" <<endl;
+		//                cout << "ending" <<endl;
                 break;
             }
             else if( _Notify.load(std::memory_order_relaxed) == THREAD_NOTIFY_PAUSE ){
