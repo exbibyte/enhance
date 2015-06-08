@@ -31,6 +31,7 @@ namespace Winged_Edge {
 	int data;
 	Vec normal;
 	bool bIsCCW;
+	bool bIsNormalCCW; //true if normal is aligned with CCW right-hand rule, false if opposite direction.
 	std::set< WingedEdge * > Neighbour_WEdges;
     };
   
@@ -66,7 +67,7 @@ namespace Winged_Edge {
     };
 
     typedef std::map< Edge *, std::pair< Vertex *, Vertex * > > MapEdge;
-    typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool/*isCW*/ > > MapFace;
+    typedef std::map< Face *, std::tuple< Vertex *, Vertex *, Vertex *, bool/*isCCW*/, bool /*isNormalCCW*/ > > MapFace;
 
     bool Get_Edge_CW_Next( WingedEdge * WEdge, WingedEdge * & Next );
     bool Get_Edge_CW_Prev( WingedEdge * WEdge, WingedEdge * & Prev );

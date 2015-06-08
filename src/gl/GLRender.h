@@ -203,10 +203,11 @@ void GLRender::SetShaders() {
     vector< Face * > faces { &f0, &f1, &f2 };
     
     MapFace face_map;
-    bool bIsClockWise = true;
-    face_map[ &f0 ] = std::make_tuple( &v0, &v1, &v2, !bIsClockWise );
-    face_map[ &f1 ] = std::make_tuple( &v0, &v3, &v2, bIsClockWise );
-    face_map[ &f2 ] = std::make_tuple( &v4, &v5, &v6, bIsClockWise );
+    bool bVerticeCCW = true;
+    bool bNormalCCW = true;
+    face_map[ &f0 ] = std::make_tuple( &v0, &v1, &v2, bVerticeCCW, bNormalCCW );
+    face_map[ &f1 ] = std::make_tuple( &v0, &v3, &v2, !bVerticeCCW, !bNormalCCW );
+    face_map[ &f2 ] = std::make_tuple( &v4, &v5, &v6, bVerticeCCW, bNormalCCW );
 
     vector< WingedEdge * > generated_wedges;
     bool bRet = Generate_WingedEdge( edge_map, face_map, generated_wedges ); 
