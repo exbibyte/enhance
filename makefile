@@ -8,6 +8,8 @@ src_folder_transition := ./src/transition
 src_folder_graph := ./src/graph
 src_folder_polymesh := ./src/polymesh
 
+src_folder_test_file := ./test/file
+
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
 inc_folder_ui := ./src/ui
@@ -122,3 +124,8 @@ Video -L/usr/local/lib -o $(build_dir)/test_WindowManager
 
 test_Trie:
 	g++ -std=c++0x -g -O0 ./test/graph/test_Trie.cpp -pthread -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_Trie
+
+test_ParsePolyMesh:
+	bison -d $(src_folder_file)/testyac_PolyMesh.y -o $(src_folder_file)/testyac_PolyMesh.tab.c
+	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
+	g++ $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_ParsePolyMesh.cpp -ll -o $(build_dir)/test_ParsePolyMesh
