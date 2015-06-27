@@ -15,7 +15,8 @@ public:
 	TEXCOORD,
 	ENUM_COUNT,
     };
-    Enum _type = UNINIT;
+    FormatPolyMesh_Base() : _type(UNINIT) {}
+    Enum _type;
     std::string strVarName;
     std::string strVarVal;
     std::vector< FormatPolyMesh_Base * > children;
