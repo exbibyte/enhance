@@ -88,6 +88,21 @@
 
 
 /* Copy the first part of user declarations.  */
+#line 1 "./src/file/testyac_PolyMesh.y"
+
+  #include "FormatPolyMesh.h"
+  #include <stdio.h>
+  #include <string.h>
+  #include <iostream>
+  #include <vector>
+  #include <string>
+  #include <utility>
+  using namespace std;
+  extern FILE * yyin;
+  extern int yylex();
+  extern int yyparse();
+  void yyerror(char *);
+  FormatPolyMesh_Base * root_data;
 
 
 /* Enabling traces.  */
@@ -110,13 +125,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 2 "./src/file/testyac_PolyMesh.y"
+#line 18 "./src/file/testyac_PolyMesh.y"
 {
     int num;
     char * str;
+    FormatPolyMesh_Base * data_node;
 }
 /* Line 193 of yacc.c.  */
-#line 120 "./src/file/testyac_PolyMesh.tab.c"
+#line 136 "./src/file/testyac_PolyMesh.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -126,20 +142,10 @@ typedef union YYSTYPE
 
 
 /* Copy the second part of user declarations.  */
-#line 16 "./src/file/testyac_PolyMesh.y"
-
-  #include <stdio.h>
-  #include <string.h>
-  #include <iostream>
-  using namespace std;
-  extern FILE * yyin;
-  extern int yylex();
-  extern int yyparse();
-  void yyerror(char *);
 
 
 /* Line 216 of yacc.c.  */
-#line 143 "./src/file/testyac_PolyMesh.tab.c"
+#line 149 "./src/file/testyac_PolyMesh.tab.c"
 
 #ifdef short
 # undef short
@@ -354,16 +360,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  7
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   35
+#define YYLAST   22
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  10
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  21
+#define YYNRULES  18
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  28
+#define YYNSTATES  25
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -409,29 +415,26 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     5,     6,     9,    12,    15,    18,    21,
-      23,    25,    31,    35,    38,    40,    44,    48,    52,    54,
-      56,    60
+       0,     0,     3,     5,     6,     9,    12,    14,    16,    22,
+      26,    29,    31,    35,    39,    43,    45,    47,    51
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      11,     0,    -1,    12,    -1,    -1,    12,    12,    -1,    12,
-      17,    -1,    12,    13,    -1,    17,    12,    -1,    13,    12,
-      -1,    17,    -1,    13,    -1,     3,     8,     6,    16,     7,
-      -1,     3,     8,    14,    -1,    14,    15,    -1,    15,    -1,
-       4,    16,     5,    -1,    16,     9,    17,    -1,    16,     9,
-      13,    -1,    13,    -1,    17,    -1,     3,     8,     3,    -1,
-       3,    -1
+      11,     0,    -1,    12,    -1,    -1,    12,    17,    -1,    12,
+      13,    -1,    17,    -1,    13,    -1,     3,     8,     6,    16,
+       7,    -1,     3,     8,    14,    -1,    14,    15,    -1,    15,
+      -1,     4,    16,     5,    -1,    16,     9,    17,    -1,    16,
+       9,    13,    -1,    13,    -1,    17,    -1,     3,     8,     3,
+      -1,     3,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    29,    29,    30,    33,    34,    35,    36,    37,    38,
-      39,    41,    42,    44,    45,    47,    49,    50,    51,    52,
-      54,    55
+       0,    42,    42,    45,    50,    54,    58,    64,    71,    76,
+      82,    86,    93,    97,   101,   105,   111,   118,   124
 };
 #endif
 
@@ -459,17 +462,15 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    10,    11,    11,    12,    12,    12,    12,    12,    12,
-      12,    13,    13,    14,    14,    15,    16,    16,    16,    16,
-      17,    17
+       0,    10,    11,    11,    12,    12,    12,    12,    13,    13,
+      14,    14,    15,    16,    16,    16,    16,    17,    17
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     0,     2,     2,     2,     2,     2,     1,
-       1,     5,     3,     2,     1,     3,     3,     3,     1,     1,
-       3,     1
+       0,     2,     1,     0,     2,     2,     1,     1,     5,     3,
+       2,     1,     3,     3,     3,     1,     1,     3,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -477,31 +478,31 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       3,    21,     0,     2,    10,     9,     0,     1,     4,     6,
-       5,     8,     7,    20,     0,     0,    12,    14,    18,     0,
-      19,     0,    13,    15,     0,    11,    17,    16
+       3,    18,     0,     2,     7,     6,     0,     1,     5,     4,
+      17,     0,     0,     9,    11,    15,     0,    16,     0,    10,
+      12,     0,     8,    14,    13
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     8,     4,    16,    17,    19,     5
+      -1,     2,     3,    15,    13,    14,    16,    17
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -8
+#define YYPACT_NINF -9
 static const yytype_int8 yypact[] =
 {
-       3,    -7,    10,     3,     3,     3,    12,    -8,     3,     3,
-       3,     3,     3,    -8,     3,     3,     9,    -8,    -8,    -2,
-      -8,    -5,    -8,    -8,     3,    -8,    -8,    -8
+       9,     5,    14,     9,    -9,    -9,     4,    -9,    -9,    -9,
+      -9,     9,     9,    11,    -9,    -9,    -3,    -9,     2,    -9,
+      -9,     9,    -9,    -9,    -9
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -8,    -8,    24,    -3,    -8,     1,     5,    11
+      -9,    -9,    -9,     0,    -9,    -8,     6,     1
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -511,27 +512,25 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       9,     6,    25,    23,    24,     9,     1,    24,     9,     9,
-       7,    18,    18,    14,    10,    13,    14,    22,    15,    10,
-      21,    26,    10,    10,     3,    20,    20,     0,    11,    12,
-       0,     0,     0,    11,    12,    27
+       4,     5,    20,     8,     9,    19,    21,    10,    11,    22,
+      12,    21,     1,     6,     7,    11,     0,     0,    18,     0,
+       0,    23,    24
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     8,     7,     5,     9,     8,     3,     9,    11,    12,
-       0,    14,    15,     4,     3,     3,     4,    16,     6,     8,
-      15,    24,    11,    12,     0,    14,    15,    -1,     4,     5,
-      -1,    -1,    -1,     9,    10,    24
+       0,     0,     5,     3,     3,    13,     9,     3,     4,     7,
+       6,     9,     3,     8,     0,     4,    -1,    -1,    12,    -1,
+      -1,    21,    21
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    11,    12,    13,    17,     8,     0,    12,    13,
-      17,    12,    12,     3,     4,     6,    14,    15,    13,    16,
-      17,    16,    15,     5,     9,     7,    13,    17
+       0,     3,    11,    12,    13,    17,     8,     0,    13,    17,
+       3,     4,     6,    14,    15,    13,    16,    17,    16,    15,
+       5,     9,     7,    13,    17
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1345,34 +1344,158 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 3:
-#line 30 "./src/file/testyac_PolyMesh.y"
-    { printf("nothing found\n"); ;}
+        case 2:
+#line 42 "./src/file/testyac_PolyMesh.y"
+    {
+	          root_data = (yyvsp[(1) - (1)].data_node);
+               ;}
+    break;
+
+  case 3:
+#line 45 "./src/file/testyac_PolyMesh.y"
+    {
+	          printf("nothing found\n");
+               ;}
+    break;
+
+  case 4:
+#line 50 "./src/file/testyac_PolyMesh.y"
+    {
+                                 (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
+				 (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+                              ;}
+    break;
+
+  case 5:
+#line 54 "./src/file/testyac_PolyMesh.y"
+    {
+                                 (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
+				 (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+                              ;}
+    break;
+
+  case 6:
+#line 58 "./src/file/testyac_PolyMesh.y"
+    {
+                                 (yyval.data_node) = new FormatPolyMesh_Base();
+				 (yyval.data_node)->strVarName = "";
+				 (yyval.data_node)->strVarVal = "";
+				 (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                              ;}
+    break;
+
+  case 7:
+#line 64 "./src/file/testyac_PolyMesh.y"
+    {
+                                 (yyval.data_node) = new FormatPolyMesh_Base();
+				 (yyval.data_node)->strVarName = "";
+				 (yyval.data_node)->strVarVal = "";
+				 (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                              ;}
+    break;
+
+  case 8:
+#line 71 "./src/file/testyac_PolyMesh.y"
+    {
+	                          printf("var_array: %s\n", (yyvsp[(1) - (5)].str) );
+				  (yyval.data_node) = (yyvsp[(4) - (5)].data_node);
+				  (yyval.data_node)->strVarName = (yyvsp[(1) - (5)].str);
+                              ;}
+    break;
+
+  case 9:
+#line 76 "./src/file/testyac_PolyMesh.y"
+    {
+				  printf("var_list: %s\n", (yyvsp[(1) - (3)].str) );
+				  (yyval.data_node) = (yyvsp[(3) - (3)].data_node);
+				  (yyval.data_node)->strVarName = (yyvsp[(1) - (3)].str);
+                              ;}
+    break;
+
+  case 10:
+#line 82 "./src/file/testyac_PolyMesh.y"
+    {
+	                          (yyval.data_node) = (yyvsp[(1) - (2)].data_node);
+				  (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+                              ;}
     break;
 
   case 11:
-#line 41 "./src/file/testyac_PolyMesh.y"
-    { printf("var_array: %s\n", (yyvsp[(1) - (5)].str) ); ;}
+#line 86 "./src/file/testyac_PolyMesh.y"
+    {
+                                  (yyval.data_node) = new FormatPolyMesh_Base();
+				  (yyval.data_node)->strVarName = "";
+				  (yyval.data_node)->strVarVal = "";
+				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                              ;}
     break;
 
   case 12:
-#line 42 "./src/file/testyac_PolyMesh.y"
-    { printf("var_list: %s\n", (yyvsp[(1) - (3)].str) ); ;}
+#line 93 "./src/file/testyac_PolyMesh.y"
+    {
+				  (yyval.data_node) = (yyvsp[(2) - (3)].data_node);
+                              ;}
     break;
 
-  case 20:
-#line 54 "./src/file/testyac_PolyMesh.y"
-    { printf("key: %s, val: %s\n", (yyvsp[(1) - (3)].str), (yyvsp[(3) - (3)].str) ); ;}
+  case 13:
+#line 97 "./src/file/testyac_PolyMesh.y"
+    {
+	                          (yyval.data_node) = (yyvsp[(1) - (3)].data_node);
+				  (yyval.data_node)->children.push_back( (yyvsp[(3) - (3)].data_node) );
+                              ;}
     break;
 
-  case 21:
-#line 55 "./src/file/testyac_PolyMesh.y"
-    { printf("val: %s\n", (yyvsp[(1) - (1)].str) ); ;}
+  case 14:
+#line 101 "./src/file/testyac_PolyMesh.y"
+    {
+				  (yyval.data_node) = (yyvsp[(1) - (3)].data_node);				  
+				  (yyval.data_node)->children.push_back( (yyvsp[(3) - (3)].data_node) );
+                              ;}
+    break;
+
+  case 15:
+#line 105 "./src/file/testyac_PolyMesh.y"
+    {
+	                          (yyval.data_node) = new FormatPolyMesh_Base();
+				  (yyval.data_node)->strVarName = "";
+				  (yyval.data_node)->strVarVal = "";
+				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                              ;}
+    break;
+
+  case 16:
+#line 111 "./src/file/testyac_PolyMesh.y"
+    {
+	                          (yyval.data_node) = new FormatPolyMesh_Base();
+				  (yyval.data_node)->strVarName = "";
+				  (yyval.data_node)->strVarVal = "";
+				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                              ;}
+    break;
+
+  case 17:
+#line 118 "./src/file/testyac_PolyMesh.y"
+    {
+	                          printf("key: %s, val: %s\n", (yyvsp[(1) - (3)].str), (yyvsp[(3) - (3)].str) );
+				  (yyval.data_node) = new FormatPolyMesh_Base();
+				  (yyval.data_node)->strVarName = (yyvsp[(1) - (3)].str);
+				  (yyval.data_node)->strVarVal = (yyvsp[(3) - (3)].str);
+                              ;}
+    break;
+
+  case 18:
+#line 125 "./src/file/testyac_PolyMesh.y"
+    {
+				  printf("val: %s\n", (yyvsp[(1) - (1)].str) );
+				  (yyval.data_node) = new FormatPolyMesh_Base();
+				  (yyval.data_node)->strVarName = "";
+				  (yyval.data_node)->strVarVal = (yyvsp[(1) - (1)].str);
+			      ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1376 "./src/file/testyac_PolyMesh.tab.c"
+#line 1499 "./src/file/testyac_PolyMesh.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1586,7 +1709,7 @@ yyreturn:
 }
 
 
-#line 57 "./src/file/testyac_PolyMesh.y"
+#line 132 "./src/file/testyac_PolyMesh.y"
 
 
 void yyerror(char * s){
