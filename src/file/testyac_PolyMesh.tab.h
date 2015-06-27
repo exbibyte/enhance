@@ -62,13 +62,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 2 "./src/file/testyac_PolyMesh.y"
+#line 18 "./src/file/testyac_PolyMesh.y"
 {
     int num;
     char * str;
+    FormatPolyMesh_Base * data_node;
 }
 /* Line 1529 of yacc.c.  */
-#line 72 "./src/file/testyac_PolyMesh.tab.h"
+#line 73 "./src/file/testyac_PolyMesh.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -1,10 +1,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include "FormatPolyMesh.h"
 using namespace std;
 extern FILE * yyin;
 extern int yylex();
 extern int yyparse();
+extern FormatPolyMesh_Base * root_data;
+
+void visitNode( FormatPolyMesh_Base * node, int spaces ) {
+    if( !node ){
+	return;
+    }
+    for( int j = 0; j < spaces * 2; j++ ){
+	cout << " ";
+    }
+    cout << "Name: " << node->strVarName << ", Val: " << node->strVarVal << endl;
+    for( auto * i : node->children ){
+	visitNode( i, spaces + 1 );
+    }
+}
 
 int main(int argc, char** argv){
     // open a file handle to a particular file:
@@ -22,5 +37,13 @@ int main(int argc, char** argv){
     yyparse();
     /* } while (!feof(yyin)); */
 
+
+    if( !root_data ){
+	cout << "root invalid" << endl;
+	return -1;
+    }
+
+    visitNode( root_data, 0 );
+    
     return 0;
 }

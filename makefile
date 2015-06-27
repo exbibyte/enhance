@@ -128,9 +128,9 @@ test_Trie:
 test_ParsePolyMesh_osx:
 	bison -d $(src_folder_file)/testyac_PolyMesh.y -o $(src_folder_file)/testyac_PolyMesh.tab.c
 	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
-	g++ $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_ParsePolyMesh.cpp -ll -o $(build_dir)/test_ParsePolyMesh
+	g++ -std=c++0x $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_ParsePolyMesh.cpp -I$(inc_folder_file) -ll -o $(build_dir)/test_ParsePolyMesh
 
 test_ParsePolyMesh:
 	bison -d $(src_folder_file)/testyac_PolyMesh.y -o $(src_folder_file)/testyac_PolyMesh.tab.c
 	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
-	g++ $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_ParsePolyMesh.cpp -lfl -o $(build_dir)/test_ParsePolyMesh
+	g++ -std=c++0x $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_ParsePolyMesh.cpp -I$(inc_folder_file) -lfl -o $(build_dir)/test_ParsePolyMesh
