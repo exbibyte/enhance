@@ -2,6 +2,10 @@
 #include <string.h>
 #include <iostream>
 #include "ParseNode.h"
+#include "Filter_ParseNode.h"
+#include "Filter_ParsePolyMesh.h"
+#include "PolyMesh_Data.h"
+
 using namespace std;
 extern FILE * yyin;
 extern int yylex();
@@ -43,7 +47,27 @@ int main(int argc, char** argv){
 	return -1;
     }
 
-    visitNode( root_data, 0 );
+    Filter_ParsePolyMesh filter_polymesh;
+    filter_polymesh.VisitNode( root_data );
+
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_Vert ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_Normal ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_Edge ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_Face ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexSrc ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexCoord ){
+	i->PrintData();
+    }
     
     return 0;
 }

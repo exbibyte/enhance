@@ -66,7 +66,7 @@ typedef union YYSTYPE
 {
     int num;
     char * str;
-    FormatPolyMesh_Base * data_node;
+    ParseNode * data_node;
 }
 /* Line 1529 of yacc.c.  */
 #line 73 "./src/file/testyac_PolyMesh.tab.h"

@@ -1,7 +1,7 @@
 %{
   #include <stdlib.h>
   void yyerror(char *);
-  #include "FormatPolyMesh.h"
+  #include "ParseNode.h"
   #include "testyac_PolyMesh.tab.h"
   #include <string.h>
   #include <iostream>
