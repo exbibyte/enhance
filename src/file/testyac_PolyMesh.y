@@ -1,5 +1,5 @@
 %{
-  #include "FormatPolyMesh.h"
+  #include "ParseNode.h"
   #include <stdio.h>
   #include <string.h>
   #include <iostream>
@@ -11,14 +11,14 @@
   extern int yylex();
   extern int yyparse();
   void yyerror(char *);
-  FormatPolyMesh_Base * root_data;
+  ParseNode * root_data;
 %}
 
 %union 
 {
     int num;
     char * str;
-    FormatPolyMesh_Base * data_node;
+    ParseNode * data_node;
 };
 
 %token<str> VARIABLE
@@ -49,86 +49,92 @@
 
      expr                   : expr keyval_item {
                                  $$ = $1;				 
-				 $$->children.push_back( $2 );
+				 $$->_children.push_back( $2 );
                               }
                             | expr var_list_array {
                                  $$ = $1;				 
-				 $$->children.push_back( $2 );
+				 $$->_children.push_back( $2 );
                               }
                             | keyval_item {
-                                 $$ = new FormatPolyMesh_Base();
-				 $$->strVarName = "";
-				 $$->strVarVal = "";
-				 $$->children.push_back( $1 );
+                                 $$ = new ParseNode();
+				 $$->_strVarName = "";
+				 $$->_strVarVal = "";
+				 $$->_children.push_back( $1 );
                               }
                             | var_list_array {
-                                 $$ = new FormatPolyMesh_Base();
-				 $$->strVarName = "";
-				 $$->strVarVal = "";
-				 $$->children.push_back( $1 );
+                                 $$ = new ParseNode();
+				 $$->_strVarName = "";
+				 $$->_strVarVal = "";
+				 $$->_children.push_back( $1 );
                               }
+                            ;
 
      var_list_array         : VARIABLE COLON BRACKET_OPEN array_multiple_items BRACKET_CLOSE {
-	                          printf("var_array: %s\n", $1 );
+	                          //printf("var_array: %s\n", $1 );
 				  $$ = $4;
-				  $$->strVarName = $1;
+				  $$->_strVarName = $1;
                               }
                             | VARIABLE COLON var_list {
-				  printf("var_list: %s\n", $1 );
+				  //printf("var_list: %s\n", $1 );
 				  $$ = $3;
-				  $$->strVarName = $1;
+				  $$->_strVarName = $1;
                               }
+                            ;
 
      var_list               : var_list var_list_item {
 	                          $$ = $1;
-				  $$->children.push_back( $2 );
+				  $$->_children.push_back( $2 );
                               }
                             | var_list_item {
-                                  $$ = new FormatPolyMesh_Base();
-				  $$->strVarName = "";
-				  $$->strVarVal = "";
-				  $$->children.push_back( $1 );
+                                  $$ = new ParseNode();
+				  $$->_strVarName = "";
+				  $$->_strVarVal = "";
+				  $$->_children.push_back( $1 );
                               }
+                            ;
 
      var_list_item          : BRACE_OPEN array_multiple_items BRACE_CLOSE {
 				  $$ = $2;
                               }
+                            ;
 
      array_multiple_items   : array_multiple_items COMMA keyval_item {
 	                          $$ = $1;
-				  $$->children.push_back( $3 );
+				  $$->_children.push_back( $3 );
                               }
                             | array_multiple_items COMMA var_list_array {
 				  $$ = $1;				  
-				  $$->children.push_back( $3 );
+				  $$->_children.push_back( $3 );
                               }
                             | var_list_array {
-	                          $$ = new FormatPolyMesh_Base();
-				  $$->strVarName = "";
-				  $$->strVarVal = "";
-				  $$->children.push_back( $1 );
+	                          $$ = new ParseNode();
+				  $$->_strVarName = "";
+				  $$->_strVarVal = "";
+				  $$->_children.push_back( $1 );
                               }
                             | keyval_item {
-	                          $$ = new FormatPolyMesh_Base();
-				  $$->strVarName = "";
-				  $$->strVarVal = "";
-				  $$->children.push_back( $1 );
+	                          $$ = new ParseNode();
+				  $$->_strVarName = "";
+				  $$->_strVarVal = "";
+				  $$->_children.push_back( $1 );
                               }
+                            ;
 
      keyval_item            : VARIABLE COLON VARIABLE {
-	                          printf("key: %s, val: %s\n", $1, $3 );
-				  $$ = new FormatPolyMesh_Base();
-				  $$->strVarName = $1;
-				  $$->strVarVal = $3;
+	                          //printf("key: %s, val: %s\n", $1, $3 );
+				  $$ = new ParseNode();
+				  $$->_strVarName = $1;
+				  $$->_strVarVal = $3;
                               }
                             | VARIABLE
 			      {
-				  printf("val: %s\n", $1 );
-				  $$ = new FormatPolyMesh_Base();
-				  $$->strVarName = "";
-				  $$->strVarVal = $1;
+				  //printf("val: %s\n", $1 );
+				  $$ = new ParseNode();
+				  $$->_strVarName = "";
+				  $$->_strVarVal = $1;
 			      }
-     
+                            ;
+
 %%
 
 void yyerror(char * s){

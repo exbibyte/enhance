@@ -458,7 +458,7 @@ char *yytext;
 #line 2 "./src/file/testlex_PolyMesh.l"
   #include <stdlib.h>
   void yyerror(char *);
-  #include "FormatPolyMesh.h"
+  #include "ParseNode.h"
   #include "testyac_PolyMesh.tab.h"
   #include <string.h>
   #include <iostream>

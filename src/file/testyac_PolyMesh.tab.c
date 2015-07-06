@@ -90,7 +90,7 @@
 /* Copy the first part of user declarations.  */
 #line 1 "./src/file/testyac_PolyMesh.y"
 
-  #include "FormatPolyMesh.h"
+  #include "ParseNode.h"
   #include <stdio.h>
   #include <string.h>
   #include <iostream>
@@ -102,7 +102,7 @@
   extern int yylex();
   extern int yyparse();
   void yyerror(char *);
-  FormatPolyMesh_Base * root_data;
+  ParseNode * root_data;
 
 
 /* Enabling traces.  */
@@ -129,7 +129,7 @@ typedef union YYSTYPE
 {
     int num;
     char * str;
-    FormatPolyMesh_Base * data_node;
+    ParseNode * data_node;
 }
 /* Line 193 of yacc.c.  */
 #line 136 "./src/file/testyac_PolyMesh.tab.c"
@@ -433,8 +433,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    42,    42,    45,    50,    54,    58,    64,    71,    76,
-      82,    86,    93,    97,   101,   105,   111,   118,   124
+       0,    42,    42,    45,    50,    54,    58,    64,    72,    77,
+      84,    88,    96,   101,   105,   109,   115,   123,   129
 };
 #endif
 
@@ -1362,7 +1362,7 @@ yyreduce:
 #line 50 "./src/file/testyac_PolyMesh.y"
     {
                                  (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
-				 (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+				 (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
                               ;}
     break;
 
@@ -1370,126 +1370,126 @@ yyreduce:
 #line 54 "./src/file/testyac_PolyMesh.y"
     {
                                  (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
-				 (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+				 (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
                               ;}
     break;
 
   case 6:
 #line 58 "./src/file/testyac_PolyMesh.y"
     {
-                                 (yyval.data_node) = new FormatPolyMesh_Base();
-				 (yyval.data_node)->strVarName = "";
-				 (yyval.data_node)->strVarVal = "";
-				 (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                                 (yyval.data_node) = new ParseNode();
+				 (yyval.data_node)->_strVarName = "";
+				 (yyval.data_node)->_strVarVal = "";
+				 (yyval.data_node)->_children.push_back( (yyvsp[(1) - (1)].data_node) );
                               ;}
     break;
 
   case 7:
 #line 64 "./src/file/testyac_PolyMesh.y"
     {
-                                 (yyval.data_node) = new FormatPolyMesh_Base();
-				 (yyval.data_node)->strVarName = "";
-				 (yyval.data_node)->strVarVal = "";
-				 (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                                 (yyval.data_node) = new ParseNode();
+				 (yyval.data_node)->_strVarName = "";
+				 (yyval.data_node)->_strVarVal = "";
+				 (yyval.data_node)->_children.push_back( (yyvsp[(1) - (1)].data_node) );
                               ;}
     break;
 
   case 8:
-#line 71 "./src/file/testyac_PolyMesh.y"
+#line 72 "./src/file/testyac_PolyMesh.y"
     {
-	                          printf("var_array: %s\n", (yyvsp[(1) - (5)].str) );
+	                          //printf("var_array: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[(4) - (5)].data_node);
-				  (yyval.data_node)->strVarName = (yyvsp[(1) - (5)].str);
+				  (yyval.data_node)->_strVarName = (yyvsp[(1) - (5)].str);
                               ;}
     break;
 
   case 9:
-#line 76 "./src/file/testyac_PolyMesh.y"
+#line 77 "./src/file/testyac_PolyMesh.y"
     {
-				  printf("var_list: %s\n", (yyvsp[(1) - (3)].str) );
+				  //printf("var_list: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[(3) - (3)].data_node);
-				  (yyval.data_node)->strVarName = (yyvsp[(1) - (3)].str);
+				  (yyval.data_node)->_strVarName = (yyvsp[(1) - (3)].str);
                               ;}
     break;
 
   case 10:
-#line 82 "./src/file/testyac_PolyMesh.y"
+#line 84 "./src/file/testyac_PolyMesh.y"
     {
 	                          (yyval.data_node) = (yyvsp[(1) - (2)].data_node);
-				  (yyval.data_node)->children.push_back( (yyvsp[(2) - (2)].data_node) );
+				  (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
                               ;}
     break;
 
   case 11:
-#line 86 "./src/file/testyac_PolyMesh.y"
+#line 88 "./src/file/testyac_PolyMesh.y"
     {
-                                  (yyval.data_node) = new FormatPolyMesh_Base();
-				  (yyval.data_node)->strVarName = "";
-				  (yyval.data_node)->strVarVal = "";
-				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+                                  (yyval.data_node) = new ParseNode();
+				  (yyval.data_node)->_strVarName = "";
+				  (yyval.data_node)->_strVarVal = "";
+				  (yyval.data_node)->_children.push_back( (yyvsp[(1) - (1)].data_node) );
                               ;}
     break;
 
   case 12:
-#line 93 "./src/file/testyac_PolyMesh.y"
+#line 96 "./src/file/testyac_PolyMesh.y"
     {
 				  (yyval.data_node) = (yyvsp[(2) - (3)].data_node);
                               ;}
     break;
 
   case 13:
-#line 97 "./src/file/testyac_PolyMesh.y"
+#line 101 "./src/file/testyac_PolyMesh.y"
     {
 	                          (yyval.data_node) = (yyvsp[(1) - (3)].data_node);
-				  (yyval.data_node)->children.push_back( (yyvsp[(3) - (3)].data_node) );
+				  (yyval.data_node)->_children.push_back( (yyvsp[(3) - (3)].data_node) );
                               ;}
     break;
 
   case 14:
-#line 101 "./src/file/testyac_PolyMesh.y"
+#line 105 "./src/file/testyac_PolyMesh.y"
     {
 				  (yyval.data_node) = (yyvsp[(1) - (3)].data_node);				  
-				  (yyval.data_node)->children.push_back( (yyvsp[(3) - (3)].data_node) );
+				  (yyval.data_node)->_children.push_back( (yyvsp[(3) - (3)].data_node) );
                               ;}
     break;
 
   case 15:
-#line 105 "./src/file/testyac_PolyMesh.y"
+#line 109 "./src/file/testyac_PolyMesh.y"
     {
-	                          (yyval.data_node) = new FormatPolyMesh_Base();
-				  (yyval.data_node)->strVarName = "";
-				  (yyval.data_node)->strVarVal = "";
-				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+	                          (yyval.data_node) = new ParseNode();
+				  (yyval.data_node)->_strVarName = "";
+				  (yyval.data_node)->_strVarVal = "";
+				  (yyval.data_node)->_children.push_back( (yyvsp[(1) - (1)].data_node) );
                               ;}
     break;
 
   case 16:
-#line 111 "./src/file/testyac_PolyMesh.y"
+#line 115 "./src/file/testyac_PolyMesh.y"
     {
-	                          (yyval.data_node) = new FormatPolyMesh_Base();
-				  (yyval.data_node)->strVarName = "";
-				  (yyval.data_node)->strVarVal = "";
-				  (yyval.data_node)->children.push_back( (yyvsp[(1) - (1)].data_node) );
+	                          (yyval.data_node) = new ParseNode();
+				  (yyval.data_node)->_strVarName = "";
+				  (yyval.data_node)->_strVarVal = "";
+				  (yyval.data_node)->_children.push_back( (yyvsp[(1) - (1)].data_node) );
                               ;}
     break;
 
   case 17:
-#line 118 "./src/file/testyac_PolyMesh.y"
+#line 123 "./src/file/testyac_PolyMesh.y"
     {
-	                          printf("key: %s, val: %s\n", (yyvsp[(1) - (3)].str), (yyvsp[(3) - (3)].str) );
-				  (yyval.data_node) = new FormatPolyMesh_Base();
-				  (yyval.data_node)->strVarName = (yyvsp[(1) - (3)].str);
-				  (yyval.data_node)->strVarVal = (yyvsp[(3) - (3)].str);
+	                          //printf("key: %s, val: %s\n", $1, $3 );
+				  (yyval.data_node) = new ParseNode();
+				  (yyval.data_node)->_strVarName = (yyvsp[(1) - (3)].str);
+				  (yyval.data_node)->_strVarVal = (yyvsp[(3) - (3)].str);
                               ;}
     break;
 
   case 18:
-#line 125 "./src/file/testyac_PolyMesh.y"
+#line 130 "./src/file/testyac_PolyMesh.y"
     {
-				  printf("val: %s\n", (yyvsp[(1) - (1)].str) );
-				  (yyval.data_node) = new FormatPolyMesh_Base();
-				  (yyval.data_node)->strVarName = "";
-				  (yyval.data_node)->strVarVal = (yyvsp[(1) - (1)].str);
+				  //printf("val: %s\n", $1 );
+				  (yyval.data_node) = new ParseNode();
+				  (yyval.data_node)->_strVarName = "";
+				  (yyval.data_node)->_strVarVal = (yyvsp[(1) - (1)].str);
 			      ;}
     break;
 
@@ -1709,7 +1709,7 @@ yyreturn:
 }
 
 
-#line 132 "./src/file/testyac_PolyMesh.y"
+#line 138 "./src/file/testyac_PolyMesh.y"
 
 
 void yyerror(char * s){
