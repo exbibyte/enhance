@@ -17,7 +17,7 @@ class Filter_ParseNode {
 public:
     Filter_ParseNode();
     bool VisitNode( ParseNode * );
-    bool VisitNode_InOrder( ParseNode * node );
+    bool VisitNode_PostOrder( ParseNode * node );
     void SetNodeTraversal( Filter_ParseNode_NodeTraversal::Enum mode );
     virtual bool TransformNode( ParseNode * ){ return false; }    
     Filter_ParseNode_NodeTraversal::Enum _NodeTraversal;

@@ -3,13 +3,13 @@
 #include "ParseNode.h"
 
 Filter_ParseNode::Filter_ParseNode(){
-    _NodeTraversal = Filter_ParseNode_NodeTraversal::PRE_ORDER;
+    _NodeTraversal = Filter_ParseNode_NodeTraversal::POST_ORDER;
 }
 
 bool Filter_ParseNode::VisitNode( ParseNode * node ){
     switch( _NodeTraversal ){
-    case Filter_ParseNode_NodeTraversal::PRE_ORDER:
-	VisitNode_InOrder( node );
+    case Filter_ParseNode_NodeTraversal::POST_ORDER:
+	VisitNode_PostOrder( node );
 	break;
     default:
     {}
@@ -17,7 +17,7 @@ bool Filter_ParseNode::VisitNode( ParseNode * node ){
     return true;
 }
 
-bool Filter_ParseNode::VisitNode_InOrder( ParseNode * node ){
+bool Filter_ParseNode::VisitNode_PostOrder( ParseNode * node ){
     bool bRet = true;
     if( !node ){
 	return true;

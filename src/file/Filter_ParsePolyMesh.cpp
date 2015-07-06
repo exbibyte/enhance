@@ -13,7 +13,7 @@ using namespace std;
 #undef DEBUG_FILTER_PARSE
 
 Filter_ParsePolyMesh::Filter_ParsePolyMesh(){
-    SetNodeTraversal( Filter_ParseNode_NodeTraversal::PRE_ORDER );
+    SetNodeTraversal( Filter_ParseNode_NodeTraversal::POST_ORDER );
 }
 
 bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
