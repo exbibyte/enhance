@@ -1,4 +1,5 @@
 #include "DataTransformMetaInfoCombiner.h"
+#include "DataTransformMetaInfo.h"
 
 #include <vector>
 using namespace std;
