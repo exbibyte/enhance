@@ -8,12 +8,13 @@
 
 class DataTransformMetaInfo {
 public:
-    DataTransformMetaInfo( std::string id );
+    DataTransformMetaInfo( std::string id = "" );
     bool AddMetaInfo( std::string key, std::string val );
-    bool GetMetaInfo( std::string key, std::vector< std::string > & vals ) const;
+    bool GetMetaInfo( std::string key, std::vector< std::string > & vals ) const;    
     bool RemoveMetaInfo( std::string key );
     bool RemoveMetaInfoAll();
-    bool GetId( string & id ) const;
+    bool GetId( std::string & id ) const;
+    bool AddMetaInfo( DataTransformMetaInfo & meta_info );
 private:
     std::multimap< std::string, std::string > _MetaInfo;
     std::string _id;
