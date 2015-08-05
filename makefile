@@ -149,3 +149,8 @@ test_DataTransformPolyMesh_osx:
 	bison -d $(src_folder_file)/testyac_PolyMesh.y -o $(src_folder_file)/testyac_PolyMesh.tab.c
 	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
 	g++ -std=c++0x -g $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_test_datatransform)/test_DataTransformPolyMesh.cpp -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -ll -o $(build_dir)/test_DataTransformPolyMesh
+
+test_Filter_ParseNode_v2_osx:
+	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
+	flex -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
+	g++ -std=c++0x -g $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_test_file)/test_Filter_ParseNode_v2.cpp $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp -I$(inc_folder_file) -ll -o $(build_dir)/test_Filter_ParseNode_v2

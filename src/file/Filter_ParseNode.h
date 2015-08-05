@@ -13,14 +13,15 @@ public:
     };
 };
 
+
 class Filter_ParseNode {
 public:
     Filter_ParseNode();
     bool VisitNode( ParseNode * );
     bool VisitNode_PostOrder( ParseNode * node );
     void SetNodeTraversal( Filter_ParseNode_NodeTraversal::Enum mode );
-    virtual bool TransformNode( ParseNode * ){ return false; }    
-    Filter_ParseNode_NodeTraversal::Enum _NodeTraversal;
+    virtual bool TransformNode( ParseNode * ){ return false; } //implementable action when passing over each node
+    Filter_ParseNode_NodeTraversal::Enum _NodeTraversal; //mode of node traversal
 };
 
 #endif
