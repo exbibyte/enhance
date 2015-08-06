@@ -5,12 +5,15 @@
 #include "Filter_ParseNode.h"
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data.h"
+#include "ParseData_PolyMesh.h"
+#include "bison_PolyMesh.tab.h"
+#include "Flex_PolyMesh.h"
 
 using namespace std;
-extern FILE * yy_PolyMesh_in;
-extern int yy_PolyMesh_lex();
-extern int yy_PolyMesh_parse();
-extern ParseNode * root_data;
+//extern FILE * yy_PolyMesh_in;
+//extern int yy_PolyMesh_lex();
+extern int yy_PolyMesh_parse( struct ParseData_PolyMesh * pp );
+//extern ParseNode * root_data;
 
 void visitNode( ParseNode * node, int spaces ) {
     if( !node ){
@@ -33,22 +36,29 @@ int main(int argc, char** argv){
         cout << "I can't open input file!" << endl;
         return -1;
     }
+
+    struct ParseData_PolyMesh p;
+    if( yy_PolyMesh_lex_init_extra( &p, &(p.scaninfo) ) ){
+	cout << "yylex init failed" << endl;
+	return -1;
+    }
+
     // set flex to read from it instead of defaulting to STDIN:
-    yy_PolyMesh_in = myfile;
+    yy_PolyMesh_set_in( myfile, &p );
 
     // parse through the input until there is no more:
     /* do { */
-    yy_PolyMesh_parse();
+    yy_PolyMesh_parse( &p );
     /* } while (!feof(yyin)); */
 
 
-    if( !root_data ){
+    if( !p.data_node ){
 	cout << "root invalid" << endl;
 	return -1;
     }
 
     Filter_ParsePolyMesh filter_polymesh;
-    filter_polymesh.VisitNode( root_data );
+    filter_polymesh.VisitNode( p.data_node );
 
     for( auto i : filter_polymesh._vec_PolyMesh_Data_Vert ){
 	i->PrintData();

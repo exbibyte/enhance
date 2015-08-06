@@ -1,9 +1,11 @@
-%option noyywrap nodefault yylineno
+%option noyywrap nodefault yylineno reentrant
 %option prefix="yy_PolyMesh_"
+%option bison-bridge
+%option extra-type="struct ParseData_PolyMesh*"
 
 %{
   #include <stdlib.h>
-  void yy_PolyMesh_error(char *);
+  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
   #include "ParseNode.h"
   #include "bison_PolyMesh.tab.h"
   #include <string.h>
@@ -11,35 +13,43 @@
   using namespace std;
 %}
 
+%{
+  #include "ParseData_PolyMesh.h"
+%}
+
 %%
 
+%{
+  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
+%}
+
 "-{"           {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return BRACE_OPEN;
                }
 
 "}"            {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return BRACE_CLOSE;
                }
 "["            {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return BRACKET_OPEN;
                }
 "]"            {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return BRACKET_CLOSE;
                }
 ":"            {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return COLON;
                }
 ","            {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return COMMA;
                }
 [\.\-a-z_0-9]+  {
-                yy_PolyMesh_lval.str = strdup(yy_PolyMesh_text);
+                yylval->str = strdup(yytext);
                 return VARIABLE;
                }
 [ \t\n]        { }

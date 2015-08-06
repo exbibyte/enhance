@@ -152,5 +152,5 @@ test_DataTransformPolyMesh_osx:
 
 test_Filter_ParseNode_v2_osx:
 	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
-	flex -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
+	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
 	g++ -std=c++0x -g $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_test_file)/test_Filter_ParseNode_v2.cpp $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp -I$(inc_folder_file) -ll -o $(build_dir)/test_Filter_ParseNode_v2

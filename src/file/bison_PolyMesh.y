@@ -1,5 +1,7 @@
 %name-prefix="yy_PolyMesh_"
-     
+%pure_parser
+%parse-param { struct ParseData_PolyMesh * pp }
+
 %{
   #include "ParseNode.h"
   #include <stdio.h>
@@ -9,11 +11,6 @@
   #include <string>
   #include <utility>
   using namespace std;
-  extern FILE * yy_PolyMesh_in;
-  extern int yy_PolyMesh_lex();
-  extern int yy_PolyMesh_parse();
-  void yy_PolyMesh_error(char *);
-  ParseNode * root_data;
 %}
 
 %union 
@@ -22,6 +19,18 @@
     char * str;
     ParseNode * data_node;
 };
+
+%{
+  #include "ParseData_PolyMesh.h"
+//  #define YYLEX_PARAM pp
+%}
+
+%lex-param{ pp }
+
+%{
+  #include "Flex_PolyMesh.h"
+  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
+%}
 
 %token<str> VARIABLE
 %token<str> BRACE_OPEN
@@ -42,7 +51,7 @@
 %%
 
      root    : expr {
-	          root_data = $1;
+	          pp->data_node = $1;
                }
              | {
 	          printf("nothing found\n");
@@ -139,6 +148,6 @@
 
 %%
 
-void yy_PolyMesh_error(char * s){
+void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * s){
   fprintf(stderr, "%s\n", s);
 }

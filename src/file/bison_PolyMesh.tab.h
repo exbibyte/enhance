@@ -62,7 +62,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 19 "./src/file/bison_PolyMesh.y"
+#line 17 "./src/file/bison_PolyMesh.y"
 {
     int num;
     char * str;
@@ -76,5 +76,5 @@ typedef union YYSTYPE
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
-extern YYSTYPE yy_PolyMesh_lval;
+
 

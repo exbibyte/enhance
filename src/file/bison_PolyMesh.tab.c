@@ -53,7 +53,7 @@
 #define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define YYPURE 0
+#define YYPURE 1
 
 /* Using locations.  */
 #define YYLSP_NEEDED 0
@@ -96,7 +96,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 2 "./src/file/bison_PolyMesh.y"
+#line 5 "./src/file/bison_PolyMesh.y"
 
   #include "ParseNode.h"
   #include <stdio.h>
@@ -106,11 +106,6 @@
   #include <string>
   #include <utility>
   using namespace std;
-  extern FILE * yy_PolyMesh_in;
-  extern int yy_PolyMesh_lex();
-  extern int yy_PolyMesh_parse();
-  void yy_PolyMesh_error(char *);
-  ParseNode * root_data;
 
 
 /* Enabling traces.  */
@@ -133,14 +128,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 19 "./src/file/bison_PolyMesh.y"
+#line 17 "./src/file/bison_PolyMesh.y"
 {
     int num;
     char * str;
     ParseNode * data_node;
 }
 /* Line 193 of yacc.c.  */
-#line 144 "./src/file/bison_PolyMesh.tab.c"
+#line 139 "./src/file/bison_PolyMesh.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -150,10 +145,18 @@ typedef union YYSTYPE
 
 
 /* Copy the second part of user declarations.  */
+#line 23 "./src/file/bison_PolyMesh.y"
+
+  #include "ParseData_PolyMesh.h"
+//  #define YYLEX_PARAM pp
+#line 30 "./src/file/bison_PolyMesh.y"
+
+  #include "Flex_PolyMesh.h"
+  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
 
 
 /* Line 216 of yacc.c.  */
-#line 157 "./src/file/bison_PolyMesh.tab.c"
+#line 160 "./src/file/bison_PolyMesh.tab.c"
 
 #ifdef short
 # undef short
@@ -441,8 +444,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    43,    43,    46,    51,    55,    59,    65,    73,    78,
-      85,    89,    97,   102,   106,   110,   116,   124,   130
+       0,    53,    53,    56,    61,    65,    69,    75,    83,    88,
+      95,    99,   107,   112,   116,   120,   126,   134,   140
 };
 #endif
 
@@ -571,7 +574,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (YY_("syntax error: cannot back up")); \
+      yyerror (pp, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -626,9 +629,9 @@ while (YYID (0))
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
 #ifdef YYLEX_PARAM
-# define YYLEX yylex (YYLEX_PARAM)
+# define YYLEX yylex (&yylval, YYLEX_PARAM)
 #else
-# define YYLEX yylex ()
+# define YYLEX yylex (&yylval, pp)
 #endif
 
 /* Enable debugging if requested.  */
@@ -651,7 +654,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value); \
+		  Type, Value, pp); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -665,17 +668,19 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct ParseData_PolyMesh * pp)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, pp)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    struct ParseData_PolyMesh * pp;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (pp);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -697,13 +702,14 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, struct ParseData_PolyMesh * pp)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
+yy_symbol_print (yyoutput, yytype, yyvaluep, pp)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    struct ParseData_PolyMesh * pp;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -711,7 +717,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, pp);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -751,12 +757,13 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, struct ParseData_PolyMesh * pp)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule)
+yy_reduce_print (yyvsp, yyrule, pp)
     YYSTYPE *yyvsp;
     int yyrule;
+    struct ParseData_PolyMesh * pp;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -770,7 +777,7 @@ yy_reduce_print (yyvsp, yyrule)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+		       		       , pp);
       fprintf (stderr, "\n");
     }
 }
@@ -778,7 +785,7 @@ yy_reduce_print (yyvsp, yyrule)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
+    yy_reduce_print (yyvsp, Rule, pp); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1029,16 +1036,18 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, struct ParseData_PolyMesh * pp)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep)
+yydestruct (yymsg, yytype, yyvaluep, pp)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
+    struct ParseData_PolyMesh * pp;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (pp);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1063,7 +1072,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void);
+int yyparse (struct ParseData_PolyMesh * pp);
 #else
 int yyparse ();
 #endif
@@ -1071,14 +1080,6 @@ int yyparse ();
 
 
 
-/* The look-ahead symbol.  */
-int yychar;
-
-/* The semantic value of the look-ahead symbol.  */
-YYSTYPE yylval;
-
-/* Number of syntax errors so far.  */
-int yynerrs;
 
 
 
@@ -1100,15 +1101,23 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void)
+yyparse (struct ParseData_PolyMesh * pp)
 #else
 int
-yyparse ()
-
+yyparse (pp)
+    struct ParseData_PolyMesh * pp;
 #endif
 #endif
 {
-  
+  /* The look-ahead symbol.  */
+int yychar;
+
+/* The semantic value of the look-ahead symbol.  */
+YYSTYPE yylval;
+
+/* Number of syntax errors so far.  */
+int yynerrs;
+
   int yystate;
   int yyn;
   int yyresult;
@@ -1353,21 +1362,21 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 43 "./src/file/bison_PolyMesh.y"
+#line 53 "./src/file/bison_PolyMesh.y"
     {
-	          root_data = (yyvsp[(1) - (1)].data_node);
+	          pp->data_node = (yyvsp[(1) - (1)].data_node);
                ;}
     break;
 
   case 3:
-#line 46 "./src/file/bison_PolyMesh.y"
+#line 56 "./src/file/bison_PolyMesh.y"
     {
 	          printf("nothing found\n");
                ;}
     break;
 
   case 4:
-#line 51 "./src/file/bison_PolyMesh.y"
+#line 61 "./src/file/bison_PolyMesh.y"
     {
                                  (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
 				 (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
@@ -1375,7 +1384,7 @@ yyreduce:
     break;
 
   case 5:
-#line 55 "./src/file/bison_PolyMesh.y"
+#line 65 "./src/file/bison_PolyMesh.y"
     {
                                  (yyval.data_node) = (yyvsp[(1) - (2)].data_node);				 
 				 (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
@@ -1383,7 +1392,7 @@ yyreduce:
     break;
 
   case 6:
-#line 59 "./src/file/bison_PolyMesh.y"
+#line 69 "./src/file/bison_PolyMesh.y"
     {
                                  (yyval.data_node) = new ParseNode();
 				 (yyval.data_node)->_strVarName = "";
@@ -1393,7 +1402,7 @@ yyreduce:
     break;
 
   case 7:
-#line 65 "./src/file/bison_PolyMesh.y"
+#line 75 "./src/file/bison_PolyMesh.y"
     {
                                  (yyval.data_node) = new ParseNode();
 				 (yyval.data_node)->_strVarName = "";
@@ -1403,7 +1412,7 @@ yyreduce:
     break;
 
   case 8:
-#line 73 "./src/file/bison_PolyMesh.y"
+#line 83 "./src/file/bison_PolyMesh.y"
     {
 	                          //printf("var_array: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[(4) - (5)].data_node);
@@ -1412,7 +1421,7 @@ yyreduce:
     break;
 
   case 9:
-#line 78 "./src/file/bison_PolyMesh.y"
+#line 88 "./src/file/bison_PolyMesh.y"
     {
 				  //printf("var_list: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[(3) - (3)].data_node);
@@ -1421,7 +1430,7 @@ yyreduce:
     break;
 
   case 10:
-#line 85 "./src/file/bison_PolyMesh.y"
+#line 95 "./src/file/bison_PolyMesh.y"
     {
 	                          (yyval.data_node) = (yyvsp[(1) - (2)].data_node);
 				  (yyval.data_node)->_children.push_back( (yyvsp[(2) - (2)].data_node) );
@@ -1429,7 +1438,7 @@ yyreduce:
     break;
 
   case 11:
-#line 89 "./src/file/bison_PolyMesh.y"
+#line 99 "./src/file/bison_PolyMesh.y"
     {
                                   (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
@@ -1439,14 +1448,14 @@ yyreduce:
     break;
 
   case 12:
-#line 97 "./src/file/bison_PolyMesh.y"
+#line 107 "./src/file/bison_PolyMesh.y"
     {
 				  (yyval.data_node) = (yyvsp[(2) - (3)].data_node);
                               ;}
     break;
 
   case 13:
-#line 102 "./src/file/bison_PolyMesh.y"
+#line 112 "./src/file/bison_PolyMesh.y"
     {
 	                          (yyval.data_node) = (yyvsp[(1) - (3)].data_node);
 				  (yyval.data_node)->_children.push_back( (yyvsp[(3) - (3)].data_node) );
@@ -1454,7 +1463,7 @@ yyreduce:
     break;
 
   case 14:
-#line 106 "./src/file/bison_PolyMesh.y"
+#line 116 "./src/file/bison_PolyMesh.y"
     {
 				  (yyval.data_node) = (yyvsp[(1) - (3)].data_node);				  
 				  (yyval.data_node)->_children.push_back( (yyvsp[(3) - (3)].data_node) );
@@ -1462,7 +1471,7 @@ yyreduce:
     break;
 
   case 15:
-#line 110 "./src/file/bison_PolyMesh.y"
+#line 120 "./src/file/bison_PolyMesh.y"
     {
 	                          (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
@@ -1472,7 +1481,7 @@ yyreduce:
     break;
 
   case 16:
-#line 116 "./src/file/bison_PolyMesh.y"
+#line 126 "./src/file/bison_PolyMesh.y"
     {
 	                          (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
@@ -1482,7 +1491,7 @@ yyreduce:
     break;
 
   case 17:
-#line 124 "./src/file/bison_PolyMesh.y"
+#line 134 "./src/file/bison_PolyMesh.y"
     {
 	                          //printf("key: %s, val: %s\n", $1, $3 );
 				  (yyval.data_node) = new ParseNode();
@@ -1492,7 +1501,7 @@ yyreduce:
     break;
 
   case 18:
-#line 131 "./src/file/bison_PolyMesh.y"
+#line 141 "./src/file/bison_PolyMesh.y"
     {
 				  //printf("val: %s\n", $1 );
 				  (yyval.data_node) = new ParseNode();
@@ -1503,7 +1512,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1507 "./src/file/bison_PolyMesh.tab.c"
+#line 1516 "./src/file/bison_PolyMesh.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1539,7 +1548,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
+      yyerror (pp, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1563,11 +1572,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
+	    yyerror (pp, yymsg);
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
+	    yyerror (pp, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1591,7 +1600,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+		      yytoken, &yylval, pp);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1647,7 +1656,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
+		  yystos[yystate], yyvsp, pp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1685,7 +1694,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (pp, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1693,7 +1702,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
+		 yytoken, &yylval, pp);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1701,7 +1710,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp, pp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1717,10 +1726,10 @@ yyreturn:
 }
 
 
-#line 139 "./src/file/bison_PolyMesh.y"
+#line 149 "./src/file/bison_PolyMesh.y"
 
 
-void yy_PolyMesh_error(char * s){
+void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * s){
   fprintf(stderr, "%s\n", s);
 }
 
