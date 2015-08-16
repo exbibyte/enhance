@@ -32,7 +32,7 @@ bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, Da
     // 	return false;
     // }
 
-    //cout << "Attempting to open file: " << data_path << endl;
+    cout << "Attempting to open file: " << data_path << endl;
 
     // open a file handle to a particular file:
     char * szPathFile = strdup( data_path.c_str() );
@@ -43,7 +43,6 @@ bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, Da
         return false;
     }
 
-//    yyscan_t my_scanner;
     struct ParseData_PolyMesh p;
 
 //    if( yy_PolyMesh_lex_init_extra( pp, &p.scaninfo ) ){
@@ -55,12 +54,12 @@ bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, Da
     // set flex to read from it instead of defaulting to STDIN:
     yy_PolyMesh_set_in( input_file, p.scaninfo );
 
-    // cout << "Attempting to parse file: " << data_path << endl;
+    cout << "Attempting to parse file: " << data_path << endl;
 
     // parse input
     yy_PolyMesh_parse( &p );
 
-//    cout << "Attempting to access parsed data from file: " << data_path << endl;
+   cout << "Attempting to access parsed data from file: " << data_path << endl;
 
     if( !p.data_node ){
 	cout << "root invalid" << endl;
