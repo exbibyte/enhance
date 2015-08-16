@@ -37,15 +37,20 @@ int main(int argc, char** argv){
         return -1;
     }
 
-    struct ParseData_PolyMesh p;
+    struct ParseData_PolyMesh p { 0, 0 };
+    // if( yy_PolyMesh_lex_init_extra( &p, &(p.scaninfo) ) ){
+    // 	cout << "yylex init failed" << endl;
+    // 	return -1;
+    // }
+
+    // set flex to read from it instead of defaulting to STDIN:
+    yy_PolyMesh_set_in( myfile, &p.scaninfo );
+
     if( yy_PolyMesh_lex_init_extra( &p, &(p.scaninfo) ) ){
 	cout << "yylex init failed" << endl;
 	return -1;
     }
-
-    // set flex to read from it instead of defaulting to STDIN:
-    yy_PolyMesh_set_in( myfile, &p );
-
+    
     // parse through the input until there is no more:
     /* do { */
     yy_PolyMesh_parse( &p );

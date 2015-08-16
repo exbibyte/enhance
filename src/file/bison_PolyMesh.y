@@ -1,5 +1,6 @@
-%name-prefix="yy_PolyMesh_"
-%pure_parser
+%name-prefix "yy_PolyMesh_"
+ /*%pure_parser*/
+%define api.pure
 %parse-param { struct ParseData_PolyMesh * pp }
 
 %{
@@ -22,14 +23,16 @@
 
 %{
   #include "ParseData_PolyMesh.h"
-//  #define YYLEX_PARAM pp
 %}
-
-%lex-param{ pp }
 
 %{
   #include "Flex_PolyMesh.h"
   void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
+%}
+
+%lex-param { void * scanner }
+%{
+  #define scanner pp->scaninfo
 %}
 
 %token<str> VARIABLE

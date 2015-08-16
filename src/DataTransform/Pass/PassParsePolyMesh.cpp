@@ -1,21 +1,24 @@
-#include "PassParsePolyMesh.h"
-#include "DataType.h"
+#include <stdio.h>
+#include <string>
+#include <iostream>
+
 #include "ParseNode.h"
 #include "Filter_ParseNode.h"
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data.h"
+#include "ParseData_PolyMesh.h"
+#include "bison_PolyMesh.tab.h"
+#include "Flex_PolyMesh.h"
+#include "PassParsePolyMesh.h"
+//#include "DataType.h"
+//#include "DataTransformPass.h"
 
-#include <stdio.h>
-#include <string>
-#include <iostream>
 using namespace std;
 
-extern FILE * yyin;
-extern int yylex();
-extern int yyparse();
-extern ParseNode * root_data;
+//extern int yy_PolyMesh_parse( struct ParseData_PolyMesh * pp );
 
 bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, DataTransformMetaInfo * meta_info_output ){
+
     DataType::Enum data_type;
     string data_path;
     if( !GetInputFileFromMetaInfo( meta_info_input, data_type, data_path ) ){
@@ -29,28 +32,43 @@ bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, Da
     // 	return false;
     // }
 
-    FILE * myfile = fopen( data_path.c_str(), "r" );
+    //cout << "Attempting to open file: " << data_path << endl;
+
+    // open a file handle to a particular file:
+    char * szPathFile = strdup( data_path.c_str() );
+    FILE * input_file = fopen( szPathFile, "r");
     // make sure it is valid:
-    if (!myfile) {
-        cout << "I can't open input file!" << endl;
-        return -1;
+    if ( !input_file ) {
+        cout << "I can't open input file: " << szPathFile << endl;
+        return false;
     }
+
+//    yyscan_t my_scanner;
+    struct ParseData_PolyMesh p;
+
+//    if( yy_PolyMesh_lex_init_extra( pp, &p.scaninfo ) ){
+    if( yy_PolyMesh_lex_init( & p.scaninfo ) ){
+	cout << "yylex init failed" << endl;
+	return false;
+    }
+
     // set flex to read from it instead of defaulting to STDIN:
-    yyin = myfile;
+    yy_PolyMesh_set_in( input_file, p.scaninfo );
 
-    // parse through the input until there is no more:
-    do {
-	yyparse();
-    } while (!feof(yyin));
+    // cout << "Attempting to parse file: " << data_path << endl;
 
-    if( !root_data ){
+    // parse input
+    yy_PolyMesh_parse( &p );
+
+//    cout << "Attempting to access parsed data from file: " << data_path << endl;
+
+    if( !p.data_node ){
 	cout << "root invalid" << endl;
 	return false;
     }
 
-    //process parsed nodes
     Filter_ParsePolyMesh filter_polymesh;
-    filter_polymesh.VisitNode( root_data );
+    filter_polymesh.VisitNode( p.data_node );
 
     for( auto i : filter_polymesh._vec_PolyMesh_Data_Vert ){
 	i->PrintData();
