@@ -70,7 +70,7 @@ bool GLSceneManager::RunBody(){
     return true;
 }
 
-bool GLSceneManager::RegisterRoutine( string routine_name, std::function<bool(GLSLProgram *)> routine, GLSceneRoutineType::Enum routine_type ){
+bool GLSceneManager::RegisterRoutine( string routine_name, std::function<bool(GLSLProgram * &)> routine, GLSceneRoutineType::Enum routine_type ){
     switch( routine_type ){
     case GLSceneRoutineType::INIT:
 	_vec_init.push_back( routine_name );
@@ -84,7 +84,7 @@ bool GLSceneManager::RegisterRoutine( string routine_name, std::function<bool(GL
     default:
 	return false;
     }
-    _map_routine.insert(std::pair< string, std::function<bool(GLSLProgram *)> >( routine_name, routine ) );
+    _map_routine.insert(std::pair< string, std::function<bool(GLSLProgram * &)> >( routine_name, routine ) );
     return true;
 }
 

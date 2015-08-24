@@ -29,13 +29,13 @@ public:
     bool RunInit();
     bool RunCleanup();
     bool RunBody();
-    bool RegisterRoutine( std::string routine_name, std::function<bool(GLSLProgram *)> routine, GLSceneRoutineType::Enum routine_type );
+    bool RegisterRoutine( std::string routine_name, std::function<bool(GLSLProgram * &)> routine, GLSceneRoutineType::Enum routine_type );
     bool UnregisterRoutine( std::string const routine_name );
 protected:
     std::vector< std::string > _vec_init;
     std::vector< std::string > _vec_cleanup;
     std::vector< std::string > _vec_body;
-    std::map< std::string, std::function<bool(GLSLProgram *)> > _map_routine;
+    std::map< std::string, std::function<bool(GLSLProgram * &)> > _map_routine;
     GLSLProgram * _GLSLProgram;
 };
 
