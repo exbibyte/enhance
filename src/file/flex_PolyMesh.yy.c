@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 37
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -47,7 +47,6 @@ typedef int16_t flex_int16_t;
 typedef uint16_t flex_uint16_t;
 typedef int32_t flex_int32_t;
 typedef uint32_t flex_uint32_t;
-typedef uint64_t flex_uint64_t;
 #else
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
@@ -55,7 +54,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -85,6 +83,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -189,7 +189,7 @@ typedef size_t yy_size_t;
      */
     #define  YY_LESS_LINENO(n) \
             do { \
-                yy_size_t yyl;\
+                int yyl;\
                 for ( yyl = n; yyl < yyleng; ++yyl )\
                     if ( yytext[yyl] == '\n' )\
                         --yylineno;\
@@ -339,7 +339,7 @@ void yy_PolyMesh_free (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define yy_PolyMesh_wrap(n) 1
+#define yy_PolyMesh_wrap(yyscanner) 1
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -358,7 +358,7 @@ static void yy_fatal_error (yyconst char msg[] ,yyscan_t yyscanner );
  */
 #define YY_DO_BEFORE_ACTION \
 	yyg->yytext_ptr = yy_bp; \
-	yyleng = (yy_size_t) (yy_cp - yy_bp); \
+	yyleng = (size_t) (yy_cp - yy_bp); \
 	yyg->yy_hold_char = *yy_cp; \
 	*yy_cp = '\0'; \
 	yyg->yy_c_buf_p = yy_cp;
@@ -456,16 +456,18 @@ static yyconst flex_int32_t yy_rule_can_match_eol[11] =
 #define YY_RESTORE_YY_MORE_OFFSET
 #line 1 "./src/file/flex_PolyMesh.l"
 #line 7 "./src/file/flex_PolyMesh.l"
+/*%option extra-type="struct ParseData_PolyMesh*"*/
   #include <stdlib.h>
-  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
+  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * );
+//  void yy_PolyMesh_error( char * );
   #include "ParseNode.h"
   #include "bison_PolyMesh.tab.h"
   #include <string.h>
-  #include <iostream>
+  //#include <iostream>
   using namespace std;
-#line 17 "./src/file/flex_PolyMesh.l"
+#line 19 "./src/file/flex_PolyMesh.l"
   #include "ParseData_PolyMesh.h"
-#line 469 "./src/file/flex_PolyMesh.yy.c"
+#line 471 "./src/file/flex_PolyMesh.yy.c"
 
 #define INITIAL 0
 
@@ -477,7 +479,9 @@ static yyconst flex_int32_t yy_rule_can_match_eol[11] =
 #include <unistd.h>
 #endif
 
-#define YY_EXTRA_TYPE struct ParseData_PolyMesh*
+#ifndef YY_EXTRA_TYPE
+#define YY_EXTRA_TYPE void *
+#endif
 
 /* Holds the entire state of the reentrant scanner. */
 struct yyguts_t
@@ -554,6 +558,10 @@ int yy_PolyMesh_get_lineno (yyscan_t yyscanner );
 
 void yy_PolyMesh_set_lineno (int line_number ,yyscan_t yyscanner );
 
+int yy_PolyMesh_get_column  (yyscan_t yyscanner );
+
+void yy_PolyMesh_set_column (int column_no ,yyscan_t yyscanner );
+
 YYSTYPE * yy_PolyMesh_get_lval (yyscan_t yyscanner );
 
 void yy_PolyMesh_set_lval (YYSTYPE * yylval_param ,yyscan_t yyscanner );
@@ -600,7 +608,7 @@ static int input (yyscan_t yyscanner );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( yytext, yyleng, 1, yyout )
+#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -611,7 +619,7 @@ static int input (yyscan_t yyscanner );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		yy_size_t n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -696,14 +704,14 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 20 "./src/file/flex_PolyMesh.l"
+#line 22 "./src/file/flex_PolyMesh.l"
 
 
 
-  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
+//  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
 
 
-#line 707 "./src/file/flex_PolyMesh.yy.c"
+#line 715 "./src/file/flex_PolyMesh.yy.c"
 
     yylval = yylval_param;
 
@@ -779,7 +787,7 @@ yy_find_action:
 
 		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
 			{
-			yy_size_t yyl;
+			int yyl;
 			for ( yyl = 0; yyl < yyleng; ++yyl )
 				if ( yytext[yyl] == '\n' )
 					   
@@ -802,7 +810,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 26 "./src/file/flex_PolyMesh.l"
+#line 28 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACE_OPEN;
@@ -810,7 +818,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 31 "./src/file/flex_PolyMesh.l"
+#line 33 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACE_CLOSE;
@@ -818,7 +826,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "./src/file/flex_PolyMesh.l"
+#line 37 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACKET_OPEN;
@@ -826,7 +834,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 39 "./src/file/flex_PolyMesh.l"
+#line 41 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACKET_CLOSE;
@@ -834,7 +842,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "./src/file/flex_PolyMesh.l"
+#line 45 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return COLON;
@@ -842,7 +850,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 47 "./src/file/flex_PolyMesh.l"
+#line 49 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return COMMA;
@@ -850,7 +858,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 51 "./src/file/flex_PolyMesh.l"
+#line 53 "./src/file/flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return VARIABLE;
@@ -859,20 +867,20 @@ YY_RULE_SETUP
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 55 "./src/file/flex_PolyMesh.l"
+#line 57 "./src/file/flex_PolyMesh.l"
 { }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 56 "./src/file/flex_PolyMesh.l"
+#line 58 "./src/file/flex_PolyMesh.l"
 return(0);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 58 "./src/file/flex_PolyMesh.l"
+#line 60 "./src/file/flex_PolyMesh.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 876 "./src/file/flex_PolyMesh.yy.c"
+#line 884 "./src/file/flex_PolyMesh.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1066,7 +1074,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) (yyg->yy_c_buf_p - b->yy_ch_buf);
@@ -1201,6 +1209,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 16);
 
+	(void)yyg;
 	return yy_is_jam ? 0 : yy_current_state;
 }
 
@@ -1295,7 +1304,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 				case EOB_ACT_END_OF_FILE:
 					{
 					if ( yy_PolyMesh_wrap(yyscanner ) )
-						return 0;
+						return EOF;
 
 					if ( ! yyg->yy_did_buffer_switch_on_eof )
 						YY_NEW_FILE;
@@ -1442,10 +1451,6 @@ static void yy_PolyMesh__load_buffer_state  (yyscan_t yyscanner)
 	yy_PolyMesh_free((void *) b ,yyscanner );
 }
 
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a yy_PolyMesh_restart() or at EOF.
@@ -1655,8 +1660,8 @@ YY_BUFFER_STATE yy_PolyMesh__scan_string (yyconst char * yystr , yyscan_t yyscan
 
 /** Setup the input buffer state to scan the given bytes. The next call to yy_PolyMesh_lex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  */
@@ -1664,7 +1669,8 @@ YY_BUFFER_STATE yy_PolyMesh__scan_bytes  (yyconst char * yybytes, yy_size_t  _yy
 {
 	YY_BUFFER_STATE b;
 	char *buf;
-	yy_size_t n, i;
+	yy_size_t n;
+	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -1810,7 +1816,7 @@ void yy_PolyMesh_set_lineno (int  line_number , yyscan_t yyscanner)
 
         /* lineno is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yy_PolyMesh_set_lineno called with no buffer" , yyscanner); 
+           YY_FATAL_ERROR( "yy_PolyMesh_set_lineno called with no buffer" );
     
     yylineno = line_number;
 }
@@ -1825,7 +1831,7 @@ void yy_PolyMesh_set_column (int  column_no , yyscan_t yyscanner)
 
         /* column is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "yy_PolyMesh_set_column called with no buffer" , yyscanner); 
+           YY_FATAL_ERROR( "yy_PolyMesh_set_column called with no buffer" );
     
     yycolumn = column_no;
 }
@@ -2049,7 +2055,7 @@ void yy_PolyMesh_free (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 58 "./src/file/flex_PolyMesh.l"
+#line 60 "./src/file/flex_PolyMesh.l"
 
 
 

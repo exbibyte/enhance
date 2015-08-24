@@ -1,15 +1,17 @@
-%option noyywrap nodefault yylineno reentrant
+%option noyywrap nodefault yylineno 
+%option reentrant
 %option prefix="yy_PolyMesh_"
 %option bison-bridge
-%option extra-type="struct ParseData_PolyMesh*"
 
 %{
+/*%option extra-type="struct ParseData_PolyMesh*"*/
   #include <stdlib.h>
-  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
+  void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * );
+//  void yy_PolyMesh_error( char * );
   #include "ParseNode.h"
   #include "bison_PolyMesh.tab.h"
   #include <string.h>
-  #include <iostream>
+  //#include <iostream>
   using namespace std;
 %}
 
@@ -20,7 +22,7 @@
 %%
 
 %{
-  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
+//  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
 %}
 
 "-{"           {

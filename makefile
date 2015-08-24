@@ -9,9 +9,11 @@ src_folder_graph := ./src/graph
 src_folder_polymesh := ./src/polymesh
 src_folder_datatransform := ./src/DataTransform
 src_folder_datatransform_pass := ./src/DataTransform/Pass
+src_folder_gl := ./src/gl
 
 src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
+src_folder_test_gl := ./test/gl
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -24,6 +26,7 @@ inc_folder_graph := ./src/graph
 inc_folder_polymesh := ./src/polymesh
 inc_folder_datatransform := ./src/DataTransform
 inc_folder_datatransform_pass := ./src/DataTransform/Pass
+inc_folder_gl := ./src/gl
 
 build_dir := ./build
 lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
@@ -34,7 +37,13 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_ParsePolyMesh test_DataTransformPolyMesh_osx
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie
+
+parsing:
+	test_ParsePolyMesh test_DataTransformPolyMesh_osx
+
+graphics_mac:
+	test_GLSceneManager_osx
 
 test_vec:
 	g++ -std=c++0x ./test/math/catch_vec.cpp $(src_folder_math)/Vec.cpp -I$(inc_folder_catch) -I$(inc_folder_math) $(lib) -o $(build_dir)/test_vec	
@@ -145,12 +154,15 @@ test_Filter_ParseNode_osx:
 	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
 	g++ -std=c++0x -g $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_test_file)/test_Filter_ParseNode.cpp $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp -I$(inc_folder_file) -ll -o $(build_dir)/test_Filter_ParseNode
 
-test_DataTransformPolyMesh_osx:
-	bison -d $(src_folder_file)/testyac_PolyMesh.y -o $(src_folder_file)/testyac_PolyMesh.tab.c
-	flex -o $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/testlex_PolyMesh.l
-	g++ -std=c++0x -g $(src_folder_file)/testyac_PolyMesh.tab.c $(src_folder_file)/testlex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_test_datatransform)/test_DataTransformPolyMesh.cpp -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -ll -o $(build_dir)/test_DataTransformPolyMesh
-
 test_Filter_ParseNode_v2_osx:
 	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
 	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
 	g++ -std=c++0x -g $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_test_file)/test_Filter_ParseNode_v2.cpp $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp -I$(inc_folder_file) -ll -o $(build_dir)/test_Filter_ParseNode_v2
+
+test_DataTransformPolyMesh_osx:
+	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
+	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
+	g++ -std=c++0x -g $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_test_datatransform)/test_DataTransformPolyMesh.cpp -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -ll -o $(build_dir)/test_DataTransformPolyMesh
+
+test_GLSceneManager_osx:
+	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++0x $(src_folder_gl)/GLSceneManager.cpp $(src_folder_ui)/WindowManagerGlfw.cpp $(src_folder_gl)/GLSLProgram.cpp $(src_folder_gl)/GLHelper.cpp $(src_folder_gl)/GLTexture.cpp $(src_folder_file)/textfile.cpp $(src_folder_file)/PPM.cpp $(src_folder_polymesh)/WingedEdge.cpp $(src_folder_math)/Vec.cpp $(src_folder_test_gl)/test_GLSceneManager.cpp -I/usr/local/include -I$(inc_folder_file) -I$(inc_folder_gl) -I$(inc_folder_ui) -I$(inc_folder_graph) -I$(inc_folder_polymesh) -I$(inc_folder_math) -I$(inc_folder_en) -I$(inc_folder_core) -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/test_GLSceneManager

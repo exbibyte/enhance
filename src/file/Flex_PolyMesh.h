@@ -13,7 +13,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 37
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -51,7 +51,6 @@ typedef int16_t flex_int16_t;
 typedef uint16_t flex_uint16_t;
 typedef int32_t flex_int32_t;
 typedef uint32_t flex_uint32_t;
-typedef uint64_t flex_uint64_t;
 #else
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
@@ -59,7 +58,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -89,6 +87,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -214,7 +214,7 @@ void yy_PolyMesh_free (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define yy_PolyMesh_wrap(n) 1
+#define yy_PolyMesh_wrap(yyscanner) 1
 #define YY_SKIP_YYWRAP
 
 #define yytext_ptr yytext_r
@@ -232,7 +232,9 @@ void yy_PolyMesh_free (void * ,yyscan_t yyscanner );
 #include <unistd.h>
 #endif
 
-#define YY_EXTRA_TYPE struct ParseData_PolyMesh*
+#ifndef YY_EXTRA_TYPE
+#define YY_EXTRA_TYPE void *
+#endif
 
 int yy_PolyMesh_lex_init (yyscan_t* scanner);
 
@@ -266,6 +268,10 @@ char *yy_PolyMesh_get_text (yyscan_t yyscanner );
 int yy_PolyMesh_get_lineno (yyscan_t yyscanner );
 
 void yy_PolyMesh_set_lineno (int line_number ,yyscan_t yyscanner );
+
+int yy_PolyMesh_get_column  (yyscan_t yyscanner );
+
+void yy_PolyMesh_set_column (int column_no ,yyscan_t yyscanner );
 
 YYSTYPE * yy_PolyMesh_get_lval (yyscan_t yyscanner );
 
@@ -332,9 +338,9 @@ extern int yy_PolyMesh_lex \
 #undef YY_DECL
 #endif
 
-#line 58 "./src/file/flex_PolyMesh.l"
+#line 60 "./src/file/flex_PolyMesh.l"
 
 
-#line 339 "./src/file/Flex_PolyMesh.h"
+#line 345 "./src/file/Flex_PolyMesh.h"
 #undef yy_PolyMesh_IN_HEADER
 #endif /* yy_PolyMesh_HEADER_H */

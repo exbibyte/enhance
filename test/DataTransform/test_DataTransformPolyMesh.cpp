@@ -22,8 +22,9 @@ int main( int argc, char ** argv ){
     DataTransformMetaInfo meta_info_input("sample_input");
     DataTransformMetaInfo meta_info_output("sample_output");
 
+    string strFilePathPolyMesh = string( file_path_polymesh );
     meta_info_input.AddMetaInfo( "INPUT_DATATYPE", "FILE_POLYMESH" );
-    meta_info_input.AddMetaInfo( "INPUT_DATAPATH", string(file_path_polymesh) );
+    meta_info_input.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
 
     meta_info_output.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");
 	

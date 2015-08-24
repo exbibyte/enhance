@@ -90,10 +90,11 @@ bool DataTransformDriver::FindSuitablePath( DataTransformPass * & pass ){
 }
 
 bool DataTransformDriver::ExecuteSuitablePath(){
+    bool bRet;
     DataTransformPass * suitable_pass;
     if( !FindSuitablePath( suitable_pass ) ){
 	return false;
     }
-    suitable_pass->ExecutePath( _pInputMetaInfoAggregate, _pOutputMetaInfoAggregate );
-    return true;
+    bRet = suitable_pass->ExecutePath( _pInputMetaInfoAggregate, _pOutputMetaInfoAggregate );
+    return bRet;
 }
