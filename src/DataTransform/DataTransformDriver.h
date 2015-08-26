@@ -16,24 +16,9 @@ class DataTransformDriver {
 public:
     DataTransformDriver();
     bool RegisterPass( DataTransformPass * pass );
-    bool AddTransformInputInfo( DataTransformMetaInfo * in );
-    bool RemoveTransformInputInfo( std::string id );
-    bool RemoveTransformInputInfoAll();
-    bool AddTransformOutputInfo( DataTransformMetaInfo * out );
-    bool RemoveTransformOutputInfo( std::string id );
-    bool RemoveTransformOutputInfoAll();
-    bool BuildTransformInfoAggregate();
-    bool FindSuitablePath( DataTransformPass * & pass );
-    bool ExecuteSuitablePath();
+    bool ExecutePasses( void * & data_in, void * & data_out );
 private:
-    DataTransformMetaInfoCombiner _MetaInfoCombiner;
     std::vector< DataTransformPass * > _Passes;
-    std::vector< DataTransformMetaInfo * > _InputMetaInfos;
-    std::vector< DataTransformMetaInfo * > _OutputMetaInfos;
-    DataTransformMetaInfo * _pInputMetaInfoAggregate; 
-    DataTransformMetaInfo * _pOutputMetaInfoAggregate;
-    DataTransformMetaInfo _InputMetaInfoAggregate; 
-    DataTransformMetaInfo _OutputMetaInfoAggregate;
 };
 
 #endif

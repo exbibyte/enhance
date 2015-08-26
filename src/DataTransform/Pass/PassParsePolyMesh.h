@@ -4,7 +4,7 @@
 #include "DataTransformPass.h"
 
 class PassParsePolyMesh : public DataTransformPass {
-    bool ExecutePath( DataTransformMetaInfo * meta_info_input, DataTransformMetaInfo * meta_info_output );
+    bool ExecutePass( void * & data_in, void * & data_out );
 };
 
 #endif

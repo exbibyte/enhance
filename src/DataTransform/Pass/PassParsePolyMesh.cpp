@@ -17,20 +17,20 @@ using namespace std;
 
 //extern int yy_PolyMesh_parse( struct ParseData_PolyMesh * pp );
 
-bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, DataTransformMetaInfo * meta_info_output ){
+bool PassParsePolyMesh::ExecutePass( void * & data_in, void * & data_out ){
 
     DataType::Enum data_type;
     string data_path;
-    if( !GetInputFileFromMetaInfo( meta_info_input, data_type, data_path ) ){
+    DataTransformMetaInfo * meta_info;
+    if( !GetDataTransformMetaInfo( meta_info ) ){
+	return false;
+    }
+    if( !QueryFromMetaInfo( meta_info, DataQuery::INPUT, data_type, data_path ) ){
 	return false;
     }
     if( DataType::FILE_POLYMESH != data_type ){
 	return false;
     }
-    // //TODO: select PolyMesh parser and feed data_path to parser
-    // if( !SetParser( DataType::FILE_POLYMESH, data_path ) ){
-    // 	return false;
-    // }
 
     cout << "Attempting to open file: " << data_path << endl;
 

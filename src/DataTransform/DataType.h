@@ -1,6 +1,14 @@
 #ifndef DATA_TYPE_H
 #define DATA_TYPE_H
 
+class DataQuery {
+public:
+    enum Enum {
+	INPUT,
+	OUTPUT,
+    };
+};
+
 class DataType {
 public:
     enum Enum {

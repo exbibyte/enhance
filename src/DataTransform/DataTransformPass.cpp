@@ -18,30 +18,73 @@ bool DataTransformPass::GetDataTransformMetaInfo( DataTransformMetaInfo * & meta
     meta_info = _MetaInfo;
     return true;
 }
-bool DataTransformPass::GetInputFileFromMetaInfo( DataTransformMetaInfo * meta_info_input, DataType::Enum & type, string & data_path ){
+bool DataTransformPass::QueryFromMetaInfo( DataTransformMetaInfo * meta_info, DataQuery::Enum query_type, DataType::Enum & data_type, string & data_detail ){
     //TODO: try to retrieve data type and path from meta info
     vector< string > vals;
-    if( !meta_info_input->GetMetaInfo( "INPUT_DATATYPE", vals ) ){
-	return false;
-    }
-    auto i = vals.begin();
-    if( vals.end() == i ){
-	return false;
-    }
-    if( "FILE_POLYMESH" ==  *i ){
-	type = DataType::FILE_POLYMESH;
-    }
-    else
+
+    string strQueryDataType;
+    string strQueryDataDetail;
+    
+    switch( query_type ){
+    case DataQuery::INPUT:
     {
-	type = DataType::FILE_OTHER;
+        strQueryDataType = "INPUT_DATATYPE";
+	strQueryDataDetail = "INPUT_DATAPATH";
+	if( !meta_info->GetMetaInfo( strQueryDataType, vals ) ){
+	    return false;
+	}
+	auto i = vals.begin();
+	if( vals.end() == i ){
+	    return false;
+	}
+	if( "FILE_POLYMESH" ==  *i ){
+	    data_type = DataType::FILE_POLYMESH;
+	}
+	else
+	{
+	    data_type = DataType::FILE_OTHER;
+	}
+	if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
+	    return false;
+	}
+	i = vals.begin();
+	if( vals.end() == i ){
+	    return false;
+	}
+	data_detail = *i;
+	break;
     }
-    if( !meta_info_input->GetMetaInfo( "INPUT_DATAPATH", vals ) ){
+    case DataQuery::OUTPUT:
+    {
+	strQueryDataType = "OUTPUT_DATATYPE";
+	strQueryDataDetail = "OUTPUT_DATAPATH";
+	if( !meta_info->GetMetaInfo( strQueryDataType, vals ) ){
+	    return false;
+	}
+	auto i = vals.begin();
+	if( vals.end() == i ){
+	    return false;
+	}
+	if( "FILE_POLYMESH" ==  *i ){
+	    data_type = DataType::FILE_POLYMESH;
+	}
+	else
+	{
+	    data_type = DataType::FILE_OTHER;
+	}
+	if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
+	    return false;
+	}
+	i = vals.begin();
+	if( vals.end() == i ){
+	    return false;
+	}
+	data_detail = *i;
+	break;
+    }
+    default:
 	return false;
     }
-    i = vals.begin();
-    if( vals.end() == i ){
-	return false;
-    }
-    data_path = *i;
+    
     return true;
 }
