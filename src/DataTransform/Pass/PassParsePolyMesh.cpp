@@ -66,27 +66,30 @@ bool PassParsePolyMesh::ExecutePass( void * & data_in, void * & data_out ){
 	return false;
     }
 
-    Filter_ParsePolyMesh filter_polymesh;
-    filter_polymesh.VisitNode( p.data_node );
+    Filter_ParsePolyMesh * filter_polymesh = new Filter_ParsePolyMesh;
+    filter_polymesh->VisitNode( p.data_node );
 
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Vert ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Normal ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Edge ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Face ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexSrc ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexCoord ){
-	i->PrintData();
-    }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Normal ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Edge ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Face ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexSrc ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexCoord ){
+    // 	i->PrintData();
+    // }
 
+    data_out = ( void * ) filter_polymesh;
+
+    cout << "PassParsePolyMesh::ExecutePass returned" << endl;
     return true;
 }

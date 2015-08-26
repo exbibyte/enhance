@@ -2,6 +2,7 @@
 #include "PassParsePolyMesh.h"
 #include "DataTransformPass.h"
 #include "DataTransformMetaInfo.h"
+#include "Filter_ParsePolyMesh.h"
 
 #include <iostream>
 #include <string>
@@ -40,6 +41,30 @@ int main( int argc, char ** argv ){
 	assert( 0 && "DataTransformDriver::ExecutePasses failed.");
 	return -1;
     }
+
+    Filter_ParsePolyMesh * filter_polymesh = ( Filter_ParsePolyMesh * ) data_out;
+
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Normal ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Edge ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Face ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexSrc ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexCoord ){
+	i->PrintData();
+    }
+
+    delete filter_polymesh;
+    filter_polymesh = nullptr;
     
     return 0;
 }
