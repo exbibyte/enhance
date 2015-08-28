@@ -17,6 +17,7 @@ public:
     DataTransformDriver();
     bool RegisterPass( DataTransformPass * pass );
     bool ExecutePasses( void * & data_in, void * & data_out );
+    bool CleanUpPasses();
 private:
     std::vector< DataTransformPass * > _Passes;
 };

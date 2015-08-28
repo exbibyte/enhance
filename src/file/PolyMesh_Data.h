@@ -15,6 +15,7 @@ public:
     };
     Enum _type;
     virtual void PrintData(){};
+    virtual bool GetArray( double * & data, int & iCount ){ return false; }
 };
 
 class PolyMesh_Data_Vert : public PolyMesh_Data {
@@ -31,6 +32,18 @@ public:
 	}
 	std::cout<< "}" << std::endl;
     }
+    bool GetArray( double * & data, int & iCount ){
+	iCount = _vec_coord.size();
+	if( 0 == iCount ){
+	    return false;
+	}
+	data = new double [ iCount ];
+	double * current = data;
+	for( auto & i : _vec_coord ){
+	    *current++ = i;
+	}
+	return true;
+    }
 };
 
 class PolyMesh_Data_Normal : public PolyMesh_Data {
@@ -46,6 +59,18 @@ public:
 	    std::cout<< i << " ";
 	}
 	std::cout<< "}" << std::endl;
+    }
+    bool GetArray( double * & data, int & iCount ){
+	iCount = _vec_coord.size();
+	if( 0 == iCount ){
+	    return false;
+	}
+	data = new double [ iCount ];
+	double * current = data;
+	for( auto & i : _vec_coord ){
+	    *current++ = i;
+	}
+	return true;
     }
 };
 

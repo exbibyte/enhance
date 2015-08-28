@@ -39,19 +39,25 @@ bool DataTransformPass::QueryFromMetaInfo( DataTransformMetaInfo * meta_info, Da
 	}
 	if( "FILE_POLYMESH" ==  *i ){
 	    data_type = DataType::FILE_POLYMESH;
+	    if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
+		return false;
+	    }
+	    i = vals.begin();
+	    if( vals.end() == i ){
+		return false;
+	    }
+	    data_detail = *i;
+	}
+	else if( "DATASTRUCT_POLYMESH" ==  *i ){
+	    data_type = DataType::DATASTRUCT_POLYMESH;
+	}
+	else if( "DATASTRUCT_POLYMESH_ARRAY" ==  *i ){
+	    data_type = DataType::DATASTRUCT_POLYMESH_ARRAY;
 	}
 	else
 	{
 	    data_type = DataType::FILE_OTHER;
 	}
-	if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
-	    return false;
-	}
-	i = vals.begin();
-	if( vals.end() == i ){
-	    return false;
-	}
-	data_detail = *i;
 	break;
     }
     case DataQuery::OUTPUT:
@@ -67,19 +73,25 @@ bool DataTransformPass::QueryFromMetaInfo( DataTransformMetaInfo * meta_info, Da
 	}
 	if( "FILE_POLYMESH" ==  *i ){
 	    data_type = DataType::FILE_POLYMESH;
+	    if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
+		return false;
+	    }
+	    i = vals.begin();
+	    if( vals.end() == i ){
+		return false;
+	    }
+	    data_detail = *i;
+	}
+	else if( "DATASTRUCT_POLYMESH" ==  *i ){
+	    data_type = DataType::DATASTRUCT_POLYMESH;
+	}
+	else if( "DATASTRUCT_POLYMESH_ARRAY" ==  *i ){
+	    data_type = DataType::DATASTRUCT_POLYMESH_ARRAY;
 	}
 	else
 	{
 	    data_type = DataType::FILE_OTHER;
 	}
-	if( !meta_info->GetMetaInfo( strQueryDataDetail, vals ) ){
-	    return false;
-	}
-	i = vals.begin();
-	if( vals.end() == i ){
-	    return false;
-	}
-	data_detail = *i;
 	break;
     }
     default:

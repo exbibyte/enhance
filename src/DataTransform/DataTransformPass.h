@@ -15,6 +15,7 @@ class DataTransformMetaInfo;
 class DataTransformPass {
 public:
     virtual bool ExecutePass( void * & data_in, void * & data_out ){ return false; }
+    virtual bool CleanPass(){ return false; }
     bool RegisterDataTransformMetaInfo( DataTransformMetaInfo * const meta_info );
     bool GetDataTransformMetaInfo( DataTransformMetaInfo * & meta_info ) const;
     bool QueryFromMetaInfo( DataTransformMetaInfo * meta_info, DataQuery::Enum query_type, DataType::Enum & data_type, std::string & data_detail );

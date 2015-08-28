@@ -10,8 +10,6 @@
 #include "bison_PolyMesh.tab.h"
 #include "Flex_PolyMesh.h"
 #include "PassParsePolyMesh.h"
-//#include "DataType.h"
-//#include "DataTransformPass.h"
 
 using namespace std;
 
@@ -66,8 +64,8 @@ bool PassParsePolyMesh::ExecutePass( void * & data_in, void * & data_out ){
 	return false;
     }
 
-    Filter_ParsePolyMesh * filter_polymesh = new Filter_ParsePolyMesh;
-    filter_polymesh->VisitNode( p.data_node );
+    _FilterPolyMesh = new Filter_ParsePolyMesh;
+    _FilterPolyMesh->VisitNode( p.data_node );
 
     // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
     // 	i->PrintData();
@@ -88,8 +86,16 @@ bool PassParsePolyMesh::ExecutePass( void * & data_in, void * & data_out ){
     // 	i->PrintData();
     // }
 
-    data_out = ( void * ) filter_polymesh;
+    data_out = ( void * ) _FilterPolyMesh;
 
     cout << "PassParsePolyMesh::ExecutePass returned" << endl;
+    return true;
+}
+bool PassParsePolyMesh::CleanPass(){
+    if( !_FilterPolyMesh ){
+	delete _FilterPolyMesh;
+	_FilterPolyMesh = nullptr;
+    }
+    cout << "PassParsePolyMesh::CleanPass returned" << endl;
     return true;
 }

@@ -3,8 +3,14 @@
 
 #include "DataTransformPass.h"
 
+class Filter_ParsePolyMesh;
+
 class PassParsePolyMesh : public DataTransformPass {
+public:
     bool ExecutePass( void * & data_in, void * & data_out );
+    bool CleanPass();
+private:
+    Filter_ParsePolyMesh * _FilterPolyMesh;
 };
 
 #endif
