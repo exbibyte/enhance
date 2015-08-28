@@ -2,6 +2,7 @@
 #include "PassParsePolyMesh.h"
 #include "DataTransformPass.h"
 #include "DataTransformMetaInfo.h"
+#include "Filter_ParsePolyMesh.h"
 
 #include <iostream>
 #include <string>
@@ -19,35 +20,51 @@ int main( int argc, char ** argv ){
     PassParsePolyMesh pass_parse_polymesh;
     PassParsePolyMesh * p_pass_parse_polymesh = & pass_parse_polymesh;
     DataTransformDriver data_transform_driver;
-    DataTransformMetaInfo meta_info_input("sample_input");
-    DataTransformMetaInfo meta_info_output("sample_output");
-
+    DataTransformMetaInfo meta_info("sample_polymesh");
+    
     string strFilePathPolyMesh = string( file_path_polymesh );
-    meta_info_input.AddMetaInfo( "INPUT_DATATYPE", "FILE_POLYMESH" );
-    meta_info_input.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
+    meta_info.AddMetaInfo( "INPUT_DATATYPE", "FILE_POLYMESH" );
+    meta_info.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
+    meta_info.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");
 
-    meta_info_output.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");
-	
+    if( !pass_parse_polymesh.RegisterDataTransformMetaInfo( & meta_info ) ){
+	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
+	return -1;
+    }
     if( !data_transform_driver.RegisterPass( p_pass_parse_polymesh ) ){
-	assert( 0 && "Register Pass failed.");
+	assert( 0 && "DataTransformDriver::RegisterPass failed.");
 	return -1;
     }
-    if( !data_transform_driver.AddTransformInputInfo( &meta_info_input ) ){
-	assert( 0 && "Add Transform Input Info failed.");
-	return -1;
-    }    
-    if( !data_transform_driver.AddTransformOutputInfo( &meta_info_output ) ){
-	assert( 0 && "Add Transform Output Info failed.");
+    void * data_in;
+    void * data_out;
+    if( !data_transform_driver.ExecutePasses( data_in, data_out ) ){
+	assert( 0 && "DataTransformDriver::ExecutePasses failed.");
 	return -1;
     }
-    if( !data_transform_driver.BuildTransformInfoAggregate() ){
-	assert( 0 && "Build Transform Info Aggregate failed.");
-	return -1;
+
+    Filter_ParsePolyMesh * filter_polymesh = ( Filter_ParsePolyMesh * ) data_out;
+
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
+	i->PrintData();
     }
-    if( !data_transform_driver.ExecuteSuitablePath() ){
-	assert( 0 && "Execute Suitable Path failed.");
-	return -1;
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Normal ){
+	i->PrintData();
     }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Edge ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_Face ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexSrc ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexCoord ){
+	i->PrintData();
+    }
+
+    delete filter_polymesh;
+    filter_polymesh = nullptr;
     
     return 0;
 }

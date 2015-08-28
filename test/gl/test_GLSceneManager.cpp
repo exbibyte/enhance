@@ -85,7 +85,7 @@ public:
 	vec_position[0] = 0.0f;
 	vec_position[1] = 0.8f;
 	vec_position[2] = 0.0f;
-	v6.pos.SetFromArray( 3, vec_position );
+tF	v6.pos.SetFromArray( 3, vec_position );
 
 	Edge e0, e1, e2, e3, e4, e5, e6, e7; // e0 to e4 makes a square, e5 to e7 makes a triangle
 	MapEdge edge_map;
@@ -173,9 +173,9 @@ public:
 	_GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
 
 	//deallocate data
-	delete arrayPositionData;
+	delete [] arrayPositionData;
 	arrayPositionData = 0;
-	delete arrayNormalData;
+	delete [] arrayNormalData;
 	arrayNormalData = 0;
 
 	return true;

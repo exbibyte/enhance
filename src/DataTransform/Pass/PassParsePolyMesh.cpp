@@ -10,27 +10,25 @@
 #include "bison_PolyMesh.tab.h"
 #include "Flex_PolyMesh.h"
 #include "PassParsePolyMesh.h"
-//#include "DataType.h"
-//#include "DataTransformPass.h"
 
 using namespace std;
 
 //extern int yy_PolyMesh_parse( struct ParseData_PolyMesh * pp );
 
-bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, DataTransformMetaInfo * meta_info_output ){
+bool PassParsePolyMesh::ExecutePass( void * & data_in, void * & data_out ){
 
     DataType::Enum data_type;
     string data_path;
-    if( !GetInputFileFromMetaInfo( meta_info_input, data_type, data_path ) ){
+    DataTransformMetaInfo * meta_info;
+    if( !GetDataTransformMetaInfo( meta_info ) ){
+	return false;
+    }
+    if( !QueryFromMetaInfo( meta_info, DataQuery::INPUT, data_type, data_path ) ){
 	return false;
     }
     if( DataType::FILE_POLYMESH != data_type ){
 	return false;
     }
-    // //TODO: select PolyMesh parser and feed data_path to parser
-    // if( !SetParser( DataType::FILE_POLYMESH, data_path ) ){
-    // 	return false;
-    // }
 
     cout << "Attempting to open file: " << data_path << endl;
 
@@ -66,27 +64,38 @@ bool PassParsePolyMesh::ExecutePath( DataTransformMetaInfo * meta_info_input, Da
 	return false;
     }
 
-    Filter_ParsePolyMesh filter_polymesh;
-    filter_polymesh.VisitNode( p.data_node );
+    _FilterPolyMesh = new Filter_ParsePolyMesh;
+    _FilterPolyMesh->VisitNode( p.data_node );
 
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Vert ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Normal ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Edge ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_Face ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexSrc ){
-	i->PrintData();
-    }
-    for( auto i : filter_polymesh._vec_PolyMesh_Data_TexCoord ){
-	i->PrintData();
-    }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Normal ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Edge ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_Face ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexSrc ){
+    // 	i->PrintData();
+    // }
+    // for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexCoord ){
+    // 	i->PrintData();
+    // }
 
+    data_out = ( void * ) _FilterPolyMesh;
+
+    cout << "PassParsePolyMesh::ExecutePass returned" << endl;
+    return true;
+}
+bool PassParsePolyMesh::CleanPass(){
+    if( !_FilterPolyMesh ){
+	delete _FilterPolyMesh;
+	_FilterPolyMesh = nullptr;
+    }
+    cout << "PassParsePolyMesh::CleanPass returned" << endl;
     return true;
 }
