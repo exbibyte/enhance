@@ -62,6 +62,12 @@ int main( int argc, char ** argv ){
     for( auto i : filter_polymesh->_vec_PolyMesh_Data_TexCoord ){
 	i->PrintData();
     }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfo ){
+	i->PrintData();
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfoSequence ){
+    	i->PrintData();
+    }
 
     delete filter_polymesh;
     filter_polymesh = nullptr;

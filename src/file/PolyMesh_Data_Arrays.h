@@ -1,6 +1,8 @@
 #ifndef POLYMESH_DATA_ARRAYS
 #define POLYMESH_DATA_ARRAYS
 
+#include <vector>
+
 class PolyMesh_Data_Arrays_Type {
 public:
     enum Enum {
@@ -19,6 +21,7 @@ public:
     float * _Normal;
     int _iNumVertex;
     int _iNumNormal;
+    std::vector< GLBufferInfo * > _BufferSegments;
 };
 
 #endif
