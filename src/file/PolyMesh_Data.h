@@ -2,6 +2,7 @@
 #define POLYMESH_DATA_H
 
 #include <iostream>
+#include <string>
 
 class PolyMesh_Data {
 public:
@@ -153,11 +154,11 @@ public:
     PolyMesh_Data_BufferInfo(){
 	_type = BUFFERINFO;
     }
-    int _id;
+    std::string _name;
     int _offset;
     int _length;
     void PrintData(){
-	std::cout<< "BufferInfo{ Id: " << _id << ". ";
+	std::cout<< "BufferInfo{ name: " << _name << ". ";
 	std::cout<< "offset: " << _offset << ". ";
 	std::cout<< "length: " << _length << " ";
 	std::cout<< "}" << std::endl;
@@ -169,11 +170,11 @@ public:
     PolyMesh_Data_BufferInfoSequence(){
 	_type = BUFFERINFO_SEQUENCE;
     }
-    int _id;
-    std::vector<int> _vec_sequence;
+    std::string _name;
+    std::vector< std::string > _vec_sequence;
     int _loop;
     void PrintData(){
-	std::cout<< "BufferInfoSequence{ Id: " << _id << ". ";
+	std::cout<< "BufferInfoSequence{ name: " << _name << ". ";
 	std::cout<< "sequence: ";
 	for( auto & i : _vec_sequence ){
 	    std::cout<< i << " ";

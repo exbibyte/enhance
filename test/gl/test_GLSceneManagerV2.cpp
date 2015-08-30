@@ -125,6 +125,17 @@ public:
             return false;
         }
 
+	map< string, GLBufferInfo * > map_buffer_info;
+	polymesh_data_arrays->GetMapBufferInfo( map_buffer_info );
+	map< string, GLBufferInfoSequence * > map_buffer_info_sequence;
+	polymesh_data_arrays->GetMapBufferInfoSequence( map_buffer_info_sequence );
+	for( auto i : map_buffer_info ){
+	    _GLSLProgram->SetBufferInfo( i.second );
+	}
+	for( auto i : map_buffer_info_sequence ){
+	    _GLSLProgram->SetBufferInfoSequence( i.second );
+	}
+	
         if( !data_transform_driver.CleanUpPasses() ){
             assert( 0 && "DataTransformDriver::CleanUpPasses failed.");
             return false;
@@ -159,8 +170,10 @@ public:
         _GLSLProgram->PrintActiveAttribs();
 
         //generate VBO, populate and bind data to vertex attribute arrays
-        pPositionData->SetData( data_vertex, 3, 27 );
-        pNormalData->SetData( data_normal, 3, 27 );
+        //pPositionData->SetData( data_vertex, 3, 27 );
+	//pNormalData->SetData( data_normal, 3, 27 );
+        pPositionData->SetData( data_vertex, 3, iNumDataVertex );
+        pNormalData->SetData( data_normal, 3, iNumDataNormal );
 
         _GLSLProgram->Use();
 
@@ -172,18 +185,18 @@ public:
         delete [] data_normal;
         data_normal = nullptr;
 
-	//set buffer segments
-	GLBufferInfo * buffer_info = new GLBufferInfo;
-	buffer_info->_Name = "BufSeg_01";
-	buffer_info->_Offset = 0;
-	buffer_info->_Length = 9;
+	// //set buffer segments
+	// GLBufferInfo * buffer_info = new GLBufferInfo;
+	// buffer_info->_Name = "BufSeg_01";
+	// buffer_info->_Offset = 0;
+	// buffer_info->_Length = 9;
 
-	if( !_GLSLProgram->SetBufferInfo( buffer_info ) ){
-	    return false;
-	}
-	if( !_GLSLProgram->SetCurrentBufferSegment( "BufSeg_01" ) ){
-	    return false;
-	}
+	// if( !_GLSLProgram->SetBufferInfo( buffer_info ) ){
+	//     return false;
+	// }
+	// if( !_GLSLProgram->SetCurrentBufferInfo( "BufSeg_01" ) ){
+	//     return false;
+	// }
 	
         return true;
     }
@@ -255,6 +268,15 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
         _GLSLProgram->BindVertexArray();
 //        glDrawArrays( GL_TRIANGLES, 0, 9 );
+	if( !_GLSLProgram->SetCurrentBufferInfo( "square" ) ){
+	    return false;
+	}
+	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	    return false;
+	}
+	if( !_GLSLProgram->SetCurrentBufferInfo( "trig_02" ) ){
+	    return false;
+	}
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
@@ -295,6 +317,15 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
         _GLSLProgram->BindVertexArray();
         //glDrawArrays( GL_TRIANGLES, 0, 9 );
+	if( !_GLSLProgram->SetCurrentBufferInfo( "square" ) ){
+	    return false;
+	}
+	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	    return false;
+	}
+	if( !_GLSLProgram->SetCurrentBufferInfo( "trig_02" ) ){
+	    return false;
+	}
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}

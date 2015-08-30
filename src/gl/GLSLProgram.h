@@ -68,9 +68,11 @@ public:
     bool AddNewTexture( string TextureName, GLTexture::eTextureType TextureType, int iWidth, int iHeight, void * const Data, int iActiveTexture );
     bool SetBufferInfo( GLBufferInfo * BufferInfo );
     bool GetBufferInfo( string strName, GLBufferInfo * & BufferInfo );
+    bool SetBufferInfoSequence( GLBufferInfoSequence * BufferInfoSequence );
+    bool GetBufferInfoSequence( string strName, GLBufferInfoSequence * & BufferInfoSequence );
     bool RemoveBufferInfo( string strName );
-    bool SetCurrentBufferSegment( string strName );
-    bool OffsetBufferSegment( int iOffset );
+    bool SetCurrentBufferInfo( string strName );
+    bool SetCurrentBufferInfoSequence( string strName );
     bool DrawCurrentBufferSegment();
 private:
     GLuint _HandleProgram;
@@ -82,7 +84,9 @@ private:
     static unsigned int _mVertexArrayIndexCount;
     map< string, GLTexture * > _MapTexture; //texture storage
     map< string, GLBufferInfo * > _MapBufferInfo; // information of buffer segments
-    GLBufferInfo * _CurrentBufferSegment;
+    map< string, GLBufferInfoSequence * > _MapBufferInfoSequence; // information of buffer sequences
+    GLBufferInfo * _CurrentBufferInfo;
+    GLBufferInfoSequence * _CurrentBufferInfoSequence;
 };
 
 #endif

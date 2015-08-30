@@ -219,12 +219,12 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
     }
     else if( "bufferinfo" == node->_strVarName ){
 	for( auto * i : node->_children ){
-	    int iId;
+	    string strName;
 	    int iOffset;
 	    int iLength;
 	    for( auto * j : i->_children ){
-		if( "id" == j->_strVarName ){
-		    iId = atoi( j->_strVarVal.c_str() );		    
+		if( "name" == j->_strVarName ){
+		    strName = j->_strVarVal;
 		}
 		else if( "offset" == j->_strVarName ){
 		    iOffset = atoi( j->_strVarVal.c_str() );
@@ -234,13 +234,13 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
 		}
 	    }
 #ifdef DEBUG_FILTER_PARSE
-	    cout<< "Found BufferInfo: id: " <<  iId << ". ";
+	    cout<< "Found BufferInfo: name: " <<  strName << ". ";
 	    cout<< "offset: " << iOffset << ". ";
 	    cout<< "length: " << iLength << endl;
 #endif
 	    //create PolyMesh_Data
 	    PolyMesh_Data_BufferInfo * buffer_info = new PolyMesh_Data_BufferInfo;
-	    buffer_info->_id = iId;
+	    buffer_info->_name = strName;
 	    buffer_info->_offset = iOffset;
 	    buffer_info->_length = iLength;
 	    _vec_PolyMesh_Data_BufferInfo.push_back( buffer_info );
@@ -248,17 +248,17 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
     }
     else if( "bufferinfosequence" == node->_strVarName ){
 	for( auto * i : node->_children ){
-	    int iId;
-	    vector<int> vecSequence;
+	    string strName;
+	    vector< string > vecSequence;
 	    int iLoop;
 	    for( auto * j : i->_children ){
-		if( "id" == j->_strVarName ){
-		    iId = atoi( j->_strVarVal.c_str() );		    
+		if( "name" == j->_strVarName ){
+		    strName = j->_strVarVal;
 		}
 		else if( "sequence" == j->_strVarName ){
 		    for( auto * k : j->_children ){
-		        int iVal = atoi( k->_strVarVal.c_str() );
-		        vecSequence.push_back( iVal );
+		        string strVal = k->_strVarVal;
+		        vecSequence.push_back( strVal );
 		    }
 		}
 		else if( "loop" == j->_strVarName ){
@@ -266,7 +266,7 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
 		}
 	    }
 #ifdef DEBUG_FILTER_PARSE
-	    cout<< "Found BufferInfoSequence: id: " <<  iId << ". ";
+	    cout<< "Found BufferInfoSequence: name: " <<  strName << ". ";
 	    cout<< "sequence: ";
 	    for( auto & m : vecSequence ){
 		cout << m << " ";
@@ -276,7 +276,7 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
 #endif
 	    //create PolyMesh_Data
 	    PolyMesh_Data_BufferInfoSequence * buffer_info_sequence = new PolyMesh_Data_BufferInfoSequence;
-	    buffer_info_sequence->_id = iId;
+	    buffer_info_sequence->_name = strName;
 	    buffer_info_sequence->_vec_sequence = vecSequence;
 	    buffer_info_sequence->_loop = iLoop;
 	    _vec_PolyMesh_Data_BufferInfoSequence.push_back( buffer_info_sequence );

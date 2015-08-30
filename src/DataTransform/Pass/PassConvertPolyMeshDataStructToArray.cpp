@@ -1,12 +1,13 @@
-#include <stdio.h>
-#include <string>
-#include <iostream>
-
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data.h"
 #include "PassConvertPolyMeshDataStructToArray.h"
 #include "PolyMesh_Data_Arrays.h"
+#include "GLBufferInfo.h"
 
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <cassert>
 using namespace std;
 
 bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void * & data_out ){
@@ -82,6 +83,28 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
     bRet = _ArrayData->Set( PolyMesh_Data_Arrays_Type::VERTEX, vertex_data, iNumVertexData );
     bRet &= _ArrayData->Set( PolyMesh_Data_Arrays_Type::NORMAL, normal_data, iNumNormalData );
 
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfo ){
+	GLBufferInfo * buffer_info = new GLBufferInfo;
+	buffer_info->_Name = i->_name;
+	buffer_info->_Offset = i->_offset;
+	buffer_info->_Length = i->_length;
+	_ArrayData->SetBufferInfo( buffer_info );	
+    }
+    for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfoSequence ){
+	GLBufferInfoSequence * buffer_info_sequence = new GLBufferInfoSequence;
+        buffer_info_sequence->_Name = i->_name;
+	for( auto j : i->_vec_sequence ){
+	    string strName = j;
+	    GLBufferInfo * buffer_info;
+	    if( !_ArrayData->GetBufferInfo( strName, buffer_info ) ){
+		assert( 0 && "PolyMesh_Data_Arrays::GetBufferInfo failed" );
+		return false;
+	    }
+	    buffer_info_sequence->_vec_BufferInfo.push_back( buffer_info );
+	}
+	_ArrayData->SetBufferInfoSequence( buffer_info_sequence );
+    }
+    
     delete [] vertex_data;
     delete [] normal_data;
     vertex_data = nullptr;

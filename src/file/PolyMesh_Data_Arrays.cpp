@@ -1,4 +1,9 @@
 #include "PolyMesh_Data_Arrays.h"
+#include "GLBufferInfo.h"
+
+#include <string>
+#include <map>
+using namespace std;
 
 PolyMesh_Data_Arrays::PolyMesh_Data_Arrays(){
     _Vertex = nullptr;
@@ -80,5 +85,50 @@ bool PolyMesh_Data_Arrays::Get( PolyMesh_Data_Arrays_Type::Enum type, float * & 
     default:
 	return false;
     }
+    return bRet;
+}
+bool PolyMesh_Data_Arrays::SetBufferInfo( GLBufferInfo * buffer_info ){
+    bool bRet = true;
+    if( !buffer_info ){
+	return false;
+    }
+    _Map_BufferInfo[ buffer_info->_Name ] = buffer_info;
+    return bRet;
+}
+bool PolyMesh_Data_Arrays::GetBufferInfo( string strName, GLBufferInfo * & buffer_info ){
+    bool bRet = true;
+    auto it = _Map_BufferInfo.find( strName );
+    if( _Map_BufferInfo.end() == it ){
+	return false;
+    }
+    buffer_info = it->second;
+    return bRet;
+}
+bool PolyMesh_Data_Arrays::GetMapBufferInfo( std::map< std::string, GLBufferInfo * > & map_buffer_info ){
+    bool bRet = true;
+    map_buffer_info = _Map_BufferInfo;
+    return bRet;
+}
+bool PolyMesh_Data_Arrays::SetBufferInfoSequence( GLBufferInfoSequence * buffer_info_sequence ){
+    bool bRet = true;
+    if( !buffer_info_sequence ){
+	return false;
+    }
+    _Map_BufferInfoSequence[ buffer_info_sequence->_Name ] = buffer_info_sequence;
+    return bRet;
+}
+bool PolyMesh_Data_Arrays::GetBufferInfoSequence( string strName, GLBufferInfoSequence * & buffer_info_sequence ){
+    bool bRet = true;
+    auto it = _Map_BufferInfoSequence.find( strName );
+    if( _Map_BufferInfoSequence.end() == it ){
+	return false;
+    }
+    buffer_info_sequence = it->second;
+    return bRet;
+}
+
+bool PolyMesh_Data_Arrays::GetMapBufferInfoSequence( map< string, GLBufferInfoSequence * > & map_buffer_info_sequence ){
+    bool bRet = true;
+    map_buffer_info_sequence = _Map_BufferInfoSequence;
     return bRet;
 }

@@ -5,6 +5,7 @@
 #include "DataTransformMetaInfo.h"
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data_Arrays.h"
+#include "GLBufferInfo.h"
 
 #include <iostream>
 #include <string>
@@ -78,6 +79,11 @@ int main( int argc, char ** argv ){
 	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
 	return -1;
     }
+    map< string, GLBufferInfoSequence * > map_buffer_info_sequences;
+    if( !polymesh_data_arrays->GetMapBufferInfoSequences( map_buffer_info_sequences ) ){
+	assert( 0 && "PolyMesh_Data_Arrays::GetMapBufferInfoSequences failed.");
+	return -1;
+    }
 
     if( !data_transform_driver.CleanUpPasses() ){
 	assert( 0 && "DataTransformDriver::CleanUpPasses failed.");
@@ -96,6 +102,23 @@ int main( int argc, char ** argv ){
 	cout << *current_normal++ << " ";
     }
     cout << endl;
+
+    cout << "bufferinfosequence: " << endl;
+    for( auto & i : map_buffer_info_sequences ){
+	string strSequenceName = i.first;
+	cout << "name: " << strSequenceName << ". ";
+	cout << "{ ";
+	GLBufferInfoSequence * buffer_info_sequence = i.second;
+	for( auto & j : buffer_info_sequence->_vec_BufferInfo ){
+	    string strBufferInfoName = j->_Name;
+	    unsigned int uiOffset = j->_Offset;
+	    unsigned int uiLength = j->_Length;
+	    cout << "name: " << strBufferInfoName << ". ";
+	    cout << "offset: " << uiOffset << ". ";
+	    cout << "length: " << uiLength;
+	}
+	cout << " }" << endl;
+    }
 
     delete [] data_vertex;
     data_vertex = nullptr;
