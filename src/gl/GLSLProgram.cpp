@@ -188,6 +188,22 @@ bool GLSLProgram::GetBufferInfo( string strName, GLBufferInfo * & BufferInfo ){
     BufferInfo = it->second;
     return true;
 }
+bool GLSLProgram::SetBufferInfoSequence( GLBufferInfoSequence * BufferInfoSequence ){
+    if( !BufferInfoSequence ){
+	assert( 0 && "GLSLProgram::SetBufferInfoSequence failed" );
+	return false;
+    }
+    _MapBufferInfoSequence[ BufferInfoSequence->_Name ] = BufferInfoSequence;
+    return true;
+}
+bool GLSLProgram::GetBufferInfoSequence( string strName, GLBufferInfoSequence * & BufferInfoSequence ){
+    auto it = _MapBufferInfoSequence.find( strName );
+    if( _MapBufferInfoSequence.end() == it ){
+	return false;
+    }
+    BufferInfoSequence = it->second;
+    return true;    
+}
 bool GLSLProgram::RemoveBufferInfo( string strName ){
     auto it = _MapBufferInfo.find( strName );
     if( _MapBufferInfo.end() == it ){
@@ -196,40 +212,33 @@ bool GLSLProgram::RemoveBufferInfo( string strName ){
     _MapBufferInfo.erase( it );
     return true;
 }
-bool GLSLProgram::SetCurrentBufferSegment( string strName ){
+bool GLSLProgram::SetCurrentBufferInfo( string strName ){
     GLBufferInfo * BufferInfo;
     if( !GetBufferInfo( strName, BufferInfo ) ){
 	return false;
     }
-    _CurrentBufferSegment = BufferInfo;
+    _CurrentBufferInfo = BufferInfo;
     return true;
 }
-bool GLSLProgram::OffsetBufferSegment( int iOffset ){
-    if( !_CurrentBufferSegment ){
+bool GLSLProgram::SetCurrentBufferInfoSequence( string strName ){
+    GLBufferInfoSequence * temporary_buffer_info_sequence;
+    if( !GetBufferInfoSequence( strName, temporary_buffer_info_sequence ) ){
 	return false;
     }
-    GLBufferInfo * temporary_segment = _CurrentBufferSegment;
-    bool bDirNext = iOffset >= 0 ? true : false;
-    if( iOffset < 0 ){
-	iOffset = -iOffset;
+    _CurrentBufferInfoSequence = temporary_buffer_info_sequence;
+    if( 0 == _CurrentBufferInfoSequence->_vec_BufferInfo.size() ){
+	return false;
     }
-    for( int i = 0; i < iOffset; i++ ){
-	if( bDirNext ){
-	    temporary_segment = temporary_segment->_Next;
-	} else {
-	    temporary_segment = temporary_segment->_Prev;
-	}
-	if( !temporary_segment ){
-	    return false;
-	}
+    GLBufferInfo * temporary_buffer_info = _CurrentBufferInfoSequence->_vec_BufferInfo[0];
+    if( !SetCurrentBufferInfo( temporary_buffer_info->_Name ) ){
+	return false;
     }
-    _CurrentBufferSegment = temporary_segment;
     return true;
 }
 bool GLSLProgram::DrawCurrentBufferSegment(){
-    if( !_CurrentBufferSegment ){
+    if( !_CurrentBufferInfo ){
 	return false;
     }
-    glDrawArrays( GL_TRIANGLES, _CurrentBufferSegment->_Offset, _CurrentBufferSegment->_Length );
+    glDrawArrays( GL_TRIANGLES, _CurrentBufferInfo->_Offset, _CurrentBufferInfo->_Length );
     return true;
 }
