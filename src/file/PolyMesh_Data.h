@@ -12,6 +12,8 @@ public:
 	FACE,
 	TEXSRC,
 	TEXCOORD,
+	BUFFERINFO,
+	BUFFERINFO_SEQUENCE,
     };
     Enum _type;
     virtual void PrintData(){};
@@ -138,12 +140,48 @@ public:
     void PrintData(){
 	std::cout<< "TexCoord{ Id: " << _id << ". ";
 	std::cout<< "id_vert: " << _id_vert << ". ";
-	std::cout<< "id_texsrc: " << _id_texsrc << ". ";
+	std::cout<< "id_texsrc: " << _id_texsrc << ". coord: ";
 	for( auto & i : _vec_txcoord ){
 	    std::cout<< i << " ";
 	}	
 	std::cout<< "}" << std::endl;
     }    
+};
+
+class PolyMesh_Data_BufferInfo : public PolyMesh_Data {
+public:
+    PolyMesh_Data_BufferInfo(){
+	_type = BUFFERINFO;
+    }
+    int _id;
+    int _offset;
+    int _length;
+    void PrintData(){
+	std::cout<< "BufferInfo{ Id: " << _id << ". ";
+	std::cout<< "offset: " << _offset << ". ";
+	std::cout<< "length: " << _length << " ";
+	std::cout<< "}" << std::endl;
+    }    
+};
+
+class PolyMesh_Data_BufferInfoSequence : public PolyMesh_Data {
+public:
+    PolyMesh_Data_BufferInfoSequence(){
+	_type = BUFFERINFO_SEQUENCE;
+    }
+    int _id;
+    std::vector<int> _vec_sequence;
+    int _loop;
+    void PrintData(){
+	std::cout<< "BufferInfoSequence{ Id: " << _id << ". ";
+	std::cout<< "sequence: ";
+	for( auto & i : _vec_sequence ){
+	    std::cout<< i << " ";
+	}	
+	std::cout<< ". ";
+	std::cout<< "loop: " << _loop << ". ";
+	std::cout<< "}" << std::endl;
+    }
 };
 
 #endif

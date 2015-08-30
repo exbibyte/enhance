@@ -192,8 +192,10 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
 		    iId_TextureSource = atoi( j->_strVarVal.c_str() );
 		}
 		else if( "coord" == j->_strVarName ){
-		    double dCoord = atof( j->_strVarVal.c_str() );
-		    vecTextureCoord.push_back( dCoord );
+		    for( auto * k : j->_children ){
+			double dCoord = atof( j->_strVarVal.c_str() );
+			vecTextureCoord.push_back( dCoord );
+		    }
 		}
 	    }
 #ifdef DEBUG_FILTER_PARSE
@@ -214,6 +216,71 @@ bool Filter_ParsePolyMesh::TransformNode( ParseNode * node ){
 	    texcoord->_vec_txcoord = vecTextureCoord;
 	    _vec_PolyMesh_Data_TexCoord.push_back( texcoord );
 	}
-    }        
+    }
+    else if( "bufferinfo" == node->_strVarName ){
+	for( auto * i : node->_children ){
+	    int iId;
+	    int iOffset;
+	    int iLength;
+	    for( auto * j : i->_children ){
+		if( "id" == j->_strVarName ){
+		    iId = atoi( j->_strVarVal.c_str() );		    
+		}
+		else if( "offset" == j->_strVarName ){
+		    iOffset = atoi( j->_strVarVal.c_str() );
+		}
+		else if( "length" == j->_strVarName ){
+		    iLength = atoi( j->_strVarVal.c_str() );
+		}
+	    }
+#ifdef DEBUG_FILTER_PARSE
+	    cout<< "Found BufferInfo: id: " <<  iId << ". ";
+	    cout<< "offset: " << iOffset << ". ";
+	    cout<< "length: " << iLength << endl;
+#endif
+	    //create PolyMesh_Data
+	    PolyMesh_Data_BufferInfo * buffer_info = new PolyMesh_Data_BufferInfo;
+	    buffer_info->_id = iId;
+	    buffer_info->_offset = iOffset;
+	    buffer_info->_length = iLength;
+	    _vec_PolyMesh_Data_BufferInfo.push_back( buffer_info );
+	}
+    }
+    else if( "bufferinfosequence" == node->_strVarName ){
+	for( auto * i : node->_children ){
+	    int iId;
+	    vector<int> vecSequence;
+	    int iLoop;
+	    for( auto * j : i->_children ){
+		if( "id" == j->_strVarName ){
+		    iId = atoi( j->_strVarVal.c_str() );		    
+		}
+		else if( "sequence" == j->_strVarName ){
+		    for( auto * k : j->_children ){
+		        int iVal = atoi( k->_strVarVal.c_str() );
+		        vecSequence.push_back( iVal );
+		    }
+		}
+		else if( "loop" == j->_strVarName ){
+		    iLoop = atoi( j->_strVarVal.c_str() );
+		}
+	    }
+#ifdef DEBUG_FILTER_PARSE
+	    cout<< "Found BufferInfoSequence: id: " <<  iId << ". ";
+	    cout<< "sequence: ";
+	    for( auto & m : vecSequence ){
+		cout << m << " ";
+	    }
+	    cout<<". ";
+	    cout<< "loop: " << iLoop << endl;
+#endif
+	    //create PolyMesh_Data
+	    PolyMesh_Data_BufferInfoSequence * buffer_info_sequence = new PolyMesh_Data_BufferInfoSequence;
+	    buffer_info_sequence->_id = iId;
+	    buffer_info_sequence->_vec_sequence = vecSequence;
+	    buffer_info_sequence->_loop = iLoop;
+	    _vec_PolyMesh_Data_BufferInfoSequence.push_back( buffer_info_sequence );
+	}
+    }
     return true;
 }

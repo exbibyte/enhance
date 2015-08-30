@@ -2,10 +2,12 @@
 #include<vector>
 #include<string>
 #include<map>
+#include <cassert>
 using namespace std;
 
 #include "GLSLProgram.h"
 #include "GLTexture.h"
+#include "GLBufferInfo.h"
 
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 
@@ -169,4 +171,65 @@ bool GLSLProgram::AddNewTexture( string TextureName, GLTexture::eTextureType Tex
         bRet = AddMapTexture( TextureName, Texture );        
     }
     return bRet;
+}
+bool GLSLProgram::SetBufferInfo( GLBufferInfo * BufferInfo ){
+    if( !BufferInfo ){
+	assert( 0 && "GLSLProgram::SetBufferInfo failed" );
+	return false;
+    }
+    _MapBufferInfo[ BufferInfo->_Name ] = BufferInfo;
+    return true;
+}
+bool GLSLProgram::GetBufferInfo( string strName, GLBufferInfo * & BufferInfo ){
+    auto it = _MapBufferInfo.find( strName );
+    if( _MapBufferInfo.end() == it ){
+	return false;
+    }
+    BufferInfo = it->second;
+    return true;
+}
+bool GLSLProgram::RemoveBufferInfo( string strName ){
+    auto it = _MapBufferInfo.find( strName );
+    if( _MapBufferInfo.end() == it ){
+	return false;
+    }
+    _MapBufferInfo.erase( it );
+    return true;
+}
+bool GLSLProgram::SetCurrentBufferSegment( string strName ){
+    GLBufferInfo * BufferInfo;
+    if( !GetBufferInfo( strName, BufferInfo ) ){
+	return false;
+    }
+    _CurrentBufferSegment = BufferInfo;
+    return true;
+}
+bool GLSLProgram::OffsetBufferSegment( int iOffset ){
+    if( !_CurrentBufferSegment ){
+	return false;
+    }
+    GLBufferInfo * temporary_segment = _CurrentBufferSegment;
+    bool bDirNext = iOffset >= 0 ? true : false;
+    if( iOffset < 0 ){
+	iOffset = -iOffset;
+    }
+    for( int i = 0; i < iOffset; i++ ){
+	if( bDirNext ){
+	    temporary_segment = temporary_segment->_Next;
+	} else {
+	    temporary_segment = temporary_segment->_Prev;
+	}
+	if( !temporary_segment ){
+	    return false;
+	}
+    }
+    _CurrentBufferSegment = temporary_segment;
+    return true;
+}
+bool GLSLProgram::DrawCurrentBufferSegment(){
+    if( !_CurrentBufferSegment ){
+	return false;
+    }
+    glDrawArrays( GL_TRIANGLES, _CurrentBufferSegment->_Offset, _CurrentBufferSegment->_Length );
+    return true;
 }

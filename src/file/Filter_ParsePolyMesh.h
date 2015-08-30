@@ -17,6 +17,8 @@ public:
     std::vector< PolyMesh_Data_Face * > _vec_PolyMesh_Data_Face;
     std::vector< PolyMesh_Data_TexSrc * > _vec_PolyMesh_Data_TexSrc;
     std::vector< PolyMesh_Data_TexCoord * > _vec_PolyMesh_Data_TexCoord;
+    std::vector< PolyMesh_Data_BufferInfo * > _vec_PolyMesh_Data_BufferInfo;
+    std::vector< PolyMesh_Data_BufferInfoSequence * > _vec_PolyMesh_Data_BufferInfoSequence;
 };
 
 #endif

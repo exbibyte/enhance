@@ -14,6 +14,7 @@
 #include "DataTransformMetaInfo.h"
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data_Arrays.h"
+#include "GLBufferInfo.h"
 
 #include <functional>
 #include <iostream>
@@ -171,6 +172,19 @@ public:
         delete [] data_normal;
         data_normal = nullptr;
 
+	//set buffer segments
+	GLBufferInfo * buffer_info = new GLBufferInfo;
+	buffer_info->_Name = "BufSeg_01";
+	buffer_info->_Offset = 0;
+	buffer_info->_Length = 9;
+
+	if( !_GLSLProgram->SetBufferInfo( buffer_info ) ){
+	    return false;
+	}
+	if( !_GLSLProgram->SetCurrentBufferSegment( "BufSeg_01" ) ){
+	    return false;
+	}
+	
         return true;
     }
 
@@ -240,7 +254,10 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
         _GLSLProgram->BindVertexArray();
-        glDrawArrays( GL_TRIANGLES, 0, 9 );
+//        glDrawArrays( GL_TRIANGLES, 0, 9 );
+	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	    return false;
+	}
         _GLSLProgram->UnBindVertexArray();
 
         //2nd pass render 
@@ -277,7 +294,10 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
         _GLSLProgram->BindVertexArray();
-        glDrawArrays( GL_TRIANGLES, 0, 9 );
+        //glDrawArrays( GL_TRIANGLES, 0, 9 );
+	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	    return false;
+	}
         _GLSLProgram->UnBindVertexArray();
         return true;
     }
