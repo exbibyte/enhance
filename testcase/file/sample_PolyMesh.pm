@@ -60,4 +60,4 @@ bufferinfo:
    -{ name: trig_03, offset: 12, length: 3 }
    -{ name: trig_04, offset: 15, length: 3 }
 bufferinfosequence:
-   -{ name: seq_01, sequence: [ trig_01, trig_02, trig_03, trig_04 ], loop: -1 }
+   -{ name: seq_01, sequence: [ trig_01, trig_02, trig_03, trig_04 ], loop: 0 }
