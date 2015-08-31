@@ -74,6 +74,7 @@ public:
     bool SetCurrentBufferInfo( string strName );
     bool SetCurrentBufferInfoSequence( string strName );
     bool DrawCurrentBufferSegment();
+    bool DrawCurrentBufferSequence( bool bIncrement );
 private:
     GLuint _HandleProgram;
     bool _Linked;

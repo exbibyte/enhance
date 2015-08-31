@@ -14,8 +14,9 @@ public:
 class GLBufferInfoSequence {
 public:
     std::string _Name;
-    std::vector< GLBufferInfo * > _vec_BufferInfo;
+    std::vector< GLBufferInfo * > _Vec_BufferInfo;
     int _CurrentIndex;
+    int _Loop;
 };
 
 #endif

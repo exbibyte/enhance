@@ -28,7 +28,7 @@ public:
     bool GetMapBufferInfo( std::map< std::string, GLBufferInfo * > & map_buffer_info );
     bool SetBufferInfoSequence( GLBufferInfoSequence * buffer_info_sequence );
     bool GetBufferInfoSequence( std::string strName, GLBufferInfoSequence * & buffer_info_sequence );
-    bool GetMapBufferInfoSequence( std::map< std::string, GLBufferInfoSequence * > & map_buffer_info_sequence );
+    bool GetMapBufferInfoSequence( std::map< std::string, GLBufferInfoSequence * > & map_buffer_info_sequences );
     float * _Vertex;
     float * _Normal;
     int _iNumVertex;

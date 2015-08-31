@@ -100,8 +100,9 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
 		assert( 0 && "PolyMesh_Data_Arrays::GetBufferInfo failed" );
 		return false;
 	    }
-	    buffer_info_sequence->_vec_BufferInfo.push_back( buffer_info );
+	    buffer_info_sequence->_Vec_BufferInfo.push_back( buffer_info );
 	}
+	buffer_info_sequence->_Loop = i->_loop;
 	_ArrayData->SetBufferInfoSequence( buffer_info_sequence );
     }
     
