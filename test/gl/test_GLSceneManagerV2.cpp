@@ -177,7 +177,7 @@ public:
 
         _GLSLProgram->Use();
 
-        _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
+        _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1500, 1500, 0, 0 );
 
         //deallocate data
         delete [] data_vertex;
@@ -210,7 +210,7 @@ public:
         mat4 ModelMatrix = glm::rotate( Model, dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
 
         //first pass render for light POV    
-        glViewport( 0, 0, 1000, 1000 );
+        glViewport( 0, 0, 1500, 1500 );
         mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                        vec3(0.0,0.0,0.0),
                                        vec3(0.0,1.0,0.0) );

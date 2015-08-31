@@ -58,12 +58,17 @@ void shadeWithShadow()
   float sum = 0; 
 
   // Sum contributions from texels around ShadowCoord
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
-  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( -1, 0 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 1, 0 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, -1 ) );
+  // sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 1 ) );
+  sum += textureProjOffset( ShadowMap, ShadowCoord, ivec2( 0, 0 ) );
 
-  float shadow = sum * 0.25;
+  // if( sum < 0.1 ){
+  //     sum = 0;
+  // }
+  //float shadow = sum * 0.25;
+  float shadow = sum;
 
   vec3 DiffSpec = phongModel( Position, Normal );
   //vec4 texColor = texture( Tex1, TexCoord );
