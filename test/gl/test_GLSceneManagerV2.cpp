@@ -274,10 +274,11 @@ public:
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
-	if( !_GLSLProgram->SetCurrentBufferInfo( "trig_02" ) ){
+	if( !_GLSLProgram->SetCurrentBufferInfoSequence( "seq_01" ) ){
 	    return false;
 	}
-	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	bool bIncrement = false;
+	if( !_GLSLProgram->DrawCurrentBufferSequence( bIncrement ) ){
 	    return false;
 	}
         _GLSLProgram->UnBindVertexArray();
@@ -323,10 +324,15 @@ public:
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
-	if( !_GLSLProgram->SetCurrentBufferInfo( "trig_02" ) ){
+	if( !_GLSLProgram->SetCurrentBufferInfoSequence( "seq_01" ) ){
 	    return false;
 	}
-	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
+	if( iWaitRenderCurrent >= iWaitRender ){
+	    bIncrement = true;
+	    iWaitRenderCurrent = 0;
+	}
+	++iWaitRenderCurrent;
+	if( !_GLSLProgram->DrawCurrentBufferSequence( bIncrement ) ){
 	    return false;
 	}
         _GLSLProgram->UnBindVertexArray();
@@ -334,6 +340,8 @@ public:
     }
     float dAngle = 0;
     string strPathPolyMesh;
+    int iWaitRender = 30;
+    int iWaitRenderCurrent = 0;
 };
 
 void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {

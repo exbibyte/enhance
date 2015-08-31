@@ -226,10 +226,14 @@ bool GLSLProgram::SetCurrentBufferInfoSequence( string strName ){
 	return false;
     }
     _CurrentBufferInfoSequence = temporary_buffer_info_sequence;
-    if( 0 == _CurrentBufferInfoSequence->_vec_BufferInfo.size() ){
+    if( 0 == _CurrentBufferInfoSequence->_Vec_BufferInfo.size() ){
 	return false;
     }
-    GLBufferInfo * temporary_buffer_info = _CurrentBufferInfoSequence->_vec_BufferInfo[0];
+    int iCurrentIndex = _CurrentBufferInfoSequence->_CurrentIndex;
+    if( iCurrentIndex >= _CurrentBufferInfoSequence->_Vec_BufferInfo.size() || iCurrentIndex < 0 ){
+	return false;
+    }
+    GLBufferInfo * temporary_buffer_info = _CurrentBufferInfoSequence->_Vec_BufferInfo[ iCurrentIndex ];
     if( !SetCurrentBufferInfo( temporary_buffer_info->_Name ) ){
 	return false;
     }
@@ -241,4 +245,27 @@ bool GLSLProgram::DrawCurrentBufferSegment(){
     }
     glDrawArrays( GL_TRIANGLES, _CurrentBufferInfo->_Offset, _CurrentBufferInfo->_Length );
     return true;
+}
+bool GLSLProgram::DrawCurrentBufferSequence( bool bIncrement ){
+    if( !_CurrentBufferInfoSequence ){
+	return false;
+    }
+    int iCurrentIndex = _CurrentBufferInfoSequence->_CurrentIndex;
+    if( iCurrentIndex >= _CurrentBufferInfoSequence->_Vec_BufferInfo.size() || iCurrentIndex < 0 ){
+	return false;
+    }
+    GLBufferInfo * buffer_info = _CurrentBufferInfoSequence->_Vec_BufferInfo.at( iCurrentIndex );
+    bool bRet = SetBufferInfo( buffer_info);
+    bRet &= SetCurrentBufferInfo( buffer_info->_Name );
+    bRet &= DrawCurrentBufferSegment();
+    if( bIncrement ){
+	if( -1 == _CurrentBufferInfoSequence->_Loop ){ //loop infinitely
+	    ++iCurrentIndex;
+	    if( iCurrentIndex >= _CurrentBufferInfoSequence->_Vec_BufferInfo.size() ){
+		iCurrentIndex = 0;
+	    }
+	    _CurrentBufferInfoSequence->_CurrentIndex = iCurrentIndex;
+	}
+    }
+    return bRet;
 }

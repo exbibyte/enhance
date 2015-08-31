@@ -8,9 +8,15 @@ vertices:
    -{ id: 6, vec: [ -0.8, -0.8,    0 ] }
    -{ id: 7, vec: [  0.8, -0.8,    0 ] }
    -{ id: 8, vec: [  0.8,  0.8,    0 ] }
-   -{ id: 9, vec: [ -0.8, -0.8,    0 ] }
-   -{ id: 10, vec: [  1.2, -0.8,    0 ] }
-   -{ id: 11, vec: [  1.2,  0.8,    0 ] }
+   -{ id: 9, vec: [ -1.2, -1.2,    0 ] }
+   -{ id: 10, vec: [  1.2, -1.2,    0 ] }
+   -{ id: 11, vec: [  1.2,  1.2,    0 ] }
+   -{ id: 12, vec: [ -1.6, -1.6,    0 ] }
+   -{ id: 13, vec: [  1.6, -1.6,    0 ] }
+   -{ id: 14, vec: [  1.6,  1.6,    0 ] }
+   -{ id: 15, vec: [ -2.0, -2.0,    0 ] }
+   -{ id: 16, vec: [  2.0, -2.0,    0 ] }
+   -{ id: 17, vec: [  2.0,  2.0,    0 ] }
 normals:
    -{ id: 0, vec: [  0,  0,  1 ] }
    -{ id: 1, vec: [  0,  0,  1 ] }
@@ -24,6 +30,12 @@ normals:
    -{ id: 9, vec: [  0,  0,  1 ] }
    -{ id: 10, vec: [  0,  0,  1 ] }
    -{ id: 11, vec: [  0,  0,  1 ] }
+   -{ id: 12, vec: [  0,  0,  1 ] }
+   -{ id: 13, vec: [  0,  0,  1 ] }
+   -{ id: 14, vec: [  0,  0,  1 ] }
+   -{ id: 15, vec: [  0,  0,  1 ] }
+   -{ id: 16, vec: [  0,  0,  1 ] }
+   -{ id: 17, vec: [  0,  0,  1 ] }
 edges:
    -{ id: 0, vert_ids: [  0, 1 ] }
    -{ id: 1, vert_ids: [  1, 2 ] }
@@ -45,5 +57,7 @@ bufferinfo:
    -{ name: square, offset: 0, length: 6 }
    -{ name: trig_01, offset: 6, length: 3 }
    -{ name: trig_02, offset: 9, length: 3 }
+   -{ name: trig_03, offset: 12, length: 3 }
+   -{ name: trig_04, offset: 15, length: 3 }
 bufferinfosequence:
-   -{ name: 0, sequence: [ trig_01, trig_02 ], loop: 1 }
+   -{ name: seq_01, sequence: [ trig_01, trig_02, trig_03, trig_04 ], loop: -1 }
