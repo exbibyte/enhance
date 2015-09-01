@@ -15,6 +15,7 @@
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data_Arrays.h"
 #include "GLBufferInfo.h"
+#include "Clock.h"
 
 #include <functional>
 #include <iostream>
@@ -177,7 +178,7 @@ public:
 
         _GLSLProgram->Use();
 
-        _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 1000, 1000, 0, 0 );
+        _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
 
         //deallocate data
         delete [] data_vertex;
@@ -210,16 +211,16 @@ public:
         mat4 ModelMatrix = glm::rotate( Model, dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
 
         //first pass render for light POV    
-        glViewport( 0, 0, 1000, 1000 );
+        glViewport( 0, 0, 2500, 2500 );
         mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                        vec3(0.0,0.0,0.0),
                                        vec3(0.0,1.0,0.0) );
-        mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
-      
+        mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 1000.0f );
+
         GLTexture * ShadowTexture;
         if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
             ShadowTexture->BindFbo();
-            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );  
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
             int iActiveTexture;
             ShadowTexture->GetActiveTexture( iActiveTexture );
             bRet = _GLSLProgram->SetUniform( "ShadowMap", iActiveTexture );
@@ -231,14 +232,14 @@ public:
         glCullFace(GL_BACK);
 
         //draw on first pass
-        // Multiply it be the bias matrix
+        //Multiply it be the bias matrix
         glm::mat4 Bias(
             0.5, 0.0, 0.0, 0.0,
             0.0, 0.5, 0.0, 0.0,
             0.0, 0.0, 0.5, 0.0,
             0.5, 0.5, 0.5, 1.0
             );
-
+	
         mat4 ModelViewMatrix = ViewMatrix  * ModelMatrix;
         mat4 MVP = ProjectionMatrixLight * ViewMatrix  * ModelMatrix;
         mat4 MVPB = Bias * ProjectionMatrixLight * ViewMatrix * ModelMatrix;
@@ -284,7 +285,7 @@ public:
         _GLSLProgram->UnBindVertexArray();
 
         //2nd pass render 
-        glCullFace(GL_FRONT);
+        glCullFace(GL_BACK);
 
         glViewport( 0, 0, 500, 500 );
         ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
@@ -382,6 +383,16 @@ void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {
     int iWait = 5;
     int iWaitCurrent = 0;
     scene_manager.RunInit();
+
+    Clock render_clock;
+    render_clock.SetFps(25);
+    bool bClockTicked = false;
+    auto FuncClockTicked = [ &bClockTicked ](){
+	bClockTicked = true;
+    };
+    render_clock.SetTickFunc( FuncClockTicked );
+    render_clock.Run();
+
     while (!glfwWindowShouldClose(window)){
 	if( bSignalExit ){
             break;
@@ -392,9 +403,14 @@ void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {
 	}else{
 	    iWaitCurrent = 0;
 	}
-        scene_manager.RunBody();
-        glfwSwapBuffers(window);
+	render_clock.Tick();
+	if( bClockTicked ){
+	    scene_manager.RunBody();
+	    glfwSwapBuffers(window);
+	    bClockTicked = false;
+	}
     }
+    render_clock.Pause();
     scene_manager.RunCleanup();
 }
 

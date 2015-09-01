@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <functional>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ Clock::Clock()
   this->bRunning = false;
   this->TimeSinceStart = 0;
   this->ClockScale = 1;
+  _TickFunc = nullptr;
 }
 
 bool Clock::SetFps(double fps)
@@ -59,7 +61,8 @@ bool Clock::Tick()
   stringstream ss;
   ss << this->TimeSinceStart;
 
-  this->TickAction(ss.str()); 
+  this->TickAction(ss.str());
+  _TickFunc();
 
   return true;
 }
@@ -98,4 +101,9 @@ void Clock::SetClockScale(double val)
 
   this->ClockScale = val;
   this->AutoDurationScaled = this->AutoDuration / this->ClockScale;
+}
+
+bool Clock::SetTickFunc( function< void(void) > func ){
+    _TickFunc = func;
+    return true;
 }
