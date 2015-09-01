@@ -15,6 +15,7 @@
 #include "Filter_ParsePolyMesh.h"
 #include "PolyMesh_Data_Arrays.h"
 #include "GLBufferInfo.h"
+#include "Clock.h"
 
 #include <functional>
 #include <iostream>
@@ -382,6 +383,16 @@ void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {
     int iWait = 5;
     int iWaitCurrent = 0;
     scene_manager.RunInit();
+
+    Clock render_clock;
+    render_clock.SetFps(25);
+    bool bClockTicked = false;
+    auto FuncClockTicked = [ &bClockTicked ](){
+	bClockTicked = true;
+    };
+    render_clock.SetTickFunc( FuncClockTicked );
+    render_clock.Run();
+
     while (!glfwWindowShouldClose(window)){
 	if( bSignalExit ){
             break;
@@ -392,9 +403,14 @@ void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {
 	}else{
 	    iWaitCurrent = 0;
 	}
-        scene_manager.RunBody();
-        glfwSwapBuffers(window);
+	render_clock.Tick();
+	if( bClockTicked ){
+	    scene_manager.RunBody();
+	    glfwSwapBuffers(window);
+	    bClockTicked = false;
+	}
     }
+    render_clock.Pause();
     scene_manager.RunCleanup();
 }
 

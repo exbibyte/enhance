@@ -3,6 +3,7 @@
 
 #include <string>
 #include <chrono>
+#include <functional>
 
 using namespace std;
 
@@ -29,7 +30,9 @@ class Clock
   void                                             SetClockScale(double);
   bool                                             IsRunning() const;
   double                                           GetTime() const;   /// get current time in milliseconds
-  virtual void                                     TickAction(string a){};   /// implementation method called after each clock Tick success
+  virtual void                                     TickAction(string a){}   /// implementation method called after each clock Tick success
+  bool                                             SetTickFunc( std::function< void(void) > func );
+  std::function< void(void) >                      _TickFunc; //function to activate on each tick
 };
 
 #endif
