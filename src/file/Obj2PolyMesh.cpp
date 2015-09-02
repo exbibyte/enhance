@@ -25,18 +25,17 @@ typedef tuple<int,int,int, int, int, float,float,float,float,float,float> tTrian
 int main(int argc, char** argv)
 {
 
-    if(argc<2)
+    if( argc < 3 )
     {
-//    cout<<"need: <input .obj file> <output file name> <object name>"<<endl;
-        cout << "need: <input .obj file>" << endl;
+	cout<<"need: <input .obj file> <output file name>"<<endl;
         return 0;
     }
 
     fstream input;
     fstream output;
 
-    input.open (argv[1], std::fstream::in);
-//  output.open (argv[2], std::fstream::out | std::fstream::trunc);
+    input.open( argv[1], std::fstream::in );
+    output.open( argv[2], std::fstream::out | std::fstream::trunc );
   
     string current;
     stringstream ss;
@@ -44,7 +43,8 @@ int main(int argc, char** argv)
     vector<vector<float> > vTexturecoord;
     vector<vector<double> > vVertex;
     vector<vector<double> > vNormal;
-    vector<tTriangleData> vTriangle;
+    vector<vector<int> > vFaceVertCoordIndex;
+    vector<vector<int> > vFaceVertNormIndex;
 
     vector<string> vTextureName;
     int objectCount = 0;
@@ -109,36 +109,52 @@ int main(int argc, char** argv)
 	    cout << "vn0: " << vec_vertnorm_index[0] << ", ";
 	    cout << "vn1: " << vec_vertnorm_index[1] << ", ";
 	    cout << "vn2: " << vec_vertnorm_index[2] << endl;
+	    vFaceVertCoordIndex.push_back( vec_vertcoord_index );
+	    vFaceVertNormIndex.push_back( vec_vertnorm_index );
 	    continue;
         }
     }
 
-    // //write vertices
-    // output<<"<vertices>"<<endl;
-    // for(auto i : vVertex)
-    // {
-    //   for(auto j : i)  
-    //   {
-    //     output<< j << " ";
-    //   }
-    //   output<<endl;
-    // }
-    // output<<"</vertices>"<<endl;  
+    //write vertices
+    output << "vertices: " << endl;
+    int iVertIndex = 0;
+    for(auto i : vVertex)
+    {
+	output << "-{ id: " << iVertIndex << ", vec: [ ";
+	for(auto j : i)  
+	{
+	    output << j << ", ";
+	}
+	output << " ] }" << endl;
+	++iVertIndex;
+    }
 
-    // //write computed face normals
-    // output<<"<normals>"<<endl;
-    // for(auto i : vNormal)
-    // {
-    //   for(auto j : i)
-    //   {
-    //     output<< j <<" ";
-    //   }
-    //   output<<endl;
-    // }
-    // output<<"</normals>"<<endl;
+    //write vertices
+    output << "normals: " << endl;
+    int iNormIndex = 0;
+    for(auto i : vNormal)
+    {
+	output << "-{ id: " << iNormIndex << ", vec: [ ";
+	for(auto j : i)  
+	{
+	    output << j << ", ";
+	}
+	output << " ] }" << endl;
+	++iNormIndex;
+    }
 
+    //write bufferinfo
+    output << "bufferinfo: " << endl;
+    int iBufferInfoIndex = 0;
+    int iBufferInfoOffset = 0;
+    for(auto i : vFaceVertCoordIndex )
+    {
+	output << "-{ name: " << iNormIndex << ", offset: " << iBufferInfoOffset << ", length: " << 3 << " }" << endl;
+	++iBufferInfoIndex;
+	iBufferInfoOffset += 3;
+    }
     input.close();
-//  output.close();
+    output.close();
 
     return 0;
 }
