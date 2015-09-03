@@ -37,7 +37,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -177,3 +177,6 @@ test_GLSceneManagerV2_osx:
 	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
 	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
 	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++0x $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_file)/PolyMesh_Data_Arrays.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassConvertPolyMeshDataStructToArray.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_gl)/GLSceneManager.cpp $(src_folder_ui)/WindowManagerGlfw.cpp $(src_folder_gl)/GLSLProgram.cpp $(src_folder_gl)/GLHelper.cpp $(src_folder_gl)/GLTexture.cpp $(src_folder_file)/textfile.cpp $(src_folder_file)/PPM.cpp $(src_folder_polymesh)/WingedEdge.cpp $(src_folder_math)/Vec.cpp $(src_folder_core)/Clock.cpp $(src_folder_test_gl)/test_GLSceneManagerV2.cpp -I/usr/local/include -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -I$(inc_folder_gl) -I$(inc_folder_ui) -I$(inc_folder_graph) -I$(inc_folder_polymesh) -I$(inc_folder_math) -I$(inc_folder_en) -I$(inc_folder_core) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/test_GLSceneManagerV2
+
+test_Obj2PolyMesh:
+	g++ -std=c++0x -g $(src_folder_file)/Obj2PolyMesh.cpp -o $(build_dir)/test_Obj2PolyMesh
