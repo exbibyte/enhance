@@ -17,10 +17,27 @@
 #include <cmath>
 #include <tuple>
 #include <regex>
+#include <cassert>
 
 using namespace std;
 
 typedef tuple<int,int,int, int, int, float,float,float,float,float,float> tTriangleData;
+
+bool WriteVec( vector<double> Vec, int iWriteIndex, int & iCountData, fstream & output ){
+    iCountData = 0;
+    output << "   -{ id: " << iWriteIndex << ", vec: [ ";
+    for( auto j = Vec.begin(); j != Vec.end(); ++j )  
+    {
+	if( j + 1 != Vec.end() ){
+	    output << *j << ", ";
+	}else{
+	    output << *j;
+	}
+	++iCountData;
+    }
+    output << " ] }" << endl;
+    return true;
+}
 
 int main(int argc, char** argv)
 {
@@ -50,12 +67,13 @@ int main(int argc, char** argv)
     int objectCount = 0;
     int triangleCount = 0;
 
+    string result_obj_name;
+
     while (getline(input, current)) 
     {    
         // object name
         std::regex reg_obj_name("^o (\\w+)");
         std::smatch match_obj_name;
-        string result_obj_name;
         if (std::regex_search( current, match_obj_name, reg_obj_name ) && match_obj_name.size() > 1 ) {
             result_obj_name = match_obj_name.str(1);
 	    cout << "Object Name: " << result_obj_name << endl;
@@ -115,44 +133,70 @@ int main(int argc, char** argv)
         }
     }
 
-    //write vertices
+    if( vFaceVertCoordIndex.size() != vFaceVertNormIndex.size() ){
+	assert( 0 && "Number of vertices coordinates and normals not match." );
+	return -1;
+    }
+    
+    //write vertices according to faces
     output << "vertices: " << endl;
-    int iVertIndex = 0;
-    for(auto i : vVertex)
+    int iVertexIndex = 0;
+    int iCountVerticesData = 0;
+    for( auto i : vFaceVertCoordIndex )
     {
-	output << "-{ id: " << iVertIndex << ", vec: [ ";
-	for(auto j : i)  
-	{
-	    output << j << ", ";
-	}
-	output << " ] }" << endl;
-	++iVertIndex;
-    }
+	//get index of vertices
+	for( auto j : i ){
+	    int iIndexVertices = j - 1;
+	    if( iIndexVertices >= vVertex.size() ){
+		assert( 0 && "Out of bounds access of vertices." );
+		return -1;
+	    }
+	    auto k = vVertex[ iIndexVertices ];
 
-    //write vertices
+	    int iCountWritten = 0;
+	    WriteVec( k, iVertexIndex, iCountWritten, output );
+	    iCountVerticesData += iCountWritten;
+	    ++iVertexIndex;
+	}
+    }
+    cout << "Number of vertices written: " << iCountVerticesData << ". " << endl;
+
+    output << endl;
+
+    //write normals according to faces
     output << "normals: " << endl;
-    int iNormIndex = 0;
-    for(auto i : vNormal)
+    int iNormalIndex = 0;
+    int iCountNormalsData = 0;
+    for( auto i : vFaceVertNormIndex )
     {
-	output << "-{ id: " << iNormIndex << ", vec: [ ";
-	for(auto j : i)  
-	{
-	    output << j << ", ";
+	//get index of normals
+	for( auto j : i ){
+	    int iIndexNormals = j - 1;
+	    if( iIndexNormals >= vNormal.size() ){
+		assert( 0 && "Out of bounds access of normals." );
+		return -1;
+	    }
+	    auto k = vNormal[ iIndexNormals ];
+
+	    int iCountWritten = 0;
+	    WriteVec( k, iNormalIndex, iCountWritten, output );
+	    iCountNormalsData += iCountWritten;
+	    ++iNormalIndex;
 	}
-	output << " ] }" << endl;
-	++iNormIndex;
+    }
+    cout << "Number of normals written: " << iCountNormalsData << ". " << endl;
+
+    if( iCountVerticesData != iCountNormalsData ){
+	assert( 0 && "Number of vertice coordinate data and vertice normal data not match." );
+	return -1;
     }
 
+    output << endl;
+	
     //write bufferinfo
     output << "bufferinfo: " << endl;
-    int iBufferInfoIndex = 0;
-    int iBufferInfoOffset = 0;
-    for(auto i : vFaceVertCoordIndex )
-    {
-	output << "-{ name: " << iNormIndex << ", offset: " << iBufferInfoOffset << ", length: " << 3 << " }" << endl;
-	++iBufferInfoIndex;
-	iBufferInfoOffset += 3;
-    }
+    output << "   -{ name: " << result_obj_name << ", offset: 0, length: " << iCountVerticesData << " }" << endl;
+    
     input.close();
     output.close();
 
