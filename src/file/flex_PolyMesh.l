@@ -50,7 +50,7 @@
                 yylval->str = strdup(yytext);
                 return COMMA;
                }
-[\.\-a-z_0-9]+  {
+[\.\-a-z_0-9A-Z]+  {
                 yylval->str = strdup(yytext);
                 return VARIABLE;
                }
