@@ -270,12 +270,14 @@ public:
         _GLSLProgram->BindVertexArray();
 //        glDrawArrays( GL_TRIANGLES, 0, 9 );
 	if( !_GLSLProgram->SetCurrentBufferInfo( "square" ) ){
+	    assert( 0 && "Cannot set buffer info for square." );
 	    return false;
 	}
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
 	if( !_GLSLProgram->SetCurrentBufferInfoSequence( "seq_01" ) ){
+	    assert( 0 && "Cannot set buffer info for seq_01." );
 	    return false;
 	}
 	bool bIncrement = false;

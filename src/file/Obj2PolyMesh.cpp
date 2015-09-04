@@ -109,7 +109,7 @@ int main(int argc, char** argv)
         }
 
         //triangle faces
-	std::regex reg_face("^f (\\d)//(\\d) (\\d)//(\\d) (\\d)//(\\d)");
+	std::regex reg_face("^f (\\d+)//(\\d+) (\\d+)//(\\d+) (\\d+)//(\\d+)");
         std::smatch match_face;
         string result_face;
         if (std::regex_search( current, match_face, reg_face ) && match_face.size() > 6 ) {
