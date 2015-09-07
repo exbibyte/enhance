@@ -191,11 +191,16 @@ int main(int argc, char** argv)
 	return -1;
     }
 
+    if( 0 != iCountVerticesData % 3 ){
+	assert( 0 && "Number of vertice and normal data not divisible by 3." );
+	return -1;
+    }
+
     output << endl;
 	
     //write bufferinfo
     output << "bufferinfo: " << endl;
-    output << "   -{ name: " << result_obj_name << ", offset: 0, length: " << iCountVerticesData << " }" << endl;
+    output << "   -{ name: " << result_obj_name << ", offset: 0, length: " << ( iCountVerticesData / 3 ) << " }" << endl;
     
     input.close();
     output.close();
