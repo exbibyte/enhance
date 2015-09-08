@@ -11,21 +11,13 @@ GLTexture::GLTexture() : _Tex(-1), _Fbo(-1), _iActiveTexture(-1) {
 }
 
 bool GLTexture::GetTextureId( GLuint & TextureId ) {
-    if( _Tex < 0 ) {
-        return false;
-    } else {
-        TextureId = _Tex;
-        return true;
-    }
+    TextureId = _Tex;
+    return true;
 }
 
 bool GLTexture::GetFboId( GLuint & FboId ) {
-    if( _Fbo < 0 ) {
-        return false;
-    } else {
-        FboId = _Fbo;
-        return true;
-    }
+    FboId = _Fbo;
+    return true;
 }
 
 bool GLTexture::GetActiveTexture( int & iActiveTexture ) {

@@ -243,6 +243,7 @@ bool GLSLProgram::DrawCurrentBufferSegment(){
     if( !_CurrentBufferInfo ){
 	return false;
     }
+    // cout << "DrawCurrentBufferSegment: Offset: " << _CurrentBufferInfo->_Offset << ", Length: " << _CurrentBufferInfo->_Length << endl;
     glDrawArrays( GL_TRIANGLES, _CurrentBufferInfo->_Offset, _CurrentBufferInfo->_Length );
     return true;
 }
