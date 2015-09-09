@@ -110,6 +110,7 @@ int main(int argc, char** argv)
 
         //triangle faces
 	std::regex reg_face("^f (\\d+)//(\\d+) (\\d+)//(\\d+) (\\d+)//(\\d+)");
+	std::regex reg_face_2("^f (\\d+)/(?:\\d+)/(\\d+) (\\d+)/(?:\\d+)/(\\d+) (\\d+)/(?:\\d+)/(\\d+)");
         std::smatch match_face;
         string result_face;
         if (std::regex_search( current, match_face, reg_face ) && match_face.size() > 6 ) {
@@ -131,7 +132,29 @@ int main(int argc, char** argv)
 	    vFaceVertNormIndex.push_back( vec_vertnorm_index );
 	    continue;
         }
+	if (std::regex_search( current, match_face, reg_face_2 ) && match_face.size() > 6 ) {
+	    vector<int> vec_vertcoord_index;
+	    vec_vertcoord_index.push_back( stoi( match_face.str(1) ) );
+	    vec_vertcoord_index.push_back( stoi( match_face.str(3) ) );
+	    vec_vertcoord_index.push_back( stoi( match_face.str(5) ) );
+	    vector<int> vec_vertnorm_index;
+	    vec_vertnorm_index.push_back( stoi( match_face.str(2) ) );
+	    vec_vertnorm_index.push_back( stoi( match_face.str(4) ) );
+	    vec_vertnorm_index.push_back( stoi( match_face.str(6) ) );
+	    cout << "Face: v0: " << vec_vertcoord_index[0] << ", ";
+	    cout << "v1: " << vec_vertcoord_index[1] << ", ";
+	    cout << "v2: " << vec_vertcoord_index[2] << ", ";
+	    cout << "vn0: " << vec_vertnorm_index[0] << ", ";
+	    cout << "vn1: " << vec_vertnorm_index[1] << ", ";
+	    cout << "vn2: " << vec_vertnorm_index[2] << endl;
+	    vFaceVertCoordIndex.push_back( vec_vertcoord_index );
+	    vFaceVertNormIndex.push_back( vec_vertnorm_index );
+	    continue;
+        }
     }
+
+    cout << "Number of face vertice coordinates: " << vFaceVertCoordIndex.size() << endl;
+    cout << "Number of face vertice normals: " << vFaceVertNormIndex.size() << endl;
 
     if( vFaceVertCoordIndex.size() != vFaceVertNormIndex.size() ){
 	assert( 0 && "Number of vertices coordinates and normals not match." );
@@ -191,11 +214,16 @@ int main(int argc, char** argv)
 	return -1;
     }
 
+    if( 0 != iCountVerticesData % 3 ){
+	assert( 0 && "Number of vertice and normal data not divisible by 3." );
+	return -1;
+    }
+
     output << endl;
 	
     //write bufferinfo
     output << "bufferinfo: " << endl;
-    output << "   -{ name: " << result_obj_name << ", offset: 0, length: " << iCountVerticesData << " }" << endl;
+    output << "   -{ name: " << result_obj_name << ", offset: 0, length: " << ( iCountVerticesData / 3 ) << " }" << endl;
     
     input.close();
     output.close();

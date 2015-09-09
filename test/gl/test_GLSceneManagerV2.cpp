@@ -208,14 +208,19 @@ public:
         dAngle += 0.005;
 
         mat4 Model = mat4(1.0f);
-        mat4 ModelMatrix = glm::rotate( Model, dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
-
+        // mat4 ModelMatrix = glm::rotate( Model, -dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
+	mat4 ModelMatrix = Model;
+	
         //first pass render for light POV    
         glViewport( 0, 0, 2500, 2500 );
-        mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
+        mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
                                        vec3(0.0,0.0,0.0),
                                        vec3(0.0,1.0,0.0) );
-        mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 1000.0f );
+	
+	// mat4 ViewMatrix = glm::lookAt( vec3(fLightPos_x,fLightPos_y,15.0), 
+	// 			       vec3(0.0,0.0,0.0),
+	// 			       vec3(0.0,1.0,0.0) );
+        mat4 ProjectionMatrixLight = glm::perspective( 60.0f, 1.0f, 0.1f, 1000.0f );
 
         GLTexture * ShadowTexture;
         if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
@@ -246,7 +251,7 @@ public:
         bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
         mat3 NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
         bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MVP );
-        bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrixLight );
+        // bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrixLight );
         bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
         bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
         vec3 LightLa;
@@ -258,8 +263,17 @@ public:
         bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
         bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
         bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
-        vec4 LightPosition( 5.0f, 5.0f, 20.0f, 1.0 );
+	float fDeltaLight = -0.01;
+        vec4 LightPosition( 0.0f, 0.0f, 20.0f, 1.0 );
+	// vec4 LightPosition( fLightPos_x, fLightPos_y, 15.0f, 1.0 );
+	fLightPos_x += fDeltaLight;
+	fLightPos_y += fDeltaLight;
         bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
+
+	mat4 LightViewMatrix = ViewMatrix;
+	// mat4 LightViewMatrix = Model;
+	bRet = _GLSLProgram->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
+	
         vec3 MaterialCoeffKa( 1.0f, 1.0f, 1.0f );
         vec3 MaterialCoeffKd( 1.0f, 1.0f, 1.0f );
         vec3 MaterialCoeffKs( 1.0f, 1.0f, 1.0f );
@@ -268,7 +282,6 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
         _GLSLProgram->BindVertexArray();
-//        glDrawArrays( GL_TRIANGLES, 0, 9 );
 	if( !_GLSLProgram->SetCurrentBufferInfo( "square" ) ){
 	    assert( 0 && "Cannot set buffer info for square." );
 	    return false;
@@ -276,6 +289,23 @@ public:
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
+	//set orientation for the objects to render below
+	mat4 ObjOrientationMatrix = glm::rotate( Model, -2*dAngle, vec3( 0.0f, 0.5f, 0.7f ) );
+	// mat4 ObjOrientationMatrix = Model;
+        mat4 ModelOrientationViewMatrix = ViewMatrix * ObjOrientationMatrix * ModelMatrix;
+	// mat4 ModelOrientationViewMatrix = ObjOrientationMatrix * ModelMatrix;
+	mat4 MOVP = ProjectionMatrixLight * ViewMatrix  * ObjOrientationMatrix * ModelMatrix;
+	mat4 MOVPB = Bias * ProjectionMatrixLight * ViewMatrix * ObjOrientationMatrix * ModelMatrix;
+        bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MOVPB );
+        mat3 NormalMatrixOrientation = glm::inverse( glm::transpose( glm::mat3(ModelOrientationViewMatrix) ) );
+        bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MOVP );
+        // // bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrixLight );
+	LightViewMatrix = ViewMatrix;
+	// LightViewMatrix = Model;
+	bRet = _GLSLProgram->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
+	
+        bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelOrientationViewMatrix );
+        bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrixOrientation );
 	if( !_GLSLProgram->SetCurrentBufferInfoSequence( "seq_01" ) ){
 	    assert( 0 && "Cannot set buffer info for seq_01." );
 	    return false;
@@ -293,6 +323,10 @@ public:
         ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
                                   vec3(0.0,0.0,0.0),
                                   vec3(0.0,1.0,0.0) );
+
+	mat4 ViewOrientationMatrix = glm::rotate( Model, -dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
+	ViewMatrix = ViewMatrix * ViewOrientationMatrix;
+	
         if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
             ShadowTexture->UnbindFbo();
         }
@@ -308,7 +342,10 @@ public:
         MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
         NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
         bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MVP );
-        bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrix );
+        // bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrix );
+
+	bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
+
         bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
         bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
         bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
@@ -320,21 +357,27 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
         _GLSLProgram->BindVertexArray();
-        //glDrawArrays( GL_TRIANGLES, 0, 9 );
 	if( !_GLSLProgram->SetCurrentBufferInfo( "square" ) ){
 	    return false;
 	}
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
+	LightViewMatrix = ViewMatrix;
+	// LightViewMatrix = Model;
+	bRet = _GLSLProgram->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
+	//set orientation for the objects to render below
+	// ObjOrientationMatrix = glm::rotate( Model, 2*dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
+	MOVP = ProjectionMatrix * ViewMatrix  * ObjOrientationMatrix * ModelMatrix;
+        bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MOVP );
+        bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelOrientationViewMatrix );
+        bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrixOrientation );
+
+	bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MOVPB );
+		
 	if( !_GLSLProgram->SetCurrentBufferInfoSequence( "seq_01" ) ){
 	    return false;
 	}
-	// if( iWaitRenderCurrent >= iWaitRender ){
-	//     bIncrement = true;
-	//     iWaitRenderCurrent = 0;
-	// }
-	// ++iWaitRenderCurrent;
 	bIncrement = true;
 	if( !_GLSLProgram->DrawCurrentBufferSequence( bIncrement ) ){
 	    return false;
@@ -346,6 +389,8 @@ public:
     string strPathPolyMesh;
     int iWaitRender = 5;
     int iWaitRenderCurrent = 0;
+    float fLightPos_x = 5;
+    float fLightPos_y = 5;
 };
 
 void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {

@@ -49,7 +49,7 @@ bool Clock::Tick()
 
   //calculate fps
   this->FpsActual = 1.0/(duration/1000)/this->ClockScale;
-  cout<<"Time Scale: "<<this->ClockScale<< " Time Scaled FPS: "<<this->FpsActual<<endl;
+//  cout<<"Time Scale: "<<this->ClockScale<< " Time Scaled FPS: "<<this->FpsActual<<endl;
 
   //save runnning time 
   this->TimeSinceStart += duration*this->ClockScale;

@@ -2,7 +2,9 @@
 // Declare any uniforms needed for the Phong shading model
 uniform sampler2DShadow ShadowMap;
 //uniform sampler2D Tex1;
- 
+
+uniform mat4 LightViewMatrix;
+
 in vec4 Position;
 in vec3 Normal;
 in vec4 ShadowCoord;
@@ -30,7 +32,10 @@ uniform MaterialInfo Material;
 
 vec3 phongModel( vec4 position, vec3 norm )
 {
-    vec3 s = normalize(vec3(Light.Position - position));
+    vec4 LightViewPos = LightViewMatrix * Light.Position;
+    vec3 s = normalize(vec3(LightViewPos - position));
+    
+    //vec3 s = normalize(vec3(Light.Position - position));
     vec3 v = normalize(-position.xyz);
     vec3 r = reflect( -s, norm );
     float sDotN = max( dot(s,norm), 0.0 );
