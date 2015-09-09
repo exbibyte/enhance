@@ -208,8 +208,8 @@ public:
         dAngle += 0.005;
 
         mat4 Model = mat4(1.0f);
-        //mat4 ModelMatrix = glm::rotate( Model, dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
-	mat4 ModelMatrix = Model;
+        mat4 ModelMatrix = glm::rotate( Model, -dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
+	// mat4 ModelMatrix = Model;
 	
         //first pass render for light POV    
         glViewport( 0, 0, 2500, 2500 );
@@ -287,13 +287,14 @@ public:
 	mat4 ObjOrientationMatrix = glm::rotate( Model, -2*dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
 	// mat4 ObjOrientationMatrix = Model;
         mat4 ModelOrientationViewMatrix = ViewMatrix * ObjOrientationMatrix * ModelMatrix;
+	// mat4 ModelOrientationViewMatrix = ObjOrientationMatrix * ModelMatrix;
 	mat4 MOVP = ProjectionMatrixLight * ViewMatrix  * ObjOrientationMatrix * ModelMatrix;
 	mat4 MOVPB = Bias * ProjectionMatrixLight * ViewMatrix * ObjOrientationMatrix * ModelMatrix;
         bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MOVPB );
         mat3 NormalMatrixOrientation = glm::inverse( glm::transpose( glm::mat3(ModelOrientationViewMatrix) ) );
         bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MOVP );
         // // bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrixLight );
-	// // mat4 LightViewMatrix = ViewMatrix * ObjOrientationMatrix;
+	// mat4 LightViewMatrix = ViewMatrix;
 	mat4 LightViewMatrix = Model;
 	bRet = _GLSLProgram->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
 	
@@ -352,7 +353,7 @@ public:
 	if( !_GLSLProgram->DrawCurrentBufferSegment() ){
 	    return false;
 	}
-	// LightViewMatrix = ViewMatrix * ObjOrientationMatrix;
+	// LightViewMatrix = ViewMatrix;
 	LightViewMatrix = Model;
 	bRet = _GLSLProgram->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
 	//set orientation for the objects to render below
