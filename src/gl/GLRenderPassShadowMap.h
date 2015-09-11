@@ -15,9 +15,6 @@ public:
     bool ProcessPassDepth( GLSLProgram * GLSLProgram, RenderMeshOrientation &, std::list<std::string> & buffer_obj_name );
     bool ProcessPassNormal( GLSLProgram * GLSLProgram, RenderMeshOrientation &, std::list<std::string> & buffer_obj_name );
     bool ProcessPassAux( GLSLProgram * GLSLProgram, RenderMeshOrientation &, std::list<std::string> & buffer_obj_name );
-
-private:
-    int IsShadeShadow = -1;
 };
 
 #endif

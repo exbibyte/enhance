@@ -16,12 +16,14 @@ public:
     //temporary buffers
     mat4 _MatView;
     mat4 _MatProjection;
+    mat4 _MatLightProjection;
+    mat4 _MatLightView;
     bool ComputeCompositeMats(); // computes _MatOrientationViewProjection, _MatOrientationViewProjectionBias, _MatNormal
-    bool GetCompositeMats( mat4 & orientation_view, mat4 & orientation_view_projection, mat4 & orientation_view_projection_bias, mat3 & normal );
+    bool GetCompositeMats( mat4 & orientation_view, mat4 & orientation_view_projection, mat4 & orientation_view_lightprojection_bias, mat3 & normal );
 
     mat4 _MatOrientationView;
     mat4 _MatOrientationViewProjection;
-    mat4 _MatOrientationViewProjectionBias;
+    mat4 _MatOrientationViewLightProjectionBias;
     mat3 _MatNormal;
 };
 

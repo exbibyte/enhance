@@ -14,16 +14,13 @@ bool GLRenderPassShadowMap::ProcessPassDepth( GLSLProgram * glsl_program, Render
 	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::ProcessPassDepth()");
 	return false;
     }
-    // if( 0 != IsShadeShadow ){
     bRet = glsl_program->SetUniform( "bShadeShadow", false );
-    // 	IsShadeShadow = 0;
-    // }
-    // glCullFace(GL_BACK);
+    glCullFace(GL_BACK);
     bRet = ProcessPassAux( glsl_program, render_mesh_orientation, buffer_obj_name );
     if( !bRet ){
 	assert( 0 && "GLRenderPassShadowMap::ProcessPassDepth() failed");
     }
-    // glCullFace(GL_BACK);
+
     return bRet;
 }
 
@@ -33,11 +30,8 @@ bool GLRenderPassShadowMap::ProcessPassNormal( GLSLProgram * glsl_program, Rende
 	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::ProcessPassNormal()");
 	return false;
     }
-    // if( 1 != IsShadeShadow ){
     bRet = glsl_program->SetUniform( "bShadeShadow", true );
-    // 	IsShadeShadow = 1;
-    // }
-    // glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
     bRet = ProcessPassAux( glsl_program, render_mesh_orientation, buffer_obj_name );
     if( !bRet ){
 	assert( 0 && "GLRenderPassShadowMap::ProcessPassNormal() failed");
@@ -62,13 +56,12 @@ bool GLRenderPassShadowMap::ProcessPassAux( GLSLProgram * glsl_program, RenderMe
 	return false;
     }
 
-    // glCullFace(GL_BACK);
     bRet = glsl_program->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
     bRet = glsl_program->SetUniform( "MVP", (mat4 const) MVP );
     bRet = glsl_program->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
     bRet = glsl_program->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
     mat4 LightViewMatrix = render_mesh_orientation._MatView;
-    // bRet = glsl_program->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
+    bRet = glsl_program->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
     glsl_program->BindVertexArray();
     for( auto & i : buffer_obj_name ){
 	if( !glsl_program->SetCurrentBufferInfo( i ) ){
@@ -81,7 +74,6 @@ bool GLRenderPassShadowMap::ProcessPassAux( GLSLProgram * glsl_program, RenderMe
 	}
     }
     glsl_program->UnBindVertexArray();
-    // glCullFace(GL_BACK);
 
     return bRet;
 }

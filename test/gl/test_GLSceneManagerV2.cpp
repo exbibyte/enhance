@@ -345,7 +345,7 @@ public:
         // bRet = _GLSLProgram->SetUniform( "ProjectionMatrix", (mat4 const) ProjectionMatrix );
 
 	bRet = _GLSLProgram->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
-
+        bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MVP ); //added
         bRet = _GLSLProgram->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
         bRet = _GLSLProgram->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
         bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );

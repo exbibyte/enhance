@@ -18,14 +18,14 @@ bool RenderMeshOrientation::ComputeCompositeMats(){
 	0.0, 0.0, 0.5, 0.0,
 	0.5, 0.5, 0.5, 1.0
 	);
-    _MatOrientationViewProjectionBias = Bias * _MatProjection * _MatView * _MatOrientation;
+    _MatOrientationViewLightProjectionBias = Bias * _MatLightProjection * _MatLightView * _MatOrientation;
     _MatNormal = glm::inverse( glm::transpose( glm::mat3( _MatOrientationView ) ) );
     return true;
 }
-bool RenderMeshOrientation::GetCompositeMats( mat4 & orientation_view, mat4 & orientation_view_projection, mat4 & orientation_view_projection_bias, mat3 & normal ){
+bool RenderMeshOrientation::GetCompositeMats( mat4 & orientation_view, mat4 & orientation_view_projection, mat4 & orientation_view_lightprojection_bias, mat3 & normal ){
     orientation_view = _MatOrientationView;
     orientation_view_projection = _MatOrientationViewProjection;
-    orientation_view_projection_bias = _MatOrientationViewProjectionBias;
+    orientation_view_lightprojection_bias = _MatOrientationViewLightProjectionBias;
     normal = _MatNormal;
     return true;
 }
