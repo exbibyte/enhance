@@ -6,6 +6,7 @@
 #include <cassert>
 #include <list>
 #include <string>
+#include <utility>
 using namespace std;
 
 bool GLRenderPassShadowMap::ProcessPassDepth( GLSLProgram * glsl_program, RenderMeshOrientation & render_mesh_orientation, list<string> & buffer_obj_name ){
@@ -74,6 +75,45 @@ bool GLRenderPassShadowMap::ProcessPassAux( GLSLProgram * glsl_program, RenderMe
 	}
     }
     glsl_program->UnBindVertexArray();
+
+    return bRet;
+}
+
+bool GLRenderPassShadowMap::ProcessPass( std::string strPassType, GLSLProgram * glsl_program ){
+    bool bRet = true;
+
+    if( "DEPTH" == strPassType ){
+	for( auto & i : list_pass_depth ){
+	    RenderMeshOrientation mesh_orientation = i.first;
+	    list<string> list_buffer_obj_name = i.second;
+	    bRet = ProcessPassDepth( glsl_program, mesh_orientation, list_buffer_obj_name );
+	    if( !bRet ){
+		return false;
+	    }
+	}
+        list_pass_depth.clear();
+    }else{
+	for( auto & i : list_pass_normal ){
+	    RenderMeshOrientation mesh_orientation = i.first;
+	    list<string> list_buffer_obj_name = i.second;
+	    bRet = ProcessPassNormal( glsl_program, mesh_orientation, list_buffer_obj_name );
+	    if( !bRet ){
+		return false;
+	    }
+	}
+	list_pass_normal.clear();
+    }
+    return bRet;    
+}
+
+bool GLRenderPassShadowMap::AddPath( std::string strPassType, RenderMeshOrientation & mesh_orientation, std::list<std::string> & buffer_obj_name ){
+    bool bRet = true;
+    
+    if( "DEPTH" == strPassType ){
+	list_pass_depth.push_back( std::make_pair( mesh_orientation, buffer_obj_name ) );
+    }else{
+        list_pass_normal.push_back( std::make_pair( mesh_orientation, buffer_obj_name ) );	
+    }
 
     return bRet;
 }
