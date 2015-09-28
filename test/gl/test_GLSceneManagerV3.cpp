@@ -237,7 +237,7 @@ public:
         // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
 
         //draw on first pass
-        //Multiply it be the bias matrix
+        //Multiply it by the bias matrix
         glm::mat4 Bias(
             0.5, 0.0, 0.0, 0.0,
             0.0, 0.5, 0.0, 0.0,
@@ -277,19 +277,18 @@ public:
         bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
 
 	///start of draw 1st object
-	RenderMeshOrientation render_mesh_orientation;
-	render_mesh_orientation._MatOrientation = ModelMatrix;
-	render_mesh_orientation._MatView = ViewMatrix;
-	render_mesh_orientation._MatProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightView = LightViewMatrixOriginal;
-	render_mesh_orientation.ComputeCompositeMats();
+	RenderMeshOrientation render_mesh_orientation_firstpass;
+	render_mesh_orientation_firstpass._MatOrientation = ModelMatrix;
+	render_mesh_orientation_firstpass._MatView = ViewMatrix;
+	render_mesh_orientation_firstpass._MatProjection = ProjectionMatrixLight;
+	render_mesh_orientation_firstpass._MatLightProjection = ProjectionMatrixLight;
+	render_mesh_orientation_firstpass._MatLightView = LightViewMatrixOriginal;
+	render_mesh_orientation_firstpass.ComputeCompositeMats();
 
 	GLRenderPassShadowMap render_pass_shadow_map;
 	list<string> buffer_obj_name_pass_depth;
 	buffer_obj_name_pass_depth.push_back( "square" );
-	render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation, buffer_obj_name_pass_depth );
-        //render_pass_shadow_map.ProcessPassDepth( _GLSLProgram, render_mesh_orientation, buffer_obj_name_pass_depth );
+	render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation_firstpass, buffer_obj_name_pass_depth );
         ///end of draw 1st object
 
 	//set orientation for the objects to render below
@@ -300,105 +299,67 @@ public:
         mat3 NormalMatrixOrientation = glm::inverse( glm::transpose( glm::mat3(ModelOrientationViewMatrix) ) );
 
 	///start of draw 2nd object
-	render_mesh_orientation._MatOrientation = ObjOrientationMatrix;
-	render_mesh_orientation._MatView = ViewMatrix;
-	render_mesh_orientation._MatProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightView = LightViewMatrixOriginal;
-	render_mesh_orientation.ComputeCompositeMats();
+	render_mesh_orientation_firstpass._MatOrientation = ObjOrientationMatrix;
+	render_mesh_orientation_firstpass._MatView = ViewMatrix;
+	render_mesh_orientation_firstpass._MatProjection = ProjectionMatrixLight;
+	render_mesh_orientation_firstpass._MatLightProjection = ProjectionMatrixLight;
+	render_mesh_orientation_firstpass._MatLightView = LightViewMatrixOriginal;
+	render_mesh_orientation_firstpass.ComputeCompositeMats();
 
 	buffer_obj_name_pass_depth.clear();
 	buffer_obj_name_pass_depth.push_back( "Wheel_4_Wheel" );
-	render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation, buffer_obj_name_pass_depth );
-	render_pass_shadow_map.ProcessPass( "DEPTH", _GLSLProgram );
-        //render_pass_shadow_map.ProcessPassDepth( _GLSLProgram, render_mesh_orientation, buffer_obj_name_pass_depth );
-        ///end of draw 2nd object
-
+	render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation_firstpass, buffer_obj_name_pass_depth );
+	//end of draw 2nd object
+	render_pass_shadow_map.ProcessPass( "DEPTH", _GLSLProgram ); //this needs to be done prior to changing glViewport dimension for second pass rendering
+	
         //2nd pass render
         glViewport( 0, 0, 500, 500 );
         ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
                                   vec3(0.0,0.0,0.0),
                                   vec3(0.0,1.0,0.0) );
-
+	
 	mat4 ViewOrientationMatrix = glm::rotate( Model, -dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
 	ViewMatrix = ViewMatrix * ViewOrientationMatrix;
-	
-        // if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
-        //     ShadowTexture->UnbindFbo();
-        // }
-        // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
+		
         //draw on 2nd pass
         ModelViewMatrix = ViewMatrix * ModelMatrix;
         mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f );
         MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
         NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
-
-        // bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
-        // bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
-        // bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
-        // bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
-        // bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
-        // bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
-        // bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
-        // bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
-
+		
 	///draw 1st object
-	render_mesh_orientation._MatOrientation = ModelMatrix;
-	render_mesh_orientation._MatView = ViewMatrix;
-	render_mesh_orientation._MatProjection = ProjectionMatrix;
-	render_mesh_orientation._MatLightProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightView = LightViewMatrixOriginal;
-	render_mesh_orientation.ComputeCompositeMats();
+	RenderMeshOrientation render_mesh_orientation_secondpass;
+	render_mesh_orientation_secondpass._MatOrientation = ModelMatrix;
+	render_mesh_orientation_secondpass._MatView = ViewMatrix;
+	render_mesh_orientation_secondpass._MatProjection = ProjectionMatrix;
+	render_mesh_orientation_secondpass._MatLightProjection = ProjectionMatrixLight;
+	render_mesh_orientation_secondpass._MatLightView = LightViewMatrixOriginal;
+	render_mesh_orientation_secondpass.ComputeCompositeMats();
 
 	buffer_obj_name_pass_depth.clear();
 	buffer_obj_name_pass_depth.push_back( "square" );
-	render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation, buffer_obj_name_pass_depth );
-	// render_pass_shadow_map.ProcessPassNormal( _GLSLProgram, render_mesh_orientation, buffer_obj_name_pass_depth );
+	render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation_secondpass, buffer_obj_name_pass_depth );
         ///end of draw 1st object
 
 	///draw 2nd object
-	render_mesh_orientation._MatOrientation = ObjOrientationMatrix;
-	render_mesh_orientation._MatView = ViewMatrix;
-	render_mesh_orientation._MatProjection = ProjectionMatrix;
-	render_mesh_orientation._MatLightProjection = ProjectionMatrixLight;
-	render_mesh_orientation._MatLightView = LightViewMatrixOriginal;
-	render_mesh_orientation.ComputeCompositeMats();
+	render_mesh_orientation_secondpass._MatOrientation = ObjOrientationMatrix;
+	render_mesh_orientation_secondpass._MatView = ViewMatrix;
+	render_mesh_orientation_secondpass._MatProjection = ProjectionMatrix;
+	render_mesh_orientation_secondpass._MatLightProjection = ProjectionMatrixLight;
+	render_mesh_orientation_secondpass._MatLightView = LightViewMatrixOriginal;
+	render_mesh_orientation_secondpass.ComputeCompositeMats();
 
 	buffer_obj_name_pass_depth.clear();
 	buffer_obj_name_pass_depth.push_back( "Wheel_4_Wheel" );
-	render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation, buffer_obj_name_pass_depth );
-	//render_pass_shadow_map.ProcessPassNormal( _GLSLProgram, render_mesh_orientation, buffer_obj_name_pass_depth );
+	render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation_secondpass, buffer_obj_name_pass_depth );
         ///end of draw 2nd object
-
-	//render all objects for depth pass
-	// GLTexture * ShadowTexture;
-        // if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
-        //     ShadowTexture->BindFbo();
-        //     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        //     int iActiveTexture;
-        //     ShadowTexture->GetActiveTexture( iActiveTexture );
-        //     bRet = _GLSLProgram->SetUniform( "ShadowMap", iActiveTexture );
-        // }
-	// bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
-        // bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
-        // bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
-        // bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
-	// render_pass_shadow_map.ProcessPass( "DEPTH", _GLSLProgram );
 
 	//render all objects for the normal pass
 	if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
             ShadowTexture->UnbindFbo();
         }
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
-        bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
-        bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
-        bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
-        bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
-        bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
-        bRet = _GLSLProgram->SetUniform( "Material.Shininess", 1.0f );
 	render_pass_shadow_map.ProcessPass( "NORMAL", _GLSLProgram );
 
         return true;
