@@ -14,10 +14,6 @@ TEST_CASE( "StreamChannel", "[StreamChannel]" ) {
 
     StreamChannel stream_channel;
     
-    // bool CleanExpiredStreams( unsigned int older_than );
-    // bool IncrementTimeStamp( unsigned int );
-    // bool SetTimeStamp( unsigned int );
-    
     SECTION( "Add and get streams" ) {
 	std::list< std::pair< std::string, void * > > list_streams { {"id_0", nullptr }, {"id_1", nullptr }, {"id_2", nullptr } };
 	CHECK( stream_channel.AddStream( list_streams ) == true );
@@ -32,6 +28,9 @@ TEST_CASE( "StreamChannel", "[StreamChannel]" ) {
 	    int timestamp;
 	    GetStreamTimestamp( i, timestamp );
 	    CHECK( 0 == timestamp );
+	    string stream_string;
+	    GetStreamString( i, stream_string );
+	    CHECK( ("id_0" == stream_string || "id_1" == stream_string || "id_2" == stream_string) );
 	}
     }
     SECTION( "Set timestamp and clean expired timestamp" ) {
