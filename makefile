@@ -38,7 +38,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -192,3 +192,6 @@ test_StreamChannel:
 
 test_StreamManager:
 	g++ -std=c++0x -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamManager
+
+test_StreamInterface:
+	g++ -std=c++0x -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_core)/StreamInterface.cpp $(src_folder_test_core)/test_StreamInterface.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamInterface

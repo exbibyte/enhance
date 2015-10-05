@@ -19,7 +19,9 @@ class StreamChannel {
 public:
     StreamChannel() : _timestamp(0) {}
     bool RequestStreams( int timestamp_min, int & timestamp_current, std::list< StreamCapsule > & );
+    bool RequestStreamsRelative( unsigned int timestamp_window, int & timestamp_current, std::list< StreamCapsule > & );
     bool AddStream( std::list< std::pair< std::string, void * > > & );
+    bool AddStream( std::list< StreamCapsule > & );
     bool CleanExpiredStreams( unsigned int older_than );
     bool IncrementTimeStamp( unsigned int );
     bool SetTimeStamp( int );

@@ -35,11 +35,19 @@ bool StreamChannel::RequestStreams( int timestamp_min, int & timestamp_current, 
     timestamp_current = _timestamp;
     return true;
 }
-
+bool StreamChannel::RequestStreamsRelative( unsigned int timestamp_window, int & timestamp_current, list< StreamCapsule > & stream_data ){
+    int timestamp_absolute = _timestamp - timestamp_window;
+    bool bRet = RequestStreams( timestamp_absolute, timestamp_current, stream_data );
+    return bRet;
+}
 bool StreamChannel::AddStream( std::list< std::pair< std::string, void * > > & stream ){
     for( auto & i : stream ){
 	_Stream.push_back( make_tuple( _timestamp, i.first, i.second ) );
     }
+    return true;
+}
+bool StreamChannel::AddStream( std::list< StreamCapsule > & stream ){
+    _Stream.insert( _Stream.end(), stream.begin(), stream.end() );
     return true;
 }
 bool StreamChannel::CleanExpiredStreams( unsigned int older_than ){
