@@ -14,6 +14,7 @@ src_folder_gl := ./src/gl
 src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
 src_folder_test_gl := ./test/gl
+src_folder_test_core := ./test/core
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -37,7 +38,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -185,3 +186,6 @@ test_GLSceneManagerV3_osx:
 
 test_Obj2PolyMesh:
 	g++ -std=c++0x -g $(src_folder_file)/Obj2PolyMesh.cpp -o $(build_dir)/test_Obj2PolyMesh
+
+test_StreamChannel:
+	g++ -std=c++0x -g $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamChannel.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamChannel
