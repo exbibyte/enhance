@@ -188,10 +188,10 @@ test_Obj2PolyMesh:
 	g++ -std=c++0x -g $(src_folder_file)/Obj2PolyMesh.cpp -o $(build_dir)/test_Obj2PolyMesh
 
 test_StreamChannel:
-	g++ -std=c++11 -g $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamChannel.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamChannel
+	g++ -std=c++0x -g $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamChannel.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamChannel
 
 test_StreamManager:
-	g++ -std=c++11 -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamManager
+	g++ -std=c++0x -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_test_core)/test_StreamManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamManager
 
 test_StreamInterface:
-	g++ -std=c++1y -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_core)/StreamInterface.cpp $(src_folder_test_core)/test_StreamInterface.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamInterface
+	g++ -std=c++0x -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_core)/StreamInterface.cpp $(src_folder_test_core)/test_StreamInterface.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamInterface
