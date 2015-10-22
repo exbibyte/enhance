@@ -22,6 +22,8 @@
 #include <functional>
 #include <iostream>
 #include <cassert>
+#include <thread>
+#include <chrono>
 
 //math library
 #define GLM_FORCE_RADIANS
@@ -55,10 +57,9 @@ bool key_callback_1()
 
 class SampleScene {
 public:
-    bool SetShaders( GLSLProgram * & _GLSLProgram ){
+    bool SetShaders( GLSLProgram * _GLSLProgram ){
         bool bRet;
         cout << "func init 01 - Set Shaders" << endl;
-        _GLSLProgram = new GLSLProgram;
         _GLSLProgram->CompileShaderFromFile("./src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
         _GLSLProgram->CompileShaderFromFile("./src/gl/shaders/Shadow.frag", GLSLShader::FRAGMENT );
         _GLSLProgram->AttachShaders();
@@ -173,8 +174,6 @@ public:
         _GLSLProgram->PrintActiveAttribs();
 
         //generate VBO, populate and bind data to vertex attribute arrays
-        //pPositionData->SetData( data_vertex, 3, 27 );
-	//pNormalData->SetData( data_normal, 3, 27 );
         pPositionData->SetData( data_vertex, 3, iNumDataVertex );
         pNormalData->SetData( data_normal, 3, iNumDataNormal );
 
@@ -187,24 +186,12 @@ public:
         data_vertex = nullptr;
         delete [] data_normal;
         data_normal = nullptr;
-
-	// //set buffer segments
-	// GLBufferInfo * buffer_info = new GLBufferInfo;
-	// buffer_info->_Name = "BufSeg_01";
-	// buffer_info->_Offset = 0;
-	// buffer_info->_Length = 9;
-
-	// if( !_GLSLProgram->SetBufferInfo( buffer_info ) ){
-	//     return false;
-	// }
-	// if( !_GLSLProgram->SetCurrentBufferInfo( "BufSeg_01" ) ){
-	//     return false;
-	// }
 	
         return true;
     }
 
-    bool Render( GLSLProgram * & _GLSLProgram ){
+    bool Render( GLSLProgram * _GLSLProgram ){
+	    
         bool bRet;
 //      cout << "func body 01 - Render Scene" << endl;
         dAngle += 0.005;
@@ -214,7 +201,7 @@ public:
 	mat4 ModelMatrix = Model;
 	
         //first pass render for light POV    
-        glViewport( 0, 0, 2500, 2500 );
+        //glViewport( 0, 0, 2500, 2500 );
         mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
                                        vec3(0.0,0.0,0.0),
                                        vec3(0.0,1.0,0.0) );
@@ -313,7 +300,7 @@ public:
 	render_pass_shadow_map.ProcessPass( "DEPTH", _GLSLProgram ); //this needs to be done prior to changing glViewport dimension for second pass rendering
 	
         //2nd pass render
-        glViewport( 0, 0, 500, 500 );
+        //glViewport( 0, 0, 500, 500 );
         ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
                                   vec3(0.0,0.0,0.0),
                                   vec3(0.0,1.0,0.0) );
@@ -372,73 +359,83 @@ public:
     float fLightPos_y = 5;
 };
 
-void RenderTask( GLFWwindow * window, string strPathPolyMesh ) {
+auto func_body_02 = []( GLSLProgram * glslprogram )->bool {
+    cout << "func body 02" << endl;
+    return true;
+};
+auto func_cleanup_01 = []( GLSLProgram * glslprogram )->bool {
+    cout << "func cleanup 01" << endl;
+    return true;
+};
 
-    auto func_body_02 = []( GLSLProgram * & glslprogram )->bool {
-        cout << "func body 02" << endl;
-        return true;
-    };
-    auto func_cleanup_01 = []( GLSLProgram * & glslprogram )->bool {
-        cout << "func cleanup 01" << endl;
-        return true;
-    };
-    
-    glfwMakeContextCurrent( window );
+class DataControl {
+public:
+    GLFWwindow * window;
+    GLSceneManager * scene_manager;
+    enTPCommon * tp;
+    WindowManagerGlfw * manager_window;
+    GLSLProgram * glsl_program;
+    SampleScene * sample_scene;
+};
+
+void InitWindow( DataControl * data_control, string strPathPolyMesh ){
+    glfwMakeContextCurrent( data_control->window );
     GLPrintInfo();
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0, 0, 0, 1.0);
 
-    GLSLProgram * glsl_program;
-    GLSceneManager scene_manager;
-    scene_manager.SetGLSLProgram( glsl_program );
-
-    SampleScene sample_scene;
-    sample_scene.strPathPolyMesh = strPathPolyMesh;
+    data_control->sample_scene->strPathPolyMesh = strPathPolyMesh;    
+    data_control->scene_manager->SetGLSLProgram( data_control->glsl_program );
     
-    std::function< bool( GLSLProgram * &) > func_wrap_init_01 = bind( &SampleScene::SetShaders, &sample_scene, std::placeholders::_1 );
-    std::function< bool( GLSLProgram * &) > func_wrap_body_01 = bind( &SampleScene::Render, &sample_scene, std::placeholders::_1 );
-    std::function< bool( GLSLProgram * &) > func_wrap_body_02 = func_body_02;
-    std::function< bool( GLSLProgram * &) > func_wrap_cleanup_01 = func_cleanup_01;
-    scene_manager.RegisterRoutine( "init_01", func_wrap_init_01, GLSceneRoutineType::INIT );
-    scene_manager.RegisterRoutine( "body_01", func_wrap_body_01, GLSceneRoutineType::BODY );
-    scene_manager.RegisterRoutine( "body_02", func_wrap_body_02, GLSceneRoutineType::BODY );
-    scene_manager.UnregisterRoutine( "body_02" );
-    scene_manager.RegisterRoutine( "cleanup_01", func_wrap_cleanup_01, GLSceneRoutineType::CLEANUP );
+    std::function< bool( GLSLProgram * ) > func_wrap_init_01 = bind( &SampleScene::SetShaders, data_control->sample_scene, std::placeholders::_1 );
+    std::function< bool( GLSLProgram * ) > func_wrap_body_01 = bind( &SampleScene::Render, data_control->sample_scene, std::placeholders::_1 );
+    std::function< bool( GLSLProgram * ) > func_wrap_body_02 = func_body_02;
+    std::function< bool( GLSLProgram * ) > func_wrap_cleanup_01 = func_cleanup_01;
+    data_control->scene_manager->RegisterRoutine( "init_01", func_wrap_init_01, GLSceneRoutineType::INIT );
+    data_control->scene_manager->RegisterRoutine( "body_01", func_wrap_body_01, GLSceneRoutineType::BODY );
+    data_control->scene_manager->RegisterRoutine( "body_02", func_wrap_body_02, GLSceneRoutineType::BODY );
+    data_control->scene_manager->UnregisterRoutine( "body_02" );
+    data_control->scene_manager->RegisterRoutine( "cleanup_01", func_wrap_cleanup_01, GLSceneRoutineType::CLEANUP );
 
-    int iWait = 5;
-    int iWaitCurrent = 0;
-    scene_manager.RunInit();
+    data_control->scene_manager->RunInit();
+}
 
+void RenderScene( DataControl * data_control ){
+    glfwMakeContextCurrent( data_control->window ); // this is need when calling rendering APIs on separate thread
+    data_control->scene_manager->RunBody();
+    // data_control->sample_scene->Render( data_control->glsl_program );
+    glfwSwapBuffers( data_control->window );
+}
+
+void ClockTask( DataControl * data_control ) {
     Clock render_clock;
-    render_clock.SetFps(25);
+    render_clock.SetFps(28);
     bool bClockTicked = false;
     auto FuncClockTicked = [ &bClockTicked ](){
 	bClockTicked = true;
     };
     render_clock.SetTickFunc( FuncClockTicked );
     render_clock.Run();
-
-    while (!glfwWindowShouldClose(window)){
+    
+    while( !glfwWindowShouldClose( data_control->window ) ){
 	if( bSignalExit ){
             break;
         }
-	if( iWaitCurrent < 5 ){
-	    iWaitCurrent++;
-	    continue;
-	}else{
-	    iWaitCurrent = 0;
-	}
 	render_clock.Tick();
 	if( bClockTicked ){
-	    scene_manager.RunBody();
-	    glfwSwapBuffers(window);
+	    std::future<void> ret = data_control->tp->AddTask( RenderScene, data_control ); //notify render task
+	    ret.get();  
 	    bClockTicked = false;
 	}
     }
     render_clock.Pause();
-    scene_manager.RunCleanup();
 }
+
+class DataGame {
+public:
+    
+};
 
 int main( int argc, char ** argv ){
 
@@ -512,12 +509,24 @@ int main( int argc, char ** argv ){
     tp.SetNumThreads(4);
     enTPCommon * ptp = &tp;
 
+    DataControl data_control;
+    data_control.tp = ptp;
+    data_control.manager_window = manager_window;
+    data_control.window = window;
+    data_control.scene_manager = new GLSceneManager;
+    data_control.sample_scene = new SampleScene;
+    data_control.glsl_program = new GLSLProgram;
+	
+    DataControl * p_data_control = &data_control;
+	    
+    std::future<void> ret1 = tp.AddTask(InitWindow, p_data_control, strPathPolyMesh );
     int count = 0;
-
-    std::future<void> ret1 = tp.AddTask(RenderTask, window, strPathPolyMesh );
 //  std::future<void> ret2 = tp.AddTask( Idle, count, ptp );
 
     tp.RunThreads();
+    
+    std::this_thread::sleep_for (std::chrono::seconds(7));
+    std::future<void> retClock = tp.AddTask(ClockTask, p_data_control );
 
     while (!glfwWindowShouldClose(window))
     {
@@ -530,9 +539,12 @@ int main( int argc, char ** argv ){
   
     ret1.get();
 //  ret2.get();
+    retClock.get();
 
     tp.EndAllThreads();
 
+    data_control.scene_manager->RunCleanup();
+	
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);

@@ -20,11 +20,21 @@ bool StreamInterface::SetStreamChannelOut( StreamChannel * stream_channel ){
     return true;
 }
 bool StreamInterface::SelectStreamOut( StreamType type ){
-    bool bRet = _StreamManager->SelectStream( type, _StreamChannelOut );
+    bool bRet = true;
+    if( _StreamManager == nullptr ){
+	return false;
+    }else{
+	bRet = _StreamManager->SelectStream( type, _StreamChannelOut );
+    }
     return bRet;
 }
 bool StreamInterface::SelectStreamIn( StreamType type ){
-    bool bRet = _StreamManager->SelectStream( type, _StreamChannelIn );
+    bool bRet = true;
+    if( _StreamManager == nullptr ){
+	return false;
+    }else{
+	bRet = _StreamManager->SelectStream( type, _StreamChannelIn );
+    }
     return bRet;
 }
 bool StreamInterface::GetStreamIn( int & stream_timestamp, string & stream_string, void * & stream_data ){

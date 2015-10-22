@@ -83,6 +83,8 @@ bool GLRenderPassShadowMap::ProcessPass( std::string strPassType, GLSLProgram * 
     bool bRet = true;
 
     if( "DEPTH" == strPassType ){
+        //first pass render for light POV    
+        glViewport( 0, 0, 2500, 2500 );
 	for( auto & i : list_pass_depth ){
 	    RenderMeshOrientation mesh_orientation = i.first;
 	    list<string> list_buffer_obj_name = i.second;
@@ -93,6 +95,8 @@ bool GLRenderPassShadowMap::ProcessPass( std::string strPassType, GLSLProgram * 
 	}
         list_pass_depth.clear();
     }else{
+	//2nd pass render
+        glViewport( 0, 0, 500, 500 );
 	for( auto & i : list_pass_normal ){
 	    RenderMeshOrientation mesh_orientation = i.first;
 	    list<string> list_buffer_obj_name = i.second;
