@@ -15,6 +15,7 @@ src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
 src_folder_test_gl := ./test/gl
 src_folder_test_core := ./test/core
+src_folder_test_transition := ./test/transition
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -120,7 +121,7 @@ test_enTPCommon:
 	g++ -std=c++0x -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_entpcommon
 
 test_TransMatrix:
-	g++ -std=c++0x -g -O0 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
+	g++ -std=c++0x -g -O0 -pthread $(src_folder_test_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
 
 test_PolyMesh:
 	g++ -std=c++0x -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
