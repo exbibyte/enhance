@@ -32,7 +32,7 @@ public:
 	_Threadpool = new enTPCommon;
 	_Threadpool->SetNumThreads(4);
 	_SceneManagers["DEFAULT"] = new GLSceneManager;
-	_Scenes["DEFAULT"] = new enSceneSample;
+	_Scenes["DEFAULT"] = new enScene;
 	_ProgramGlsl = new GLSLProgram;
     }
     ~enGameData(){

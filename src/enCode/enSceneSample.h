@@ -42,7 +42,7 @@ using namespace Winged_Edge;
 
 class enSceneSample : public enScene {
 public:
-    bool SetShaders( GLSLProgram * _GLSLProgram ) override {
+    bool SetShaders( GLSLProgram * _GLSLProgram ) {
         bool bRet;
         cout << "func init 01 - Set Shaders" << endl;
         _GLSLProgram->CompileShaderFromFile("./src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
@@ -175,7 +175,7 @@ public:
         return true;
     }
 
-    bool Render( GLSLProgram * _GLSLProgram ) override {
+    bool Render( GLSLProgram * _GLSLProgram ) {
         bool bRet;
         _dAngle += 0.005;
 
