@@ -70,6 +70,17 @@ bool GLSceneManager::RunBody(){
     return true;
 }
 
+bool GLSceneManager::RunBodySpecified( string routine_name ){
+    auto j = _map_routine.find( routine_name );
+    if( _map_routine.end() != j ){
+	bool bRet = j->second( _GLSLProgram );
+	return bRet;
+    }else{
+	return false;
+    }
+    return true;
+}
+
 bool GLSceneManager::RegisterRoutine( string routine_name, std::function<bool(GLSLProgram *)> routine, GLSceneRoutineType::Enum routine_type ){
     switch( routine_type ){
     case GLSceneRoutineType::INIT:

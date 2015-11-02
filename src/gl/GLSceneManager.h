@@ -29,6 +29,7 @@ public:
     bool RunInit();
     bool RunCleanup();
     bool RunBody();
+    bool RunBodySpecified( std::string routine_name );
     bool RegisterRoutine( std::string routine_name, std::function<bool(GLSLProgram *)> routine, GLSceneRoutineType::Enum routine_type );
     bool UnregisterRoutine( std::string const routine_name );
 protected:
