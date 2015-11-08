@@ -64,6 +64,20 @@ public:
 	auto it = _SetVertices.find( new_vertex );
 	return *it;
     }
+    bool GenerateMinSpanTreeKruskal( std::vector< MinSpanTree::EdgeWeight > & min_span_tree ){
+	min_span_tree.clear();
+	while( !_EdgeWeights.empty() ){
+	    MinSpanTree::EdgeWeight edge = _EdgeWeights.top();
+	    _EdgeWeights.pop();
+	    DisjointSetForrest::SetNode * vert_a = edge._vert_a->_set_node.get();
+	    DisjointSetForrest::SetNode * vert_b = edge._vert_b->_set_node.get();
+	    if( DisjointSetForrest::FindSet( vert_a ) != DisjointSetForrest::FindSet( vert_b ) ){
+		min_span_tree.push_back( edge );
+		DisjointSetForrest::Union( vert_a, vert_b );
+	    }
+	}
+	return true;
+    }
     std::set< std::shared_ptr< MinSpanTree::VertexNode >, MinSpanTree::CompareVertexId > _SetVertices;
     std::priority_queue< EdgeWeight, std::vector< EdgeWeight >, MinSpanTree::CompareWeight > _EdgeWeights;
 };
