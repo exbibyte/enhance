@@ -16,6 +16,7 @@ src_folder_test_datatransform := ./test/DataTransform
 src_folder_test_gl := ./test/gl
 src_folder_test_core := ./test/core
 src_folder_test_transition := ./test/transition
+src_folder_test_graph := ./test/graph
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -201,3 +202,6 @@ test_enGameMain_osx:
 	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
 	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
 	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++1y $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_file)/PolyMesh_Data_Arrays.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassConvertPolyMeshDataStructToArray.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_gl)/GLSceneManager.cpp $(src_folder_ui)/WindowManagerGlfw.cpp $(src_folder_gl)/GLSLProgram.cpp $(src_folder_gl)/GLHelper.cpp $(src_folder_gl)/GLTexture.cpp $(src_folder_gl)/GLRenderPassShadowMap.cpp $(src_folder_file)/textfile.cpp $(src_folder_file)/PPM.cpp $(src_folder_polymesh)/WingedEdge.cpp $(src_folder_math)/Vec.cpp $(src_folder_math)/RenderMeshOrientation.cpp $(src_folder_core)/Clock.cpp $(src_folder_en)/enGameMain.cpp -I/usr/local/include -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -I$(inc_folder_gl) -I$(inc_folder_ui) -I$(inc_folder_graph) -I$(inc_folder_polymesh) -I$(inc_folder_math) -I$(inc_folder_en) -I$(inc_folder_core) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/enGameMain
+
+test_DisjointSetForrest:
+	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_DisjointSetForrest.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_DisjointSetForrest
