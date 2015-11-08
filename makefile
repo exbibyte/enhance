@@ -205,3 +205,6 @@ test_enGameMain_osx:
 
 test_DisjointSetForrest:
 	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_DisjointSetForrest.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_DisjointSetForrest
+
+test_MinSpanTree:
+	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_MinSpanTree.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_MinSpanTree
