@@ -46,8 +46,24 @@ public:
 	}
 	return true;
     }
-    static bool DepthFirstSearch( NodeType * node_src ){
+    
+    template < typename FuncWeight >
+    static bool DepthFirstSearch( FuncWeight func_weight, std::shared_ptr< NodeType > node_src ){
+	node_src->_node_colour = GraphNodeG_Colour::GREY;
+	node_src->_relaxed_weight = 0;
+	DepthFirstVisit( func_weight, node_src );
 	return true;
+    }
+
+    template < typename FuncWeight >
+    static void DepthFirstVisit( FuncWeight func_weight, std::shared_ptr< NodeType > node_src ){
+	int id_current_node = node_src->_id;
+	for( auto & adjacent : node_src->_desc ){
+	    adjacent->_node_colour = GraphNodeG_Colour::GREY;
+	    if( Relax( node_src, adjacent, func_weight ) ){
+                DepthFirstVisit( func_weight, adjacent ); //if relaxed, descendents of adjacent node needs to be updated
+	    }
+	}
     }
 };
 

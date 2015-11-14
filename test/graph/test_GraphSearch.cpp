@@ -14,7 +14,7 @@
 #include <memory>
 using namespace std;
 
-TEST_CASE( "ShortestPathBellmanFord", "[ShortestPathBellmanFord]" ) {
+TEST_CASE( "GraphSearch", "[GraphSearch]" ) {
   bool bRet;
 
   map< int, shared_ptr< GraphNodeG<std::string> > > nodes;
@@ -53,8 +53,32 @@ TEST_CASE( "ShortestPathBellmanFord", "[ShortestPathBellmanFord]" ) {
 	  return false;
       }
   };
-  GraphSearch<std::string >::BreathFirstSearch( weight_func, nodes[0] );
+
   SECTION( "BreathFirstSearch Check" ) {
+
+      GraphSearch<std::string >::BreathFirstSearch( weight_func, nodes[0] );
+      
+      auto node4_pred_1x = nodes[4]->_pred;
+      auto node4_pred_2x = nodes[4]->_pred->_pred;
+      auto node4_pred_3x = nodes[4]->_pred->_pred->_pred;
+      auto node4_pred_4x = nodes[4]->_pred->_pred->_pred->_pred;
+      CHECK( node4_pred_1x.get() == nodes[3].get() );
+      CHECK( node4_pred_2x.get() == nodes[2].get() );
+      CHECK( node4_pred_3x.get() == nodes[0].get() );
+      CHECK( node4_pred_4x.get() == nullptr );
+      CHECK( 5 == nodes[4]->_relaxed_weight );
+      
+      auto node5_pred_1x = nodes[5]->_pred;
+      auto node5_pred_2x = nodes[5]->_pred->_pred;
+      CHECK( node5_pred_1x.get() == nodes[0].get() );
+      CHECK( node5_pred_2x.get() == nullptr );
+      CHECK( -1 == nodes[5]->_relaxed_weight );
+  }
+
+  SECTION( "DepthFirstSearch Check" ) {
+
+      GraphSearch<std::string >::DepthFirstSearch( weight_func, nodes[0] );
+      
       auto node4_pred_1x = nodes[4]->_pred;
       auto node4_pred_2x = nodes[4]->_pred->_pred;
       auto node4_pred_3x = nodes[4]->_pred->_pred->_pred;
