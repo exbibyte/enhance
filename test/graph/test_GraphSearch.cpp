@@ -17,12 +17,12 @@ using namespace std;
 TEST_CASE( "GraphSearch", "[GraphSearch]" ) {
   bool bRet;
 
-  map< int, shared_ptr< GraphNodeG<std::string> > > nodes;
+  map< int, shared_ptr< GraphNodeWeightedSimple<std::string> > > nodes;
   char szNewString [256];
   for( int i = 0; i < 6; ++i ){
       sprintf( szNewString , "Value_%d", i );
       string newString( szNewString );
-      nodes.emplace( i, make_shared< GraphNodeG<string> >( i, newString ) );
+      nodes.emplace( i, make_shared< GraphNodeWeightedSimple<string> >( i, newString ) );
   }
 
   //wire up the graph
@@ -43,8 +43,26 @@ TEST_CASE( "GraphSearch", "[GraphSearch]" ) {
   weightmap.insert( make_pair( make_pair( 0, 5 ), -1 ) );
   weightmap.insert( make_pair( make_pair( 4, 5 ), 6 ) );
 
+  map< pair<int, int>, int> capacitymap;
+  capacitymap.insert( make_pair( make_pair( 0, 1 ), 1 ) );
+  capacitymap.insert( make_pair( make_pair( 0, 2 ), 3 ) );
+  capacitymap.insert( make_pair( make_pair( 1, 4 ), 2 ) );
+  capacitymap.insert( make_pair( make_pair( 2, 3 ), 1 ) );
+  capacitymap.insert( make_pair( make_pair( 3, 4 ), 6 ) );
+  capacitymap.insert( make_pair( make_pair( 0, 5 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 4, 5 ), 5 ) );
+
+  map< pair<int, int>, int> flowmap;
+  capacitymap.insert( make_pair( make_pair( 0, 1 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 0, 2 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 1, 4 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 2, 3 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 3, 4 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 0, 5 ), 0 ) );
+  capacitymap.insert( make_pair( make_pair( 4, 5 ), 0 ) );
+  
   //lambda of the edge weight function given 2 nodes
-  auto weight_func = [&weightmap]( shared_ptr< GraphNodeG< string > > node_src, shared_ptr< GraphNodeG< string > > node_dest, int & edge_weight ){
+  auto weight_func = [&weightmap]( shared_ptr< GraphNodeWeightedSimple< string > > node_src, shared_ptr< GraphNodeWeightedSimple< string > > node_dest, int & edge_weight ){
       auto it = weightmap.find( make_pair( node_src->_id, node_dest->_id ) );
       if( weightmap.end() != it ){
 	  edge_weight = it->second;

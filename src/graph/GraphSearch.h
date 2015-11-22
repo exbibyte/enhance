@@ -6,11 +6,12 @@
 #include <queue>
 #include <memory>
 #include <set>
+#include <algorithm>
 
 template< typename DataType >
-class GraphSearch : public GraphNodeG< DataType > {
+class GraphSearch : public GraphNodeWeightedSimple< DataType > {
 public:
-    using NodeType = GraphNodeG< DataType >;
+    using NodeType = GraphNodeWeightedSimple< DataType >;
 
     template < typename FuncWeight >
     static bool Relax( std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest, FuncWeight func_weight ){
@@ -95,6 +96,81 @@ public:
 	    }
 	}
     }
+    template < typename FuncWeight >
+    static bool RelaxUnitLengthMaxFlow( std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest, FuncWeight func_weight ){
+	int edge_weight;
+	bool bRet = func_weight( node_src, node_dest, edge_weight );
+	if( bRet
+	    && std::numeric_limits<int>::max() != node_src->_relaxed_weight
+	    && 1 == edge_weight
+	    && node_dest->_relaxed_weight > node_src->_relaxed_weight + edge_weight )
+	{
+	    node_dest->_relaxed_weight = node_src->_relaxed_weight + edge_weight;
+	    node_dest->_pred = node_src;
+	    return true; //relaxed
+	}else{
+	    return false; //not relaxed
+	}
+    }
+
+    static bool ConnectNodesWeidghted( std::shared_ptr< NodeType > in, std::shared_ptr< NodeType > out ) {
+	return false;
+    }
+    static bool ConnectNodesMaxFlow( std::shared_ptr< NodeType > in, std::shared_ptr< NodeType > out ) {
+	return false;
+    }    
+//     template < typename FuncWeight >
+//     static bool BreathFirstSearchMaxFlowUnitLengthEdge( FuncWeight func_weight, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeTpye > node_dest ){
+// 	std::queue< std::shared_ptr< NodeType > > queue_vertex;
+// 	node_src->_node_colour = GraphNodeG_Colour::GREY;
+// 	node_src->_relaxed_weight = 0;
+// 	node_src->_data._capacity = std::numeric_limits<int>::max();
+// 	queue_vertex.push( node_src );
+// 	while( !queue_vertex.empty() ){
+// 	    std::shared_ptr< NodeType > current_node( queue_vertex.front() );
+// 	    queue_vertex.pop();
+// 	    int id_current_node = current_node->_id;
+// 	    for( auto & adjacent : current_node->_desc ){
+// 		adjacent->_node_colour = GraphNodeG_Colour::GREY;
+// 		if( RelaxUnitLengthMaxFlow( current_node, adjacent, func_weight ) ){
+// 		    queue_vertex.push( adjacent ); //if relaxed, descendents of adjacent node needs to be updated
+// 		}
+// //		}
+// 	    }
+// //	    current_node->_node_colour = GraphNodeG_Colour::BLACK;
+// 	}
+// 	return true;
+//     }
+//     static bool MaxFlowEdmondsKarp( map< pair<int, int>, int> capacitymap, map< pair<int, int>, int> & flowmap, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest ){
+// 	int flow = 0; //maximum flow initialization
+// 	while( true ){
+// 	    if( !BreathFirstMaxFlowUnitLengthEdge( func_weight, node_src, node_dest ) ){
+// 		break;
+// 	    }
+// 	    if( nullptr == node_dest->_pred ){ //if no path found
+// 		break;
+// 	    }
+// 	    //find residual capacity of the current shortest path found
+// 	    int delta_flow = std::numeric_limits<int>::max();
+// 	    auto prev_node = node_dest;
+// 	    auto current_node = node_dest;
+// 	    while( current_node = prev_node->_prev && nullptr != current_node ){
+// 		auto it = capacitymap.find( current_node, prev_node );
+// 		if( capacitymap.end() == it || it->second == 0 ){
+// 		    continue;
+// 		}
+// 		auto edge_flow = flowmap.find( current_node, prev_node );
+// 		if( flowmap.end() == edge_flow ){
+// 		    flowmap.insert( std::make_pair( std::make_pair(
+// 		}
+// 		delta_flow = std::min( delta_flow, );
+		    
+// 		prev_node = current_node;
+// 		current_node = current_node->_pred;
+
+// 	    }
+// 	}
+//     }
 };
 
 #endif
