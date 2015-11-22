@@ -40,7 +40,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
