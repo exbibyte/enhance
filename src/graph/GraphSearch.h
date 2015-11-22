@@ -8,10 +8,19 @@
 #include <set>
 #include <algorithm>
 
+template< typename NodeType, typename DataType >
+class GraphSearch {
+public:
+};
+
+//specialization on node type GraphNodeWeightedSimple
 template< typename DataType >
-class GraphSearch : public GraphNodeWeightedSimple< DataType > {
+class GraphSearch< GraphNodeWeightedSimple<DataType>, DataType > : public GraphNodeWeightedSimple< DataType > {
 public:
     using NodeType = GraphNodeWeightedSimple< DataType >;
+
+    using NodeRelaxationType = GraphNodeRelaxation< DataType >;
+    using EdgeWeightedType = GraphEdgeWeighted< DataType >;
 
     template < typename FuncWeight >
     static bool Relax( std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest, FuncWeight func_weight ){
@@ -112,13 +121,6 @@ public:
 	    return false; //not relaxed
 	}
     }
-
-    static bool ConnectNodesWeidghted( std::shared_ptr< NodeType > in, std::shared_ptr< NodeType > out ) {
-	return false;
-    }
-    static bool ConnectNodesMaxFlow( std::shared_ptr< NodeType > in, std::shared_ptr< NodeType > out ) {
-	return false;
-    }    
 //     template < typename FuncWeight >
 //     static bool BreathFirstSearchMaxFlowUnitLengthEdge( FuncWeight func_weight, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeTpye > node_dest ){
 // 	std::queue< std::shared_ptr< NodeType > > queue_vertex;
