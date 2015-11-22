@@ -213,4 +213,4 @@ test_ShortestPathBellmanFord:
 	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_ShortestPathBellmanFord.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_ShortestPathBellmanFord
 
 test_GraphSearch:
-	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_GraphSearch.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_GraphSearch
+	$(CXX) -stdlib=libc++ -std=c++14 -g $(src_folder_test_graph)/test_GraphSearch.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_GraphSearch
