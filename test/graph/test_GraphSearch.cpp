@@ -42,6 +42,17 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
   weightmap.insert( make_pair( make_pair( 3, 4 ), -1 ) );
   weightmap.insert( make_pair( make_pair( 0, 5 ), -1 ) );
   weightmap.insert( make_pair( make_pair( 4, 5 ), 6 ) );
+
+  map< pair< shared_ptr< GraphNodeWeightedSimple<std::string> >, shared_ptr< GraphNodeWeightedSimple<std::string> > >, int > capacitymap;
+  capacitymap.insert( make_pair( make_pair( nodes[0], nodes[1] ), 5 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[0], nodes[2] ), 3 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[1], nodes[4] ), 2 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[2], nodes[3] ), 1 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[3], nodes[4] ), 6 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[0], nodes[5] ), 3 ) );
+  capacitymap.insert( make_pair( make_pair( nodes[4], nodes[5] ), 2 ) );
+
+  map< pair< shared_ptr< GraphNodeWeightedSimple<std::string> >, shared_ptr< GraphNodeWeightedSimple<std::string> > >, int > flowmap;
   
   //lambda of the edge weight function given 2 nodes
   auto weight_func = [&weightmap]( shared_ptr< GraphNodeWeightedSimple< string > > node_src, shared_ptr< GraphNodeWeightedSimple< string > > node_dest, int & edge_weight ){
@@ -115,6 +126,13 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
       CHECK( node5_pred_1x.get() == nodes[0].get() );
       CHECK( node5_pred_2x.get() == nullptr );
       CHECK( -1 == nodes[5]->_relaxed_weight );
+  }
+
+  SECTION( "MaxFlowEdmondsKarp Check" ) {
+      int netflow;
+      bool bRet = GraphSearch< GraphNodeWeightedSimple<std::string>, std::string >::MaxFlowEdmondsKarp( capacitymap, flowmap, nodes[0], nodes[5], netflow );
+      CHECK( true == bRet );
+      CHECK( 5 == netflow );
   }
 }
 

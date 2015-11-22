@@ -121,58 +121,83 @@ public:
 	    return false; //not relaxed
 	}
     }
-//     template < typename FuncWeight >
-//     static bool BreathFirstSearchMaxFlowUnitLengthEdge( FuncWeight func_weight, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeTpye > node_dest ){
-// 	std::queue< std::shared_ptr< NodeType > > queue_vertex;
-// 	node_src->_node_colour = GraphNodeG_Colour::GREY;
-// 	node_src->_relaxed_weight = 0;
-// 	node_src->_data._capacity = std::numeric_limits<int>::max();
-// 	queue_vertex.push( node_src );
-// 	while( !queue_vertex.empty() ){
-// 	    std::shared_ptr< NodeType > current_node( queue_vertex.front() );
-// 	    queue_vertex.pop();
-// 	    int id_current_node = current_node->_id;
-// 	    for( auto & adjacent : current_node->_desc ){
-// 		adjacent->_node_colour = GraphNodeG_Colour::GREY;
-// 		if( RelaxUnitLengthMaxFlow( current_node, adjacent, func_weight ) ){
-// 		    queue_vertex.push( adjacent ); //if relaxed, descendents of adjacent node needs to be updated
-// 		}
-// //		}
-// 	    }
-// //	    current_node->_node_colour = GraphNodeG_Colour::BLACK;
-// 	}
-// 	return true;
-//     }
-//     static bool MaxFlowEdmondsKarp( map< pair<int, int>, int> capacitymap, map< pair<int, int>, int> & flowmap, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest ){
-// 	int flow = 0; //maximum flow initialization
-// 	while( true ){
-// 	    if( !BreathFirstMaxFlowUnitLengthEdge( func_weight, node_src, node_dest ) ){
-// 		break;
-// 	    }
-// 	    if( nullptr == node_dest->_pred ){ //if no path found
-// 		break;
-// 	    }
-// 	    //find residual capacity of the current shortest path found
-// 	    int delta_flow = std::numeric_limits<int>::max();
-// 	    auto prev_node = node_dest;
-// 	    auto current_node = node_dest;
-// 	    while( current_node = prev_node->_prev && nullptr != current_node ){
-// 		auto it = capacitymap.find( current_node, prev_node );
-// 		if( capacitymap.end() == it || it->second == 0 ){
-// 		    continue;
-// 		}
-// 		auto edge_flow = flowmap.find( current_node, prev_node );
-// 		if( flowmap.end() == edge_flow ){
-// 		    flowmap.insert( std::make_pair( std::make_pair(
-// 		}
-// 		delta_flow = std::min( delta_flow, );
-		    
-// 		prev_node = current_node;
-// 		current_node = current_node->_pred;
 
-// 	    }
-// 	}
-//     }
+    static bool BreathFirstSearchMaxFlowUnitLengthEdge( std::map< std::pair< std::shared_ptr< NodeType >, std::shared_ptr< NodeType > >, int> capacitymap, std::map< std::pair< std::shared_ptr< NodeType >, std::shared_ptr< NodeType > >, int> & flowmap, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest ){
+	node_dest->_pred = nullptr;
+	node_src->_pred = nullptr;
+	std::queue< std::shared_ptr< NodeType > > queue_vertex;
+	std::set< std::shared_ptr< NodeType > > travelled_nodes;
+	queue_vertex.push( node_src );
+	travelled_nodes.insert( node_src );
+	while( !queue_vertex.empty() ){
+	    std::shared_ptr< NodeType > current_node( queue_vertex.front() );
+	    queue_vertex.pop();
+	    for( auto & adjacent : current_node->_desc ){
+		auto it_capacity = capacitymap.find( std::make_pair( current_node, adjacent ) );
+		int capacity = 0;
+		if( capacitymap.end() != it_capacity ){
+		    capacity = it_capacity->second;
+		}
+		auto it_flow = flowmap.find( std::make_pair( current_node, adjacent ) );
+		int flow = 0;
+		if( flowmap.end() != it_flow ){
+		    flow = it_flow->second;
+		}
+		if( adjacent != node_src &&
+		    travelled_nodes.end() == travelled_nodes.find( adjacent ) &&
+		    capacity > flow ) //relaxation
+		{
+		    travelled_nodes.insert( adjacent );
+		    adjacent->_pred = current_node;
+		    queue_vertex.push( adjacent );
+		}
+	    }
+	}
+	if( nullptr == node_dest->_pred ){
+	    return false;
+	}
+	return true;
+    }
+    static bool MaxFlowEdmondsKarp( std::map< std::pair< std::shared_ptr< NodeType >, std::shared_ptr< NodeType > >, int> capacitymap, std::map< std::pair< std::shared_ptr< NodeType >, std::shared_ptr< NodeType > >, int> & flowmap, std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest, int & netflow ){
+	flowmap.clear();
+	netflow = 0; //maximum flow initialization
+	while( true ){
+	    if( !BreathFirstSearchMaxFlowUnitLengthEdge( capacitymap, flowmap, node_src, node_dest ) ){ //if no path found
+		break;
+	    }
+	    //find residual capacity / addition flow of the current shortest path found
+	    int delta_flow = std::numeric_limits<int>::max();
+	    for( auto current_node = node_dest, prev_node = current_node->_pred;
+		 nullptr != prev_node;
+		 current_node = prev_node, prev_node = prev_node->_pred )
+	    {
+		auto it_capacity = capacitymap.find( std::make_pair( prev_node, current_node ) );
+		if( capacitymap.end() == it_capacity || it_capacity->second == 0 ){
+		    return false; //something wrong if capacity is not found but shortest path from above section is found
+		}
+		int capacity = it_capacity->second;
+		auto it_flow = flowmap.find( std::make_pair( prev_node, current_node ) );
+		int flow;
+		if( flowmap.end() == it_flow ){
+		    flowmap.insert( std::make_pair( std::make_pair( prev_node, current_node ), 0 ) );
+		    flow = 0;
+		}else{
+		    flow = it_flow->second;
+		}
+		delta_flow = std::min( delta_flow, capacity - flow );
+	    }
+	    //update current shortest path with the addition flow
+	    for( auto current_node = node_dest, prev_node = current_node->_pred;
+		 nullptr != prev_node;
+		 current_node = prev_node, prev_node = prev_node->_pred )
+	    {
+		auto it_flow = flowmap.find( std::make_pair( prev_node, current_node ) );
+		it_flow->second += delta_flow;
+	    }
+	    netflow += delta_flow;
+	}
+	return true;
+    }
 };
 
 #endif
