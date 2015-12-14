@@ -10,6 +10,7 @@ src_folder_polymesh := ./src/polymesh
 src_folder_datatransform := ./src/DataTransform
 src_folder_datatransform_pass := ./src/DataTransform/Pass
 src_folder_gl := ./src/gl
+src_folder_asset := ./src/asset
 
 src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
@@ -17,6 +18,7 @@ src_folder_test_gl := ./test/gl
 src_folder_test_core := ./test/core
 src_folder_test_transition := ./test/transition
 src_folder_test_graph := ./test/graph
+src_folder_test_asset := ./test/asset
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -30,6 +32,7 @@ inc_folder_polymesh := ./src/polymesh
 inc_folder_datatransform := ./src/DataTransform
 inc_folder_datatransform_pass := ./src/DataTransform/Pass
 inc_folder_gl := ./src/gl
+inc_folder_asset := ./src/asset
 
 build_dir := ./build
 lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
@@ -214,3 +217,6 @@ test_ShortestPathBellmanFord:
 
 test_GraphSearch:
 	$(CXX) -std=c++11 -g $(src_folder_test_graph)/test_GraphSearch.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_GraphSearch
+
+test_AssetManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_asset)/test_AssetManager.cpp -I$(inc_folder_catch) -I$(src_folder_asset) -o $(build_dir)/test_AssetManager
