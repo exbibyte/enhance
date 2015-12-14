@@ -61,4 +61,40 @@ public:
 private:
     std::map< std::string, AssetType > _MapAsset;
 };
+
+template< >
+class AssetManager< std::vector< int > > {
+public:
+    using AssetType = std::vector< int >;
+    bool AddData( std::string strId, AssetType asset ){
+	_MapAsset.emplace( strId, asset );
+	return true;
+    }
+    bool GetData( std::string strId, AssetType & asset ){
+	auto it_find = _MapAsset.find( strId );
+	if( _MapAsset.end() == it_find ){
+	    return false;
+	}
+	asset = it_find->second;
+	return true;
+    }
+    bool GetDataArray( std::string strId, std::shared_ptr< int > & data_array, int & size ){
+	auto it_find = _MapAsset.find( strId );
+	if( _MapAsset.end() == it_find ){
+	    return false;
+	}
+	int size_array = it_find->second.size();
+	size = size_array;
+	data_array = std::shared_ptr< int >( new int[ size_array ], std::default_delete<int[]>() );
+	try {   
+	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
+	}catch( ... ){
+	    return false;
+	}
+	return true;
+    }
+private:
+    std::map< std::string, AssetType > _MapAsset;
+};
+
 #endif
