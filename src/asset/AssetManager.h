@@ -31,6 +31,7 @@ template< >
 class AssetManager< std::vector< double > > {
 public:
     using AssetType = std::vector< double >;
+    using ElementType = double;
     bool AddData( std::string strId, AssetType asset ){
 	_MapAsset.emplace( strId, asset );
 	return true;
@@ -43,14 +44,14 @@ public:
 	asset = it_find->second;
 	return true;
     }
-    bool GetDataArray( std::string strId, std::shared_ptr< double > & data_array, int & size ){
+    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( strId );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
 	int size_array = it_find->second.size();
 	size = size_array;
-	data_array = std::shared_ptr< double >( new double[ size_array ], std::default_delete<double[]>() );
+	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<double[]>() );
 	try {   
 	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
 	}catch( ... ){
@@ -66,6 +67,7 @@ template< >
 class AssetManager< std::vector< int > > {
 public:
     using AssetType = std::vector< int >;
+    using ElementType = int;
     bool AddData( std::string strId, AssetType asset ){
 	_MapAsset.emplace( strId, asset );
 	return true;
@@ -78,14 +80,50 @@ public:
 	asset = it_find->second;
 	return true;
     }
-    bool GetDataArray( std::string strId, std::shared_ptr< int > & data_array, int & size ){
+    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( strId );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
 	int size_array = it_find->second.size();
 	size = size_array;
-	data_array = std::shared_ptr< int >( new int[ size_array ], std::default_delete<int[]>() );
+	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<int[]>() );
+	try {   
+	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
+	}catch( ... ){
+	    return false;
+	}
+	return true;
+    }
+private:
+    std::map< std::string, AssetType > _MapAsset;
+};
+
+template< >
+class AssetManager< std::vector< float > > {
+public:
+    using AssetType = std::vector< float >;
+    using ElementType = float;
+    bool AddData( std::string strId, AssetType asset ){
+	_MapAsset.emplace( strId, asset );
+	return true;
+    }
+    bool GetData( std::string strId, AssetType & asset ){
+	auto it_find = _MapAsset.find( strId );
+	if( _MapAsset.end() == it_find ){
+	    return false;
+	}
+	asset = it_find->second;
+	return true;
+    }
+    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
+	auto it_find = _MapAsset.find( strId );
+	if( _MapAsset.end() == it_find ){
+	    return false;
+	}
+	int size_array = it_find->second.size();
+	size = size_array;
+	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<ElementType[]>() );
 	try {   
 	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
 	}catch( ... ){
