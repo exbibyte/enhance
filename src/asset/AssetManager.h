@@ -8,15 +8,15 @@
 #include <algorithm>
 #include <cassert>
 
-template< class AssetType >
+template< class IdType, class AssetType >
 class AssetManager {
 public:
-    bool AddData( std::string strId, AssetType asset ){
-	_MapAsset.emplace( strId, asset );
+    bool AddData( IdType id, AssetType asset ){
+	_MapAsset.emplace( id, asset );
 	return true;
     }
-    bool GetData( std::string strId, AssetType & asset ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetData( IdType id, AssetType & asset ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
@@ -24,28 +24,28 @@ public:
 	return true;
     }
 private:
-    std::map< std::string, AssetType > _MapAsset;
+    std::map< IdType, AssetType > _MapAsset;
 };
 
-template< >
-class AssetManager< std::vector< double > > {
+template< class IdType >
+class AssetManager< IdType, std::vector< double > > {
 public:
     using AssetType = std::vector< double >;
     using ElementType = double;
-    bool AddData( std::string strId, AssetType asset ){
-	_MapAsset.emplace( strId, asset );
+    bool AddData( IdType id, AssetType asset ){
+	_MapAsset.emplace( id, asset );
 	return true;
     }
-    bool GetData( std::string strId, AssetType & asset ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetData( IdType id, AssetType & asset ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
 	asset = it_find->second;
 	return true;
     }
-    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
@@ -60,28 +60,28 @@ public:
 	return true;
     }
 private:
-    std::map< std::string, AssetType > _MapAsset;
+    std::map< IdType, AssetType > _MapAsset;
 };
 
-template< >
-class AssetManager< std::vector< int > > {
+template< class IdType >
+class AssetManager< IdType, std::vector< int > > {
 public:
     using AssetType = std::vector< int >;
     using ElementType = int;
-    bool AddData( std::string strId, AssetType asset ){
-	_MapAsset.emplace( strId, asset );
+    bool AddData( IdType id, AssetType asset ){
+	_MapAsset.emplace( id, asset );
 	return true;
     }
-    bool GetData( std::string strId, AssetType & asset ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetData( IdType id, AssetType & asset ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
 	asset = it_find->second;
 	return true;
     }
-    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
@@ -96,28 +96,28 @@ public:
 	return true;
     }
 private:
-    std::map< std::string, AssetType > _MapAsset;
+    std::map< IdType, AssetType > _MapAsset;
 };
 
-template< >
-class AssetManager< std::vector< float > > {
+template< class IdType >
+class AssetManager< IdType, std::vector< float > > {
 public:
     using AssetType = std::vector< float >;
     using ElementType = float;
-    bool AddData( std::string strId, AssetType asset ){
-	_MapAsset.emplace( strId, asset );
+    bool AddData( IdType id, AssetType asset ){
+	_MapAsset.emplace( id, asset );
 	return true;
     }
-    bool GetData( std::string strId, AssetType & asset ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetData( IdType id, AssetType & asset ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
 	asset = it_find->second;
 	return true;
     }
-    bool GetDataArray( std::string strId, std::shared_ptr< ElementType > & data_array, int & size ){
-	auto it_find = _MapAsset.find( strId );
+    bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
+	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
 	}
@@ -132,7 +132,7 @@ public:
 	return true;
     }
 private:
-    std::map< std::string, AssetType > _MapAsset;
+    std::map< IdType, AssetType > _MapAsset;
 };
 
 #endif

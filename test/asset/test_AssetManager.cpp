@@ -15,12 +15,13 @@
 #include <utility>
 #include <set>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 TEST_CASE( "AssetManager Double", "[ALL]" ) {
     SECTION( "Double single item" ){
-	AssetManager< double > manager;
+	AssetManager< std::string, double > manager;
 	bool bRet = manager.AddData( "Item_A", 5 );
 	bRet &= manager.AddData( "Item_B", 23 );
 	bRet &= manager.AddData( "Item_C", -7 );
@@ -37,7 +38,7 @@ TEST_CASE( "AssetManager Double", "[ALL]" ) {
     }
     SECTION( "Double vector" ){
 	vector< double > vector_A { 4.5, 5.5 };
-	AssetManager< vector< double > > manager;
+	AssetManager< std::string, vector< double > > manager;
 	bool bRet = manager.AddData( "Item_A", vector_A );
 	vector<double> vector_B( std::initializer_list<double>{ 99.9, 22.2, 55.7 } );
 	bRet &= manager.AddData( "Item_B", vector_B );
@@ -60,7 +61,7 @@ TEST_CASE( "AssetManager Double", "[ALL]" ) {
     }
     SECTION( "Double array" ){
 	vector< double > vector_A { 4.5, 5.5 };
-	AssetManager< vector< double > > manager;
+	AssetManager< std::string, vector< double > > manager;
 	bool bRet = manager.AddData( "Item_A", vector_A );
 	shared_ptr< double > get1;
 	int size;
@@ -73,7 +74,7 @@ TEST_CASE( "AssetManager Double", "[ALL]" ) {
 }
 TEST_CASE( "AssetManager Int", "[ALL]" ) {
     SECTION( "Int single item" ){
-	AssetManager< int > manager;
+	AssetManager< std::string, int > manager;
 	bool bRet = manager.AddData( "Item_A", 5 );
 	bRet &= manager.AddData( "Item_B", 23 );
 	bRet &= manager.AddData( "Item_C", -7 );
@@ -90,7 +91,7 @@ TEST_CASE( "AssetManager Int", "[ALL]" ) {
     }
     SECTION( "Int vector" ){
 	vector< int > vector_A { 4, 5 };
-	AssetManager< vector< int > > manager;
+	AssetManager< std::string, vector< int > > manager;
 	bool bRet = manager.AddData( "Item_A", vector_A );
 	vector<int> vector_B( std::initializer_list<int>{ 99, 22, 55 } );
 	bRet &= manager.AddData( "Item_B", vector_B );
@@ -113,7 +114,7 @@ TEST_CASE( "AssetManager Int", "[ALL]" ) {
     }
     SECTION( "Int array" ){
 	vector< int > vector_A { 4, 5 };
-	AssetManager< vector< int > > manager;
+	AssetManager< std::string, vector< int > > manager;
 	bool bRet = manager.AddData( "Item_A", vector_A );
 	shared_ptr< int > get1;
 	int size;

@@ -224,3 +224,6 @@ test_AssetManager:
 
 test_enAssetManager:
 	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enAssetManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enAssetManager
+
+test_InstanceManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_asset)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager
