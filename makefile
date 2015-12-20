@@ -227,3 +227,6 @@ test_enAssetManager:
 
 test_InstanceManager:
 	$(CXX) -std=c++14 -g $(src_folder_test_asset)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager
+
+test_InjectionGenSeq:
+	$(CXX) -std=c++14 -g $(src_folder_test_core)/test_InjectionGenSeq.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_InjectionGenSeq

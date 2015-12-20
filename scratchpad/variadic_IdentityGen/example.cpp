@@ -30,13 +30,18 @@ class Identity{};
 
 class A {
 public:
-    void TestAction(){
+    bool TestAction(){
 	cout << "action" << endl;
+	return true;
     }
 };
 
 class B {
 public:
+    bool TestAction(){
+	cout << "action B" << endl;
+	return true;
+    }
 };
 
 
@@ -55,6 +60,7 @@ public:
     static Identity<Host> _identity;
     int _n;
     int GetN( Identity<Host> ){ return _n; }
+    bool TestAction( Identity<Host> ){ return Host::TestAction(); };
     IdentityGen( int n = 0 ) : _n( n ) {}
 };
 
@@ -66,8 +72,9 @@ template< typename First, typename... Injections >
 class D< First, Injections... > : public First, D< Injections... > {
 public:
     using First::GetN;
+    using First::TestAction;
     using D< Injections... >::GetN;
-    
+    using D< Injections... >::TestAction;
     D( First first, Injections... rest ) : First( first ), D< Injections... >( rest... ) {}
 };
 
@@ -112,7 +119,7 @@ int main()
     // static_assert(1 == get_index<int, char, int, void>::value, "");
     // static_assert(2 == get_index<void, char, int, void>::value, "");
     auto _z = GenSequence< D >( IdentityGen<A>(), IdentityGen<B>(), IdentityGen<C>(), IdentityGen<E>() );
-    _z.TestAction();
+    _z.TestAction( Identity<B>() );
     cout << _z.GetN(IdentityGen<A>::_identity) << _z.GetN(IdentityGen<B>::_identity) << _z.GetN(IdentityGen<C>::_identity) << _z.GetN(IdentityGen<E>::_identity) << endl;
     return 0;
 }
