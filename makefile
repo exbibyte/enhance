@@ -11,6 +11,7 @@ src_folder_datatransform := ./src/DataTransform
 src_folder_datatransform_pass := ./src/DataTransform/Pass
 src_folder_gl := ./src/gl
 src_folder_asset := ./src/asset
+src_folder_instance := ./src/instance
 
 src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
@@ -20,6 +21,7 @@ src_folder_test_transition := ./test/transition
 src_folder_test_graph := ./test/graph
 src_folder_test_asset := ./test/asset
 src_folder_test_en := ./test/enCode
+src_folder_test_instance := ./test/instance
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -34,6 +36,7 @@ inc_folder_datatransform := ./src/DataTransform
 inc_folder_datatransform_pass := ./src/DataTransform/Pass
 inc_folder_gl := ./src/gl
 inc_folder_asset := ./src/asset
+inc_folder_instance := ./src/instance
 
 build_dir := ./build
 lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
@@ -225,8 +228,8 @@ test_AssetManager:
 test_enAssetManager:
 	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enAssetManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enAssetManager
 
-test_InstanceManager:
-	$(CXX) -std=c++14 -g $(src_folder_test_asset)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager
-
 test_InjectionGenSeq:
 	$(CXX) -std=c++14 -g $(src_folder_test_core)/test_InjectionGenSeq.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_InjectionGenSeq
+
+test_InstanceManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager

@@ -13,7 +13,7 @@ class AssetManager {
 public:
     using AssetType = Asset;
     bool AddData( IdType id, Asset asset ){
-	_MapAsset.emplace( id, asset );
+        _MapAsset[ id ] = asset;
 	return true;
     }
     bool GetData( IdType id, Asset & asset ){
@@ -34,7 +34,7 @@ public:
     using AssetType = std::vector< double >;
     using ElementType = double;
     bool AddData( IdType id, AssetType asset ){
-	_MapAsset.emplace( id, asset );
+	_MapAsset[ id ] = asset;
 	return true;
     }
     bool GetData( IdType id, AssetType & asset ){
@@ -70,7 +70,7 @@ public:
     using AssetType = std::vector< int >;
     using ElementType = int;
     bool AddData( IdType id, AssetType asset ){
-	_MapAsset.emplace( id, asset );
+	_MapAsset[ id ] = asset;
 	return true;
     }
     bool GetData( IdType id, AssetType & asset ){
@@ -106,7 +106,7 @@ public:
     using AssetType = std::vector< float >;
     using ElementType = float;
     bool AddData( IdType id, AssetType asset ){
-	_MapAsset.emplace( id, asset );
+	_MapAsset[ id ] = asset;
 	return true;
     }
     bool GetData( IdType id, AssetType & asset ){

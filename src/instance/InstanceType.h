@@ -1,12 +1,13 @@
 #ifndef INSTANCETYPE_H
 #define INSTANCETYPE_H
 
-enum class InstanceType {
-    ObjectGeneric,
-    Player,
-    Npc,
-    Duel,
-    Spectator,
+class InstanceType {
+public:
+    class ObjectGeneric{};
+    class Player{};
+    class Npc{};
+    class Duel{};
+    class Spectator{};
 };
 
 #endif

@@ -2,60 +2,59 @@
 #define INSTANCEMANAGER_H
 
 #include "AssetManager.h"
-#include "RenderType.h"
+#include "GenSeq.h"
+#include "IdentityGen.h"
 
+#include <cassert>
 #include <map>
+#include <vector>
 
-// //math library
-// #define GLM_FORCE_RADIANS
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
-// #include <glm/gtc/type_ptr.hpp>
-// #include <glm/gtx/transform2.hpp>
-// using glm::mat4;
-// using glm::vec3;
+#include "GenSeq.h"
+#include "Injection.h"
+#include "IdentityGen.h"
 
-template< class InstanceType >
-class InstanceManager { };
+// template< typename InstType >
+// class InstanceManager { };
 
-template< >
-class InstanceManager< RenderPolyVertices > : public AssetManager< unsigned int, std::vector< float > > {
+template< typename... InstTypes >
+class InstanceManager : public AssetManager< unsigned int, std::vector< int > > {
 public:
-    using AssetManager< unsigned int, std::vector< float > >::AddData;
-    using AssetManager< unsigned int, std::vector< float > >::GetData;
-    using AssetManager< unsigned int, std::vector< float > >::GetDataArray;
-};
-
-template< >
-class InstanceManager< RenderLightAmbient > : public AssetManager< unsigned int, std::vector< double > > {
-public:
-    using AssetManager< unsigned int, std::vector< double > >::AddData;
-    using AssetManager< unsigned int, std::vector< double > >::GetData;
-    using AssetManager< unsigned int, std::vector< double > >::GetDataArray; 
-};
-
-template< >
-class InstanceManager< RenderLightSpectral > : public AssetManager< unsigned int, std::vector< double > > {
-public:
-    using AssetManager< unsigned int, std::vector< double > >::AddData;
-    using AssetManager< unsigned int, std::vector< double > >::GetData;
-    using AssetManager< unsigned int, std::vector< double > >::GetDataArray; 
-};
-
-template< >
-class InstanceManager< RenderLightDiffuse > : public AssetManager< unsigned int, std::vector< double > > {
-public:
-    using AssetManager< unsigned int, std::vector< double > >::AddData;
-    using AssetManager< unsigned int, std::vector< double > >::GetData;
-    using AssetManager< unsigned int, std::vector< double > >::GetDataArray; 
-};
-
-template< >
-class InstanceManager< RenderCameraProjection > : public AssetManager< unsigned int, std::vector< double > > {
-public:
-    using AssetManager< unsigned int, std::vector< double > >::AddData;
-    using AssetManager< unsigned int, std::vector< double > >::GetData;
-    using AssetManager< unsigned int, std::vector< double > >::GetDataArray;
+    using AssetManager< unsigned int, std::vector< int > >::AddData;
+    using AssetManager< unsigned int, std::vector< int > >::GetData;
+    using AssetManager< unsigned int, std::vector< int > >::GetDataArray;
+    Inject< IdentityGen< InstTypes >... > _inject_instance_types;
+    static constexpr int _num_types = sizeof...(InstTypes);
+    InstanceManager() : _inject_instance_types( GenSeq::GenSequence< Inject >( IdentityGen< InstTypes >()... ) ){
+    }
+    template< typename QueryInstType >
+    bool QueryValue( int id, int & val ){
+	int index_in_entry = _inject_instance_types.GetIdSeq(IdentityGen<QueryInstType>::_identity);
+	std::vector< int > entry;
+	if( !GetData( id, entry ) ){
+	    assert( 0 && "InstanceManager::GetData() failed" );
+	    return false;
+	}
+	if( entry.size() <= index_in_entry ){
+	    assert( 0 && "InstanceManager::GetData() retreived entry size too small for lookup index" );
+	    return false;
+	}
+	val = entry.at( index_in_entry );
+	return true;
+    }
+    template< typename QueryInstType >
+    bool SetValue( int id, int val ){
+	int index_in_entry = _inject_instance_types.GetIdSeq(IdentityGen<QueryInstType>::_identity);
+	std::vector< int > entry;
+	entry.resize( _num_types );
+	GetData( id, entry ); //obtain existing data if any or else use newly initialized entry
+	if( entry.size() <= index_in_entry ){
+	    assert( 0 && "InstanceManager::GetData() retreived entry size too small for lookup index" );
+	    return false;
+	}
+	entry[index_in_entry] = val;
+	AddData( id, entry ); //save data
+	return true;
+    }
 };
 
 #endif
