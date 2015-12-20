@@ -10,11 +10,18 @@ src_folder_polymesh := ./src/polymesh
 src_folder_datatransform := ./src/DataTransform
 src_folder_datatransform_pass := ./src/DataTransform/Pass
 src_folder_gl := ./src/gl
+src_folder_asset := ./src/asset
+src_folder_instance := ./src/instance
 
 src_folder_test_file := ./test/file
 src_folder_test_datatransform := ./test/DataTransform
 src_folder_test_gl := ./test/gl
 src_folder_test_core := ./test/core
+src_folder_test_transition := ./test/transition
+src_folder_test_graph := ./test/graph
+src_folder_test_asset := ./test/asset
+src_folder_test_en := ./test/enCode
+src_folder_test_instance := ./test/instance
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -28,6 +35,8 @@ inc_folder_polymesh := ./src/polymesh
 inc_folder_datatransform := ./src/DataTransform
 inc_folder_datatransform_pass := ./src/DataTransform/Pass
 inc_folder_gl := ./src/gl
+inc_folder_asset := ./src/asset
+inc_folder_instance := ./src/instance
 
 build_dir := ./build
 lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
@@ -38,7 +47,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -120,7 +129,7 @@ test_enTPCommon:
 	g++ -std=c++0x -g ./test/enCode/test_enTPCommon.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_en) -I$(inc_folder_catch) -o $(build_dir)/test_entpcommon
 
 test_TransMatrix:
-	g++ -std=c++0x -g -O0 -pthread $(src_folder_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
+	g++ -std=c++0x -g -O0 -pthread $(src_folder_test_transition)/TestTransMatrix.cpp -I$(inc_folder_transition) -I$(inc_folder_catch) -o $(build_dir)/test_TransMatrix
 
 test_PolyMesh:
 	g++ -std=c++0x -g -O0 ./test/polymesh/test_PolyMesh.cpp -pthread $(src_folder_math)/Vec.cpp $(src_folder_polymesh)/PolyMesh.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -I$(inc_folder_polymesh) -I$(inc_folder_transition) -o $(build_dir)/test_PolyMesh
@@ -195,3 +204,32 @@ test_StreamManager:
 
 test_StreamInterface:
 	$(CXX) -std=c++11 -g $(src_folder_core)/StreamManager.cpp $(src_folder_core)/StreamChannel.cpp $(src_folder_core)/StreamInterface.cpp $(src_folder_test_core)/test_StreamInterface.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_StreamInterface
+
+test_enGameMain_osx:
+	bison -d $(src_folder_file)/bison_PolyMesh.y -o $(src_folder_file)/bison_PolyMesh.tab.c
+	flex --header-file=$(src_folder_file)/Flex_PolyMesh.h -o $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/flex_PolyMesh.l
+	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++1y $(src_folder_file)/bison_PolyMesh.tab.c $(src_folder_file)/flex_PolyMesh.yy.c $(src_folder_file)/Filter_ParseNode.cpp $(src_folder_file)/Filter_ParsePolyMesh.cpp $(src_folder_file)/PolyMesh_Data_Arrays.cpp $(src_folder_datatransform)/DataTransformPass.cpp $(src_folder_datatransform)/DataTransformMetaInfo.cpp $(src_folder_datatransform)/DataTransformMetaInfoCombiner.cpp $(src_folder_datatransform)/DataTransformDriver.cpp $(src_folder_datatransform_pass)/PassConvertPolyMeshDataStructToArray.cpp $(src_folder_datatransform_pass)/PassParsePolyMesh.cpp $(src_folder_gl)/GLSceneManager.cpp $(src_folder_ui)/WindowManagerGlfw.cpp $(src_folder_gl)/GLSLProgram.cpp $(src_folder_gl)/GLHelper.cpp $(src_folder_gl)/GLTexture.cpp $(src_folder_gl)/GLRenderPassShadowMap.cpp $(src_folder_file)/textfile.cpp $(src_folder_file)/PPM.cpp $(src_folder_polymesh)/WingedEdge.cpp $(src_folder_math)/Vec.cpp $(src_folder_math)/RenderMeshOrientation.cpp $(src_folder_core)/Clock.cpp $(src_folder_en)/enGameMain.cpp -I/usr/local/include -I$(inc_folder_file) -I$(inc_folder_datatransform) -I$(inc_folder_datatransform_pass) -I$(inc_folder_gl) -I$(inc_folder_ui) -I$(inc_folder_graph) -I$(inc_folder_polymesh) -I$(inc_folder_math) -I$(inc_folder_en) -I$(inc_folder_core) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/enGameMain
+
+test_DisjointSetForrest:
+	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_DisjointSetForrest.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_DisjointSetForrest
+
+test_MinSpanTree:
+	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_MinSpanTree.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_MinSpanTree
+
+test_ShortestPathBellmanFord:
+	$(CXX) -std=c++14 -g $(src_folder_test_graph)/test_ShortestPathBellmanFord.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_ShortestPathBellmanFord
+
+test_GraphSearch:
+	$(CXX) -std=c++11 -g $(src_folder_test_graph)/test_GraphSearch.cpp -I$(inc_folder_catch) -I$(src_folder_graph) -o $(build_dir)/test_GraphSearch
+
+test_AssetManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_asset)/test_AssetManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -o $(build_dir)/test_AssetManager
+
+test_enAssetManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enAssetManager.cpp -I$(inc_folder_catch) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enAssetManager
+
+test_InjectionGenSeq:
+	$(CXX) -std=c++14 -g $(src_folder_test_core)/test_InjectionGenSeq.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_InjectionGenSeq
+
+test_InstanceManager:
+	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager
