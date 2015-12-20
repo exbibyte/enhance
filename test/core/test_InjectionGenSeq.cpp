@@ -21,7 +21,7 @@
 #include <string>
 
 using namespace std;
-using namespace GenSeq;
+using namespace GenSeq; 
 using namespace GetIndex;
 
 class A {

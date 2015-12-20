@@ -15,11 +15,11 @@ class Inject{
 };
 
 template< typename First, typename... Injections >
-class Inject< First, Injections... > : public First, public Inject< Injections... > {
+class Inject< First, Injections... > : public Inject< First >, public Inject< Injections... > {
 public:
-    using First::GetIdSeq;
+    using Inject< First >::GetIdSeq;
     using Inject< Injections... >::GetIdSeq;
-    Inject( First first, Injections... rest ) : First( first ), Inject< Injections... >( rest... ) {}
+    Inject( First first, Injections... rest ) : Inject< First >( first ), Inject< Injections... >( rest... ) {}
 };
 
 template< typename Injection >
