@@ -8,14 +8,15 @@
 #include <algorithm>
 #include <cassert>
 
-template< class IdType, class AssetType >
+template< class IdType, class Asset >
 class AssetManager {
 public:
-    bool AddData( IdType id, AssetType asset ){
+    using AssetType = Asset;
+    bool AddData( IdType id, Asset asset ){
 	_MapAsset.emplace( id, asset );
 	return true;
     }
-    bool GetData( IdType id, AssetType & asset ){
+    bool GetData( IdType id, Asset & asset ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
