@@ -135,5 +135,23 @@ bRet = _manager.QueryLinkedAttributeVal( attribute_keys3, query_val );
 	    CHECK( 55.5 == query_leaf_data_0 );
 	    CHECK( 33.33 == query_leaf_data_1 );
 	}
+
+	//InstanceManagerIter
+	{
+	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator }, { 1, eInstanceType::Displacement } };
+	    InstanceManagerIter< eInstanceType > * p_get_manager;
+	    bRet = _manager.GetLinkedAttributeManager( attribute_keys5, p_get_manager );
+	    CHECK( true == bRet );
+	    bRet = ( p_get_manager == &_manager_empty ? true : false );
+	    CHECK( true == bRet );
+	}
+	{
+	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator } };
+	    InstanceManagerIter< eInstanceType > * p_get_manager;
+	    bRet = _manager.GetLinkedAttributeManager( attribute_keys5, p_get_manager );
+	    CHECK( true == bRet );
+	    bRet = ( p_get_manager == &_manager_empty ? true : false );
+	    CHECK( false == bRet );
+	}
     }
 }

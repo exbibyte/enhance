@@ -138,6 +138,26 @@ public:
 	}
 	return false;
     }
+    bool GetLinkedAttributeManager( std::vector<std::pair<unsigned int, DataType> > attribute_keys, InstanceManagerIter<DataType, AssetManagerType> * & manager ){
+	std::vector< DataType > data_types;
+        GetDataTypes( data_types );
+	if( attribute_keys.size() >= 1 ){
+	    unsigned int entry_id = attribute_keys[0].first;
+	    DataType entry_attribute = attribute_keys[0].second;
+	    int temp_query_val;
+	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+		return false;
+	    }
+            //continue finding next attribute
+	    attribute_keys.erase( attribute_keys.begin() );
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+		return false;
+	    }else{
+		return manager->GetLinkedAttributeManager( attribute_keys, manager );
+	    }
+	}
+	return true;
+    }
 private:
     const int _num_types;
     std::vector< DataType > _types;
