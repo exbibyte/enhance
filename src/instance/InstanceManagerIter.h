@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <algorithm>
 
 #include "InstanceType.h"
 #include "AssetManager.h"
@@ -71,6 +72,71 @@ public:
 	}
 	manager = it_find->second;
 	return true;
+    }
+    bool GetDataTypes( std::vector< DataType > & data_types ){
+	data_types = _types;
+	return true;
+    }
+    bool GetLinkedAttributes( std::vector< DataType > & attributes ){
+	std::vector< DataType > data_types;
+        GetDataTypes( data_types );
+	for( auto & i : data_types ){
+	    attributes.push_back( i );
+	    auto it_external_manager = _external_manager.find( i );
+	    if( _external_manager.end() != it_external_manager ){
+		it_external_manager->second->GetLinkedAttributes( attributes );
+	    }
+	}
+	return true;
+    }
+    bool QueryLinkedAttributeVal( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int & query_val ){
+	std::vector< DataType > data_types;
+        GetDataTypes( data_types );
+	if( attribute_keys.size() >= 1 ){
+	    unsigned int entry_id = attribute_keys[0].first;
+	    DataType entry_attribute = attribute_keys[0].second;
+	    if( !QueryData( entry_id, entry_attribute, query_val ) ){ //can't find entry with that attribute
+		return false;
+	    }
+	    if( attribute_keys.size() == 1 ){ //found final attribute
+		return true;
+	    }else{ //continue finding next attribute
+		attribute_keys.erase( attribute_keys.begin() );
+		InstanceManagerIter<DataType, AssetManagerType> * manager;
+		if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+		    return false;
+		}else{
+		    return manager->QueryLinkedAttributeVal( attribute_keys, query_val );
+		}
+	    }
+	}else{
+	    return false;
+	}
+	return false;
+    }
+    template< typename LeafDataType >
+    bool QueryLinkedAttributeLeafData( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int query_id, LeafDataType & query_val ){
+	std::vector< DataType > data_types;
+        GetDataTypes( data_types );
+	if( attribute_keys.size() >= 1 ){
+	    unsigned int entry_id = attribute_keys[0].first;
+	    DataType entry_attribute = attribute_keys[0].second;
+	    int temp_query_val;
+	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+		return false;
+	    }
+            //continue finding next attribute
+	    attribute_keys.erase( attribute_keys.begin() );
+	    InstanceManagerIter<DataType, AssetManagerType> * manager;
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+		return false;
+	    }else{
+		return manager->QueryLinkedAttributeLeafData( attribute_keys, query_id, query_val );
+	    }
+	}else{ //try query leaf data
+	    return QueryData( query_id, query_val );
+	}
+	return false;
     }
 private:
     const int _num_types;
