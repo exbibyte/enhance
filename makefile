@@ -239,3 +239,6 @@ test_InstanceManagerLink:
 
 test_InstanceManagerIter:
 	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManagerIter.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_InstanceManagerIter
+
+test_enInstanceManagerIter:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enInstanceManagerIter.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enInstanceManagerIter

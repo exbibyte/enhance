@@ -58,13 +58,13 @@ public:
 	bool bRet = _asset_manager.AddData( id, data );
 	return bRet;
     }
-    bool LinkExternalInstanceManager( std::vector< std::pair<DataType, InstanceManagerIter<DataType> * > > external_managers ){
+    bool LinkExternalInstanceManager( std::vector< std::pair<DataType, InstanceManagerIter<DataType, AssetManagerType> * > > external_managers ){
 	for( auto & i : external_managers ){
 	    _external_manager[ i.first ] = i.second;
 	}
 	return true;
     }
-    bool GetExternalInstanceManager( DataType datatype, InstanceManagerIter<DataType> * & manager ){
+    bool GetExternalInstanceManager( DataType datatype, InstanceManagerIter<DataType, AssetManagerType> * & manager ){
 	auto it_find = _external_manager.find( datatype );
 	if( _external_manager.end() == it_find ){
 	    return false;
@@ -77,7 +77,7 @@ private:
     std::vector< DataType > _types;
     std::map< DataType, unsigned int > _type_index;
     std::map< unsigned int, std::vector< int > > _data;
-    std::map< DataType, InstanceManagerIter<DataType> * > _external_manager;
+    std::map< DataType, InstanceManagerIter<DataType, AssetManagerType> * > _external_manager;
     AssetManagerType _asset_manager;
 };
 

@@ -57,6 +57,7 @@ public:
     }
 };
 
+
 template< >
 class InstanceManager< int > : public AssetManager< unsigned int, int > {
 public:
