@@ -155,7 +155,7 @@ public:
 	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->QueryLinkedAttributeLeafData( attribute_keys, query_id, query_val );
+		return manager->SetLinkedAttributeLeafData( attribute_keys, query_id, query_val );
 	    }
 	}else{ //try query leaf data
 	    return SetDataLeaf( query_id, query_val );
