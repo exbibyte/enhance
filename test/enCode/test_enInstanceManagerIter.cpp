@@ -29,10 +29,10 @@ TEST_CASE( "enInstanceManagerIter", "[ALL]" ) {
 	vector<double> vec_data_double;
 	vec_data_double.push_back(55.5);
 	vec_data_double.push_back(33.33);
-	bool bRet = _manager_empty.SetData( 99, vec_data_double );
+	bool bRet = _manager_empty.SetLinkedAttributeLeafData( {}, 99, vec_data_double );
 	CHECK( true == bRet );
 	vector<double> query_vec_data_double;
-	bRet = _manager_empty.QueryData( 99, query_vec_data_double );
+	bRet = _manager_empty.QueryDataLeaf( 99, query_vec_data_double );
 	CHECK( true == bRet );
 	CHECK( query_vec_data_double.size() == 2 );
 	CHECK( query_vec_data_double[0] == 55.5 );

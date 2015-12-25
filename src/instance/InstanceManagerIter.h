@@ -37,8 +37,13 @@ public:
 	return true;
     }
     template< typename LeafDataType >
-    bool QueryData( int id, LeafDataType & data ){
+    bool QueryDataLeaf( int id, LeafDataType & data ){
 	bool bRet = _asset_manager.GetData( id, data );
+	return bRet;
+    }
+    template< typename LeafDataType >
+    bool SetDataLeaf( int id, LeafDataType & data ){
+	bool bRet = _asset_manager.AddData( id, data );
 	return bRet;
     }
     bool SetData( unsigned int id, DataType arg, int val ){
@@ -53,11 +58,6 @@ public:
 	//modify existing entry
 	_data[ id ][ it_find_index->second ] = val;
 	return true;
-    }
-    template< typename LeafDataType >
-    bool SetData( int id, LeafDataType data ){
-	bool bRet = _asset_manager.AddData( id, data );
-	return bRet;
     }
     bool LinkExternalInstanceManager( std::vector< std::pair<DataType, InstanceManagerIter<DataType, AssetManagerType> * > > external_managers ){
 	for( auto & i : external_managers ){
@@ -134,7 +134,31 @@ public:
 		return manager->QueryLinkedAttributeLeafData( attribute_keys, query_id, query_val );
 	    }
 	}else{ //try query leaf data
-	    return QueryData( query_id, query_val );
+	    return QueryDataLeaf( query_id, query_val );
+	}
+	return false;
+    }
+    template< typename LeafDataType >
+    bool SetLinkedAttributeLeafData( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int query_id, LeafDataType & query_val ){
+	std::vector< DataType > data_types;
+        GetDataTypes( data_types );
+	if( attribute_keys.size() >= 1 ){
+	    unsigned int entry_id = attribute_keys[0].first;
+	    DataType entry_attribute = attribute_keys[0].second;
+	    int temp_query_val;
+	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+		return false;
+	    }
+            //continue finding next attribute
+	    attribute_keys.erase( attribute_keys.begin() );
+	    InstanceManagerIter<DataType, AssetManagerType> * manager;
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+		return false;
+	    }else{
+		return manager->QueryLinkedAttributeLeafData( attribute_keys, query_id, query_val );
+	    }
+	}else{ //try query leaf data
+	    return SetDataLeaf( query_id, query_val );
 	}
 	return false;
     }
