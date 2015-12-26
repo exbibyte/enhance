@@ -65,7 +65,7 @@ TEST_CASE( "enInstanceManagerIterPackage", "[ALL]" ) {
 	CHECK( bRet );
 
 	vector<double> vec_data_double_query;
-	bRet = entity_package_manager->QueryLinkedAttributeLeafData( { { 99, eInstanceType::EntityOrientation }, { 100, eInstanceType::OrientOffset } }, 101, vec_data_double_query );
+	bRet = entity_package_manager->QueryLinkedAttributeLeafData( 99, { eInstanceType::EntityOrientation, eInstanceType::OrientOffset }, vec_data_double_query );
 	CHECK( bRet );
 	
 	bRet = vec_data_double_query == vec_data_double ? true : false;

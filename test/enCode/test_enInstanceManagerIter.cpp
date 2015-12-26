@@ -29,7 +29,7 @@ TEST_CASE( "enInstanceManagerIter", "[ALL]" ) {
 	vector<double> vec_data_double;
 	vec_data_double.push_back(55.5);
 	vec_data_double.push_back(33.33);
-	bool bRet = _manager_empty.SetLinkedAttributeLeafData( {}, 99, vec_data_double );
+	bool bRet = _manager_empty.SetLinkedAttributeLeafData( 99, {}, vec_data_double );
 	CHECK( true == bRet );
 	vector<double> query_vec_data_double;
 	bRet = _manager_empty.QueryDataLeaf( 99, query_vec_data_double );
@@ -48,7 +48,7 @@ TEST_CASE( "enInstanceManagerIter", "[ALL]" ) {
 	bRet &= _manager.SetData( 1, eInstanceType::Spectator, 10 );
 	CHECK( true == bRet );
 	
-	int query1, query2, query3;
+	unsigned int query1, query2, query3;
 	bRet = _manager.QueryData( 1, eInstanceType::ObjectGeneric, query1 );
 	CHECK( true == bRet );
 	CHECK( 5 == query1 );
