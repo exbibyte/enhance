@@ -16,7 +16,7 @@
 #include "InstanceType.h"
 #include "AssetManager.h"
 
-template< typename DataType, typename AssetManagerType = AssetManager< int, std::vector< double > > >
+template< typename DataType, typename AssetManagerType = AssetManager< unsigned int, std::vector< double > > >
 class InstanceManagerIter {
 public:
     InstanceManagerIter( std::vector< DataType > datatypes ) : _types( datatypes ), _num_types( datatypes.size() ){
@@ -24,7 +24,7 @@ public:
 	    _type_index[_types[i]] = i;
 	}
     }
-    bool QueryData( unsigned int id, DataType arg, int & val){
+    bool QueryData( unsigned int id, DataType arg, unsigned int & val){
 	auto it_find_id = _data.find( id );
 	if( _data.end() == it_find_id ){
 	    return false;
@@ -46,14 +46,14 @@ public:
 	bool bRet = _asset_manager.AddData( id, data );
 	return bRet;
     }
-    bool SetData( unsigned int id, DataType arg, int val ){
+    bool SetData( unsigned int id, DataType arg, unsigned int val ){
 	auto it_find_index = _type_index.find( arg );
 	if( _type_index.end() == it_find_index ){
 	    return false;
 	}
 	auto it_find_id = _data.find( id );
 	if( _data.end() == it_find_id ){ //create new entry if not existing
-	    _data[ id ] = std::vector< int >( _num_types, 0 );
+	    _data[ id ] = std::vector< unsigned int >( _num_types, 0 );
 	}
 	//modify existing entry
 	_data[ id ][ it_find_index->second ] = val;
@@ -89,95 +89,105 @@ public:
 	}
 	return true;
     }
-    bool QueryLinkedAttributeVal( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int & query_val ){
-	std::vector< DataType > data_types;
-        GetDataTypes( data_types );
-	if( attribute_keys.size() >= 1 ){
-	    unsigned int entry_id = attribute_keys[0].first;
-	    DataType entry_attribute = attribute_keys[0].second;
-	    if( !QueryData( entry_id, entry_attribute, query_val ) ){ //can't find entry with that attribute
-		return false;
-	    }
-	    if( attribute_keys.size() == 1 ){ //found final attribute
-		return true;
-	    }else{ //continue finding next attribute
-		attribute_keys.erase( attribute_keys.begin() );
-		InstanceManagerIter<DataType, AssetManagerType> * manager;
-		if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
-		    return false;
-		}else{
-		    return manager->QueryLinkedAttributeVal( attribute_keys, query_val );
-		}
-	    }
-	}else{
+    bool QueryLinkedAttributeVal( unsigned int id, std::vector< DataType > attributes, unsigned int & query_val ){
+	if( attributes.size() == 0 ){
 	    return false;
-	}
-	return false;
-    }
-    template< typename LeafDataType >
-    bool QueryLinkedAttributeLeafData( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int query_id, LeafDataType & query_val ){
-	std::vector< DataType > data_types;
-        GetDataTypes( data_types );
-	if( attribute_keys.size() >= 1 ){
-	    unsigned int entry_id = attribute_keys[0].first;
-	    DataType entry_attribute = attribute_keys[0].second;
-	    int temp_query_val;
-	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+	}else if( attributes.size() == 1 ){
+	    return QueryData( id, attributes[0], query_val ); // query attribute
+	}else{ // size of 2 or greater
+	    unsigned int entry_id = id;
+	    DataType entry_attribute = attributes[0];
+	    unsigned int next_entry_id;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //can't find entry with that attribute
 		return false;
 	    }
-            //continue finding next attribute
-	    attribute_keys.erase( attribute_keys.begin() );
+	    //continue finding next attribute
+	    attributes.erase( attributes.begin() );
 	    InstanceManagerIter<DataType, AssetManagerType> * manager;
 	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->QueryLinkedAttributeLeafData( attribute_keys, query_id, query_val );
+		return manager->QueryLinkedAttributeVal( next_entry_id, attributes, query_val );
 	    }
-	}else{ //try query leaf data
-	    return QueryDataLeaf( query_id, query_val );
 	}
 	return false;
     }
-    template< typename LeafDataType >
-    bool SetLinkedAttributeLeafData( std::vector<std::pair<unsigned int, DataType> > attribute_keys, int query_id, LeafDataType & query_val ){
-	std::vector< DataType > data_types;
-        GetDataTypes( data_types );
-	if( attribute_keys.size() >= 1 ){
-	    unsigned int entry_id = attribute_keys[0].first;
-	    DataType entry_attribute = attribute_keys[0].second;
-	    int temp_query_val;
-	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+    bool SetLinkedAttributeVal( unsigned int id, std::vector< DataType > attributes, unsigned int set_val ){
+	if( attributes.size() == 0 ){
+	    return false;
+	}else if( attributes.size() == 1 ){
+	    return SetData( id, attributes[0], set_val ); //set attribute val
+	}else{ // size of 2 or greater
+	    unsigned int entry_id = id;
+	    DataType entry_attribute = attributes[0];
+	    unsigned int next_entry_id;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //can't find entry with that attribute
 		return false;
 	    }
-            //continue finding next attribute
-	    attribute_keys.erase( attribute_keys.begin() );
+	    //continue finding next attribute
+	    attributes.erase( attributes.begin() );
 	    InstanceManagerIter<DataType, AssetManagerType> * manager;
 	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->SetLinkedAttributeLeafData( attribute_keys, query_id, query_val );
+		return manager->SetLinkedAttributeVal( next_entry_id, attributes, set_val ); //recurse
 	    }
-	}else{ //try query leaf data
-	    return SetDataLeaf( query_id, query_val );
 	}
 	return false;
     }
-    bool GetLinkedAttributeManager( std::vector<std::pair<unsigned int, DataType> > attribute_keys, InstanceManagerIter<DataType, AssetManagerType> * & manager ){
-	std::vector< DataType > data_types;
-        GetDataTypes( data_types );
-	if( attribute_keys.size() >= 1 ){
-	    unsigned int entry_id = attribute_keys[0].first;
-	    DataType entry_attribute = attribute_keys[0].second;
-	    int temp_query_val;
-	    if( !QueryData( entry_id, entry_attribute, temp_query_val ) ){ //can't find entry with that attribute
+    template< typename LeafDataType >
+    bool QueryLinkedAttributeLeafData( unsigned int id, std::vector< DataType > attributes, LeafDataType & query_val ){
+	if( attributes.size() == 0 ){ 
+	    return QueryDataLeaf( id, query_val ); //query leaf data
+	}else{ //size of 1 or greater
+	    unsigned int entry_id = id;
+	    DataType entry_attribute = attributes[0];
+	    unsigned int next_entry_id;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //find entry with that attribute
 		return false;
 	    }
             //continue finding next attribute
-	    attribute_keys.erase( attribute_keys.begin() );
-	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+	    attributes.erase( attributes.begin() );
+	    InstanceManagerIter<DataType, AssetManagerType> * manager;
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->GetLinkedAttributeManager( attribute_keys, manager );
+		return manager->QueryLinkedAttributeLeafData( next_entry_id, attributes, query_val );
+	    }
+	}
+	return false;
+    }
+    template< typename LeafDataType >
+    bool SetLinkedAttributeLeafData( unsigned int id, std::vector< DataType > attributes, LeafDataType & set_val ){
+	if( attributes.size() == 0 ){
+	    return SetDataLeaf( id, set_val ); //set leaf data
+	}else{ //size of 1 or greater
+	    unsigned int entry_id = id;
+	    DataType entry_attribute = attributes[0];
+	    unsigned int next_entry_id;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //query value of the attribute
+		return false;
+	    }
+            //continue finding next attribute
+	    attributes.erase( attributes.begin() );
+	    InstanceManagerIter<DataType, AssetManagerType> * manager;
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //find external manager for the given attribute
+		return false;
+	    }else{
+		return manager->SetLinkedAttributeLeafData( next_entry_id, attributes, set_val ); //recurse
+	    }
+	}
+	return false;
+    }
+    bool GetLinkedAttributeManager( std::vector< DataType > attributes, InstanceManagerIter<DataType, AssetManagerType> * & manager ){
+	if( attributes.size() >= 1 ){
+	    DataType entry_attribute = attributes[0];
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //find external manager for the given attribute
+		return false;
+	    }else{
+		//continue finding next attribute
+		attributes.erase( attributes.begin() );
+		return manager->GetLinkedAttributeManager( attributes, manager ); // recurse
 	    }
 	}
 	return true;
@@ -186,7 +196,7 @@ private:
     const int _num_types;
     std::vector< DataType > _types;
     std::map< DataType, unsigned int > _type_index;
-    std::map< unsigned int, std::vector< int > > _data;
+    std::map< unsigned int, std::vector< unsigned int > > _data;
     std::map< DataType, InstanceManagerIter<DataType, AssetManagerType> * > _external_manager;
     AssetManagerType _asset_manager;
 };

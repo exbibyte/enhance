@@ -29,7 +29,7 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	vector<double> vec_data_double;
 	vec_data_double.push_back(55.5);
 	vec_data_double.push_back(33.33);
-	bool bRet = _manager_empty.SetLinkedAttributeLeafData( {}, 99, vec_data_double );
+	bool bRet = _manager_empty.SetLinkedAttributeLeafData( 99, {}, vec_data_double );
 	CHECK( true == bRet );
 	vector<double> query_vec_data_double;
 	bRet = _manager_empty.QueryDataLeaf( 99, query_vec_data_double );
@@ -37,13 +37,17 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	CHECK( query_vec_data_double.size() == 2 );
 	CHECK( query_vec_data_double[0] == 55.5 );
 	CHECK( query_vec_data_double[1] == 33.33 );
+
+	bRet = _manager_empty.SetLinkedAttributeLeafData( 53, {}, vec_data_double );
 		
 	InstanceManagerIter< eInstanceType > _manager2 ( { eInstanceType::PolyVerts } );
 	_manager2.SetData( 1, eInstanceType::PolyVerts, 25 );
 	InstanceManagerIter< eInstanceType > _manager3 ( { eInstanceType::Displacement } );
 	_manager3.SetData( 1, eInstanceType::Displacement, 26 );
+	_manager3.SetData( 10, eInstanceType::Displacement, 53 );
 	vector<double> vec_data_double_2 { 88.8, 99.9 };
 	_manager3.SetDataLeaf( 77, vec_data_double_2 );
+	_manager3.SetDataLeaf( 10, vec_data_double_2 );
 
 	_manager3.LinkExternalInstanceManager( { { eInstanceType::Displacement, &_manager_empty } } );
 	    
@@ -52,7 +56,7 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	bRet &= _manager.SetData( 1, eInstanceType::Spectator, 10 );
 	CHECK( true == bRet );
 	
-	int query1, query2, query3;
+	unsigned int query1, query2, query3;
 	bRet = _manager.QueryData( 1, eInstanceType::ObjectGeneric, query1 );
 	CHECK( true == bRet );
 	CHECK( 5 == query1 );
@@ -89,31 +93,30 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	CHECK( true == bRet );
 
 	//QueryLinkedAttributeVal
-	std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys { { 1, eInstanceType::Spectator }, { 1, eInstanceType::Displacement } };
-        int query_val;
-	bRet = _manager.QueryLinkedAttributeVal( attribute_keys, query_val );
+	std::vector< eInstanceType > attribute_keys { eInstanceType::Spectator, eInstanceType::Displacement };
+        unsigned int query_val;
+	bRet = _manager.QueryLinkedAttributeVal( 1, attribute_keys, query_val );
 	CHECK( true == bRet );
-	CHECK( 26 == query_val );
+	CHECK( 53 == query_val );
 
-	std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys2 { { 1, eInstanceType::Spectator }, { 2, eInstanceType::Displacement } };
-bRet = _manager.QueryLinkedAttributeVal( attribute_keys2, query_val );
+	std::vector< eInstanceType > attribute_keys2 { eInstanceType::Spectator, eInstanceType::Displacement };
+	bRet = _manager.QueryLinkedAttributeVal( 2, attribute_keys2, query_val );
 	CHECK( false == bRet );
 
-	std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys3 { { 1, eInstanceType::Spectator }, { 1, eInstanceType::Player } };
-bRet = _manager.QueryLinkedAttributeVal( attribute_keys3, query_val );
+	std::vector< eInstanceType > attribute_keys3 { eInstanceType::Spectator, eInstanceType::Player };
+	bRet = _manager.QueryLinkedAttributeVal( 1, attribute_keys3, query_val );
 	CHECK( false == bRet );
 
-	std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys4 { { 1, eInstanceType::ObjectGeneric } };
-	bRet = _manager.QueryLinkedAttributeVal( attribute_keys4, query_val );
+	std::vector< eInstanceType > attribute_keys4 { eInstanceType::ObjectGeneric };
+	bRet = _manager.QueryLinkedAttributeVal( 1, attribute_keys4, query_val );
 	CHECK( true == bRet );
 	CHECK( 5 == query_val );
 
 	//QueryLinkedAttributeLeafData
 	{
-	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator } };
-	    int query_leaf_id = 77;
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator };
 	    vector<double> query_leaf_data;
-	    bRet = _manager.QueryLinkedAttributeLeafData( attribute_keys5, query_leaf_id, query_leaf_data );
+	    bRet = _manager.QueryLinkedAttributeLeafData( 1, attribute_keys5, query_leaf_data );
 	    CHECK( true == bRet );
 	    int size_query_leaf_data = query_leaf_data.size();
 	    CHECK( size_query_leaf_data == 2 );
@@ -124,10 +127,9 @@ bRet = _manager.QueryLinkedAttributeVal( attribute_keys3, query_val );
 	}
 
 	{
-	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator }, { 1, eInstanceType::Displacement } };
-	    int query_leaf_id = 99;
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator, eInstanceType::Displacement };
 	    vector<double> query_leaf_data;
-	    bRet = _manager.QueryLinkedAttributeLeafData( attribute_keys5, query_leaf_id, query_leaf_data );
+	    bRet = _manager.QueryLinkedAttributeLeafData( 1, attribute_keys5, query_leaf_data );
 	    CHECK( true == bRet );
 	    int size_query_leaf_data = query_leaf_data.size();
 	    CHECK( size_query_leaf_data == 2 );
@@ -139,7 +141,7 @@ bRet = _manager.QueryLinkedAttributeVal( attribute_keys3, query_val );
 
 	//InstanceManagerIter
 	{
-	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator }, { 1, eInstanceType::Displacement } };
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator, eInstanceType::Displacement };
 	    InstanceManagerIter< eInstanceType > * p_get_manager;
 	    bRet = _manager.GetLinkedAttributeManager( attribute_keys5, p_get_manager );
 	    CHECK( true == bRet );
@@ -147,12 +149,41 @@ bRet = _manager.QueryLinkedAttributeVal( attribute_keys3, query_val );
 	    CHECK( true == bRet );
 	}
 	{
-	    std::vector<std::pair<unsigned int, eInstanceType> > attribute_keys5 { { 1, eInstanceType::Spectator } };
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator };
 	    InstanceManagerIter< eInstanceType > * p_get_manager;
 	    bRet = _manager.GetLinkedAttributeManager( attribute_keys5, p_get_manager );
 	    CHECK( true == bRet );
 	    bRet = ( p_get_manager == &_manager_empty ? true : false );
 	    CHECK( false == bRet );
+	}
+
+	//SetLinkedAttributeLeafData
+	{
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator, eInstanceType::Displacement };
+	    vector<double> set_leaf_data { 3.3, 4.4 };
+	    bRet = _manager.SetLinkedAttributeLeafData( 1, attribute_keys5, set_leaf_data );
+	    CHECK( true == bRet );
+	    vector<double> query_leaf_data;
+	    bRet = _manager.QueryLinkedAttributeLeafData( 1, attribute_keys5, query_leaf_data );
+	    int size_query_leaf_data = query_leaf_data.size();
+	    CHECK( size_query_leaf_data == 2 );
+	    double query_leaf_data_0 = query_leaf_data[0];
+	    double query_leaf_data_1 = query_leaf_data[1];
+	    CHECK( 3.3 == query_leaf_data_0 );
+	    CHECK( 4.4 == query_leaf_data_1 );
+	}
+
+	//SetLinkedAttributeVal
+	{
+
+	    std::vector< eInstanceType > attribute_keys { eInstanceType::Spectator, eInstanceType::Displacement };
+	    unsigned int query_val;
+	    unsigned int set_val = 90;
+	    bRet = _manager.SetLinkedAttributeVal( 1, attribute_keys, set_val );
+	    CHECK( true == bRet );
+	    bRet = _manager.QueryLinkedAttributeVal( 1, attribute_keys, query_val );
+	    CHECK( true == bRet );
+	    CHECK( 90 == query_val );
 	}
     }
 }
