@@ -9,10 +9,9 @@
 #include "InstanceType.h"
 #include "InstanceManagerIter.h"
 
-using enInstanceManagerIter = InstanceManagerIter< eInstanceType, enAssetManager >;
-
 class enInstanceManagerIterPackage {
 public:
+    using enInstanceManagerIter = InstanceManagerIter< eInstanceType, enAssetManager >;
     ~enInstanceManagerIterPackage(){
 	for( auto & i : _map_manager ){
 	    delete i.second;

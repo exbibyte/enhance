@@ -11,6 +11,7 @@
 #include "enTPCommon.h"
 #include "enScene.h"
 #include "enSceneSample.h"
+#include "enInstanceManagerIter.h"
 
 class enGameData {
 public:
@@ -34,6 +35,7 @@ public:
 	_SceneManagers["DEFAULT"] = new GLSceneManager;
 	_Scenes["DEFAULT"] = new enScene;
 	_ProgramGlsl = new GLSLProgram;
+	_InstanceManagerPackage = new enInstanceManagerIterPackage;
     }
     ~enGameData(){
 	delete _ManagerWindow;
@@ -51,6 +53,9 @@ public:
 	}
 	delete _ProgramGlsl;
 	_ProgramGlsl = nullptr;
+
+	delete _InstanceManagerPackage;
+	_InstanceManagerPackage = nullptr;
     }
     GLFWwindow * _Window;
     enTPCommon * _Threadpool;
@@ -60,6 +65,7 @@ public:
     map< std::string, enScene * > _Scenes;
     int _id_window;
     string _strPathPolyMesh;
+    enInstanceManagerIterPackage * _InstanceManagerPackage;
 };
 
 #endif
