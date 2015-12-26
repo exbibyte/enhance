@@ -112,7 +112,36 @@ public:
 	}
 	return false;
     }
-    bool SetLinkedAttributeVal( unsigned int id, std::vector< DataType > attributes, unsigned int set_val ){
+    bool QueryLinkedAttributeValMultiple( unsigned int id, std::vector< DataType > attributes, std::vector< std::pair< DataType, unsigned int > > & query_val ){
+	if( attributes.size() == 0 ){
+	    return false;
+	}else if( attributes.size() == 1 ){
+	    unsigned int attrib_val;
+	    if( !QueryData( id, attributes[0], attrib_val ) ){ // query attribute
+		return false;
+	    }
+	    query_val.push_back( std::pair< DataType, unsigned int >( attributes[0], attrib_val ) );
+	    return true;
+	}else{ // size of 2 or greater
+	    unsigned int entry_id = id;
+	    DataType entry_attribute = attributes[0];
+	    unsigned int next_entry_id;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //can't find entry with that attribute
+		return false;
+	    }
+	    query_val.push_back( std::pair< DataType, unsigned int >( entry_attribute, next_entry_id ) );
+	    //continue finding next attribute
+	    attributes.erase( attributes.begin() );
+	    InstanceManagerIter<DataType, AssetManagerType> * manager;
+	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
+		return false;
+	    }else{
+		return manager->QueryLinkedAttributeValMultiple( next_entry_id, attributes, query_val );
+	    }
+	}
+	return false;
+    }
+    bool SetLinkedAttributeVal( unsigned int id, std::vector< DataType > attributes, unsigned int set_val, std::vector< unsigned int > attributes_default = {} ){
 	if( attributes.size() == 0 ){
 	    return false;
 	}else if( attributes.size() == 1 ){
@@ -121,16 +150,27 @@ public:
 	    unsigned int entry_id = id;
 	    DataType entry_attribute = attributes[0];
 	    unsigned int next_entry_id;
-	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //can't find entry with that attribute
-		return false;
+	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //find entry with that attribute
+		if( attributes_default.size() >= 1 ){
+		    if( !SetData( entry_id, entry_attribute, attributes_default[0] ) ){ //set to default attribute val if able			
+			return false;
+		    }else{
+			next_entry_id = attributes_default[0];
+		    }
+		}else{
+		    return false;
+		}
 	    }
 	    //continue finding next attribute
 	    attributes.erase( attributes.begin() );
+	    if( !attributes_default.empty() ){
+		attributes_default.erase( attributes_default.begin() );
+	    }
 	    InstanceManagerIter<DataType, AssetManagerType> * manager;
 	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //can't find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->SetLinkedAttributeVal( next_entry_id, attributes, set_val ); //recurse
+		return manager->SetLinkedAttributeVal( next_entry_id, attributes, set_val, attributes_default ); //recurse
 	    }
 	}
 	return false;
@@ -158,7 +198,7 @@ public:
 	return false;
     }
     template< typename LeafDataType >
-    bool SetLinkedAttributeLeafData( unsigned int id, std::vector< DataType > attributes, LeafDataType & set_val ){
+    bool SetLinkedAttributeLeafData( unsigned int id, std::vector< DataType > attributes, LeafDataType & set_val, bool bCreateIfNotExist = false, unsigned int default_attrib_val = 0 ){
 	if( attributes.size() == 0 ){
 	    return SetDataLeaf( id, set_val ); //set leaf data
 	}else{ //size of 1 or greater
@@ -166,7 +206,14 @@ public:
 	    DataType entry_attribute = attributes[0];
 	    unsigned int next_entry_id;
 	    if( !QueryData( entry_id, entry_attribute, next_entry_id ) ){ //query value of the attribute
-		return false;
+		if( bCreateIfNotExist ){
+		    if( !SetData( entry_id, entry_attribute, default_attrib_val ) ){ //try create entry with a default attribute value
+			return false;
+		    }
+		    next_entry_id = default_attrib_val;
+		}else{
+		    return false;
+		}
 	    }
             //continue finding next attribute
 	    attributes.erase( attributes.begin() );
@@ -174,7 +221,7 @@ public:
 	    if( !GetExternalInstanceManager( entry_attribute, manager ) ){ //find external manager for the given attribute
 		return false;
 	    }else{
-		return manager->SetLinkedAttributeLeafData( next_entry_id, attributes, set_val ); //recurse
+		return manager->SetLinkedAttributeLeafData( next_entry_id, attributes, set_val, bCreateIfNotExist, default_attrib_val ); //recurse
 	    }
 	}
 	return false;

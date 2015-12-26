@@ -173,6 +173,35 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	    CHECK( 4.4 == query_leaf_data_1 );
 	}
 
+	//SetLinkedAttributeLeafData with bCreateIfNotExist on, QueryLinkedAttributeValMultiple
+	{
+	    bool bCreateIfNotExist = true;
+	    std::vector< eInstanceType > attribute_keys5 { eInstanceType::Spectator, eInstanceType::Displacement };
+	    vector<double> set_leaf_data { 1234.5, 763.5, 252.76 };
+	    bRet = _manager.SetLinkedAttributeLeafData( 8, attribute_keys5, set_leaf_data, bCreateIfNotExist );
+	    CHECK( true == bRet );
+	    vector<double> query_leaf_data;
+	    bRet = _manager.QueryLinkedAttributeLeafData( 8, attribute_keys5, query_leaf_data );
+	    int size_query_leaf_data = query_leaf_data.size();
+	    CHECK( size_query_leaf_data == 3 );
+	    double query_leaf_data_0 = query_leaf_data[0];
+	    double query_leaf_data_1 = query_leaf_data[1];
+	    double query_leaf_data_2 = query_leaf_data[2];
+	    CHECK( 1234.5 == query_leaf_data_0 );
+	    CHECK( 763.5 == query_leaf_data_1 );
+	    CHECK( 252.76 == query_leaf_data_2 );
+
+	    std::vector< std::pair< eInstanceType, unsigned int > > query_val;
+	    bRet = _manager.QueryLinkedAttributeValMultiple( 8, attribute_keys5, query_val );
+	    CHECK( bRet );
+	    int size_query_attribute_multiple = query_val.size();
+	    CHECK( 2 == size_query_attribute_multiple );
+	    unsigned int attrib_val_1 = query_val[0].second;
+	    unsigned int attrib_val_2 = query_val[1].second;
+	    CHECK( 0 == attrib_val_1 );
+	    CHECK( 0 == attrib_val_2 );
+	}
+	
 	//SetLinkedAttributeVal
 	{
 
@@ -184,6 +213,29 @@ TEST_CASE( "InstanceManagerIter", "[ALL]" ) {
 	    bRet = _manager.QueryLinkedAttributeVal( 1, attribute_keys, query_val );
 	    CHECK( true == bRet );
 	    CHECK( 90 == query_val );
+	}
+
+	//SetLinkedAttributeVal with attributes_default
+	{
+
+	    std::vector< eInstanceType > attribute_keys { eInstanceType::Spectator, eInstanceType::Displacement };
+	    unsigned int query_val;
+	    unsigned int set_val = 90;
+	    bRet = _manager.SetLinkedAttributeVal( 99, attribute_keys, set_val, { 11 } );
+	    CHECK( true == bRet );
+	    bRet = _manager.QueryLinkedAttributeVal( 99, attribute_keys, query_val );
+	    CHECK( true == bRet );
+	    CHECK( 90 == query_val );
+
+	    std::vector< std::pair< eInstanceType, unsigned int > > query_attrib_val;
+	    bRet = _manager.QueryLinkedAttributeValMultiple( 99, attribute_keys, query_attrib_val );
+	    CHECK( bRet );
+	    int size_query_attribute_multiple = query_attrib_val.size();
+	    CHECK( 2 == size_query_attribute_multiple );
+	    unsigned int attrib_val_1 = query_attrib_val[0].second;
+	    unsigned int attrib_val_2 = query_attrib_val[1].second;
+	    CHECK( 11 == attrib_val_1 );
+	    CHECK( 90 == attrib_val_2 );
 	}
     }
 }
