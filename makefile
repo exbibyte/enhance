@@ -233,3 +233,15 @@ test_InjectionGenSeq:
 
 test_InstanceManager:
 	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManager.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManager
+
+test_InstanceManagerLink:
+	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManagerLink.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -o $(build_dir)/test_InstanceManagerLink
+
+test_InstanceManagerIter:
+	$(CXX) -std=c++14 -g $(src_folder_test_instance)/test_InstanceManagerIter.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_InstanceManagerIter
+
+test_enInstanceManagerIter:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enInstanceManagerIter.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enInstanceManagerIter
+
+test_enInstanceManagerIterPackage:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enInstanceManagerIterPackage.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -I$(inc_folder_instance) -I$(inc_folder_asset) -I$(inc_folder_en) -o $(build_dir)/test_enInstanceManagerIterPackage
