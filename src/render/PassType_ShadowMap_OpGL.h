@@ -35,6 +35,9 @@ private:
 
     bool GetAttribute( eRenderType render_type, std::vector< mat4 > & attrib );
     bool GetAttribute( eRenderType render_type, std::vector< mat3 > & attrib );
+    bool GetAttribute( eRenderType render_type, vec3 & attrib );
+    bool GetAttribute( eRenderType render_type, vec4 & attrib );
+    bool GetAttribute( eRenderType render_type, float & attrib );
     unsigned int _CountRenderVerts;
 };
 

@@ -187,6 +187,62 @@ bool PassType_ShadowMap_OpGL::ProcessPassCommon( GLSLProgram * glsl_program ){
 	assert( 0 && "Cannot find Light View Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
     }
 
+    //retrieve light data
+    vec3 Light_Position_3;
+    vec4 Light_Position;
+    vec3 Light_Ambient;
+    vec3 Light_Diffuse;
+    vec3 Light_Specular;
+    //light position
+    if( !GetAttribute( eRenderType::LIGHT_COORDINATE, Light_Position_3 ) ){
+	assert( 0 && "Cannot find Light Coordinate attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    Light_Position = vec4( Light_Position_3, 1.0f );
+    //light ambient
+    if( !GetAttribute( eRenderType::LIGHT_COEFF_AMBIENT, Light_Ambient ) ){
+	assert( 0 && "Cannot find Light Ambient attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //light diffuse
+    if( !GetAttribute( eRenderType::LIGHT_COEFF_DIFFUSE, Light_Diffuse ) ){
+	assert( 0 && "Cannot find Light Diffuse attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //light specular
+    if( !GetAttribute( eRenderType::LIGHT_COEFF_SPECULAR, Light_Specular ) ){
+	assert( 0 && "Cannot find Light Specular attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //set light data
+    bRet = glsl_program->SetUniform( "Light.Position", Light_Position );
+    bRet = glsl_program->SetUniform( "Light.La", Light_Ambient );
+    bRet = glsl_program->SetUniform( "Light.Ld", Light_Diffuse );
+    bRet = glsl_program->SetUniform( "Light.Ls", Light_Specular );
+
+    //retrieve material data
+    vec3 Material_Ambient;
+    vec3 Material_Diffuse;
+    vec3 Material_Specular;
+    float Material_Shininess;
+    //material ambient
+    if( !GetAttribute( eRenderType::MATERIAL_COEFF_AMBIENT, Material_Ambient ) ){
+	assert( 0 && "Cannot find Material Ambient attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //material diffuse
+    if( !GetAttribute( eRenderType::MATERIAL_COEFF_DIFFUSE, Material_Diffuse ) ){
+	assert( 0 && "Cannot find Material Diffuse attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //material specular
+    if( !GetAttribute( eRenderType::MATERIAL_COEFF_SPECULAR, Material_Specular ) ){
+	assert( 0 && "Cannot find Material Specular attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //material shininess
+    if( !GetAttribute( eRenderType::MATERIAL_COEFF_SHININESS, Material_Shininess ) ){
+	assert( 0 && "Cannot find Material Shininess attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    }
+    //set material data
+    bRet = glsl_program->SetUniform( "Material.Ka", Material_Ambient );
+    bRet = glsl_program->SetUniform( "Material.Kd", Material_Diffuse );
+    bRet = glsl_program->SetUniform( "Material.Ks", Material_Specular );
+    bRet = glsl_program->SetUniform( "Material.Shininess", Material_Shininess );
+    
     //use the first item from the vector for now
     mat4 ModelViewMatrix = attrib_model_view_matrix[0];
     mat4 MVP = attrib_model_view_perspective_matrix[0];
@@ -237,6 +293,51 @@ bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vector< mat
 	return false;
     }
     attrib = it->second;
+    return true;
+}
+
+bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vec3 & attrib ){
+    auto it = _map_render_double.find( render_type );
+    if( _map_render_double.end() == it ){
+	return false;
+    }
+    if( it->second.empty() ){
+	return false;
+    }
+    if( it->second.size() < 3 ){
+	return false;
+    }
+    attrib = vec3( it->second[0], it->second[1], it->second[2] );
+    return true;
+}
+
+bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vec4 & attrib ){
+    auto it = _map_render_double.find( render_type );
+    if( _map_render_double.end() == it ){
+	return false;
+    }
+    if( it->second.empty() ){
+	return false;
+    }
+    if( it->second.size() < 4 ){
+	return false;
+    }
+    attrib = vec4( it->second[0], it->second[1], it->second[2], it->second[3] );
+    return true;
+}
+
+bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, float & attrib ){
+    auto it = _map_render_double.find( render_type );
+    if( _map_render_double.end() == it ){
+	return false;
+    }
+    if( it->second.empty() ){
+	return false;
+    }
+    if( it->second.size() < 1 ){
+	return false;
+    }
+    attrib = it->second[0];
     return true;
 }
 

@@ -232,6 +232,10 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
         
     //first pass render for light POV    
     glViewport( 0, 0, 2500, 2500 );
+    // vector<double> light_direction { 0, 0, 0 };
+    // vector<double> light_up { 0, 1, 0 };
+    // render->AddToProcess( eRenderType::LIGHT_DIRECTION, light_direction );
+    // render->AddToProcess( eRenderType::LIGHT_UP, light_up );
     mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
 				   vec3(0.0,0.0,0.0),
 				   vec3(0.0,1.0,0.0) );
@@ -251,41 +255,29 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
     // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
 
     //draw on first pass
-    //Multiply it by the bias matrix
-    glm::mat4 Bias(
-	0.5, 0.0, 0.0, 0.0,
-	0.0, 0.5, 0.0, 0.0,
-	0.0, 0.0, 0.5, 0.0,
-	0.5, 0.5, 0.5, 1.0
-	);
-        
-    mat4 ModelViewMatrix = ViewMatrix  * ModelMatrix;
 
-    vec3 LightLa;
-    vec3 LightLd;
-    vec3 LightLs;
-    LightLa = vec3( 0.05, 0.05, 0.05 );
-    LightLd = vec3( 0.5, 0.5, 0.5 );
-    LightLs = vec3( 0.45, 0.45, 0.45 );
-    bRet = _GLSLProgram->SetUniform( "Light.La", LightLa );
-    bRet = _GLSLProgram->SetUniform( "Light.Ld", LightLd );
-    bRet = _GLSLProgram->SetUniform( "Light.Ls", LightLs );
+    //set light parameters
+    vector<double> light_position { 0, 0, 20 };
+    vector<double> light_ambient { 0.05, 0.05, 0.05 };
+    vector<double> light_diffuse { 0.5, 0.5, 0.5 };
+    vector<double> light_specular { 0.45, 0.45, 0.45 };
+    render->AddToProcess( eRenderType::LIGHT_COORDINATE, light_position );
+    render->AddToProcess( eRenderType::LIGHT_COEFF_AMBIENT, light_ambient );
+    render->AddToProcess( eRenderType::LIGHT_COEFF_DIFFUSE, light_diffuse );
+    render->AddToProcess( eRenderType::LIGHT_COEFF_SPECULAR, light_specular );
     float fDeltaLight = -0.01;
-    vec4 LightPosition( 0.0f, 0.0f, 20.0f, 1.0 );
-    // vec4 LightPosition( _fLightPos_x, _fLightPos_y, 15.0f, 1.0 );
-    scene_data->_fLightPos_x += fDeltaLight;
-    scene_data->_fLightPos_y += fDeltaLight;
-    bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
-
+    vec3 LightPosition( 0.0f, 0.0f, 20.0f );
     mat4 LightViewMatrixOriginal = ViewMatrix;
-        
-    vec3 MaterialCoeffKa( 1.0f, 1.0f, 1.0f );
-    vec3 MaterialCoeffKd( 1.0f, 1.0f, 1.0f );
-    vec3 MaterialCoeffKs( 1.0f, 1.0f, 1.0f );
-    bRet = _GLSLProgram->SetUniform( "Material.Ka", MaterialCoeffKa );
-    bRet = _GLSLProgram->SetUniform( "Material.Kd", MaterialCoeffKd );
-    bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
-    bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
+
+    //set material parameters
+    vector<double> material_ambient { 1, 1, 1 };
+    vector<double> material_diffuse { 1, 1, 1 };
+    vector<double> material_specular { 1, 1, 1 };
+    vector<double> material_shininess { 2 };
+    render->AddToProcess( eRenderType::MATERIAL_COEFF_AMBIENT, material_ambient );
+    render->AddToProcess( eRenderType::MATERIAL_COEFF_DIFFUSE, material_diffuse );
+    render->AddToProcess( eRenderType::MATERIAL_COEFF_SPECULAR, material_specular );
+    render->AddToProcess( eRenderType::MATERIAL_COEFF_SHININESS, material_shininess );
 
     //set render matrices for 1st pass
     RenderMeshOrientation render_mesh_orientation_firstpass;
@@ -324,7 +316,6 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
     ViewMatrix = ViewMatrix * ViewOrientationMatrix;
                 
     //draw on 2nd pass
-    ModelViewMatrix = ViewMatrix * ModelMatrix;
     mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f );
 
     //set rendering matrices
@@ -354,7 +345,7 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
 	ShadowTexture->UnbindFbo();
     }
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
+//    bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
 
     render->ProcessNow( _GLSLProgram, "NORMAL" );
     render->Clear();
