@@ -12,6 +12,7 @@
 #include "enScene.h"
 #include "enSceneSample.h"
 #include "enInstanceManagerIter.h"
+#include "enRenderPass.h"
 
 class enGameData {
 public:
@@ -36,6 +37,9 @@ public:
 	_Scenes["DEFAULT"] = new enScene;
 	_ProgramGlsl = new GLSLProgram;
 	_InstanceManagerPackage = new enInstanceManagerIterPackage;
+
+	//rendering pass
+	_render_pass = new enRenderPass_ShadowMap_OpGL;
     }
     ~enGameData(){
 	delete _ManagerWindow;
@@ -56,6 +60,9 @@ public:
 
 	delete _InstanceManagerPackage;
 	_InstanceManagerPackage = nullptr;
+
+	delete _render_pass;
+	_render_pass = nullptr;
     }
     GLFWwindow * _Window;
     enTPCommon * _Threadpool;
@@ -66,6 +73,7 @@ public:
     int _id_window;
     string _strPathPolyMesh;
     enInstanceManagerIterPackage * _InstanceManagerPackage;
+    enRenderPass_ShadowMap_OpGL * _render_pass;
 };
 
 #endif

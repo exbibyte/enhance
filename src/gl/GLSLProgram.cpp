@@ -129,13 +129,11 @@ bool GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & Attri
     return bRet;
 }
 void GLSLProgram::BindMapAttrib(){
-
     for(auto & i : _MapAttrib ){
         int CurrentVertexArrayIndex = _mVertexArrayIndexCount++;
         i.second->SetVertexArrayIndex( _VertexArrayObj, CurrentVertexArrayIndex );
         BindAttribLocation( i.second->GetIndexAttrib(), i.first );
     }
-
 }
 void GLSLProgram::BindVertexArray()
 {

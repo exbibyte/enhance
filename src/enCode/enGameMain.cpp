@@ -12,6 +12,7 @@
 #include "enScene.h"
 #include "enSceneSample.h"
 #include "enGameData.h"
+#include "enRenderPass.h"
 
 #include "DataTransformDriver.h"
 #include "PassParsePolyMesh.h"
@@ -70,7 +71,7 @@ auto func_cleanup_01 = []( GLSLProgram * glslprogram )->bool {
     return true;
 };
 
-bool SceneInit( enScene * scene_data, GLSLProgram * _GLSLProgram ){
+bool SceneInit( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLSLProgram ){
     bool bRet;
     cout << "func init 01 - Set Shaders" << endl;
     _GLSLProgram->CompileShaderFromFile("./src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
@@ -161,21 +162,21 @@ bool SceneInit( enScene * scene_data, GLSLProgram * _GLSLProgram ){
     float * current_vertex = data_vertex;
     float * current_normal = data_normal;
 
-    cout << "vertex: " << endl;
-    for( int i = 0; i < iNumDataVertex; i++ ){
-	cout << *current_vertex++ << " ";
-    }
-    cout << endl;
-    cout << "normal: " << endl;
-    for( int i = 0; i < iNumDataNormal; i++ ){
-	cout << *current_normal++ << " ";
-    }
-    cout << endl;
+    // cout << "vertex: " << endl;
+    // for( int i = 0; i < iNumDataVertex; i++ ){
+    // 	cout << *current_vertex++ << " ";
+    // }
+    // cout << endl;
+    // cout << "normal: " << endl;
+    // for( int i = 0; i < iNumDataNormal; i++ ){
+    // 	cout << *current_normal++ << " ";
+    // }
+    // cout << endl;
     
     //save mapping of data
     _GLSLProgram->AddMapAttrib( "VertexPosition", pPositionData );
     _GLSLProgram->AddMapAttrib( "VertexNormal", pNormalData );
-    //bind attributes
+    //bind the above attributes to vertex array object
     _GLSLProgram->BindMapAttrib();
 
     _GLSLProgram->BindFragDataLocation( 0, "FragColor" );
@@ -186,40 +187,55 @@ bool SceneInit( enScene * scene_data, GLSLProgram * _GLSLProgram ){
 
     _GLSLProgram->PrintActiveAttribs();
 
-    //generate VBO, populate and bind data to vertex attribute arrays
-    pPositionData->SetData( data_vertex, 3, iNumDataVertex );
-    pNormalData->SetData( data_normal, 3, iNumDataNormal );
-
     _GLSLProgram->Use();
-
+    
     _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
 
-    //deallocate data
+    cout << "After linking program" << endl;
+    //generate VBO, populate and bind data to vertex attribute arrays
+//    pPositionData->SetData( data_vertex, 3, iNumDataVertex );
+//    pNormalData->SetData( data_normal, 3, iNumDataNormal );
+
+    vector<double> vert_pos;
+    vector<double> vert_norm;
+    for( int i = 0; i < iNumDataVertex; ++i ){
+	vert_pos.push_back( data_vertex[i] );
+    }
+    for( int i = 0; i < iNumDataNormal; ++i ){
+	vert_norm.push_back( data_normal[i] );
+    }
+    cout << "Size of vert_pos: " << vert_pos.size() << endl;
+    cout << "Size of vert_norm: " << vert_norm.size() << endl;
+
+    game_data->_render_pass->AddToProcess( eRenderType::POLY_VERT, vert_pos );
+    game_data->_render_pass->AddToProcess( eRenderType::POLY_NORM, vert_norm );
+    
+   //deallocate data
     delete [] data_vertex;
     data_vertex = nullptr;
     delete [] data_normal;
     data_normal = nullptr;
-        
+
+    cout << "End of Init Phase" << endl;
+
     return true;
 }
 
-bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
+bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLSLProgram ){
     bool bRet;
     scene_data->_dAngle += 0.005;
 
+    enRenderPass_ShadowMap_OpGL * render = game_data->_render_pass;
+
     mat4 Model = mat4(1.0f);
-    // mat4 ModelMatrix = glm::rotate( Model, -_dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
     mat4 ModelMatrix = Model;
         
     //first pass render for light POV    
-    //glViewport( 0, 0, 2500, 2500 );
+    glViewport( 0, 0, 2500, 2500 );
     mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
 				   vec3(0.0,0.0,0.0),
 				   vec3(0.0,1.0,0.0) );
-        
-    // mat4 ViewMatrix = glm::lookAt( vec3(_fLightPos_x,_fLightPos_y,15.0), 
-    //                             vec3(0.0,0.0,0.0),
-    //                             vec3(0.0,1.0,0.0) );
+
     mat4 ProjectionMatrixLight = glm::perspective( 60.0f, 1.0f, 0.1f, 1000.0f );
 
     GLTexture * ShadowTexture;
@@ -244,9 +260,6 @@ bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
 	);
         
     mat4 ModelViewMatrix = ViewMatrix  * ModelMatrix;
-    mat4 MVP = ProjectionMatrixLight * ViewMatrix  * ModelMatrix;
-    mat4 MVPB = Bias * ProjectionMatrixLight * ViewMatrix * ModelMatrix;
-    mat3 NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
 
     vec3 LightLa;
     vec3 LightLd;
@@ -274,8 +287,10 @@ bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
     bRet = _GLSLProgram->SetUniform( "Material.Ks", MaterialCoeffKs );
     bRet = _GLSLProgram->SetUniform( "Material.Shininess", 2.0f );
 
-    ///start of draw 1st object
+    //set render matrices for 1st pass
     RenderMeshOrientation render_mesh_orientation_firstpass;
+    //set orientation for the objects to render below
+    mat4 ObjOrientationMatrix = glm::rotate( Model, -2 * scene_data->_dAngle, vec3( 0.0f, 0.5f, 0.7f ) );
     render_mesh_orientation_firstpass._MatOrientation = ModelMatrix;
     render_mesh_orientation_firstpass._MatView = ViewMatrix;
     render_mesh_orientation_firstpass._MatProjection = ProjectionMatrixLight;
@@ -283,35 +298,24 @@ bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
     render_mesh_orientation_firstpass._MatLightView = LightViewMatrixOriginal;
     render_mesh_orientation_firstpass.ComputeCompositeMats();
 
-    GLRenderPassShadowMap render_pass_shadow_map;
-    list<string> buffer_obj_name_pass_depth;
-    buffer_obj_name_pass_depth.push_back( "square" );
-    render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation_firstpass, buffer_obj_name_pass_depth );
-    ///end of draw 1st object
+    //get computed matrices for rendering
+    mat4 model_view_matrix;
+    mat4 model_view_proj_matrix;
+    mat4 model_view_pro_bias_matrix;
+    mat3 normal_matrix;
+    mat4 light_view = LightViewMatrixOriginal;
+    render_mesh_orientation_firstpass.GetCompositeMats( model_view_matrix, model_view_proj_matrix, model_view_pro_bias_matrix, normal_matrix );
+    render->AddToProcess( eRenderType::MODEL_VIEW_MATRIX, model_view_matrix );
+    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_MATRIX, model_view_proj_matrix );
+    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_BIAS_MATRIX, model_view_pro_bias_matrix );
+    render->AddToProcess( eRenderType::NORMAL_MATRIX, normal_matrix );
+    render->AddToProcess( eRenderType::LIGHT_VIEW_MATRIX, light_view );
 
-    //set orientation for the objects to render below
-    mat4 ObjOrientationMatrix = glm::rotate( Model, -2 * scene_data->_dAngle, vec3( 0.0f, 0.5f, 0.7f ) );
-    mat4 ModelOrientationViewMatrix = ViewMatrix * ObjOrientationMatrix * ModelMatrix;
-    mat4 MOVP = ProjectionMatrixLight * ViewMatrix  * ObjOrientationMatrix * ModelMatrix;
-    mat4 MOVPB = Bias * ProjectionMatrixLight * ViewMatrix * ObjOrientationMatrix * ModelMatrix;
-    mat3 NormalMatrixOrientation = glm::inverse( glm::transpose( glm::mat3(ModelOrientationViewMatrix) ) );
-
-    ///start of draw 2nd object
-    render_mesh_orientation_firstpass._MatOrientation = ObjOrientationMatrix;
-    render_mesh_orientation_firstpass._MatView = ViewMatrix;
-    render_mesh_orientation_firstpass._MatProjection = ProjectionMatrixLight;
-    render_mesh_orientation_firstpass._MatLightProjection = ProjectionMatrixLight;
-    render_mesh_orientation_firstpass._MatLightView = LightViewMatrixOriginal;
-    render_mesh_orientation_firstpass.ComputeCompositeMats();
-
-    buffer_obj_name_pass_depth.clear();
-    buffer_obj_name_pass_depth.push_back( "Wheel_4_Wheel" );
-    render_pass_shadow_map.AddPath( "DEPTH", render_mesh_orientation_firstpass, buffer_obj_name_pass_depth );
-    //end of draw 2nd object
-    render_pass_shadow_map.ProcessPass( "DEPTH", _GLSLProgram ); //this needs to be done prior to changing glViewport dimension for second pass rendering
-        
+    render->ProcessNow( _GLSLProgram, "DEPTH" );
+    render->Clear();
+    
     //2nd pass render
-    //glViewport( 0, 0, 500, 500 );
+    glViewport( 0, 0, 500, 500 );
     ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
 			      vec3(0.0,0.0,0.0),
 			      vec3(0.0,1.0,0.0) );
@@ -322,10 +326,8 @@ bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
     //draw on 2nd pass
     ModelViewMatrix = ViewMatrix * ModelMatrix;
     mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f );
-    MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-    NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
-                
-    ///draw 1st object
+
+    //set rendering matrices
     RenderMeshOrientation render_mesh_orientation_secondpass;
     render_mesh_orientation_secondpass._MatOrientation = ModelMatrix;
     render_mesh_orientation_secondpass._MatView = ViewMatrix;
@@ -334,36 +336,52 @@ bool SceneRender( enScene * scene_data, GLSLProgram * _GLSLProgram ){
     render_mesh_orientation_secondpass._MatLightView = LightViewMatrixOriginal;
     render_mesh_orientation_secondpass.ComputeCompositeMats();
 
-    buffer_obj_name_pass_depth.clear();
-    buffer_obj_name_pass_depth.push_back( "square" );
-    render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation_secondpass, buffer_obj_name_pass_depth );
-    ///end of draw 1st object
+    //get computed matrices for rendering
+    mat4 model_view_matrix_2nd;
+    mat4 model_view_proj_matrix_2nd;
+    mat4 model_view_pro_bias_matrix_2nd;
+    mat3 normal_matrix_2nd;
+    mat4 light_view_2nd = LightViewMatrixOriginal;
+    render_mesh_orientation_secondpass.GetCompositeMats( model_view_matrix_2nd, model_view_proj_matrix_2nd, model_view_pro_bias_matrix_2nd, normal_matrix_2nd );
+    render->AddToProcess( eRenderType::MODEL_VIEW_MATRIX, model_view_matrix_2nd );
+    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_MATRIX, model_view_proj_matrix_2nd );
+    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_BIAS_MATRIX, model_view_pro_bias_matrix_2nd );
+    render->AddToProcess( eRenderType::NORMAL_MATRIX, normal_matrix_2nd );
+    render->AddToProcess( eRenderType::LIGHT_VIEW_MATRIX, light_view_2nd );
 
-    ///draw 2nd object
-    render_mesh_orientation_secondpass._MatOrientation = ObjOrientationMatrix;
-    render_mesh_orientation_secondpass._MatView = ViewMatrix;
-    render_mesh_orientation_secondpass._MatProjection = ProjectionMatrix;
-    render_mesh_orientation_secondpass._MatLightProjection = ProjectionMatrixLight;
-    render_mesh_orientation_secondpass._MatLightView = LightViewMatrixOriginal;
-    render_mesh_orientation_secondpass.ComputeCompositeMats();
-
-    buffer_obj_name_pass_depth.clear();
-    buffer_obj_name_pass_depth.push_back( "Wheel_4_Wheel" );
-    render_pass_shadow_map.AddPath( "NORMAL", render_mesh_orientation_secondpass, buffer_obj_name_pass_depth );
-    ///end of draw 2nd object
-
-    //render all objects for the normal pass
+    //render all objects for 2nd pass
     if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
 	ShadowTexture->UnbindFbo();
     }
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
-    render_pass_shadow_map.ProcessPass( "NORMAL", _GLSLProgram );
 
+    render->ProcessNow( _GLSLProgram, "NORMAL" );
+    render->Clear();
+    
     return true;
 }
 
 void InitWindow( enGameData * game_data, string strPathPolyMesh ){
+
+    //instance manager setup for game entities
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::PolyVertices, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightAmbient, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightSpectral, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightDiffuse, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::CameraProjection, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialAmbient, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialDiffuse, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialSpectral, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialShininess, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientOffset, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientRotation, {} );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightComposition, { eInstanceType::LightAmbient, eInstanceType::LightSpectral, eInstanceType::LightDiffuse } );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialComposition, { eInstanceType::MaterialAmbient, eInstanceType::MaterialDiffuse, eInstanceType::MaterialSpectral, eInstanceType::MaterialShininess } );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityOrientation, { eInstanceType::OrientOffset, eInstanceType::OrientRotation } );
+    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityPackage, { eInstanceType::PolyVertices, eInstanceType::EntityOrientation, eInstanceType::MaterialComposition  } );
+    game_data->_InstanceManagerPackage->LinkManagers();
+
     glfwMakeContextCurrent( game_data->_Window );
     GLPrintInfo();
 
@@ -376,8 +394,8 @@ void InitWindow( enGameData * game_data, string strPathPolyMesh ){
     scene->_strPathPolyMesh = strPathPolyMesh;    
     scene_manager->SetGLSLProgram( game_data->_ProgramGlsl );
     
-    std::function< bool( GLSLProgram * ) > func_wrap_init_01 = bind( SceneInit, scene, std::placeholders::_1 );
-    std::function< bool( GLSLProgram * ) > func_wrap_body_01 = bind( SceneRender, scene, std::placeholders::_1 );
+    std::function< bool( GLSLProgram * ) > func_wrap_init_01 = bind( SceneInit, game_data, scene, std::placeholders::_1 );
+    std::function< bool( GLSLProgram * ) > func_wrap_body_01 = bind( SceneRender, game_data, scene, std::placeholders::_1 );
     std::function< bool( GLSLProgram * ) > func_wrap_body_02 = func_body_02;
     std::function< bool( GLSLProgram * ) > func_wrap_cleanup_01 = func_cleanup_01;
     scene_manager->RegisterRoutine( "init_LoadShaders", func_wrap_init_01, GLSceneRoutineType::INIT );
