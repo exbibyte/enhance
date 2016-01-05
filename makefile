@@ -251,3 +251,6 @@ test_enInstanceManagerIterPackage:
 
 test_BatchProcess:
 	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_BatchProcess.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -o $(build_dir)/test_BatchProcess
+
+test_RenderProjection:
+	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderProjection.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -o $(build_dir)/test_RenderProjection

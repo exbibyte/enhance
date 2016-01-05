@@ -12,11 +12,11 @@ template< class IdType, class Asset >
 class AssetManager {
 public:
     using AssetType = Asset;
-    bool AddData( IdType id, Asset asset ){
+    bool AddData( IdType id, AssetType asset ){
         _MapAsset[ id ] = asset;
 	return true;
     }
-    bool GetData( IdType id, Asset & asset ){
+    bool GetData( IdType id, AssetType & asset ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
 	    return false;
@@ -24,8 +24,17 @@ public:
 	asset = it_find->second;
 	return true;
     }
+    bool AddDataSingle( IdType id, AssetType asset ){
+	_SingleAsset = asset;
+	return true;
+    }
+    bool GetDataSingle( IdType id, AssetType & asset ){
+	asset = _SingleAsset;
+	return true;
+    }
 private:
     std::map< IdType, AssetType > _MapAsset;
+    AssetType _SingleAsset;
 };
 
 template< class IdType >
@@ -45,6 +54,14 @@ public:
 	asset = it_find->second;
 	return true;
     }
+    bool AddDataSingle( IdType id, AssetType asset ){
+	_SingleAsset = asset;
+	return true;
+    }
+    bool GetDataSingle( IdType id, AssetType & asset ){
+	asset = _SingleAsset;
+	return true;
+    }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
@@ -62,6 +79,7 @@ public:
     }
 private:
     std::map< IdType, AssetType > _MapAsset;
+    AssetType _SingleAsset;
 };
 
 template< class IdType >
@@ -81,6 +99,14 @@ public:
 	asset = it_find->second;
 	return true;
     }
+    bool AddDataSingle( IdType id, AssetType asset ){
+	_SingleAsset = asset;
+	return true;
+    }
+    bool GetDataSingle( IdType id, AssetType & asset ){
+	asset = _SingleAsset;
+	return true;
+    }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
@@ -98,6 +124,7 @@ public:
     }
 private:
     std::map< IdType, AssetType > _MapAsset;
+    AssetType _SingleAsset;
 };
 
 template< class IdType >
@@ -117,6 +144,14 @@ public:
 	asset = it_find->second;
 	return true;
     }
+    bool AddDataSingle( IdType id, AssetType asset ){
+	_SingleAsset = asset;
+	return true;
+    }
+    bool GetDataSingle( IdType id, AssetType & asset ){
+	asset = _SingleAsset;
+	return true;
+    }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
@@ -134,6 +169,7 @@ public:
     }
 private:
     std::map< IdType, AssetType > _MapAsset;
+    AssetType _SingleAsset;
 };
 
 #endif
