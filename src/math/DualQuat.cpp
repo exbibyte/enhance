@@ -346,14 +346,15 @@ void DualQuat::GetRigidTransform( float trans [] ) const{
   trans[2] = 2*(_A._quat[0]*_A._quat[2]- _A._quat[3]*_A._quat[1]);
   trans[6] = 2*(_A._quat[1]*_A._quat[2]+ _A._quat[3]*_A._quat[0]);
   trans[10] =  _A._quat[3]*_A._quat[3] - _A._quat[0]*_A._quat[0] - _A._quat[1]*_A._quat[1] + _A._quat[2]*_A._quat[2];
-      
+
+  //below is not used
   // trans[12] = 2*(_A._quat[3]*_B._quat[0] - _A._quat[0]*_B._quat[3] + _A._quat[1]*_B._quat[2] - _A._quat[2]*_B._quat[1]);
   // trans[13] = 2*(_A._quat[3]*_B._quat[1] - _A._quat[0]*_B._quat[2] - _A._quat[1]*_B._quat[3] +_A._quat[2]*_B._quat[0]);
   // trans[14] = 2*(_A._quat[3]*_B._quat[2] + _A._quat[0]*_B._quat[1] - _A._quat[1]*_B._quat[0] - _A._quat[2]*_B._quat[3]);
 
   trans[12] = 2 * _B._quat[0];
   trans[13] = 2 * _B._quat[1];
-  trans[14] = 2 * _A._quat[2];
+  trans[14] = 2 * _B._quat[2];
 
   trans[15] = 1;
   trans[3] = 0;
