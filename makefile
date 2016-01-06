@@ -257,3 +257,9 @@ test_RenderLight:
 
 test_RenderCamera:
 	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderCamera.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -o $(build_dir)/test_RenderCamera
+
+test_RenderMaterial:
+	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderMaterial.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -o $(build_dir)/test_RenderMaterial
+
+test_RenderPoly:
+	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderPoly.cpp $(src_folder_math)/Vec.cpp $(src_folder_math)/Quat.cpp $(src_folder_math)/DualScalar.cpp $(src_folder_math)/DualQuat.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -I$(inc_folder_math) -o $(build_dir)/test_RenderPoly
