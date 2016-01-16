@@ -15,6 +15,7 @@ src_folder_instance := ./src/instance
 src_folder_render := ./src/render
 
 src_folder_test_file := ./test/file
+src_folder_test_ui := ./test/ui
 src_folder_test_datatransform := ./test/DataTransform
 src_folder_test_gl := ./test/gl
 src_folder_test_core := ./test/core
@@ -263,3 +264,9 @@ test_RenderMaterial:
 
 test_RenderPoly:
 	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderPoly.cpp $(src_folder_math)/Vec.cpp $(src_folder_math)/Quat.cpp $(src_folder_math)/DualScalar.cpp $(src_folder_math)/DualQuat.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -I$(inc_folder_math) -o $(build_dir)/test_RenderPoly
+
+test_RenderVertex:
+	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderVertex.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -o $(build_dir)/test_RenderVertex
+
+test_imgui:
+	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++1y $(src_folder_test_ui)/test_imgui.cpp $(src_folder_ui)/imgui.cpp $(src_folder_ui)/imgui_impl_glfw.cpp -I/usr/local/include -I$(inc_folder_gl) -I$(inc_folder_ui) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/test_imgui

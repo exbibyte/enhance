@@ -62,6 +62,10 @@ public:
 	asset = _SingleAsset;
 	return true;
     }
+    bool GetDataSingleSize( IdType id, unsigned int & size ){
+	size = _SingleAsset.size();
+	return true;
+    }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
@@ -107,6 +111,10 @@ public:
 	asset = _SingleAsset;
 	return true;
     }
+    bool GetDataSingleSize( IdType id, unsigned int & size ){
+	size = _SingleAsset.size();
+	return true;
+    }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
 	auto it_find = _MapAsset.find( id );
 	if( _MapAsset.end() == it_find ){
@@ -150,6 +158,10 @@ public:
     }
     bool GetDataSingle( IdType id, AssetType & asset ){
 	asset = _SingleAsset;
+	return true;
+    }
+    bool GetDataSingleSize( IdType id, unsigned int & size ){
+	size = _SingleAsset.size();
 	return true;
     }
     bool GetDataArray( IdType id, std::shared_ptr< ElementType > & data_array, int & size ){
