@@ -21,6 +21,7 @@ class GLAttribData {
 public:
     GLAttribData(){
         glGenBuffers( 1, &_HandleBuffer );
+	_pData = nullptr;
     }
     ~GLAttribData(){
         if( _pData ) {
@@ -33,7 +34,10 @@ public:
         _hVAO = vao;
     }
     void SetData( DataType * Data, int VertexSize, int Count ){
-        _pData = new DataType[ Count ];
+	if( _pData ) {
+            delete [] _pData;
+        }
+	_pData = new DataType[ Count ];
         std::copy ( Data, Data + Count, _pData );
         _VertexSize = VertexSize;
         _Size = Count;
