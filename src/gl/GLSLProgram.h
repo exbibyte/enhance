@@ -60,6 +60,7 @@ public:
     void PrintActiveAttribs() const;
     bool AddMapAttrib( string AttribName, GLAttribData<float> * AttribData );
     bool GetMapAttrib( string AttribName, GLAttribData<float> * & AttribData ) const;
+    bool DeallocateMapAttrib( string AttribName );
     void BindMapAttrib(); //binds all attributes in map
     void BindVertexArray();
     void UnBindVertexArray();

@@ -74,6 +74,7 @@ public:
     string _strPathPolyMesh;
     enInstanceManagerIterPackage * _InstanceManagerPackage;
     enRenderPass_ShadowMap_OpGL * _render_pass;
+    map< std::string, vector<double> > _temporary_game_data;
 };
 
 #endif

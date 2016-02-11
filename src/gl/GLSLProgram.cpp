@@ -128,6 +128,17 @@ bool GLSLProgram::GetMapAttrib( string AttribName, GLAttribData<float> * & Attri
     }
     return bRet;
 }
+bool GLSLProgram::DeallocateMapAttrib( string AttribName ){
+    GLAttribData<float> * AttribData;
+    if( !GetMapAttrib( AttribName, AttribData ) )
+    {
+	return false;
+    }else{
+	delete [] AttribData;
+	_MapAttrib.erase( AttribName );
+    }
+    return true;
+}
 void GLSLProgram::BindMapAttrib(){
     for(auto & i : _MapAttrib ){
         int CurrentVertexArrayIndex = _mVertexArrayIndexCount++;

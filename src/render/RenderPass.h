@@ -21,24 +21,8 @@ class RenderPass {};
 template< class PassType > 
 class RenderPass< RenderBackEndOpenGL, PassType > : public PassType {
 public:
-    bool AddToProcess( eRenderType render_type, vector< double > data ){
-	bool bRet = PassType::AddToProcess( render_type, data );
-	return bRet;
-    }
-    bool AddToProcess( eRenderType render_type, mat4 data ){
-	bool bRet = PassType::AddToProcess( render_type, data );
-	return bRet;
-    }
-    bool AddToProcess( eRenderType render_type, mat3 data ){
-	bool bRet = PassType::AddToProcess( render_type, data );
-	return bRet;
-    }
-    bool ProcessNow( GLSLProgram * glsl_program, std::string strPassType ){
-	bool bRet = PassType::ProcessNow( glsl_program, strPassType );
-	return bRet;
-    }
-    bool Clear(){
-	bool bRet = PassType::Clear();
+    bool Process( GLSLProgram * glsl_program, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
+	bool bRet = PassType::Process( glsl_program, entities, light, camera, context );
 	return bRet;
     }
 };
