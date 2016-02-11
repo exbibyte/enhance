@@ -26,6 +26,13 @@
 #include "GLRenderPassShadowMap.h"
 #include "RenderMeshOrientation.h"
 
+//testing starts
+#include "RenderLight.h"
+#include "RenderCamera.h"
+#include "RenderEntity.h"
+#include "RenderContext.h"
+//testing ends
+
 #include <functional>
 #include <iostream>
 #include <cassert>
@@ -207,149 +214,115 @@ bool SceneInit( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLS
     cout << "Size of vert_pos: " << vert_pos.size() << endl;
     cout << "Size of vert_norm: " << vert_norm.size() << endl;
 
-    game_data->_render_pass->AddToProcess( eRenderType::POLY_VERT, vert_pos );
-    game_data->_render_pass->AddToProcess( eRenderType::POLY_NORM, vert_norm );
-    
+    // game_data->_render_pass->AddToProcess( eRenderType::POLY_VERT, vert_pos );
+    // game_data->_render_pass->AddToProcess( eRenderType::POLY_NORM, vert_norm );
+    game_data->_temporary_game_data[ "POLY_VERT" ] = vert_pos;
+    game_data->_temporary_game_data[ "POLY_NORM" ] = vert_norm;
+	
    //deallocate data
     delete [] data_vertex;
     data_vertex = nullptr;
     delete [] data_normal;
     data_normal = nullptr;
 
+    game_data->_temporary_game_data["Entity_RotateAngle"] = vector<double>{ 0 };
+    
     cout << "End of Init Phase" << endl;
 
     return true;
 }
 
 bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLSLProgram ){
+    glfwMakeContextCurrent( game_data->_Window ); // this is need when calling rendering APIs on separate thread
     bool bRet;
-    scene_data->_dAngle += 0.005;
 
     enRenderPass_ShadowMap_OpGL * render = game_data->_render_pass;
 
-    mat4 Model = mat4(1.0f);
-    mat4 ModelMatrix = Model;
-        
-    //first pass render for light POV    
-    glViewport( 0, 0, 2500, 2500 );
-    // vector<double> light_direction { 0, 0, 0 };
-    // vector<double> light_up { 0, 1, 0 };
-    // render->AddToProcess( eRenderType::LIGHT_DIRECTION, light_direction );
-    // render->AddToProcess( eRenderType::LIGHT_UP, light_up );
-    mat4 ViewMatrix = glm::lookAt( vec3(0.0,0.0,20.0), 
-				   vec3(0.0,0.0,0.0),
-				   vec3(0.0,1.0,0.0) );
+    //light ----------------------------------------------------------------------
+    vector<double> light_position     { 0, 0, 10 };
+    vector<double> light_lookat       { 0, 0, 0 };
+    vector<double> light_up           { 0, 1, 0 };
+    vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
+    vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
+    vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
+    vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
 
-    mat4 ProjectionMatrixLight = glm::perspective( 60.0f, 1.0f, 0.1f, 1000.0f );
+    //camera ---------------------------------------------------------------------
+    vector<double> camera_position    { -5, -5, 8.0 };
+    vector<double> camera_lookat      { 0, 0, 0 };
+    vector<double> camera_up          { 0, 1, 0 };
+    vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
+    vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
+    vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
+    vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
 
-    GLTexture * ShadowTexture;
-    if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
-	ShadowTexture->BindFbo();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	int iActiveTexture;
-	ShadowTexture->GetActiveTexture( iActiveTexture );
-	bRet = _GLSLProgram->SetUniform( "ShadowMap", iActiveTexture );
-    }
+    //context --------------------------------------------------------------------
+    vector<int> context_windowsize { 500, 500 };
+    vector<int> context_texturesize_shadowmap { 2500, 2500 };
+    string context_title = "ENHANCE_WIP";
 
-    // GLuint RecordDepthIndex = glGetSubroutineIndex( _GLSLProgram->GetHandle(), GL_FRAGMENT_SHADER, "recordDepth" ); 
-    // glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &RecordDepthIndex);
+    //entities -------------------------------------------------------------------
+    //orientation	
+    vector<double> entity_translate    { 0, 0, 0};
+    vector<double> entity_rotate_axis  { 1, 0, 0};
+    // vector<double> entity_rotate_angle { 0 };
+    double rotation_angle = game_data->_temporary_game_data["Entity_RotateAngle"][0];
+    vector<double> entity_rotate_angle { rotation_angle };
+    //set material data
+    vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
+    vector<double> entity_material_diffuse   { 1, 1, 1 };
+    vector<double> entity_material_specular  { 1, 1, 1 };
+    vector<double> entity_material_shininess { 2 };
+    //set vertex data 
+    vector<double> entity_vertices = game_data->_temporary_game_data[ "POLY_VERT" ];
+    vector<double> entity_normals = game_data->_temporary_game_data[ "POLY_NORM" ];
+	
+    RenderLight * light = new RenderLight;;
+    light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
+    light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
+    light->AddDataSingle( RenderLightData::Up(),          light_up          );
+    light->AddDataSingle( RenderLightData::Perspective(), light_perspective );
+    light->AddDataSingle( RenderLightData::Ambient(),     light_ambient     );
+    light->AddDataSingle( RenderLightData::Diffuse(),     light_diffuse     );
+    light->AddDataSingle( RenderLightData::Specular(),    light_specular    );
 
-    //draw on first pass
+    RenderCamera * camera = new RenderCamera;
+    camera->AddDataSingle( RenderCameraData::Coordinate(),  camera_position    );
+    camera->AddDataSingle( RenderCameraData::Lookat(),      camera_lookat      );
+    camera->AddDataSingle( RenderCameraData::Up(),          camera_up          );
+    camera->AddDataSingle( RenderCameraData::Perspective(), camera_perspective );
+    camera->AddDataSingle( RenderCameraData::Ambient(),     camera_ambient     );
+    camera->AddDataSingle( RenderCameraData::Diffuse(),     camera_diffuse     );
+    camera->AddDataSingle( RenderCameraData::Specular(),    camera_specular    );
 
-    //set light parameters
-    vector<double> light_position { 0, 0, 20 };
-    vector<double> light_ambient { 0.05, 0.05, 0.05 };
-    vector<double> light_diffuse { 0.5, 0.5, 0.5 };
-    vector<double> light_specular { 0.45, 0.45, 0.45 };
-    render->AddToProcess( eRenderType::LIGHT_COORDINATE, light_position );
-    render->AddToProcess( eRenderType::LIGHT_COEFF_AMBIENT, light_ambient );
-    render->AddToProcess( eRenderType::LIGHT_COEFF_DIFFUSE, light_diffuse );
-    render->AddToProcess( eRenderType::LIGHT_COEFF_SPECULAR, light_specular );
-    float fDeltaLight = -0.01;
-    vec3 LightPosition( 0.0f, 0.0f, 20.0f );
-    mat4 LightViewMatrixOriginal = ViewMatrix;
+    RenderContext * context = new RenderContext;
+    context->AddDataSingle( RenderContextData::WindowSize(),           context_windowsize );
+    context->AddDataSingle( RenderContextData::TextureSizeShadowMap(), context_texturesize_shadowmap );
+    context->AddDataSingle( RenderContextData::Title(),                context_title );
 
-    //set material parameters
-    vector<double> material_ambient { 1, 1, 1 };
-    vector<double> material_diffuse { 1, 1, 1 };
-    vector<double> material_specular { 1, 1, 1 };
-    vector<double> material_shininess { 2 };
-    render->AddToProcess( eRenderType::MATERIAL_COEFF_AMBIENT, material_ambient );
-    render->AddToProcess( eRenderType::MATERIAL_COEFF_DIFFUSE, material_diffuse );
-    render->AddToProcess( eRenderType::MATERIAL_COEFF_SPECULAR, material_specular );
-    render->AddToProcess( eRenderType::MATERIAL_COEFF_SHININESS, material_shininess );
+    list< RenderEntity * > * entities = new list< RenderEntity * >;
+    RenderEntity * entity_01 = new RenderEntity;
+    entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
+    entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
+    entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
 
-    //set render matrices for 1st pass
-    RenderMeshOrientation render_mesh_orientation_firstpass;
-    //set orientation for the objects to render below
-    mat4 ObjOrientationMatrix = glm::rotate( Model, -2 * scene_data->_dAngle, vec3( 0.0f, 0.5f, 0.7f ) );
-    render_mesh_orientation_firstpass._MatOrientation = ModelMatrix;
-    render_mesh_orientation_firstpass._MatView = ViewMatrix;
-    render_mesh_orientation_firstpass._MatProjection = ProjectionMatrixLight;
-    render_mesh_orientation_firstpass._MatLightProjection = ProjectionMatrixLight;
-    render_mesh_orientation_firstpass._MatLightView = LightViewMatrixOriginal;
-    render_mesh_orientation_firstpass.ComputeCompositeMats();
+    entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
+    entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
+    entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
+    entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
+    entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
+    entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
 
-    //get computed matrices for rendering
-    mat4 model_view_matrix;
-    mat4 model_view_proj_matrix;
-    mat4 model_view_pro_bias_matrix;
-    mat3 normal_matrix;
-    mat4 light_view = LightViewMatrixOriginal;
-    render_mesh_orientation_firstpass.GetCompositeMats( model_view_matrix, model_view_proj_matrix, model_view_pro_bias_matrix, normal_matrix );
-    render->AddToProcess( eRenderType::MODEL_VIEW_MATRIX, model_view_matrix );
-    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_MATRIX, model_view_proj_matrix );
-    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_BIAS_MATRIX, model_view_pro_bias_matrix );
-    render->AddToProcess( eRenderType::NORMAL_MATRIX, normal_matrix );
-    render->AddToProcess( eRenderType::LIGHT_VIEW_MATRIX, light_view );
+    entities->push_back( entity_01 );
 
-    render->ProcessNow( _GLSLProgram, "DEPTH" );
-    render->Clear();
-    
-    //2nd pass render
-    glViewport( 0, 0, 500, 500 );
-    ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
-			      vec3(0.0,0.0,0.0),
-			      vec3(0.0,1.0,0.0) );
-        
-    mat4 ViewOrientationMatrix = glm::rotate( Model, - scene_data->_dAngle, vec3( 0.0f, 0.2f, 0.7f ) );
-    ViewMatrix = ViewMatrix * ViewOrientationMatrix;
-                
-    //draw on 2nd pass
-    mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f );
+    render->Process( _GLSLProgram, entities, light, camera, context );
 
-    //set rendering matrices
-    RenderMeshOrientation render_mesh_orientation_secondpass;
-    render_mesh_orientation_secondpass._MatOrientation = ModelMatrix;
-    render_mesh_orientation_secondpass._MatView = ViewMatrix;
-    render_mesh_orientation_secondpass._MatProjection = ProjectionMatrix;
-    render_mesh_orientation_secondpass._MatLightProjection = ProjectionMatrixLight;
-    render_mesh_orientation_secondpass._MatLightView = LightViewMatrixOriginal;
-    render_mesh_orientation_secondpass.ComputeCompositeMats();
+    delete entity_01;
+    delete entities;
+    delete context;
+    delete camera;
+    delete light;
 
-    //get computed matrices for rendering
-    mat4 model_view_matrix_2nd;
-    mat4 model_view_proj_matrix_2nd;
-    mat4 model_view_pro_bias_matrix_2nd;
-    mat3 normal_matrix_2nd;
-    mat4 light_view_2nd = LightViewMatrixOriginal;
-    render_mesh_orientation_secondpass.GetCompositeMats( model_view_matrix_2nd, model_view_proj_matrix_2nd, model_view_pro_bias_matrix_2nd, normal_matrix_2nd );
-    render->AddToProcess( eRenderType::MODEL_VIEW_MATRIX, model_view_matrix_2nd );
-    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_MATRIX, model_view_proj_matrix_2nd );
-    render->AddToProcess( eRenderType::MODEL_VIEW_PERSPECTIVE_BIAS_MATRIX, model_view_pro_bias_matrix_2nd );
-    render->AddToProcess( eRenderType::NORMAL_MATRIX, normal_matrix_2nd );
-    render->AddToProcess( eRenderType::LIGHT_VIEW_MATRIX, light_view_2nd );
-
-    //render all objects for 2nd pass
-    if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
-	ShadowTexture->UnbindFbo();
-    }
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-//    bRet = _GLSLProgram->SetUniform( "Light.Position", LightPosition );
-
-    render->ProcessNow( _GLSLProgram, "NORMAL" );
-    render->Clear();
-    
     return true;
 }
 
@@ -401,6 +374,10 @@ void InitWindow( enGameData * game_data, string strPathPolyMesh ){
 void RenderScene( enGameData * game_data ){
     glfwMakeContextCurrent( game_data->_Window ); // this is need when calling rendering APIs on separate thread
     // game_data->_SceneManagers["DEFAULT"]->RunBody();
+
+    //update rotation angle of entity    
+    game_data->_temporary_game_data["Entity_RotateAngle"][0] += 0.05;
+
     bool bRet = game_data->_SceneManagers["DEFAULT"]->RunBodySpecified("body_RenderScene");
     if( !bRet ){
 	cout << "Rendering call returned false" << endl;
@@ -410,7 +387,7 @@ void RenderScene( enGameData * game_data ){
 
 void ClockTask( enGameData * game_data ) {
     Clock render_clock;
-    render_clock.SetFps(28);
+    render_clock.SetFps(25);
     bool bClockTicked = false;
     auto FuncClockTicked = [ &bClockTicked ](){
 	bClockTicked = true;

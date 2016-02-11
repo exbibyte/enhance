@@ -1,6 +1,12 @@
 #include "PassType_ShadowMap_OpGL.h"
 #include "GLSLProgram.h"
-#include "RenderType.h"
+#include "RenderContext.h"
+#include "RenderEntity.h"
+#include "RenderLight.h"
+#include "RenderCamera.h"
+#include "RenderPoly.h"
+#include "RenderVertex.h"
+#include "RenderMaterial.h"
 
 #include <GLFW/glfw3.h>
 
@@ -8,155 +14,95 @@
 #include <cassert>
 #include <string>
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
-bool PassType_ShadowMap_OpGL::AddToProcess( eRenderType render_type, vector< double > render_data ){
-    // add data pertaining to different render types
-    auto it_find = _map_render_double.find( render_type );
-    if( _map_render_double.end() == it_find ){
-	_map_render_double[ render_type ] = render_data;
-    }else{
-	it_find->second.insert( it_find->second.end(), render_data.begin(), render_data.end() );
-    }
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::AddToProcess( eRenderType render_type, mat4 render_data ){
-    // add data pertaining to different render types
-    auto it_find = _map_render_mat4.find( render_type );
-    if( _map_render_mat4.end() == it_find ){
-	vector< mat4 > new_item { render_data };
-	_map_render_mat4[ render_type ] = new_item;
-    }else{
-	it_find->second.push_back( render_data );
-    }
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::AddToProcess( eRenderType render_type, mat3 render_data ){
-    // add data pertaining to different render types
-    auto it_find = _map_render_mat3.find( render_type );
-    if( _map_render_mat3.end() == it_find ){
-	vector< mat3 > new_item { render_data };
-	_map_render_mat3[ render_type ] = new_item;
-    }else{
-	it_find->second.push_back( render_data );
-    }
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::ProcessNow( GLSLProgram * glsl_program, string strPassType ){
+bool PassType_ShadowMap_OpGL::Process( GLSLProgram * glsl_program, list< RenderEntity *> * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
     bool bRet = true;
+    if( !glsl_program ){
+	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::Process()");
+	return false;
+    }
+    if( !entities ||
+	!light ||
+    	!camera ||
+    	!context ){
+    	return false;
+    }
 
-    //convert data to array
-    float * vert_pos = nullptr;
-    float * vert_norm = nullptr;
-    int iNumDataVertex;
-    int iNumDataNormal;
-    //retrieve GL attribute handles
-    GLAttribData<float> * attrib_PositionData;
-    GLAttribData<float> * attrib_NormalData;
-    if( !glsl_program->GetMapAttrib( "VertexPosition", attrib_PositionData ) ){
-	assert( 0 && "VertexPosition attribute not found in PassType_ShadowMap_OpGL::ProcessNow" );
+    //retrieve render context data
+    RenderContextData::WindowSize::Type data_windowsize;
+    RenderContextData::TextureSizeShadowMap::Type data_texturesize_shadowmap;
+    RenderContextData::Title::Type data_title;
+    if( !context->Compute( data_windowsize, data_texturesize_shadowmap, data_title ) ){
+	assert( 0 && "RenderContext Compute() failed." );
 	return false;
     }
-    if( !glsl_program->GetMapAttrib( "VertexNormal", attrib_NormalData ) ){
-	assert( 0 && "VertexNormal attribute not found in PassType_ShadowMap_OpGL::ProcessNow" );
-	return false;
-    }
-    {
-	auto it_find = _map_render_double.find( eRenderType::POLY_VERT );
-	if( _map_render_double.end() == it_find ){
-	    assert( 0 && "Cannot find POLY_VERT in PassType_ShadowMap_OpGL" );
+    // switch( pass_type ){
+    // case PassType::DEPTH:
+    // {
+        //first pass render for light POV
+	//bind shadow map texture prior to rendering with light's POV
+	GLTexture * ShadowTexture;
+	if( glsl_program->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
+	    ShadowTexture->BindFbo();
+	    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	    int iActiveTexture;
+	    ShadowTexture->GetActiveTexture( iActiveTexture );
+	    bRet = glsl_program->SetUniform( "ShadowMap", iActiveTexture );
+	} else {
+	    assert( 0 && "Can't find ShadowTexture." );
 	    return false;
 	}
-	iNumDataVertex = it_find->second.size();
-	vert_pos = new float[ iNumDataVertex ];
-	float * p_data = vert_pos;
-	for( auto & i : it_find->second ){
-	    *p_data++ = (float)i;
-	}
-    }
-    {
-	auto it_find = _map_render_double.find( eRenderType::POLY_NORM );
-	if( _map_render_double.end() == it_find ){
-	    assert( 0 && "Cannot find POLY_NORM in PassType_ShadowMap_OpGL" );
-	    return false;
-	}
-	iNumDataNormal = it_find->second.size();
-	vert_norm = new float[ iNumDataNormal ];
-	float * p_data = vert_norm;
-	for( auto & i : it_find->second ){
-	    *p_data++ = (float)i;
-	}
-    }
 
-    if( iNumDataVertex != iNumDataNormal ){
-	assert( 0 && "Vertex and Normal count not equal in PassType_ShadowMap_OpGL" );
-	delete vert_pos;
-	delete vert_norm;
-	return false;
-    }else{
-	_CountRenderVerts = iNumDataVertex;
-    }
-    //generate VBO, populate and bind data to vertex attribute arrays
-    attrib_PositionData->SetData( vert_pos, 3, iNumDataVertex );
-    attrib_NormalData->SetData( vert_norm, 3, iNumDataNormal );
+	//set render window with rendering context data: view port size
+	int width = data_texturesize_shadowmap[0];
+	int height = data_texturesize_shadowmap[1];
+	glViewport( 0, 0, width, height );
 
-    delete [] vert_pos;
-    delete [] vert_norm;
+	bRet = glsl_program->SetUniform( "bShadeShadow", false );
+	glCullFace(GL_BACK);
 
-    if( "DEPTH" == strPassType ){
-        //first pass render for light POV    
-        glViewport( 0, 0, 2500, 2500 );
-	bRet = ProcessPassDepth( glsl_program );
+	bRet = ProcessPassCommon( PassType::DEPTH, glsl_program, entities, light, camera, context );
 	if( !bRet ){
-	    return false;
+	    assert( 0 && "GLRenderPassShadowMap::ProcessPassCommon() for Depth Render failed");
 	}
-    }else{
+    // }
+    // 	break;
+    // case PassType::NORMAL:
+    // {
 	//2nd pass render
-        glViewport( 0, 0, 500, 500 );
-	bRet = ProcessPassNormal( glsl_program );
-	if( !bRet ){
+	//unbind shadow map texture prior to rendering from light's POV
+	// GLTexture * ShadowTexture;
+	if( glsl_program->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
+	    ShadowTexture->UnbindFbo();
+	} else {
+	    assert( 0 && "Can't find ShadowTexture." );
 	    return false;
 	}
-    }
-    return bRet;
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	
+	//set render window with rendering context data: view port size
+	width = data_windowsize[0];
+	height = data_windowsize[1];
+	glViewport( 0, 0, width, height );
+		
+	bRet = glsl_program->SetUniform( "bShadeShadow", true );
+	glCullFace(GL_BACK);
+	bRet = ProcessPassCommon( PassType::NORMAL, glsl_program, entities, light, camera, context );
+	if( !bRet ){
+	    assert( 0 && "GLRenderPassShadowMap::ProcessPassCommon() for Normal Render failed");
+	}
+    // }
+    // 	break;
+    // default:
+    // 	return false;
+    // }
+    return true;
 }
 
-bool PassType_ShadowMap_OpGL::ProcessPassDepth( GLSLProgram * glsl_program ){
-    bool bRet = true;
-    if( !glsl_program ){
-	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::ProcessPassDepth()");
-	return false;
-    }
-    bRet = glsl_program->SetUniform( "bShadeShadow", false );
-    glCullFace(GL_BACK);
-    bRet = ProcessPassCommon( glsl_program );
-    if( !bRet ){
-	assert( 0 && "GLRenderPassShadowMap::ProcessPassDepth() failed");
-    }
-
-    return bRet;
-}
-
-bool PassType_ShadowMap_OpGL::ProcessPassNormal( GLSLProgram * glsl_program ){
-    bool bRet = true;
-    if( !glsl_program ){
-	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::ProcessPassNormal()");
-	return false;
-    }
-    bRet = glsl_program->SetUniform( "bShadeShadow", true );
-    glCullFace(GL_BACK);
-    bRet = ProcessPassCommon( glsl_program );
-    if( !bRet ){
-	assert( 0 && "GLRenderPassShadowMap::ProcessPassNormal() failed");
-    }
-    return bRet;
-}
-
-bool PassType_ShadowMap_OpGL::ProcessPassCommon( GLSLProgram * glsl_program ){
+bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram * glsl_program, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
     bool bRet = true;
 
     if( !glsl_program ){
@@ -164,185 +110,181 @@ bool PassType_ShadowMap_OpGL::ProcessPassCommon( GLSLProgram * glsl_program ){
 	return false;
     }
 
-    //retrieve matrices needed for rendering, TODO
-    vector< mat4 > attrib_model_view_matrix;
-    vector< mat4 > attrib_model_view_perspective_matrix;
-    vector< mat4 > attrib_model_view_perspective_bias_matrix;
-    vector< mat3 > attrib_normal_matrix;
-    vector< mat4 > attrib_light_view_matrix;
-    
-    if( !GetAttribute( eRenderType::MODEL_VIEW_MATRIX, attrib_model_view_matrix ) ){
-	assert( 0 && "Cannot find Model View Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
+    /// light --------------------------------------------------------------
+    //retrieve the above attributes
+    RenderLightData::Ambient::Type light_data_ambient;
+    RenderLightData::Diffuse::Type light_data_diffuse;
+    RenderLightData::Specular::Type light_data_specular;
+    RenderLightData::Coordinate::Type light_data_coordinate;
+    mat4 light_perspective_frust_matrix;
+    mat4 light_view_matrix;
+    if( !light->Compute( light_data_ambient, light_data_diffuse, light_data_specular, light_data_coordinate,
+			 light_perspective_frust_matrix,
+			 light_view_matrix ) ){
+	assert( 0 && "RenderLight Compute() failed." );
+	return false;
     }
-    if( !GetAttribute( eRenderType::MODEL_VIEW_PERSPECTIVE_MATRIX, attrib_model_view_perspective_matrix ) ){
-	assert( 0 && "Cannot find Model View Perspective Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
-    }
-    if( !GetAttribute( eRenderType::MODEL_VIEW_PERSPECTIVE_BIAS_MATRIX, attrib_model_view_perspective_bias_matrix ) ){
-	assert( 0 && "Cannot find Model View Perspective Bias Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
-    }
-    if( !GetAttribute( eRenderType::NORMAL_MATRIX, attrib_normal_matrix ) ){
-	assert( 0 && "Cannot find Normal Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
-    }
-    if( !GetAttribute( eRenderType::LIGHT_VIEW_MATRIX, attrib_light_view_matrix ) ){
-	assert( 0 && "Cannot find Light View Matrix attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );	
-    }
-
     //retrieve light data
-    vec3 Light_Position_3;
-    vec4 Light_Position;
-    vec3 Light_Ambient;
-    vec3 Light_Diffuse;
-    vec3 Light_Specular;
-    //light position
-    if( !GetAttribute( eRenderType::LIGHT_COORDINATE, Light_Position_3 ) ){
-	assert( 0 && "Cannot find Light Coordinate attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
-    Light_Position = vec4( Light_Position_3, 1.0f );
-    //light ambient
-    if( !GetAttribute( eRenderType::LIGHT_COEFF_AMBIENT, Light_Ambient ) ){
-	assert( 0 && "Cannot find Light Ambient attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
-    //light diffuse
-    if( !GetAttribute( eRenderType::LIGHT_COEFF_DIFFUSE, Light_Diffuse ) ){
-	assert( 0 && "Cannot find Light Diffuse attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
-    //light specular
-    if( !GetAttribute( eRenderType::LIGHT_COEFF_SPECULAR, Light_Specular ) ){
-	assert( 0 && "Cannot find Light Specular attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
+    vec4 Light_Position = vec4( light_data_coordinate[0], light_data_coordinate[1], light_data_coordinate[2], 1 );
+    vec3 Light_Ambient = vec3( light_data_ambient[0], light_data_ambient[1], light_data_ambient[2] );
+    vec3 Light_Diffuse = vec3( light_data_diffuse[0], light_data_diffuse[1], light_data_diffuse[2] );
+    vec3 Light_Specular = vec3( light_data_specular[0], light_data_specular[1], light_data_specular[2] );
     //set light data
     bRet = glsl_program->SetUniform( "Light.Position", Light_Position );
     bRet = glsl_program->SetUniform( "Light.La", Light_Ambient );
     bRet = glsl_program->SetUniform( "Light.Ld", Light_Diffuse );
     bRet = glsl_program->SetUniform( "Light.Ls", Light_Specular );
 
-    //retrieve material data
-    vec3 Material_Ambient;
-    vec3 Material_Diffuse;
-    vec3 Material_Specular;
-    float Material_Shininess;
-    //material ambient
-    if( !GetAttribute( eRenderType::MATERIAL_COEFF_AMBIENT, Material_Ambient ) ){
-	assert( 0 && "Cannot find Material Ambient attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+    /// camera -------------------------------------------------------------
+    vec3 Camera_Position_3;
+    vec4 Camera_Position;
+    vec3 Camera_Ambient;
+    vec3 Camera_Diffuse;
+    vec3 Camera_Specular;
+    RenderCameraData::Ambient::Type camera_data_ambient;
+    RenderCameraData::Diffuse::Type camera_data_diffuse;
+    RenderCameraData::Specular::Type camera_data_specular;
+    RenderCameraData::Coordinate::Type camera_data_coordinate;
+    mat4 camera_perspective_frust_matrix;
+    mat4 camera_view_matrix;
+    if( !camera->Compute( camera_data_ambient, camera_data_diffuse,
+			  camera_data_specular, camera_data_coordinate,
+			  camera_perspective_frust_matrix,
+			  camera_view_matrix ) ){
+	assert( 0 && "RenderCamera Compute() failed." );
+	return false;
     }
-    //material diffuse
-    if( !GetAttribute( eRenderType::MATERIAL_COEFF_DIFFUSE, Material_Diffuse ) ){
-	assert( 0 && "Cannot find Material Diffuse attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
+
+    /// per entity ---------------------------------------------------------
+    for( auto * entity : *entities ){
+	// if( !entity ){
+	//     assert( 0 && "entity data invalid." );
+	//     return false;
+	// }
+	GLAttribData<float> * attrib_PositionData;
+	GLAttribData<float> * attrib_NormalData;
+	if( !glsl_program->GetMapAttrib( "VertexPosition", attrib_PositionData ) ){
+	    assert( 0 && "VertexPosition attribute not found in PassType_ShadowMap_OpGL::ProcessNow" );
+	    return false;
+	}
+	if( !glsl_program->GetMapAttrib( "VertexNormal", attrib_NormalData ) ){
+	    assert( 0 && "VertexNormal attribute not found in PassType_ShadowMap_OpGL::ProcessNow" );
+	    return false;
+	}
+	
+	/// retrieve polygon vertex and normal data --------------------------
+	RenderVertexData::Vertices::Type vertices;
+	RenderVertexData::Normals::Type normals;
+	if( !entity->Compute( RenderVertexData(), vertices, normals ) ){
+	    assert( 0 && "RenderVertex Compute() failed." );
+	    return false;
+	}
+
+	int iSizeVertexData = vertices.size();
+	float * vertex_coord = new float[ iSizeVertexData ];
+	float * vertex_normal = new float[ iSizeVertexData ];
+	float * vertex_coord_iter = vertex_coord;
+	float * vertex_normal_iter = vertex_normal;
+	auto it_vertices = vertices.begin();
+	auto it_normals = normals.begin();
+	for( int i = 0; i < iSizeVertexData; ++i ){
+	    *vertex_coord_iter = (float)*it_vertices;
+	    *vertex_normal_iter = (float)*it_normals;
+	    ++vertex_coord_iter;
+	    ++vertex_normal_iter;
+	    ++it_vertices;
+	    ++it_normals;
+	}
+	//generate VBO, populate and bind data to vertex attribute arrays
+	attrib_PositionData->SetData( vertex_coord, 3, iSizeVertexData );
+	attrib_NormalData->SetData( vertex_normal, 3, iSizeVertexData );
+
+	glsl_program->BindVertexArray();
+	
+	/// retrive entity orientation data ----------------------------------
+	RenderPolyData::Coordinate::Type entity_coordinate;
+	RenderPolyData::RotationAxis::Type entity_rotation_axis;
+	RenderPolyData::RotationAngle::Type entity_rotation_angle;
+	mat4 entity_orientation_matrix;
+	if( !entity->Compute( RenderPolyData(), entity_coordinate, entity_rotation_axis, entity_rotation_angle, entity_orientation_matrix ) ){
+	    assert( 0 && "RenderPoly Compute() failed." );
+	    return false;
+	}
+
+	//retrieve matrices needed for rendering, TODO
+	mat4 Bias(
+	    0.5, 0.0, 0.0, 0.0,
+	    0.0, 0.5, 0.0, 0.0,
+	    0.0, 0.0, 0.5, 0.0,
+	    0.5, 0.5, 0.5, 1.0
+	    );
+
+	mat4 view_matrix_light_or_camera;
+	mat4 perspective_matrix_light_or_camera;
+	//use light or camera view depending on pass_type
+	//use light or camera perspective depending on pass_type
+	switch( pass_type ){
+	case PassType::DEPTH:
+	{
+	    view_matrix_light_or_camera = light_view_matrix;
+	    perspective_matrix_light_or_camera = light_perspective_frust_matrix;
+	}
+	    break;
+	case PassType::NORMAL:
+	{
+	    view_matrix_light_or_camera = camera_view_matrix;
+	    perspective_matrix_light_or_camera = camera_perspective_frust_matrix;
+	}
+	    break;
+	default:
+	    assert( 0 && "PassType invalid." );
+	    return false;
+	}
+
+	mat4 attrib_model_view_matrix = view_matrix_light_or_camera * entity_orientation_matrix;
+	mat4 attrib_model_view_perspective_matrix = perspective_matrix_light_or_camera * view_matrix_light_or_camera * entity_orientation_matrix;
+	// MVPB matrix's view and perspective matrices are from light's POV
+	mat4 attrib_model_view_perspective_bias_matrix = Bias * light_perspective_frust_matrix * light_view_matrix * entity_orientation_matrix;
+	mat3 attrib_normal_matrix = glm::inverse( glm::transpose( glm::mat3( attrib_model_view_matrix ) ) );
+	mat4 attrib_light_view_matrix = light_view_matrix;
+
+	/// retrieve material data ------------------------------------------
+	RenderMaterialData::Ambient::Type data_ambient;
+	RenderMaterialData::Diffuse::Type data_diffuse;
+	RenderMaterialData::Specular::Type data_specular;
+	RenderMaterialData::Shininess::Type data_shininess;
+	if( !entity->Compute( RenderMaterialData(), data_ambient, data_diffuse, data_specular, data_shininess ) ){
+	    assert( 0 && "RenderVertex Compute() failed." );
+	    return false;
+	}
+	vec3 Material_Ambient = vec3( data_ambient[0], data_ambient[1], data_ambient[2] );
+	vec3 Material_Diffuse = vec3( data_diffuse[0], data_diffuse[1], data_diffuse[2] );
+	vec3 Material_Specular = vec3( data_specular[0], data_specular[1], data_specular[2] );
+	float Material_Shininess = data_shininess[0];
+	//set material data
+	bRet = glsl_program->SetUniform( "Material.Ka", Material_Ambient );
+	bRet = glsl_program->SetUniform( "Material.Kd", Material_Diffuse );
+	bRet = glsl_program->SetUniform( "Material.Ks", Material_Specular );
+	bRet = glsl_program->SetUniform( "Material.Shininess", Material_Shininess );
+
+	bRet = glsl_program->SetUniform( "ShadowMatrix", (mat4 const) attrib_model_view_perspective_bias_matrix );
+	bRet = glsl_program->SetUniform( "MVP", (mat4 const) attrib_model_view_perspective_matrix );
+	bRet = glsl_program->SetUniform( "ModelViewMatrix", (mat4 const) attrib_model_view_matrix );
+	bRet = glsl_program->SetUniform( "NormalMatrix", (mat3 const) attrib_normal_matrix );
+	bRet = glsl_program->SetUniform( "LightViewMatrix", (mat4 const) attrib_light_view_matrix );
+
+	// glsl_program->BindVertexArray();
+
+	//render everything in the buffer for now	
+	GLBufferInfo render_buffer_info;
+	render_buffer_info._Name = "Default_Render_Buffer";
+	render_buffer_info._Offset = 0;
+	render_buffer_info._Length = iSizeVertexData;
+	glsl_program->SetBufferInfo( &render_buffer_info );
+	glsl_program->SetCurrentBufferInfo( "Default_Render_Buffer" );
+	glsl_program->DrawCurrentBufferSegment();
+
+	glsl_program->UnBindVertexArray();
     }
-    //material specular
-    if( !GetAttribute( eRenderType::MATERIAL_COEFF_SPECULAR, Material_Specular ) ){
-	assert( 0 && "Cannot find Material Specular attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
-    //material shininess
-    if( !GetAttribute( eRenderType::MATERIAL_COEFF_SHININESS, Material_Shininess ) ){
-	assert( 0 && "Cannot find Material Shininess attribute in PassType_ShadowMap_OpGL::ProcessPassCommon" );
-    }
-    //set material data
-    bRet = glsl_program->SetUniform( "Material.Ka", Material_Ambient );
-    bRet = glsl_program->SetUniform( "Material.Kd", Material_Diffuse );
-    bRet = glsl_program->SetUniform( "Material.Ks", Material_Specular );
-    bRet = glsl_program->SetUniform( "Material.Shininess", Material_Shininess );
-    
-    //use the first item from the vector for now
-    mat4 ModelViewMatrix = attrib_model_view_matrix[0];
-    mat4 MVP = attrib_model_view_perspective_matrix[0];
-    mat4 MVPB = attrib_model_view_perspective_bias_matrix[0];
-    mat3 NormalMatrix = attrib_normal_matrix[0];
-    mat4 LightViewMatrix = attrib_light_view_matrix[0];
-
-    bRet = glsl_program->SetUniform( "ShadowMatrix", (mat4 const) MVPB );
-    bRet = glsl_program->SetUniform( "MVP", (mat4 const) MVP );
-    bRet = glsl_program->SetUniform( "ModelViewMatrix", (mat4 const) ModelViewMatrix );
-    bRet = glsl_program->SetUniform( "NormalMatrix", (mat3 const) NormalMatrix );
-    bRet = glsl_program->SetUniform( "LightViewMatrix", (mat4 const) LightViewMatrix );
-    
-    glsl_program->BindVertexArray();
-
-    //render everything in the buffer for now	
-    GLBufferInfo render_buffer_info;
-    render_buffer_info._Name = "Default_Render_Buffer";
-    render_buffer_info._Offset = 0;
-    render_buffer_info._Length = _CountRenderVerts;
-    glsl_program->SetBufferInfo( &render_buffer_info );
-    glsl_program->SetCurrentBufferInfo( "Default_Render_Buffer" );
-    glsl_program->DrawCurrentBufferSegment();
-
-    glsl_program->UnBindVertexArray();
-
     return bRet;
-}
-
-bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vector< mat4 > & attrib ){
-    auto it = _map_render_mat4.find( render_type );
-    if( _map_render_mat4.end() == it ){
-	return false;
-    }
-    if( it->second.empty() ){
-	return false;
-    }
-    attrib = it->second;
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vector< mat3 > & attrib ){
-    auto it = _map_render_mat3.find( render_type );
-    if( _map_render_mat3.end() == it ){
-	return false;
-    }
-    if( it->second.empty() ){
-	return false;
-    }
-    attrib = it->second;
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vec3 & attrib ){
-    auto it = _map_render_double.find( render_type );
-    if( _map_render_double.end() == it ){
-	return false;
-    }
-    if( it->second.empty() ){
-	return false;
-    }
-    if( it->second.size() < 3 ){
-	return false;
-    }
-    attrib = vec3( it->second[0], it->second[1], it->second[2] );
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, vec4 & attrib ){
-    auto it = _map_render_double.find( render_type );
-    if( _map_render_double.end() == it ){
-	return false;
-    }
-    if( it->second.empty() ){
-	return false;
-    }
-    if( it->second.size() < 4 ){
-	return false;
-    }
-    attrib = vec4( it->second[0], it->second[1], it->second[2], it->second[3] );
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::GetAttribute( eRenderType render_type, float & attrib ){
-    auto it = _map_render_double.find( render_type );
-    if( _map_render_double.end() == it ){
-	return false;
-    }
-    if( it->second.empty() ){
-	return false;
-    }
-    if( it->second.size() < 1 ){
-	return false;
-    }
-    attrib = it->second[0];
-    return true;
-}
-
-bool PassType_ShadowMap_OpGL::Clear(){
-//    _map_render_double.clear(); TODO: vertex data to be flushed
-    _map_render_mat4.clear();
-    return true;
 }

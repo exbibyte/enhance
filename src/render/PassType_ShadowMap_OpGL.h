@@ -15,30 +15,26 @@ using glm::vec3;
 
 #include <vector>
 #include <map>
+#include <type_traits>
+#include <list>
+
+#include "RenderEntity.h"
+#include "RenderLight.h"
+#include "RenderCamera.h"
+#include "RenderContext.h"
 
 class GLSLProgram;
 
 class PassType_ShadowMap_OpGL {
 public:
-    bool AddToProcess( eRenderType render_type, std::vector< double > render_data );
-    bool AddToProcess( eRenderType render_type, mat4 render_data );
-    bool AddToProcess( eRenderType render_type, mat3 render_data );
-    bool ProcessNow( GLSLProgram *, string strPassType );
-    bool Clear();
+    enum class PassType {
+	NORMAL,
+	DEPTH,
+    };
+    // bool Process( GLSLProgram *, PassType pass_type, list< RenderEntity * > entity, RenderLight * light, RenderCamera * camera, RenderContext * context );
+    bool Process( GLSLProgram *, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context );
 private:
-    bool ProcessPassDepth( GLSLProgram * );
-    bool ProcessPassNormal( GLSLProgram * );
-    bool ProcessPassCommon( GLSLProgram * );
-    std::map< eRenderType, std::vector< double > > _map_render_double;
-    std::map< eRenderType, std::vector< mat4 > > _map_render_mat4;
-    std::map< eRenderType, std::vector< mat3 > > _map_render_mat3;
-
-    bool GetAttribute( eRenderType render_type, std::vector< mat4 > & attrib );
-    bool GetAttribute( eRenderType render_type, std::vector< mat3 > & attrib );
-    bool GetAttribute( eRenderType render_type, vec3 & attrib );
-    bool GetAttribute( eRenderType render_type, vec4 & attrib );
-    bool GetAttribute( eRenderType render_type, float & attrib );
-    unsigned int _CountRenderVerts;
+    bool ProcessPassCommon( PassType, GLSLProgram *, list< RenderEntity * > * entity, RenderLight * light, RenderCamera * camera, RenderContext * context );
 };
 
 #endif
