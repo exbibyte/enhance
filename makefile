@@ -111,6 +111,9 @@ test_Thread:
 test_Octree:
 	g++ -std=c++0x -O3 ./test/math/test_Octree.cpp -I$(inc_folder_catch) -I$(inc_folder_math) -o $(build_dir)/test_octree
 
+test_TreeRb:
+	g++ -std=c++0x -O3 ./test/graph/test_TreeRb.cpp -I$(inc_folder_catch) -I$(inc_folder_graph) -o $(build_dir)/test_TreeRb
+
 test_ThreadPool:
 	g++ -std=c++0x -O0 -g -Wall ./test/core/test_ThreadPool.cpp -pthread -I$(inc_folder_core) -I$(inc_folder_catch) -o $(build_dir)/test_threadpool
 

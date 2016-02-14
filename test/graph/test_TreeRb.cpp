@@ -1,3 +1,6 @@
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
+
 #include "TreeRb.h"
 #include <cassert>
 #include <vector>
@@ -18,7 +21,7 @@ int FuncCompareInt(int a, int b){
     }
 }
 
-int main(){
+TEST_CASE( "TreeRb", "[TreeRb]" ) {
 
     int (*FuncCompare)(int,int) = &FuncCompareInt;
     
@@ -42,43 +45,43 @@ int main(){
     CTreeNodeRb<int, DataContainer> * pNodeFound;
     bool bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 3, pNodeFound);
 
-    assert( bFound );
+    CHECK( bFound );
 
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 2, pNodeFound);
-    assert( !bFound );
+    CHECK( !bFound );
 
     bool bInsert = CTreeNodeRb<int, DataContainer>::Insert( pNode, pNode1 ); //4
-    assert( bInsert );
+    CHECK( bInsert );
     bInsert = CTreeNodeRb<int, DataContainer>::Insert( pNode, pNode2 ); //6
-    assert( bInsert );
+    CHECK( bInsert );
     bInsert = CTreeNodeRb<int, DataContainer>::Insert( pNode, pNode3 );
-    assert( bInsert );
+    CHECK( bInsert );
     bInsert = CTreeNodeRb<int, DataContainer>::Insert( pNode, pNode4 );
-    assert( bInsert );
+    CHECK( bInsert );
     bInsert = CTreeNodeRb<int, DataContainer>::Insert( pNode, pNode5 );
-    assert( bInsert );
+    CHECK( bInsert );
 
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 4, pNodeFound);
-    assert( bFound );
+    CHECK( bFound );
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 5, pNodeFound);
-    assert( bFound );
+    CHECK( bFound );
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 1, pNodeFound);
-    assert( bFound );
+    CHECK( bFound );
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 6, pNodeFound);
-    assert( bFound );
+    CHECK( bFound );
     bFound = CTreeNodeRb<int, DataContainer>::Find( pNode, 0, pNodeFound);
-    assert( bFound );
+    CHECK( bFound );
 
     CTreeNodeRb<int, DataContainer> * NodeRoot;
     bFound = CTreeNodeRb<int, DataContainer>::GetRoot( pNode, NodeRoot );
     vector< pair<int, eRbColour> > KeysResult;
     bool bGet = CTreeNodeRb<int, DataContainer>::GetKeysSubTreeInOrder( NodeRoot, KeysResult );    
-    assert( KeysResult[0].first == 0 );
-    assert( KeysResult[1].first == 1 );
-    assert( KeysResult[2].first == 3 );
-    assert( KeysResult[3].first == 4 );
-    assert( KeysResult[4].first == 5 );
-    assert( KeysResult[5].first == 6 );
+    CHECK( KeysResult[0].first == 0 );
+    CHECK( KeysResult[1].first == 1 );
+    CHECK( KeysResult[2].first == 3 );
+    CHECK( KeysResult[3].first == 4 );
+    CHECK( KeysResult[4].first == 5 );
+    CHECK( KeysResult[5].first == 6 );
 
     int RootKey;
     eRbColour RootColour;
@@ -93,10 +96,10 @@ int main(){
     bRemove = CTreeNodeRb<int, DataContainer>::Remove( pNode2 ); //remove 6
     bFound = CTreeNodeRb<int, DataContainer>::GetRoot( pNode, NodeRoot );
     bGet = CTreeNodeRb<int, DataContainer>::GetKeysSubTreeInOrder( NodeRoot, KeysResult );    
-    assert( KeysResult[0].first == 0 );
-    assert( KeysResult[1].first == 3 );
-    assert( KeysResult[2].first == 4 );
-    assert( KeysResult[3].first == 5 );
+    CHECK( KeysResult[0].first == 0 );
+    CHECK( KeysResult[1].first == 3 );
+    CHECK( KeysResult[2].first == 4 );
+    CHECK( KeysResult[3].first == 5 );
 
     for( auto * i : v_pNodes ){
         delete i;
@@ -104,5 +107,4 @@ int main(){
     }
     v_pNodes.clear();
 
-    return 0;
 }
