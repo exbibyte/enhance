@@ -328,23 +328,23 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
 
 void InitWindow( enGameData * game_data, string strPathPolyMesh ){
 
-    //instance manager setup for game entities
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::PolyVertices, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightAmbient, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightSpectral, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightDiffuse, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::CameraProjection, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialAmbient, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialDiffuse, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialSpectral, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialShininess, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientOffset, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientRotation, {} );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightComposition, { eInstanceType::LightAmbient, eInstanceType::LightSpectral, eInstanceType::LightDiffuse } );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialComposition, { eInstanceType::MaterialAmbient, eInstanceType::MaterialDiffuse, eInstanceType::MaterialSpectral, eInstanceType::MaterialShininess } );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityOrientation, { eInstanceType::OrientOffset, eInstanceType::OrientRotation } );
-    game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityPackage, { eInstanceType::PolyVertices, eInstanceType::EntityOrientation, eInstanceType::MaterialComposition  } );
-    game_data->_InstanceManagerPackage->LinkManagers();
+    // //instance manager setup for game entities
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::PolyVertices, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightAmbient, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightSpectral, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightDiffuse, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::CameraProjection, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialAmbient, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialDiffuse, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialSpectral, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialShininess, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientOffset, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientRotation, {} );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightComposition, { eInstanceType::LightAmbient, eInstanceType::LightSpectral, eInstanceType::LightDiffuse } );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialComposition, { eInstanceType::MaterialAmbient, eInstanceType::MaterialDiffuse, eInstanceType::MaterialSpectral, eInstanceType::MaterialShininess } );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityOrientation, { eInstanceType::OrientOffset, eInstanceType::OrientRotation } );
+    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityPackage, { eInstanceType::PolyVertices, eInstanceType::EntityOrientation, eInstanceType::MaterialComposition  } );
+    // game_data->_InstanceManagerPackage->LinkManagers();
 
     glfwMakeContextCurrent( game_data->_Window );
     GLPrintInfo();
