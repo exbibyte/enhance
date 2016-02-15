@@ -14,6 +14,8 @@
 #include "enInstanceManagerIter.h"
 #include "enRenderPass.h"
 
+#include <cassert>
+
 class enGameData {
 public:
     enGameData( int iWindowId, int iWidth, int iHeight, std::string strWindowName ){
@@ -29,6 +31,11 @@ public:
 	    cout << "Error getting window" << endl;
 	    glfwTerminate();
 	    exit( EXIT_FAILURE );
+	}
+	glfwMakeContextCurrent( _Window );
+	GLenum err = glGetError();
+	if( GL_NO_ERROR != err ){
+	    assert( 0 && "GL error" );
 	}
 	//initialize thread pool
 	_Threadpool = new enTPCommon;

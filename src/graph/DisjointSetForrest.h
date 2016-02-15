@@ -36,6 +36,10 @@ public:
 	}
 	return node->_p;
     }
+    static bool IsSameSet( DisjointSetForrest::SetNode * node_a, DisjointSetForrest::SetNode * node_b ){
+	if( FindSet( node_a ) == FindSet( node_b ) ) return true;
+	else return false;
+    }
 };
 
 #endif

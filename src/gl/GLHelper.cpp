@@ -199,12 +199,18 @@ bool GLSetUniform( GLuint Program, char const * Name, bool val ){
 void GLPrintActiveUniforms( GLuint Program )
 {
     GLint nUniforms, maxLen;
-    glGetProgramiv( Program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLen);
+    GLenum err = glGetError();
+    glGetProgramiv( Program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLen );
+    err = glGetError();
+    if( GL_NO_ERROR != err ){
+	assert( 0 && "GL error" );
+    }
     glGetProgramiv( Program, GL_ACTIVE_UNIFORMS, &nUniforms);
     GLchar * name = (GLchar *) malloc( maxLen );
     GLint size, location;
     GLsizei written;
     GLenum type;
+    cout << "Number of uniforms: " << nUniforms << endl;
     printf(" Location | Name\n");
     printf("------------------------------------------------\n");
     for( int i = 0; i < nUniforms; ++i ) {
