@@ -27,7 +27,7 @@ TEST_CASE( "DisjointSetForrest", "[DisjointSetForrest]" ) {
       CHECK( nullptr != n4 );
       CHECK( nullptr != n5 );
   }  
-  SECTION( "union and link, find set" ) {
+  SECTION( "union and link, find set, is in same set" ) {
       bRet = DisjointSetForrest::Union( n1, n2 );
       bRet &= DisjointSetForrest::Union( n3, n4 );
       CHECK( bRet );
@@ -44,5 +44,9 @@ TEST_CASE( "DisjointSetForrest", "[DisjointSetForrest]" ) {
       n_find = DisjointSetForrest::FindSet( n5 );
       CHECK( n_find == n5 );
 
+      bRet = DisjointSetForrest::IsSameSet( n1, n2 );
+      CHECK( bRet );
+      bRet = DisjointSetForrest::IsSameSet( n1, n4 );
+      CHECK( !bRet );
   }  
 }
