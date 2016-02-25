@@ -13,6 +13,7 @@ src_folder_gl := ./src/gl
 src_folder_asset := ./src/asset
 src_folder_instance := ./src/instance
 src_folder_render := ./src/render
+src_folder_algo := ./src/algo
 
 src_folder_test_file := ./test/file
 src_folder_test_ui := ./test/ui
@@ -25,6 +26,7 @@ src_folder_test_asset := ./test/asset
 src_folder_test_en := ./test/enCode
 src_folder_test_instance := ./test/instance
 src_folder_test_render := ./test/render
+src_folder_test_algo := ./test/algo
 
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
@@ -41,6 +43,7 @@ inc_folder_gl := ./src/gl
 inc_folder_asset := ./src/asset
 inc_folder_instance := ./src/instance
 inc_folder_render := ./src/render
+inc_folder_algo := ./src/algo
 
 build_dir := ./build
 lib:= -L/usr/lib/nvidia-340 -lGL -lGLU -lGLEW -lglut
@@ -279,3 +282,6 @@ test_RenderContext:
 
 test_imgui:
 	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++1y $(src_folder_test_ui)/test_imgui.cpp $(src_folder_ui)/imgui.cpp $(src_folder_ui)/imgui_impl_glfw.cpp -I/usr/local/include -I$(inc_folder_gl) -I$(inc_folder_ui) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/test_imgui
+
+test_SortCount:
+	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortCount.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortCount
