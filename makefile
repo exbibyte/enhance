@@ -291,3 +291,6 @@ test_Heap:
 
 test_SortQuick:
 	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortQuick.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortQuick
+
+test_SortInsertion:
+	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortInsertion.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortInsertion
