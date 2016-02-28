@@ -285,3 +285,6 @@ test_imgui:
 
 test_SortCount:
 	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortCount.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortCount
+
+test_Heap:
+	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_Heap.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_Heap
