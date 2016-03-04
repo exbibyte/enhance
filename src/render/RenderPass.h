@@ -1,7 +1,6 @@
 #ifndef RENDERPASS_H
 #define RENDERPASS_H
 
-#include "RenderType.h"
 #include "RenderBackend.h"
 
 #define GLM_FORCE_RADIANS
@@ -30,13 +29,7 @@ public:
 template< class PassType > 
 class RenderPass< RenderBackEndDirectX, PassType > {
 public:
-    bool AddToProcess( eRenderType render_type, vector< double > data ){
-	return false;
-    }
-    bool ProcessNow(){
-	return false;
-    }
-    bool Clear(){
+    bool Process( GLSLProgram * glsl_program, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
 	return false;
     }
 };

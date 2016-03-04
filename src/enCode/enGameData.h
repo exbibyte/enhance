@@ -10,7 +10,6 @@
 #include "WingedEdge.h"
 #include "enTPCommon.h"
 #include "enScene.h"
-#include "enSceneSample.h"
 #include "enInstanceManagerIter.h"
 #include "enRenderPass.h"
 
