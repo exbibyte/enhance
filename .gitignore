@@ -25,3 +25,6 @@
 *~*
 documentation/
 build/
+
+# Generated Files
+*.ini
