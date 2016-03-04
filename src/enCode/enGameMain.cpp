@@ -10,7 +10,6 @@
 #include "WingedEdge.h"
 #include "enTPCommon.h"
 #include "enScene.h"
-#include "enSceneSample.h"
 #include "enGameData.h"
 #include "enRenderPass.h"
 
@@ -23,7 +22,6 @@
 #include "PolyMesh_Data_Arrays.h"
 #include "GLBufferInfo.h"
 #include "Clock.h"
-#include "GLRenderPassShadowMap.h"
 #include "RenderMeshOrientation.h"
 
 //testing starts
