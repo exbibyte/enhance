@@ -1,7 +1,9 @@
-src_files := $(wildcard ./src/*.cpp)
+src_files := $(wildcard ./src/*.cpp)AA
 src_folder_math := ./src/math
 src_folder_file := ./src/file
 src_folder_ui := ./src/ui
+src_folder_ui_imgui := ./src/ui/imgui
+src_folder_ui_imgui_gl := ./src/ui/imgui/GL
 src_folder_en := ./src/enCode
 src_folder_core := ./src/core
 src_folder_transition := ./src/transition
@@ -31,6 +33,8 @@ src_folder_test_algo := ./test/algo
 inc_folder_math := ./src/math
 inc_folder_file := ./src/file
 inc_folder_ui := ./src/ui
+inc_folder_ui_imgui := ./src/ui/imgui
+inc_folder_ui_imgui_gl := ./src/ui/imgui/GL
 inc_folder_catch := ./test
 inc_folder_en := ./src/enCode
 inc_folder_core := ./src/core
@@ -280,9 +284,6 @@ test_RenderEntity:
 test_RenderContext:
 	$(CXX) -std=c++14 -g $(src_folder_test_render)/test_RenderContext.cpp $(src_folder_math)/Vec.cpp -I$(inc_folder_catch) -I$(inc_folder_render) -I$(inc_folder_asset) -I$(inc_folder_math) -o $(build_dir)/test_RenderContext
 
-test_imgui:
-	g++ -g -DGLFW_INCLUDE_GLCOREARB -std=c++1y $(src_folder_test_ui)/test_imgui.cpp $(src_folder_ui)/imgui.cpp $(src_folder_ui)/imgui_impl_glfw.cpp -I/usr/local/include -I$(inc_folder_gl) -I$(inc_folder_ui) -ll -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -L/usr/local/lib -o $(build_dir)/test_imgui
-
 test_SortCount:
 	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortCount.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortCount
 
@@ -294,3 +295,6 @@ test_SortQuick:
 
 test_SortInsertion:
 	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortInsertion.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortInsertion
+
+test_Imgui_osx:
+	g++ -g -std=c++1y $(src_folder_test_ui)/test_Imgui.cpp $(src_folder_ui_imgui)/imgui.cpp $(src_folder_ui_imgui)/imgui_draw.cpp $(src_folder_ui_imgui)/imgui_demo.cpp $(src_folder_ui_imgui)/imgui_impl_glfw_gl3.cpp $(src_folder_ui_imgui_gl)/gl3w.c -I$(inc_folder_ui_imgui) -I$(inc_folder_ui_imgui_gl) -I/usr/local/include -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework Carbon -L/usr/local/lib -o $(build_dir)/test_Imgui_osx
