@@ -35,3 +35,10 @@ Dependencies:
 
 GLFW, OpenGL, GLM, Flex, Bison
 
+--------------------------------------------
+
+Progress:
+
+Testing of rotation and shadow mapping.
+Issues: Artifacts present when rendering on a MAC.
+https://youtu.be/x8cADzdhJhs
