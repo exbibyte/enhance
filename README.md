@@ -33,5 +33,5 @@ https://github.com/philsquared/Catch
 
 Dependencies:
 
-GLFW, OpenGL, GLM, Flex, Bison
+GLFW, gl3w, OpenGL, GLM, Flex, Bison
 
