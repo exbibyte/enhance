@@ -2,7 +2,8 @@
 #define EN_GAME_MAIN_H
 
 //opengl includes
-#include <GLFW/glfw3.h>
+#include <GL/gl3w.h>
+//#include <GLFW/glfw3.h>
 
 #include "GLSceneManager.h"
 #include "GLSLProgram.h"
@@ -23,6 +24,11 @@
 #include "GLBufferInfo.h"
 #include "Clock.h"
 #include "RenderMeshOrientation.h"
+
+#include <imgui.h>
+#include "imgui_impl_glfw_gl3.h"
+#include <GLFW/glfw3.h>
+// #include "imgui_impl_glfw.h"
 
 //testing starts
 #include "RenderLight.h"
@@ -50,6 +56,8 @@ using namespace std;
 using namespace Winged_Edge;
 
 bool bSignalExit = false;
+
+ImVec4 clear_color = ImColor(60, 60, 90);
 
 static void error_callback(int error, const char* description)
 {
@@ -345,6 +353,9 @@ void InitWindow( enGameData * game_data, string strPathPolyMesh ){
     // game_data->_InstanceManagerPackage->LinkManagers();
 
     glfwMakeContextCurrent( game_data->_Window );
+
+    gl3wInit();
+
     GLPrintInfo();
 
     glEnable(GL_DEPTH_TEST);
@@ -367,25 +378,48 @@ void InitWindow( enGameData * game_data, string strPathPolyMesh ){
     scene_manager->RegisterRoutine( "cleanup_01", func_wrap_cleanup_01, GLSceneRoutineType::CLEANUP );
 
     scene_manager->RunInit();
+    //Imgui initialization starts
+    bool bInstallCallback = false;
+    ImGui_ImplGlfwGL3_Init( game_data->_Window, bInstallCallback );
+    //Imgui initialization ends
 }
 
 void RenderScene( enGameData * game_data ){
     glfwMakeContextCurrent( game_data->_Window ); // this is need when calling rendering APIs on separate thread
-    // game_data->_SceneManagers["DEFAULT"]->RunBody();
 
     //update rotation angle of entity    
     game_data->_temporary_game_data["Entity_RotateAngle"][0] += 0.05;
 
     bool bRet = game_data->_SceneManagers["DEFAULT"]->RunBodySpecified("body_RenderScene");
     if( !bRet ){
-	cout << "Rendering call returned false" << endl;
+    	cout << "Rendering call returned false" << endl;
     }
+
+    //Imgui renderig starts
+    ImGui_ImplGlfwGL3_NewFrame();
+    {
+    	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
+    	ImGui::SetNextWindowSize(ImVec2(120,70), ImGuiSetCond_FirstUseEver);
+    	ImGui::Begin("Status UI");
+    	ImGui::ColorEdit3("clear color", (float*)&clear_color);
+    	ImGui::Text("Rendering: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    	ImGui::End();
+
+    	int display_w, display_h;
+        glfwGetFramebufferSize( game_data->_Window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    }
+    ImGui::Render();
+    //Imgui rendering ends
+
     glfwSwapBuffers( game_data->_Window );
 }
 
 void ClockTask( enGameData * game_data ) {
     Clock render_clock;
     render_clock.SetFps(25);
+    // render_clock.SetFps(0.1);
     bool bClockTicked = false;
     auto FuncClockTicked = [ &bClockTicked ](){
 	bClockTicked = true;
@@ -432,14 +466,14 @@ int main( int argc, char ** argv ){
     int major, minor, rev;
     glfwGetVersion( &major, &minor, &rev );
     cout<< "major: "<<major<<", minor: "<<minor<<", rev: "<<rev<<endl;
-
+	
     //create winow and initialize game data managers
     int iWindowId = 1;
     enGameData game_data( 1, 500, 500, "EN_GAME_MAIN" );
     enGameData * p_game_data = & game_data;
     GLFWwindow * window = game_data._Window;
     glfwMakeContextCurrent(window);
-
+    
     //add key combo and associated callback
     map<KeyButtonWhich::Enum, KeyButtonState::Enum> map_key_combo {
         { KeyButtonWhich::KEY_J, KeyButtonState::DOWN },
@@ -494,3 +528,4 @@ int main( int argc, char ** argv ){
 
 
 #endif
+

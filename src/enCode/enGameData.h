@@ -32,10 +32,10 @@ public:
 	    exit( EXIT_FAILURE );
 	}
 	glfwMakeContextCurrent( _Window );
-	GLenum err = glGetError();
-	if( GL_NO_ERROR != err ){
-	    assert( 0 && "GL error" );
-	}
+	/* GLenum err = glGetError(); */
+	/* if( GL_NO_ERROR != err ){ */
+	/*     assert( 0 && "GL error" ); */
+	/* } */
 	//initialize thread pool
 	_Threadpool = new enTPCommon;
 	_Threadpool->SetNumThreads(4);
