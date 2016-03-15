@@ -4,7 +4,7 @@ Enhance
 
 =======
 
-Experimental 3D kinematics game
+Experimental 3D rendering and engine tools for interactive application development.
 
 Checklist:
 
@@ -40,5 +40,7 @@ GLFW, gl3w, OpenGL, GLM, Flex, Bison
 Progress:
 
 Testing of rotation and shadow mapping.
-Issues: Artifacts present when rendering on a MAC.
 https://youtu.be/x8cADzdhJhs
+
+Addition of Imgui UI toolkit:
+https://youtu.be/Je6lmugDkJc
