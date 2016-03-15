@@ -1,6 +1,7 @@
 #include "GLHelper.h"
 
 #include <GLFW/glfw3.h>
+#include <OpenGL/gl3.h>
 
 ///////////
 bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
