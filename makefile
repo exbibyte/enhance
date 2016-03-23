@@ -1,4 +1,4 @@
-src_files := $(wildcard ./src/*.cpp)AA
+src_files := $(wildcard ./src/*.cpp)
 src_folder_math := ./src/math
 src_folder_file := ./src/file
 src_folder_ui := ./src/ui
