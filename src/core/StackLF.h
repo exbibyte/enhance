@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <mutex>
 
 template< class T >
 class StackLF {
@@ -15,24 +16,25 @@ public:
     };
     StackLF() : _head( nullptr ) {}
    // bool empty() const;
-    size_t size() const;
+    size_t size() const; //blocking
     bool top( T & val );
     void push( T const & val );
     bool pop( T & val );
 private:
-    std::atomic< Node * > _head;    
+    std::atomic< Node * > _head;
+    mutable std::mutex _mutex;
 };
 template< class T >
 void StackLF<T>::push( T const & val ){
     Node * new_node = new Node( val );
-    Node * head = _head.load();
+    Node * head = _head.load( std::memory_order_relaxed );
     new_node->_next = head;
-    while( !_head.compare_exchange_weak( new_node->_next, new_node ) );
+    while( !_head.compare_exchange_weak( new_node->_next, new_node, std::memory_order_release ) );
 }
 template< class T >
 bool StackLF<T>::pop( T & val ){
-    Node * head = _head.load();
-    while( head && !_head.compare_exchange_weak( head, head->_next ) );
+    Node * head = _head.load( std::memory_order_relaxed );
+    while( head && !_head.compare_exchange_weak( head, head->_next, std::memory_order_acquire ) );
     if( !head )
 	return false;
     val = head->_val;
@@ -42,8 +44,8 @@ bool StackLF<T>::pop( T & val ){
 
 template< class T >
 bool StackLF<T>::top( T & val ){
-    Node * head = _head.load();
-    while( head && !_head.compare_exchange_weak( head, head ) );
+    Node * head = _head.load( std::memory_order_relaxed );
+    while( head && !_head.compare_exchange_weak( head, head, std::memory_order_acquire ) );
     if( !head )
 	return false;
     val = head->_val;
@@ -52,7 +54,8 @@ bool StackLF<T>::top( T & val ){
 
 template< class T >
 size_t StackLF<T>::size() const {
-    Node * current_node = _head.load();
+    std::lock_guard<std::mutex> lck( _mutex );
+    Node * current_node = _head.load( std::memory_order_relaxed );
     size_t count = 0;
     while( current_node ){
 	++count;

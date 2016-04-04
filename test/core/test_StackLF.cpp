@@ -56,7 +56,6 @@ TEST_CASE( "StackLF", "[stack]" ) {
 	size_t count;
 	unsigned int num_threads = 10;
 	vector<thread> threads( num_threads );
-	mutex mtx;
 	for( int i = 0; i < num_threads; ++i ){
 	    threads[i] = std::thread( [ &stack, i ](){
 		    stack.push( i );
@@ -75,9 +74,11 @@ TEST_CASE( "StackLF", "[stack]" ) {
 		i = std::thread( [&](){
 			int pop_val;
 			bool bRet = stack.pop( pop_val );
+			mtx.lock();
 			if( bRet ){
 			    vals_retrieve.insert( pop_val );
 			}
+			mtx.unlock();
 		    } );
 	    }
 	    for( auto & i : threads ){
@@ -88,6 +89,8 @@ TEST_CASE( "StackLF", "[stack]" ) {
 	    for( int i = 0; i < num_threads; ++i ){
 		auto it = vals_retrieve.find(i);
 		CHECK( vals_retrieve.end() != it );
+		if( vals_retrieve.end() != it )
+		    vals_retrieve.erase(it);
 	    }
 	}
     }
