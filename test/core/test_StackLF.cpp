@@ -88,6 +88,8 @@ TEST_CASE( "StackLF", "[stack]" ) {
 	    for( int i = 0; i < num_threads; ++i ){
 		auto it = vals_retrieve.find(i);
 		CHECK( vals_retrieve.end() != it );
+		if( vals_retrieve.end() != it )
+		    vals_retrieve.erase(it);
 	    }
 	}
     }
