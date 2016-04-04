@@ -304,3 +304,6 @@ test_Imgui_osx:
 
 test_StackLF:
 	g++ -g -std=c++11 $(src_folder_test_core)/test_StackLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_StackLF
+
+test_StackLF_SplitReference:
+	g++ -g -std=c++11 $(src_folder_test_core)/test_StackLF_SplitReference.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_StackLF_SplitReference
