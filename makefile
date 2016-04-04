@@ -1,4 +1,4 @@
-src_files := $(wildcard ./src/*.cpp)AA
+src_files := $(wildcard ./src/*.cpp)
 src_folder_math := ./src/math
 src_folder_file := ./src/file
 src_folder_ui := ./src/ui
@@ -301,3 +301,6 @@ test_SortInsertion:
 
 test_Imgui_osx:
 	g++ -g -std=c++1y $(src_folder_test_ui)/test_Imgui.cpp $(src_folder_ui_imgui)/imgui.cpp $(src_folder_ui_imgui)/imgui_draw.cpp $(src_folder_ui_imgui)/imgui_demo.cpp $(src_folder_ui_imgui)/imgui_impl_glfw_gl3.cpp $(src_folder_ui_imgui_gl)/gl3w.c -I$(inc_folder_ui_imgui) -I$(inc_folder_ui_imgui_gl) -I/usr/local/include -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework Carbon -L/usr/local/lib -o $(build_dir)/test_Imgui_osx
+
+test_StackLF:
+	g++ -g -std=c++11 $(src_folder_test_core)/test_StackLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_StackLF

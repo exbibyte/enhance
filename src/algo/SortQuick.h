@@ -12,6 +12,12 @@ public:
 	    return a < b;
 	}
     };
+    class CompDefault_Desc {
+    public:
+	bool operator()( TypeVal const & a, TypeVal const & b ){
+	    return a >= b;
+	}
+    };
     template< class Comp = CompDefault >
     static void Sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
 	if( i_end - i_start <= 0 ) return; //ends if only single element
