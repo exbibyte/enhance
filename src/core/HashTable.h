@@ -7,15 +7,15 @@
 #include <type_traits>
 
 //default template
-template< class T, class Enable = void >
+template< class T, class V, class Enable = void >
 class HashTable{};
 
 //partial specialization for value type T that are integral in nature
 template< class T >
 using EnableForIntegral = typename std::enable_if< std::is_integral<T>::value>::type;
 
-template< class T >
-class HashTable< T, EnableForIntegral<T> >
+template< class T, class V >
+class HashTable< T, V, EnableForIntegral<T> >
 {
 public:
     template< class TypeVal >
@@ -29,25 +29,32 @@ public:
 	MyIterator operator++( int ) { MyIterator tmp( *this ); operator++(); return tmp; }
 	bool operator==( const MyIterator & rhs ) { return p==rhs.p; }
 	bool operator!=( const MyIterator & rhs ) { return p!=rhs.p; }
-	int& operator*() { return *p; }
+	TypeVal & operator*() { return *p; }
     };
-    using iterator = MyIterator< T >;
-    using const_iterator = MyIterator< const T >;
-    void Insert( T );
+    using iterator = MyIterator< V >;
+    using const_iterator = MyIterator< const V >;
+    void Insert( T, V );
     iterator find( T );
     void AddHashFunc( std::function<int(int)> ){} //TODO
+    void ResizeTable( int size );
 private:
     std::vector<int> _table;
-    int _size;
-    int _dummy = 99; //TODO
+    int _size = 0;
+    V _dummy; //TODO
     std::vector<std::function<int(int)>> _funcs_hash; //TODO
 };
-template< class T >
-void HashTable<T, EnableForIntegral<T>>::Insert( T val ){
+template< class T, class V >
+void HashTable<T, V, EnableForIntegral<T>>::Insert( T key, V val ){
     int int_val = (int) val;
+    _dummy = int_val;
 }
-template< class T >
-typename HashTable<T, EnableForIntegral<T>>::iterator HashTable<T, EnableForIntegral<T> >::find( T val ){
-    return MyIterator< T >( &_dummy );
+template< class T, class V >
+typename HashTable<T, V, EnableForIntegral<T>>::iterator HashTable<T, V, EnableForIntegral<T> >::find( T key ){
+    return MyIterator< V >( &_dummy );
+}
+template< class T, class V >
+void HashTable<T, V, EnableForIntegral<T> >::ResizeTable( int size ){
+    _size = size;
+    
 }
 #endif
