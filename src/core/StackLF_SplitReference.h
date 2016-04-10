@@ -42,7 +42,7 @@ void StackLF_SplitReference<T>::push( T const & val ){
     new_node->_count_external = 1;
     NodeExternal * head = _head.load( std::memory_order_relaxed );
     new_node->_node->_next = head;
-    while( !_head.compare_exchange_weak( new_node->_node->_next, new_node ) );
+    while( !_head.compare_exchange_weak( new_node->_node->_next, new_node, std::memory_order_release, std::memory_order_relaxed ) );
 }
 template< class T >
 void StackLF_SplitReference<T>::AcquireNode( NodeExternal * & external_node ){
@@ -56,7 +56,7 @@ void StackLF_SplitReference<T>::AcquireNode( NodeExternal * & external_node ){
 	temp->_node = external_node->_node;
 	temp->_count_external = external_node->_count_external;
 	++temp->_count_external;
-    } while( !_head.compare_exchange_strong( external_node, temp ) );
+    } while( !_head.compare_exchange_strong( external_node, temp, std::memory_order_acquire, std::memory_order_relaxed ) );
     if( external_node ){
 	delete external_node;
     }
@@ -73,15 +73,15 @@ bool StackLF_SplitReference<T>::pop( T & val ){
 	Node * saved_node = head->_node;
 	if( !saved_node ){ //empty internal node, so remove the external node from the stack
 	    NodeExternal * temp = head;
-	    if( _head.compare_exchange_strong( temp, nullptr ) ){
+	    if( _head.compare_exchange_strong( temp, nullptr, std::memory_order_release, std::memory_order_relaxed ) ){
 		delete head;
 		continue;
 	    }
 	}
-	else if( _head.compare_exchange_strong( head, saved_node->_next ) ){ //take ownership of the head
+	else if( _head.compare_exchange_strong( head, saved_node->_next, std::memory_order_relaxed ) ){ //take ownership of the head
 	    val = saved_node->_val;
 	    int count_increase = head->_count_external - 2; //1 for linkage to list, 1 for current thread access
-	    if( -count_increase == saved_node->_count_internal.fetch_add( count_increase ) ){ //last reference to node, thus remove it
+	    if( -count_increase == saved_node->_count_internal.fetch_add( count_increase, std::memory_order_release ) ){ //last reference to node, thus remove it
 		if( head ){
 		    if( head->_node ){
 			delete head->_node;
@@ -94,6 +94,7 @@ bool StackLF_SplitReference<T>::pop( T & val ){
 	    return true;
 	}else if( 1 == saved_node->_count_internal.fetch_sub(1) ){ //other thread took ownership of the head, so decrease internal count and try again; clean up if necessary
 	    if( saved_node ){
+		saved_node->_count_internal.load( std::memory_order_acquire ); //sync
 		delete saved_node;
 		saved_node = nullptr;
 	    }
