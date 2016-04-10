@@ -5,7 +5,6 @@
 #include <iostream>
 #include <mutex>
 #include <set>
-#include <chrono>
 
 #include "catch.hpp"
 #include "QueueLF.h"
@@ -45,13 +44,12 @@ TEST_CASE( "QueueLF", "[queue]" ) {
     
     SECTION( "multi-thread push" ) {
     	size_t count;
-    	unsigned int num_threads = 10;
+    	unsigned int num_threads = 100;
     	vector<thread> threads( num_threads );
     	for( int i = 0; i < num_threads; ++i ){
     	    threads[i] = std::thread( [ &, i ](){
     		    queue.push( i );
     		} );
-	    std::this_thread::sleep_for (std::chrono::milliseconds(75)); //timed enforcement of insertion of items in numerical order
     	}
     	for( auto & i : threads ){
     	    i.join();
@@ -60,28 +58,29 @@ TEST_CASE( "QueueLF", "[queue]" ) {
     	CHECK( num_threads == count );
 
         SECTION( "multi-thread pop" ) {
-	    vector<int> vals_retrieve;
-    	    mutex mtx;
-    	    for( auto & i : threads ){
-    		i = std::thread( [&](){
-    			int pop_val;
-    			bool bRet = queue.pop( pop_val );
-    			mtx.lock();
-    			if( bRet ){
-    			    vals_retrieve.push_back( pop_val );
-    			}
-    			mtx.unlock();
-    		    } );
-    	    }
-    	    for( auto & i : threads ){
-    		i.join();
-    	    }
-    	    count = queue.size();
-    	    CHECK( 0 == count );
-            REQUIRE( num_threads == vals_retrieve.size() );
-    	    for( int i = 0; i < num_threads; ++i ){
-    	        int val_retrieve = vals_retrieve[i];
-		CHECK( i == val_retrieve );
+	    set<int> vals_retrieve;
+	    mutex mtx;
+	    for( auto & i : threads ){
+		i = std::thread( [&](){
+			int pop_val;
+			bool bRet = queue.pop( pop_val );
+			mtx.lock();
+			if( bRet ){
+			    vals_retrieve.insert( pop_val );
+			}
+			mtx.unlock();
+		    } );
+	    }
+	    for( auto & i : threads ){
+		i.join();
+	    }
+	    count = queue.size();
+	    CHECK( 0 == count );
+	    for( int i = 0; i < num_threads; ++i ){
+		auto it = vals_retrieve.find(i);
+		CHECK( vals_retrieve.end() != it );
+		if( vals_retrieve.end() != it )
+		    vals_retrieve.erase(it);
 	    }
          }
      }
