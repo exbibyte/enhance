@@ -18,6 +18,8 @@ D = To do
 
 [C] UI handling
 
+[C] Core utilities
+
 [C] Graphics Engine
 
 [C] Game Engine
