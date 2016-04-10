@@ -25,14 +25,13 @@ public:
 	Node( T val ) : _val( val ), _next( nullptr ), _count_internal(0) {}
     };
     StackLF_SplitReference() : _head( nullptr ) {}
-    size_t size() const; //blocking
+    size_t size() const; //not guaranteed to be consistent when threads are accessing stack
     //bool top( T & val );
     void push( T const & val );
     bool pop( T & val );
 private:
     void AcquireNode( NodeExternal * & );
     std::atomic< NodeExternal * > _head;
-    mutable std::mutex _mutex;
 };
 template< class T >
 void StackLF_SplitReference<T>::push( T const & val ){
@@ -105,7 +104,6 @@ bool StackLF_SplitReference<T>::pop( T & val ){
 
 template< class T >
 size_t StackLF_SplitReference<T>::size() const {
-    std::lock_guard<std::mutex> lck( _mutex );
     NodeExternal * current_node = _head.load( std::memory_order_relaxed );
     size_t count = 0;
     while( current_node ){

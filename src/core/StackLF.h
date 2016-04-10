@@ -3,7 +3,6 @@
 
 #include <atomic>
 #include <cstddef>
-#include <mutex>
 
 template< class T >
 class StackLF {
@@ -16,13 +15,12 @@ public:
     };
     StackLF() : _head( nullptr ) {}
    // bool empty() const;
-    size_t size() const; //blocking
+    size_t size() const; //not guaranteed to be consistent when threads are accesing stack
     bool top( T & val );
     void push( T const & val );
     bool pop( T & val );
 private:
     std::atomic< Node * > _head;
-    mutable std::mutex _mutex;
 };
 template< class T >
 void StackLF<T>::push( T const & val ){
@@ -54,7 +52,6 @@ bool StackLF<T>::top( T & val ){
 
 template< class T >
 size_t StackLF<T>::size() const {
-    std::lock_guard<std::mutex> lck( _mutex );
     Node * current_node = _head.load( std::memory_order_relaxed );
     size_t count = 0;
     while( current_node ){
