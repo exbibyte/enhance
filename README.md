@@ -14,7 +14,7 @@ C = In Progress
 D = To do
 
 
-[A] Math and Physics Library Layer
+[A] Math utilites
 
 [C] UI handling
 
