@@ -3,7 +3,6 @@
 
 //opengl includes
 #include <GL/gl3w.h>
-//#include <GLFW/glfw3.h>
 
 #include "GLSceneManager.h"
 #include "GLSLProgram.h"
@@ -28,7 +27,6 @@
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
 #include <GLFW/glfw3.h>
-// #include "imgui_impl_glfw.h"
 
 //testing starts
 #include "RenderLight.h"
@@ -205,9 +203,6 @@ bool SceneInit( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLS
     _GLSLProgram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
 
     cout << "After linking program" << endl;
-    //generate VBO, populate and bind data to vertex attribute arrays
-//    pPositionData->SetData( data_vertex, 3, iNumDataVertex );
-//    pNormalData->SetData( data_normal, 3, iNumDataNormal );
 
     vector<double> vert_pos;
     vector<double> vert_norm;
@@ -220,12 +215,9 @@ bool SceneInit( enGameData * game_data, enScene * scene_data, GLSLProgram * _GLS
     cout << "Size of vert_pos: " << vert_pos.size() << endl;
     cout << "Size of vert_norm: " << vert_norm.size() << endl;
 
-    // game_data->_render_pass->AddToProcess( eRenderType::POLY_VERT, vert_pos );
-    // game_data->_render_pass->AddToProcess( eRenderType::POLY_NORM, vert_norm );
     game_data->_temporary_game_data[ "POLY_VERT" ] = vert_pos;
     game_data->_temporary_game_data[ "POLY_NORM" ] = vert_norm;
-	
-   //deallocate data
+
     delete [] data_vertex;
     data_vertex = nullptr;
     delete [] data_normal;
@@ -333,24 +325,6 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
 }
 
 void InitWindow( enGameData * game_data, string strPathPolyMesh ){
-
-    // //instance manager setup for game entities
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::PolyVertices, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightAmbient, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightSpectral, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightDiffuse, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::CameraProjection, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialAmbient, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialDiffuse, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialSpectral, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialShininess, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientOffset, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::OrientRotation, {} );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::LightComposition, { eInstanceType::LightAmbient, eInstanceType::LightSpectral, eInstanceType::LightDiffuse } );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::MaterialComposition, { eInstanceType::MaterialAmbient, eInstanceType::MaterialDiffuse, eInstanceType::MaterialSpectral, eInstanceType::MaterialShininess } );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityOrientation, { eInstanceType::OrientOffset, eInstanceType::OrientRotation } );
-    // game_data->_InstanceManagerPackage->CreateManager( eInstanceType::EntityPackage, { eInstanceType::PolyVertices, eInstanceType::EntityOrientation, eInstanceType::MaterialComposition  } );
-    // game_data->_InstanceManagerPackage->LinkManagers();
 
     glfwMakeContextCurrent( game_data->_Window );
 

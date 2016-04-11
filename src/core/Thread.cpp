@@ -1,4 +1,4 @@
-#ifdef THREAD_H
+#include "Thread.h"
 
 void Thread::WaitForThreadEnd(){   /// blocking until end state
     while( _Access.load(std::memory_order_relaxed) != THREAD_ENDED );
@@ -40,5 +40,3 @@ void Thread::ContinueThread(){
         _Notify.store( THREAD_NOTIFY_CONTINUE, std::memory_order_relaxed);
     }
 }
-
-#endif
