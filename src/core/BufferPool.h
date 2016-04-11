@@ -1,136 +1,38 @@
+//--------------------------------------------------------------------
+// Buffer Pool
+// 
+
 #ifndef BUFFER_POOL_H
 #define BUFFER_POOL_H
-
-// #include "CircularBufferThreadSafe.h"
 
 #include <vector>
 #include <mutex>
 
 using namespace std;
 
-template< typename Buffer, typename T >
+template< template<typename> class BufferType, typename T >
 class BufferPool{
 public:
                                              BufferPool();
-  void                                       Clear(); //remove all buffers
-  void                                       SetNumBuffers( int num ); // -1 removed all buffers
-  int                                        GetNumBuffers() const;
   bool                                       AddToBuffer( T & a );
   bool                                       GetFromBuffer( T & a );
-  bool                                       GetBufferAtIndex(int index, Buffer * & bufptr ) const;
-  void                                       ResetIndex();
-  bool                                       ConsumeBuffersRandom( T & a );
 private:
-  vector< Buffer * >                         _buffers; //vector of buffers
-  int                                        _bufSelIndex;
-  int                                        _bufConsumeIndex;
-  mutable std::mutex                         _mut;
+  BufferType< T >                            _buffer;
 };
 
-template< typename Buffer, typename T >
-BufferPool< Buffer, T > :: BufferPool(){
-  SetNumBuffers(1);
-}
+template< template<typename> class BufferType, typename T >
+BufferPool< BufferType, T > :: BufferPool(){}
 
-template< typename Buffer, typename T >
-void BufferPool< Buffer, T > :: Clear(){
-  SetNumBuffers(-1);
-}
-
-template< typename Buffer, typename T >
-void BufferPool< Buffer, T > :: SetNumBuffers( int num ){
-  if( num <= 0 ){
-    _buffers.clear();
-  }else{
-    int diff = num - _buffers.size();
-    if( diff > 0 ){
-      while( diff > 0 ){
-	Buffer * cb = new Buffer;
-	_buffers.push_back( cb );
-	--diff;
-      }
-    }else if( diff < 0 ){
-      while( diff < 0 ){
-	_buffers.pop_back();
-	++diff;
-      }
-    }
-  }
-  ResetIndex();
-}
-
-template< typename Buffer, typename T >
-int BufferPool< Buffer, T > :: GetNumBuffers() const{
-  return _buffers.size();
-}
-
-template< typename Buffer, typename T >
-bool BufferPool< Buffer, T > :: AddToBuffer( T & a ){
-  if( _bufSelIndex == -1 ){
-    return false;
-  }else if( _bufSelIndex >=  _buffers.size()){
-    _bufSelIndex = 0;
-  }
-
-  bool ret = false;
-  while( ret == false && _bufSelIndex < _buffers.size() ){
-    ret = ( _buffers.at(_bufSelIndex) )->Add( a );
-    ++_bufSelIndex;
-    if( ret == true ){
-      return true;
-    }
-  }
-
-  return false;
-}
-
-template< typename Buffer, typename T >
-bool BufferPool< Buffer, T > :: GetBufferAtIndex(int index, Buffer * & bufptr ) const{
-  if( _buffers.empty() == false && index >= 0 && index < _buffers.size() ){
-    bufptr = _buffers.at( index );
+template< template<typename> class BufferType, typename T >
+bool BufferPool< BufferType, T > :: AddToBuffer( T & a ){
+    _buffer.push( a );
     return true;
-  }else{
-    bufptr = nullptr;
-    return false;
-  }
 }
 
-template< typename Buffer, typename T >
-void BufferPool< Buffer, T > :: ResetIndex(){
-    if( _buffers.empty() ){
-        _bufSelIndex = -1;
-        _bufConsumeIndex = -1;
-    }else{
-        _bufSelIndex = 0;
-        _bufConsumeIndex = 0;
-    }
-}
-
-template< typename Buffer, typename T >
-bool BufferPool< Buffer, T > :: ConsumeBuffersRandom( T & a ){
-
-  std::lock_guard<std::mutex> lguard(_mut);
-
-  if( _bufConsumeIndex == -1 ){
-    return false;
-  }else if( _bufConsumeIndex >=  _buffers.size()){
-    _bufConsumeIndex = 0;
-  }
-
-  bool ret = false;
-  while( ret == false && _bufConsumeIndex < _buffers.size() ){
-    ret = ( _buffers.at(_bufConsumeIndex) )->Consume( a );
-    ++_bufConsumeIndex;
-    if( ret == true ){
-      return true;
-    }
-  }
-  return false;
-}
-
-template< typename Buffer, typename T >
-bool BufferPool< Buffer, T > :: GetFromBuffer( T & a ){
-    return ConsumeBuffersRandom( a );
+template< template<typename> class BufferType, typename T >
+bool BufferPool< BufferType, T > :: GetFromBuffer( T & a ){
+    bool bRet = _buffer.pop( a );
+    return bRet;
 }
 
 #endif

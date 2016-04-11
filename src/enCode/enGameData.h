@@ -38,7 +38,7 @@ public:
 	/* } */
 	//initialize thread pool
 	_Threadpool = new enTPCommon;
-	_Threadpool->SetNumThreads(4);
+	_Threadpool->SetNumThreads(2);
 	_SceneManagers["DEFAULT"] = new GLSceneManager;
 	_Scenes["DEFAULT"] = new enScene;
 	_ProgramGlsl = new GLSLProgram;

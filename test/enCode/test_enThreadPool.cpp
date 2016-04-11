@@ -4,7 +4,7 @@
 #include "enThreadPool.h"
 #include "ThreadPool.h"
 #include "BufferPool.h"
-#include "CircularBufferThreadSafe.h"
+#include "QueueLF.h"
 #include "enThread.h"
 #include "FuncWrap.h"
 
@@ -17,6 +17,7 @@
 #include <utility>
 #include <type_traits>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -62,7 +63,7 @@ int FindPrime( int limit){
   return numPrime;
 }
 
-class myBufferPool : public BufferPool< CircularBufferThreadSafe< FuncWrap >, FuncWrap > {};
+class myBufferPool : public BufferPool< QueueLF, FuncWrap > {};
 class myThreadPool : public enThreadPool< myBufferPool, enThread  >{};
 
 TEST_CASE( "enThreadPool", "[enThreadPool]" ) {
@@ -88,4 +89,6 @@ TEST_CASE( "enThreadPool", "[enThreadPool]" ) {
     CHECK( primes2 == 1229 );
   }
 
+  tp.EndAllThreads();
+  std::this_thread::sleep_for (std::chrono::seconds(1));
 }

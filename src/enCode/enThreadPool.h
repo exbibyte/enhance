@@ -16,7 +16,10 @@ public:
         return _BuffPool.GetFromBuffer( fw );
     }
     void SetNumThreads( int n ){
-        _BuffPool.SetNumBuffers( n );
+	auto it = _vThread.begin(), it_end = _vThread.end();
+	for( ; it != it_end; ++it ){
+	    delete *it;
+	}
         _vThread.clear();
         for( int i = 0; i < n; i++ ){
             ThreadType * NewThread = new ThreadType;

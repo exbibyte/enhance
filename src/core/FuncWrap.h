@@ -79,9 +79,9 @@ public:
                   _func = std::move( other._func );
 		  return *this;
                 }
-                FuncWrap( const FuncWrap & ) = delete;
-                FuncWrap( FuncWrap & ) = delete;
-  FuncWrap &    operator= ( const FuncWrap & ) = delete;
+  //               FuncWrap( const FuncWrap & ) = delete;
+  //               FuncWrap( FuncWrap & ) = delete;
+  // FuncWrap &    operator= ( const FuncWrap & ) = delete;
 };
 
 #endif

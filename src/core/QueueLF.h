@@ -13,9 +13,9 @@ public:
 	std::atomic< Node * > _next;
 	T _val;
 	Node(): _next( nullptr ) {}
-	Node( T val ): _val(val), _next( nullptr ) {}
+	Node( T & val ): _val(std::move(val)), _next( nullptr ) {}
     };
-    void push( T const & val );
+    void push( T & val );
     bool pop( T & val );
     size_t size();
     QueueLF();
@@ -40,7 +40,7 @@ QueueLF<T>::~QueueLF(){
     }    
 }
 template< typename T >
-void QueueLF<T>::push( T const & val ){ //push item to the tail
+void QueueLF<T>::push( T & val ){ //push item to the tail
     Node * new_node = new Node( val );
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
@@ -69,7 +69,7 @@ bool QueueLF<T>::pop( T & val ){ //obtain item from the head
 		    _tail.compare_exchange_weak( tail, head_next, std::memory_order_relaxed ); //other thread updated head/tail, so retry
 		}
 	    }else{
-		val = head_next->_val;
+		val = std::move(head_next->_val);
 		if( _head.compare_exchange_weak( head, head_next, std::memory_order_relaxed ) ){ //try add new item
 		    delete head; //thread suceeds and returns
 		    return true;

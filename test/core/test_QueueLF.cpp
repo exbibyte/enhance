@@ -18,7 +18,8 @@ TEST_CASE( "QueueLF", "[queue]" ) {
     SECTION( "push" ) {
 	size_t count = queue.size();
 	CHECK( 0 == count );
-	queue.push(5);
+	int val = 5;
+	queue.push(val);
 	count = queue.size();
 	CHECK( 1 == count );
 
@@ -48,7 +49,8 @@ TEST_CASE( "QueueLF", "[queue]" ) {
     	vector<thread> threads( num_threads );
     	for( int i = 0; i < num_threads; ++i ){
     	    threads[i] = std::thread( [ &, i ](){
-    		    queue.push( i );
+		    int val = i;
+    		    queue.push( val );
     		} );
     	}
     	for( auto & i : threads ){
