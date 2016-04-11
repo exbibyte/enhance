@@ -4,7 +4,7 @@ Enhance
 
 =======
 
-Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser.
+Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser through a common infrastructure.
 
 Checklist:
 
@@ -46,3 +46,9 @@ https://youtu.be/x8cADzdhJhs
 
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
+
+--------------------------------------------
+
+License:
+
+See LICENSE file.
