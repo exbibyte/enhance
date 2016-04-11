@@ -4,7 +4,7 @@ Enhance
 
 =======
 
-Experimental 3D rendering and engine tools for interactive application development.
+Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser.
 
 Checklist:
 
@@ -24,7 +24,7 @@ D = To do
 
 [C] Game Engine
 
-[D] Game Content Editor
+[D] Content Editor/Script
 
 --------------------------------------------
 
