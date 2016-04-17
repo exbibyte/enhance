@@ -8,7 +8,7 @@
 #include "FuncWrap.h"
 #include "QueueLF.h"
 
-class enBufferPoolCommon : public BufferPool< QueueLF, FuncWrap > {};
+class enBufferPoolCommon : public BufferPool< QueueLF, FuncWrap2 > {};
 class enTPCommon : public enThreadPool< enBufferPoolCommon, enThread  >{};
 
 #endif

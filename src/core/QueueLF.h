@@ -69,7 +69,7 @@ bool QueueLF<T>::pop( T & val ){ //obtain item from the head
 		    _tail.compare_exchange_weak( tail, head_next, std::memory_order_relaxed ); //other thread updated head/tail, so retry
 		}
 	    }else{
-		val = std::move(head_next->_val);
+		val = head_next->_val;
 		if( _head.compare_exchange_weak( head, head_next, std::memory_order_relaxed ) ){ //try add new item
 		    delete head; //thread suceeds and returns
 		    return true;

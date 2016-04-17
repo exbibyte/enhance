@@ -4,15 +4,16 @@
 #include "ThreadPool.h"
 #include <vector>
 
-class FuncWrap;
+//class FuncWrap;
+class FuncWrap2;
 
 template< typename BufferType, typename ThreadType >
-class enThreadPool : public ThreadPool {
+class enThreadPool : public ThreadPool2 {
 public:
     enThreadPool(){
         SetNumThreads(1);
     }
-    bool GetTask( FuncWrap & fw ){
+    bool GetTask( FuncWrap2 & fw ){
         return _BuffPool.GetFromBuffer( fw );
     }
     void SetNumThreads( int n ){
@@ -48,7 +49,7 @@ public:
 private:
     BufferType                              _BuffPool;
     std::vector< ThreadType * >             _vThread;
-    void AddTaskHook( FuncWrap & fw ){
+    void AddTaskHook( FuncWrap2 & fw ){
         _BuffPool.AddToBuffer( fw );
     }
 };

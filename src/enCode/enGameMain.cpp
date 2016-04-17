@@ -324,7 +324,7 @@ bool SceneRender( enGameData * game_data, enScene * scene_data, GLSLProgram * _G
     return true;
 }
 
-void InitWindow( enGameData * game_data, string strPathPolyMesh ){
+bool InitWindow( enGameData * game_data, string strPathPolyMesh ){
 
     glfwMakeContextCurrent( game_data->_Window );
 
@@ -356,9 +356,10 @@ void InitWindow( enGameData * game_data, string strPathPolyMesh ){
     bool bInstallCallback = false;
     ImGui_ImplGlfwGL3_Init( game_data->_Window, bInstallCallback );
     //Imgui initialization ends
+    return true;
 }
 
-void RenderScene( enGameData * game_data ){
+bool RenderScene( enGameData * game_data ){
     glfwMakeContextCurrent( game_data->_Window ); // this is need when calling rendering APIs on separate thread
 
     //update rotation angle of entity    
@@ -388,9 +389,10 @@ void RenderScene( enGameData * game_data ){
     //Imgui rendering ends
 
     glfwSwapBuffers( game_data->_Window );
+    return true;
 }
 
-void ClockTask( enGameData * game_data ) {
+bool ClockTask( enGameData * game_data ) {
     Clock render_clock;
     render_clock.SetFps(25);
     // render_clock.SetFps(0.1);
@@ -407,12 +409,14 @@ void ClockTask( enGameData * game_data ) {
         }
 	render_clock.Tick();
 	if( bClockTicked ){
-	    std::future<void> ret = game_data->_Threadpool->AddTask( RenderScene, game_data ); //notify render task
-	    ret.get();  
+	    // std::future<bool> ret = game_data->_Threadpool->AddTask( RenderScene, game_data ); //notify render task
+	    game_data->_Threadpool->AddTask( RenderScene, game_data ); //notify render task
+	    // ret.get();  
 	    bClockTicked = false;
 	}
     }
     render_clock.Pause();
+    return true;
 }
 
 int main( int argc, char ** argv ){
@@ -472,33 +476,36 @@ int main( int argc, char ** argv ){
         exit( EXIT_FAILURE );
     }
 
-    std::future<void> ret1 = game_data._Threadpool->AddTask(InitWindow, p_game_data, strPathPolyMesh );
+    // std::future<bool> ret1 = game_data._Threadpool->AddTask(InitWindow, p_game_data, strPathPolyMesh );
+    game_data._Threadpool->AddTask(InitWindow, p_game_data, strPathPolyMesh );
     int count = 0;
 
     game_data._Threadpool->RunThreads();
     
     std::this_thread::sleep_for (std::chrono::seconds(3));
-    std::future<void> retClock = game_data._Threadpool->AddTask(ClockTask, p_game_data );
+    // std::future<bool> retClock = game_data._Threadpool->AddTask(ClockTask, p_game_data );
+    game_data._Threadpool->AddTask(ClockTask, p_game_data );
 
     while( !glfwWindowShouldClose( window ) )
     {
         if( bSignalExit ){
+	    std::this_thread::sleep_for (std::chrono::seconds(2));
             break;
         }
         glfwPollEvents();
         game_data._ManagerWindow->ProcessKeyButtonCombo();
     }
-    ret1.get();
-    retClock.get();
+    // ret1.get();
+    // retClock.get();
 
+    std::this_thread::sleep_for (std::chrono::seconds(1));
+    
     game_data._Threadpool->EndAllThreads();
 
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 
-    std::this_thread::sleep_for (std::chrono::seconds(1));
-    
     return 0;
 }
 

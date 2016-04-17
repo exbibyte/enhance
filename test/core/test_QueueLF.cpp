@@ -44,6 +44,7 @@ TEST_CASE( "QueueLF", "[queue]" ) {
 
     
     SECTION( "multi-thread push" ) {
+	while(1){
     	size_t count;
     	unsigned int num_threads = 100;
     	vector<thread> threads( num_threads );
@@ -53,37 +54,44 @@ TEST_CASE( "QueueLF", "[queue]" ) {
     		    queue.push( val );
     		} );
     	}
-    	for( auto & i : threads ){
-    	    i.join();
-    	}
-    	count = queue.size();
-    	CHECK( num_threads == count );
+    	// count = queue.size();
+    	// CHECK( num_threads == count );
 
-        SECTION( "multi-thread pop" ) {
-	    set<int> vals_retrieve;
-	    mutex mtx;
-	    for( auto & i : threads ){
-		i = std::thread( [&](){
+        // SECTION( "multi-thread pop" ) {
+    	vector<thread> threads2( num_threads );
+	set<int> vals_retrieve;
+	    // mutex mtx;
+	    // for( auto & i : threads ){
+	    for( int i = 0; i < num_threads * 0.1; ++i ){
+		// i = std::thread( [&](){
+		threads2[i] = std::thread( [&](){
 			int pop_val;
 			bool bRet = queue.pop( pop_val );
-			mtx.lock();
+			// mtx.lock();
 			if( bRet ){
-			    vals_retrieve.insert( pop_val );
+			    // vals_retrieve.insert( pop_val );
+			    std::cout << pop_val << std::endl;
 			}
-			mtx.unlock();
+			// mtx.unlock();
 		    } );
+	    }
+	    // for( auto & i : threads ){
+	    for( int i = 0; i < num_threads * 0.1; ++i ){
+		// i.join();
+		threads2[i].join();
 	    }
 	    for( auto & i : threads ){
 		i.join();
 	    }
-	    count = queue.size();
-	    CHECK( 0 == count );
-	    for( int i = 0; i < num_threads; ++i ){
-		auto it = vals_retrieve.find(i);
-		CHECK( vals_retrieve.end() != it );
-		if( vals_retrieve.end() != it )
-		    vals_retrieve.erase(it);
-	    }
-         }
+	    // count = queue.size();
+	    // CHECK( 0 == count );
+	    // for( int i = 0; i < num_threads; ++i ){
+	    // 	auto it = vals_retrieve.find(i);
+	    // 	CHECK( vals_retrieve.end() != it );
+	    // 	if( vals_retrieve.end() != it )
+	    // 	    vals_retrieve.erase(it);
+	    // }
+         // }
+	}
      }
 }
