@@ -199,6 +199,9 @@ bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram
 	attrib_PositionData->SetData( vertex_coord, 3, iSizeVertexData );
 	attrib_NormalData->SetData( vertex_normal, 3, iSizeVertexData );
 
+	delete [] vertex_coord;
+	delete [] vertex_normal;
+
 	glsl_program->BindVertexArray();
 	
 	/// retrive entity orientation data ----------------------------------
