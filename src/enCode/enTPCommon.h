@@ -3,12 +3,13 @@
 
 #include "enThreadPool.h"
 #include "ThreadPool.h"
-#include "BufferPool.h"
+#include "BufferInterface.h"
 #include "enThread.h"
-#include "FuncWrap.h"
+#include "FuncWrap2.h"
 #include "QueueLF.h"
 
-class enBufferPoolCommon : public BufferPool< QueueLF, FuncWrap2 > {};
-class enTPCommon : public enThreadPool< enBufferPoolCommon, enThread  >{};
+class enThreadSpecialized : public enThread<ThreadPool2, FuncWrap2 >{};
+class enBuffer_QueueLF_FuncWrap2 : public BufferInterface< QueueLF, FuncWrap2 > {};
+class enTPCommon : public enThreadPool< enBuffer_QueueLF_FuncWrap2, enThreadSpecialized >{};
 
 #endif
