@@ -11,8 +11,6 @@
 #include "FuncWrap.h"
 #include "FuncWrap2.h"
 
-class FuncWrap2;
-
 class ThreadPool {
 public:
     virtual void AddTaskHook( FuncWrap & fw ){}; /// implementable hook executed in AddTask, eg: adding to a buffer
@@ -24,7 +22,7 @@ public:
         std::future< result_type > res( task.get_future() );
     
         FuncWrap fw( std::move(task), std::forward<Args>(params)... );
-
+        AddTaskHook( fw );    /// call implemented function
         return res;
     }
     virtual bool GetTask( FuncWrap2 & fw ){ return false; } /// implementable interface
