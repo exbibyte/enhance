@@ -1,6 +1,7 @@
 #ifndef QUEUE_LF_H
 #define QUEUE_LF_H
 
+#include <mutex>
 #include <atomic>
 
 //unbounded lock free queue, based on section Art of Multiprocessor Programming section 10.5
@@ -13,7 +14,7 @@ public:
 	std::atomic< Node * > _next;
 	T _val;
 	Node(): _next( nullptr ) {}
-	Node( T & val ): _val(std::move(val)), _next( nullptr ) {}
+	Node( T & val ): _val(val), _next( nullptr ) {}
     };
     void push( T & val );
     bool pop( T & val );
@@ -23,6 +24,7 @@ public:
 private:
     std::atomic< Node * > _head;
     std::atomic< Node * > _tail;
+    // std::mutex _mutex;
 };
 template< typename T >
 QueueLF<T>::QueueLF(){
@@ -41,6 +43,7 @@ QueueLF<T>::~QueueLF(){
 }
 template< typename T >
 void QueueLF<T>::push( T & val ){ //push item to the tail
+    // std::lock_guard<std::mutex> lck( _mutex );
     Node * new_node = new Node( val );
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
@@ -57,6 +60,7 @@ void QueueLF<T>::push( T & val ){ //push item to the tail
 }
 template< typename T >
 bool QueueLF<T>::pop( T & val ){ //obtain item from the head
+    // std::lock_guard<std::mutex> lck( _mutex );
     while( true ){
 	Node * head = _head.load( std::memory_order_relaxed );
 	Node * tail = _tail.load( std::memory_order_relaxed );

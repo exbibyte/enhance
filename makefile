@@ -58,7 +58,7 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferPool test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
+all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferInterface test_slerp test_sclerp test_ThreadPoolCircularBuffer test_enThreadPool test_enTPCommon test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -109,8 +109,8 @@ test_CircularBuffer:
 test_CircularBufferThreadSafe:
 	g++ -std=c++0x ./test/core/test_CircularBufferThreadSafe.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_circularbufferthreadsafe
 
-test_BufferPool:
-	g++ -std=c++0x ./test/core/test_BufferPool.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_bufferpool
+test_BufferInterface:
+	g++ -std=c++0x ./test/core/test_BufferInterface.cpp -I$(inc_folder_catch) -I$(inc_folder_core) -o $(build_dir)/test_bufferinterface
 
 test_Thread:
 	g++ -std=c++0x -O3 ./test/core/test_Thread.cpp -pthread -I$(inc_folder_core) -o $(build_dir)/test_thread

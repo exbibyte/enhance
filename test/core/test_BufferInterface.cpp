@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
-#include "BufferPool.h"
+#include "BufferInterface.h"
 #include "QueueLF.h"
 #include <string>
 #include <iostream>
@@ -9,7 +9,7 @@ using namespace std;
 
 TEST_CASE( "ThreadPool", "[ThreadPool]" ) {
 
-    BufferPool< QueueLF, string > buffer;
+    BufferInterface< QueueLF, string > buffer;
 
     SECTION( "Add and get from buffer" ) {
         bool bRet;
