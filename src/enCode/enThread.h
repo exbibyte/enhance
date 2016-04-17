@@ -3,6 +3,7 @@
 
 #include "Thread.h"
 
+#include <thread>
 #include <iostream>
 using namespace std;
 
@@ -39,6 +40,7 @@ public:
             }else{
                 /// else do nothing
                 _Access.store( THREAD_IDLE, std::memory_order_relaxed);
+		std::this_thread::yield();
             }
         }
         _Access.store( THREAD_ENDED, std::memory_order_relaxed); /// end thread
