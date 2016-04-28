@@ -299,6 +299,9 @@ test_SortQuick:
 test_SortInsertion:
 	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortInsertion.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortInsertion
 
+test_SortMerge:
+	$(CXX) -std=c++11 -g $(src_folder_test_algo)/test_SortMerge.cpp -I$(inc_folder_catch) -I$(src_folder_algo) -o $(build_dir)/test_SortMerge
+
 test_Imgui_osx:
 	g++ -g -std=c++1y $(src_folder_test_ui)/test_Imgui.cpp $(src_folder_ui_imgui)/imgui.cpp $(src_folder_ui_imgui)/imgui_draw.cpp $(src_folder_ui_imgui)/imgui_demo.cpp $(src_folder_ui_imgui)/imgui_impl_glfw_gl3.cpp $(src_folder_ui_imgui_gl)/gl3w.c -I$(inc_folder_ui_imgui) -I$(inc_folder_ui_imgui_gl) -I/usr/local/include -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework Carbon -L/usr/local/lib -o $(build_dir)/test_Imgui_osx
 
