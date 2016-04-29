@@ -75,5 +75,48 @@ TEST_CASE( "Heap", "[Heap]" ) {
 	}
 	int size_remain = expected_vals.size();
 	CHECK( 0 == size_remain );
-    }    
+    }
+    SECTION( "Heap Insert" ) {
+	bool bRet;
+	Heap< int, HeapMax >::Unit unit_2 {10,3};
+	Heap< int, HeapMax >::Unit unit_3 {6,4};
+	Heap< int, HeapMax >::Unit unit_4 {15,5};
+	Heap< int, HeapMax >::Unit unit_1 {3,2};
+	Heap< int, HeapMax >::Unit unit_0 {4,1};
+
+	bRet = heap_max.Insert( unit_0 );
+	bRet &= heap_max.Insert( unit_1 );
+	bRet &= heap_max.Insert( unit_2 );
+	bRet &= heap_max.Insert( unit_3 );
+	bRet &= heap_max.Insert( unit_4 );
+	CHECK( bRet );
+	
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( bRet );
+	CHECK( retrieve._val == 15 );
+	CHECK( retrieve._data == 5 );
+
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( bRet );
+	CHECK( retrieve._val == 10 );
+	CHECK( retrieve._data == 3 );
+
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( bRet );
+	CHECK( retrieve._val == 6 );
+	CHECK( retrieve._data == 4 );
+
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( bRet );
+	CHECK( retrieve._val == 4 );
+	CHECK( retrieve._data == 1 );
+
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( bRet );
+	CHECK( retrieve._val == 3 );
+	CHECK( retrieve._data == 2 );
+
+	bRet = heap_max.ExtractMax( retrieve );
+	CHECK( !bRet );
+    }
 }

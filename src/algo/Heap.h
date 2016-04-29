@@ -2,6 +2,7 @@
 #define HEAP_H
 
 #include <vector>
+#include <limits>
 
 class HeapMin;
 class HeapMax;
@@ -17,6 +18,9 @@ public:
 	int _val;
 	TypeData _data;
     };
+    Heap(){
+	_size_heap_internal = 0;
+    }
     bool Heapify( int i ){
 	int size_heap = _size_heap_internal;
 	if( i >= size_heap ) return true;
@@ -24,24 +28,16 @@ public:
 	int i_child_left = GetIndexChildLeft( i );
 	int i_child_right = GetIndexChildRight( i );
 	int i_largest = i;
-	Unit current = _arr[ i ];
-        Unit largest = _arr[ i_largest ];
-	Unit child_left = _arr[ i_child_left ]; 
-	if( i_child_left < size_heap && child_left._val > largest._val ){
+	if( i_child_left < size_heap && _arr[ i_child_left ]._val > _arr[ i_largest ]._val ){
 	    i_largest = i_child_left;
 	}
-        largest = _arr[ i_largest ];
-	Unit child_right = _arr[ i_child_right ];
-	if( i_child_right < size_heap && child_right._val > largest._val ){
+	if( i_child_right < size_heap && _arr[ i_child_right ]._val > _arr[ i_largest ]._val ){
 	    i_largest = i_child_right;
 	}
-	if( i_largest == i_child_left ){
-	    _arr[ i ] = child_left;
-	    _arr[ i_largest ] = current;
-	    return Heapify( i_largest );
-	}else if( i_largest == i_child_right ){
-	    _arr[ i ] = child_right;
-	    _arr[ i_largest ] = current;
+	if( i_largest != i ){
+	    Unit swap = _arr[ i ];
+	    _arr[ i ] = _arr[ i_largest ];
+	    _arr[ i_largest ] = swap;
 	    return Heapify( i_largest );
 	}
 	return true;
@@ -65,7 +61,8 @@ public:
 	unit = _arr[ 0 ];
 	int index_last = _arr.size() - 1;
 	_arr[ 0 ] = _arr[ index_last ];
-	_arr.resize( index_last );
+	_arr.pop_back();
+	--_size_heap_internal;
 	Heapify( 0 );
 	return true;
     }
@@ -73,15 +70,20 @@ public:
 	if( i >= _arr.size() ) return false;
 	if( val < _arr[i]._val ) return false;
 	_arr[i]._val = val;
-	while( i > 0 ){
-	    int i_parent = GetIndexParent( i );
-	    if( _arr[ i_parent ]._val >= _arr[ i ]._val ) break;
-	    Unit temporary = _arr[ i_parent ];
-	    _arr[ i_parent ] = _arr[ i ];
+	while( i > 0 && _arr[ GetIndexParent( i ) ]._val < _arr[ i ]._val ){
+	    Unit temporary = _arr[ GetIndexParent( i ) ];
+	    _arr[ GetIndexParent( i ) ] = _arr[ i ];
 	    _arr[ i ] = temporary;
-	    i = i_parent;
+	    i = GetIndexParent( i );
 	}
 	return true;
+    }
+    bool Insert( Unit & unit ){
+	int key = unit._val;
+	unit._val = std::numeric_limits<int>::min();
+	_arr.push_back( unit );
+	++_size_heap_internal;
+	return IncreaseVal( _arr.size()-1, key );
     }
     int GetHeapSize() const {
 	return _arr.size();
@@ -105,7 +107,7 @@ public:
 private:
     int GetIndexParent( int i ){
 	if( 0 == i ) return 0;
-	return (i+1) / 2 - 1;
+	return (i+1)/2 - 1;
     }
     int GetIndexChildLeft( int i ){
 	return 2 * i + 1;
