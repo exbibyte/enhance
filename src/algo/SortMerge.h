@@ -44,22 +44,28 @@ public:
 	auto it_arr1_end = it + index_arr2_start;
 	auto it_arr2_start = it + index_arr2_start;
 	auto it_arr2_end = it + index_end + 1;
+	//copy into temporary arrays
 	std::vector< TypeVal > arr1( it_arr1_start, it_arr1_end );
 	std::vector< TypeVal > arr2( it_arr2_start, it_arr2_end );
+	//merge sorted arrays
 	int i = 0;
 	int j = 0;
 	int m = index_start;
-	while( true ){
-	    if( i == arr1.size() && j == arr2.size() )
-		break;
-	    else if( arr2.size() == j || ( i < arr1.size() && comparator( arr1[i], arr2[j] ) ) ){
-		values[m] = arr1[i];
-		++i;
-		++m;
-	    }else if( arr1.size() == i || ( j < arr2.size() && comparator( arr2[j], arr1[i] ) ) ){
+	for( int m = index_start; m <= index_end; ++m ){
+	    if( i == arr1.size() ){
 		values[m] = arr2[j];
 		++j;
-		++m;
+	    }else if( j == arr2.size() ){
+		values[m] = arr1[i];
+		++i;
+	    }else if( comparator( arr1[i], arr2[j] ) ){
+		values[m] = arr1[i];
+		++i;
+	    }else if( comparator( arr2[j], arr1[i] ) ){
+		values[m] = arr2[j];
+		++j;
+	    }else{
+		//not expected to come here
 	    }
 	}
     }
