@@ -48,7 +48,8 @@ https://youtu.be/x8cADzdhJhs
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
-The framework is currently under going restructuring to implement behavioural specialization through high level policy templates.
+The framework is currently under going restructuring to implement behavioural specialization through high level policy templates
+
 --------------------------------------------
 
 License:
