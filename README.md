@@ -48,7 +48,7 @@ https://youtu.be/x8cADzdhJhs
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
-The framework is currently undergoing restructuring to implement behavioural specialization through high level policy templates.
+The framework is currently undergoing restructuring to implement behavioural specialization through high level policy templates. One of the eventual goal is creating a more functional style programming available for customizing certain module behaviour.
 
 Note: Current development will be using OpenGL as the rendering backend until reasonable stabilization of global infrastructure and initial release of full prototype.
 
