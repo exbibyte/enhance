@@ -15,15 +15,17 @@
 
 using namespace std;
 
-void test(){
+bool test(){
   cout<<"task called"<<endl;
+  return true;
 }
 
-void test2(string a){
+bool test2(string a){
   cout<<"task2 called: "<< "argument: " << a <<endl;
+  return true;
 }
 
-int FindPrime( int limit){
+bool FindPrime( int limit, int * result){
   int numPrime = 0;
 
   //using sieve of eratosthenes
@@ -54,21 +56,13 @@ int FindPrime( int limit){
     }
   }
   delete [] array;
-  return numPrime;
+  *result = numPrime;
+  return true;
 }
 
-int IncreNum( int a ){
-    return ++a;
-}
-
-void IncreNumRef( int & a ){
+bool IncreNumRef( int & a ){
     a++;
-}
-
-void IncreNumRefSelfTask( enTPCommon * b, int & a ){
-    a++;
-    auto retnum = b->AddTask(IncreNumRef, std::ref(a));
-    retnum.get();
+    return true;
 }
 
 TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
@@ -82,40 +76,30 @@ TEST_CASE( "enTPCommon", "[enTPCommon]" ) {
   int testnum3 = 10000;
   string teststr = "asdf";
 
-  std::future<int> ret1 = tp.AddTask(IncreNum, 120 );
-  std::future<void> ret2 = tp.AddTask(test2, teststr );
-  std::future<int> ret3 = tp.AddTask(FindPrime, 1000);
-  typedef decltype(FindPrime(10000)) retType;
-  std::future< retType > ret4 = tp.AddTask(FindPrime, 10000);
-  std::future<void> ret5 = tp.AddTask(IncreNumRefSelfTask, ptp, std::ref(testnum));
+  tp.AddTask(test2, teststr );
+
+  int result_find_prime_1000;
+  int result_find_prime_10000;
+  int * p_result_find_prime_1000 = &result_find_prime_1000;
+  int * p_result_find_prime_10000 = &result_find_prime_10000;
+  tp.AddTask(FindPrime, 1000, p_result_find_prime_1000 );
+  tp.AddTask(FindPrime, 10000, p_result_find_prime_10000 );
+  tp.AddTask(IncreNumRef, std::ref(testnum));
 
   tp.RunThreads();
 
-  int primes1 = ret3.get();
-  retType  primes2 = ret4.get();
-  ret5.get();
-  int increRet = ret1.get();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  
+  int primes1 = result_find_prime_1000;
+  int primes2 = result_find_prime_10000;
   cout<<"Number of primes under 1000: "<<primes1<<endl;
   cout<<"Number of primes under 10000: "<<primes2<<endl;
 
   SECTION( "Task Results" ) {
     CHECK( primes1 == 168 );
     CHECK( primes2 == 1229 );
-    CHECK( testnum == 102 );
-    CHECK( increRet == 121 );
+    CHECK( testnum == 101 );
   }
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   
-  int temp;
-  while(cin>>temp){
-      if(temp < 0){
-          break;
-      }
-      std::future<int> ret5 = tp.AddTask(FindPrime, temp);
-      int tempprime = ret5.get();
-      cout<<"Number of primes under " << temp <<": "<< tempprime <<endl;
-  }
   tp.EndAllThreads();
-
 }
