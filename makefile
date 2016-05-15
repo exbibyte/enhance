@@ -319,3 +319,6 @@ test_Imgui_MemoryEditor:
 
 test_QueueLF:
 	g++ -g -std=c++11 $(src_folder_test_core)/test_QueueLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_QueueLF
+
+test_enEngineCoreAbstract:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineCoreAbstract.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -o $(build_dir)/test_enEngineCoreAbstract
