@@ -3,6 +3,7 @@
 
 //component types recognized by the core engine
 enum class enComponentType {
+    LOG,
     UI,
     FRONTEND,
     BACKEND,

@@ -1,39 +1,27 @@
 #ifndef EN_ENGINE_H
 #define EN_ENGINE_H
 
-class EngineCoreDefault{};
-class EngineLogicDefault{};
-class EngineContentDefault{};
-class EngineWindowDefault{};
-class EngineRenderDefault{};
-class EngineUiDefault{};
-class EngineFrontDefault{};
-class EngineNetworkDefault{};
-class EngineLogDefault{};
-
-template< class CoreEngine, class LogicEngine, class ContentEngine, class WindowEngine, class RenderEngine, class UiEngine, class FrontEngine, class NetworkEngine, class LogEngine >
+//encapsulating engine declaration
+template< class LogEngine, class CoreEngine, class UIEngine, class FrontendEngine, class BackendEngine, class RenderEngine, class MainEngine >
 class enEngine {
 public:
-    using TypeCoreEngine =     CoreEngine;
-    using TypeLogicEngine =    LogicEngine;
-    using TypeContentEngine =  ContentEngine;
-    using TypeWindowEngine =   WindowEngine;
-    using TypeRenderEngine =   RenderEngine;
-    using TypeUiEngine =       UiEngine;
-    using TypeFrontEngine =    FrontEngine;
-    using TypeNetworkEngine =  NetworkEngine;
-    using TypeLogEngine =      LogEngine;
-    CoreEngine                 _core_engine;
-    ContentEngine              _content_engine;
-    WindowEngine               _window_engine;
-    RenderEngine               _render_engine;
-    UiEngine                   _ui_engine;
-    FrontEngine                _front_engine;
-    NetworkEngine              _network_engine;
+    using TypeEngineLog =      LogEngine;
+    using TypeEngineCore =     CoreEngine;
+    using TypeEngineUI =       UIEngine;
+    using TypeFrontendEngine = FrontendEngine;
+    using TypeEngineBackend =  BackendEngine;
+    using TypeEngineRender =   RenderEngine;
+    using TypeEngineMain =     MainEngine;
     LogEngine                  _log_engine;
-    bool                       Initialize()       { return false; };
-    bool                       Run()              { return false; };
-    bool                       Cleanup()          { return false; };
+    CoreEngine                 _core_engine;
+    UIEngine                   _ui_engine;
+    FrontendEngine             _frontend_engine;
+    BackendEngine              _backend_engine;
+    RenderEngine               _render_engine;
+    MainEngine                 _main_engine;
+    virtual bool               Initialize()       { return false; };
+    virtual bool               Run()              { return false; };
+    virtual bool               Cleanup()          { return false; };
 };
 
 #endif
