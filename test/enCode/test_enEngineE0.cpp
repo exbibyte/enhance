@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN  // This tells Cactch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
 #include "enEngineE0.h"
@@ -26,19 +26,16 @@ enComponentType TestClassB::_component_type = enComponentType::BACKEND;
 TEST_CASE( "EnEngineE0", "[EnEngineE0]" ) {
     SECTION( "RegisterComponent, GetComponent" ) {
 
-	TestClassA instance_a;
-	TestClassB instance_b;
-
 	enEngineE0 engine;
-	engine._core_engine.RegisterComponent( TestClassA::_component_type, &instance_a );
-	engine._core_engine.RegisterComponent( TestClassB::_component_type, &instance_b );
+	bool bRet = engine.initialize();
+	CHECK( bRet );
 
-	CHECK( engine._core_engine._components.size() == 2 );
+	CHECK( engine._core_engine._components.size() == 7 );
 
-	TestClassA * component_frontend = engine._core_engine.GetComponent<TestClassA>( TestClassA::_component_type );
-	CHECK( component_frontend == &instance_a );
+	enFrontend0 * component_frontend = engine._core_engine.GetComponent<enFrontend0>( enFrontend0::_component_type );
+	CHECK( component_frontend == &engine._frontend_engine );
 	
-	TestClassB * component_backend = engine._core_engine.GetComponent<TestClassB>( TestClassB::_component_type );
-	CHECK( component_backend == &instance_b );
+        enBackend0 * component_backend = engine._core_engine.GetComponent<enBackend0>( enBackend0::_component_type );
+	CHECK( component_backend == &engine._backend_engine );
     }
 }

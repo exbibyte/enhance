@@ -11,13 +11,13 @@
 #include "enMain0.h"
 
 class enEngineE0 : public enEngine< enLog0, enCore0, enUI0, enFrontend0, enBackend0, enRenderPass_ShadowMap_OpGL, enMain0 > {
-    bool Initialize() override {
+    bool initialize_specialize() override {
 	return true;
     }
-    bool Run() override {
+    bool run_specialize() override {
 	return true;
     }
-    bool Cleanup() override {
+    bool cleanup_specialize() override {
 	return true;
     }
 };
