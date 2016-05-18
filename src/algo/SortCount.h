@@ -22,9 +22,8 @@ public:
 	do{
 	    --it_end;
 	    unsigned int val = *it_end;
-	    unsigned int index = temporary_partial_sum_index[ val ] - 1;
+	    unsigned int index = --temporary_partial_sum_index[ val ];
 	    output[ index ] = val;
-	    temporary_partial_sum_index[ val ]--;
 	}while( it_end != it_begin );
 	return true;
     }
