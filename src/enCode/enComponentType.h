@@ -3,15 +3,17 @@
 
 //component types recognized by the core engine
 enum class enComponentType {
-    LOG,
-    CORE,
+    UNDEFINED,
+    LOGGER,
+    CORE_UTILITY,
+    CORE_SCHEDULE,
+    LOGIC_FRONTEND,
+    LOGIC_BACKEND,
     UI,
-    FRONTEND,
-    BACKEND,
     RENDER,
-    MAIN,
-    PERIODIC,
-    TASKQUEUE,
+    CLOCK,
+    TRACKER_SYS_RESOURCE,
+    TRACKER_COMPONENTS,
 };
 
 #endif
