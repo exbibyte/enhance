@@ -4,6 +4,7 @@
 #include "enEngineKernelAbstract.hpp"
 #include "enComponentType.hpp"
 #include "enComponentMeta.hpp"
+#include "enComp_Clock.hpp"
 
 using namespace std;
 
@@ -11,15 +12,13 @@ using namespace std;
 class TestClassA : public enComponentMeta {
 public:
     int _val;
-    TestClassA() : _val(1), enComponentMeta(enComponentType::LOGIC_FRONTEND) {
+    TestClassA() : _val(1), enComponentMeta(enComponentType::LOGIC) {
     }
 };
 
-class TestClassB : public enComponentMeta {
+class TestClassB : public enComp_Clock {
 public:
     int _val;
-    TestClassB() : _val(2), enComponentMeta(enComponentType::LOGIC_BACKEND) {
-    }
 };
 
 TEST_CASE( "EnEngineKernelAbstract", "[EnEngineKernelAbstract]" ) {
@@ -29,15 +28,15 @@ TEST_CASE( "EnEngineKernelAbstract", "[EnEngineKernelAbstract]" ) {
 	TestClassB instance_b;
 
 	enEngineKernelAbstract engine_core;
-	engine_core.RegisterComponent( &instance_a );
-	engine_core.RegisterComponent( &instance_b );
+	engine_core.register_component( &instance_a );
+	engine_core.register_component( &instance_b );
 
-	CHECK( engine_core._components.size() == 2 );
+	CHECK( engine_core.get_num_components() == 2 );
 
-	TestClassA * component_frontend = dynamic_cast<TestClassA*>(engine_core.GetComponent(enComponentType::LOGIC_FRONTEND));
+	TestClassA * component_frontend = dynamic_cast<TestClassA*>(engine_core.get_component(enComponentType::LOGIC));
 	CHECK( component_frontend == &instance_a );
 	
-	TestClassB * component_backend = dynamic_cast<TestClassB*>(engine_core.GetComponent(enComponentType::LOGIC_BACKEND));
-	CHECK( component_backend == &instance_b );
+        enComp_Clock * component_clock = dynamic_cast<enComp_Clock*>(engine_core.get_component(enComponentType::CLOCK));
+	CHECK( component_clock != nullptr );
     }
 }

@@ -14,23 +14,28 @@
 class enEngineKernelAbstract {
 public:
     enEngineKernelAbstract(){}
-    ~enEngineKernelAbstract(){}
-    bool RegisterComponent( enComponentMeta * component, uint_fast32_t cid = 0 );
-    enComponentMeta * GetComponent( enComponentType type, uint_fast32_t cid = 0 );
-    bool RemoveComponentAll();
-    enEngineKernelAbstract * GetCoreEngine();
-    void AccumulateComponents( std::function<void(enComponentMeta*,std::vector<enComponentMeta*>&)> f, std::vector<enComponentMeta * > & accum );
-    std::map< std::pair<enComponentType,uint_fast32_t>, enComponentMeta * > _components;
-    uint_fast32_t _cid = 0; //component id
-
-    //stages for custom actions starts-----
-    virtual void Init(){}
-    virtual void Deinit(){}
-    //stages for custom actions ends-----
+    virtual ~enEngineKernelAbstract(){}
 
     //API section starts-----
+    bool register_component( enComponentMeta * component, uint_fast32_t cid = 0 );
+    enComponentMeta * get_component( enComponentType type, uint_fast32_t cid = 0 );
+    enEngineKernelAbstract * get_core_engine();
+    void accumulate_components( std::function<void(enComponentMeta*,std::vector<enComponentMeta*>&)> f, std::vector<enComponentMeta * > & accum );
     void transmit( enPacketTransmit packet ){}
+    int get_num_components() const;
     //API section ends-----
+    
+protected:
+    //stages for custom actions starts-----
+    virtual void init(){}
+    virtual void deinit(){}
+    //stages for custom actions ends-----
+
+    bool remove_component_all();
+    
+private:
+    std::map< std::pair<enComponentType,uint_fast32_t>, enComponentMeta * > _components;
+    uint_fast32_t _cid = 0; //component id
 };
 
 #endif

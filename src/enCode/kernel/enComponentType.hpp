@@ -4,16 +4,24 @@
 //component types recognized by the core engine
 enum class enComponentType {
     UNDEFINED,
-    LOGGER,
-    CORE_UTILITY,
-    CORE_SCHEDULE,
-    LOGIC_FRONTEND,
-    LOGIC_BACKEND,
-    UI,
-    RENDER,
+    //FACTORY STARTS
+    FACTORY_CLOCK,
+    FACTORY_LOGGER,
+    FACTORY_RENDER,
+    FACTORY_UI,
+    FACTORY_LOGIC,
+    FACTORY_SCHEDULER,
+    FACTORY_UTILITY,
+    //FACTORY ENDS
+    //INSTANCE STARTS
     CLOCK,
-    TRACKER_SYS_RESOURCE,
-    TRACKER_COMPONENTS,
+    LOGGER,
+    RENDER,
+    UI,
+    LOGIC,
+    SCHEDULER,
+    UTILITY,
+    //INSTANCE ENDS
 };
 
 #endif
