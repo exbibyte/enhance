@@ -1,9 +1,9 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "enEngineKernelAbstract.h"
-#include "enComponentType.h"
-#include "enComponentMeta.h"
+#include "enEngineKernelAbstract.hpp"
+#include "enComponentType.hpp"
+#include "enComponentMeta.hpp"
 
 using namespace std;
 
@@ -34,10 +34,10 @@ TEST_CASE( "EnEngineKernelAbstract", "[EnEngineKernelAbstract]" ) {
 
 	CHECK( engine_core._components.size() == 2 );
 
-	TestClassA * component_frontend = engine_core.GetComponent<TestClassA>(enComponentType::LOGIC_FRONTEND);
+	TestClassA * component_frontend = dynamic_cast<TestClassA*>(engine_core.GetComponent(enComponentType::LOGIC_FRONTEND));
 	CHECK( component_frontend == &instance_a );
 	
-	TestClassB * component_backend = engine_core.GetComponent<TestClassB>(enComponentType::LOGIC_BACKEND);
+	TestClassB * component_backend = dynamic_cast<TestClassB*>(engine_core.GetComponent(enComponentType::LOGIC_BACKEND));
 	CHECK( component_backend == &instance_b );
     }
 }
