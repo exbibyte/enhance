@@ -5,6 +5,7 @@
 enum class enComponentType {
     UNDEFINED,
     //FACTORY STARTS
+    FACTORY,
     FACTORY_CLOCK,
     FACTORY_LOGGER,
     FACTORY_RENDER,

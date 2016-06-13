@@ -21,9 +21,9 @@ protected:
     void receive( enPacketTransmit packet );
     void process_received_messages( std::function<void(enPacketTransmit &)> func );
 private:
+    enComponentType _component_type;
     uint_fast32_t _cid;
     enEngineKernelAbstract * _kernel;
-    enComponentType _component_type;
     std::deque< enPacketTransmit > _queue_receive;
 };
 

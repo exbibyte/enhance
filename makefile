@@ -324,8 +324,5 @@ test_Imgui_MemoryEditor:
 test_QueueLF:
 	g++ -g -std=c++11 $(src_folder_test_core)/test_QueueLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_QueueLF
 
-test_enEngineKernelAbstract:
-	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineKernelAbstract.cpp $(src_folder_en_kernel)/enEngineKernelAbstract.cpp $(src_folder_en_kernel_component)/enComponentMeta.cpp $(src_folder_en_kernel_component)/enComp_Clock.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -I$(inc_folder_en_kernel) -I$(inc_folder_en_kernel_component) -o $(build_dir)/test_enEngineKernelAbstract
-
-test_enEngineE0:
-	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineE0.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -I$(inc_folder_render) -I$(inc_folder_asset) -I$(inc_folder_gl) -I$(inc_folder_file) -I$(inc_folder_math) -o $(build_dir)/test_enEngineE0
+test_enEngineKernel0:
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineKernel0.cpp $(src_folder_en_kernel)/enEngineKernelAbstract.cpp $(src_folder_en_kernel)/enEngineKernel0.cpp $(src_folder_en_kernel_component)/enComponentMeta.cpp $(src_folder_core)/Clock0.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -I$(inc_folder_en_kernel) -I$(inc_folder_en_kernel_component) -I$(inc_folder_core) -o $(build_dir)/test_enEngineKernel0

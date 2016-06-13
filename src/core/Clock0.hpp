@@ -1,18 +1,17 @@
-#ifndef EN_COMPONENT_CLOCK_H
-#define EN_COMPONENT_CLOCK_H
+#ifndef CLOCK0_H
+#define CLOCK0_H
 
 #include <chrono>
 
-#include "enComponentMeta.hpp"
-#include "enComponentType.hpp"
+#include "IClock.hpp"
 
-class enComponent_Clock0 : public enComponentMeta {
+class Clock0 : public IClock {
 public:  
-    enComponent_Clock0() : enComponentMeta( enComponentType::CLOCK ), _is_running(false) {}
-    virtual void                                     run();
-    virtual void                                     pause();
-    virtual bool                                     is_running() const;
-    virtual void                                     set_frequency(double frequency_Hz);
+    Clock0() : _is_running(false) {}
+    void                                             run();
+    void                                             pause();
+    bool                                             is_running() const;
+    void                                             set_frequency(double frequency_Hz);
     void                                             set_func_cb( std::function<void(void)> );
     bool                                             tick();
 private:

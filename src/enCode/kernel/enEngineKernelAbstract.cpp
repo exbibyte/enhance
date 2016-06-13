@@ -7,11 +7,12 @@
 #include "enEngineKernelAbstract.hpp"
 #include "enComponentMeta.hpp"
 
-bool enEngineKernelAbstract::register_component( enComponentMeta * component, uint_fast32_t cid ){
+bool enEngineKernelAbstract::register_component( enComponentMeta * component ){
     if( !component )
 	return false;
     component->SaveKernelInfo( this, _cid );
     _components[ std::pair<enComponentType,uint_fast32_t>( component->get_component_type(), _cid) ] = component;
+    ++_cid;
     return true;
 }
 
@@ -35,6 +36,15 @@ void enEngineKernelAbstract::accumulate_components( std::function<void(enCompone
     for( auto & i : _components ){
 	f( i.second, accum );
     }
+}
+
+void enEngineKernelAbstract::get_components_by_type( enComponentType type, std::vector< enComponentMeta * > & accum ){
+    auto f = [=]( enComponentMeta * x, std::vector<enComponentMeta*> & result )->void{
+	if( x->get_component_type() == type ){
+	    result.push_back( x );
+	}
+    };
+    accumulate_components( f, accum );
 }
 
 int enEngineKernelAbstract::get_num_components() const {

@@ -1,25 +1,25 @@
 #include <chrono>
 
-#include "enComp_Clock.hpp"
+#include "Clock0.hpp"
 
 using namespace std;
 
-void enComp_Clock::run(){
+void Clock0::run(){
     _is_running = true;
 }
-void enComp_Clock::pause(){
+void Clock0::pause(){
     _is_running = false;
 }
-bool enComp_Clock::is_running() const {
+bool Clock0::is_running() const {
     return _is_running;
 }
-void enComp_Clock::set_frequency(double frequency_Hz){
+void Clock0::set_frequency(double frequency_Hz){
     _period_ms = 1.0/frequency_Hz*1000;
 }
-void enComp_Clock::set_func_cb( std::function<void(void)> f ){
+void Clock0::set_func_cb( std::function<void(void)> f ){
     _func_cb = f;
 }
-bool enComp_Clock::tick(){
+bool Clock0::tick(){
     if( !_is_running )
 	return false;
     if( _period_ms < 0 )

@@ -10,8 +10,9 @@
 
 //interface for core engine
 class enEngineKernel0 : public enEngineKernelAbstract {
-    void Init();
-    void Deinit();
+public:
+    void init();
+    void deinit();
 };
 
 #endif
