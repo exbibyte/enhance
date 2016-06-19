@@ -32,17 +32,19 @@ enEngineKernelAbstract * enEngineKernelAbstract::get_core_engine(){
     return this;
 }
 
-void enEngineKernelAbstract::accumulate_components( std::function<void(enComponentMeta*,std::vector<enComponentMeta*>&)> f, std::vector< enComponentMeta * > & accum ){
+void enEngineKernelAbstract::accumulate_components( std::function<bool(enComponentMeta*)> f, std::vector< enComponentMeta * > & accum ){
     for( auto & i : _components ){
-	f( i.second, accum );
+	if( f( i.second ) )
+	    accum.push_back( i.second );
     }
 }
 
 void enEngineKernelAbstract::get_components_by_type( enComponentType type, std::vector< enComponentMeta * > & accum ){
-    auto f = [=]( enComponentMeta * x, std::vector<enComponentMeta*> & result )->void{
-	if( x->get_component_type() == type ){
-	    result.push_back( x );
-	}
+    auto f = [=]( enComponentMeta * x )->bool{
+	if( x->get_component_type() == type )
+	    return true;
+	else
+	    return false;
     };
     accumulate_components( f, accum );
 }

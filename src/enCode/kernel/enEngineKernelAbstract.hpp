@@ -20,7 +20,7 @@ public:
     bool register_component( enComponentMeta * component );
     enComponentMeta * get_component( enComponentType type, uint_fast32_t cid = 0 );
     enEngineKernelAbstract * get_core_engine();
-    void accumulate_components( std::function<void(enComponentMeta*,std::vector<enComponentMeta*>&)> f, std::vector<enComponentMeta * > & accum );
+    void accumulate_components( std::function<bool(enComponentMeta*)> f, std::vector<enComponentMeta * > & accum );
     void get_components_by_type( enComponentType type, std::vector< enComponentMeta * > & accum );
     void transmit( enPacketTransmit packet ){}
     int get_num_components() const;
