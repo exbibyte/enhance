@@ -3,11 +3,12 @@
 
 #include <mutex>
 #include <atomic>
+#include "IQueue.hpp"
 
 //unbounded lock free queue, based on section Art of Multiprocessor Programming section 10.5
 
 template< class T >
-class QueueLF {
+class QueueLF : IQueue<T> {
 public:
     class Node {
     public:
@@ -21,6 +22,8 @@ public:
     size_t size();
     QueueLF();
     ~QueueLF();
+    void add_to_queue( T & val ){ push(val); }
+    bool get_from_queue( T & val ){ return pop(val); }
 private:
     std::atomic< Node * > _head;
     std::atomic< Node * > _tail;
