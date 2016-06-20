@@ -6,6 +6,9 @@
 #include "enComponentMeta.hpp"
 #include "enComponentClock.hpp"
 #include "enComponentLogger.hpp"
+#include "enComponentScheduler.hpp"
+
+#include "Funwrap3.hpp"
 
 #include <vector>
 
@@ -18,7 +21,7 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	CHECK( engine_kernel.get_num_components() == 0 );
 
 	engine_kernel.init();
-	CHECK( engine_kernel.get_num_components() == 2 );
+	CHECK( engine_kernel.get_num_components() == 3 );
 
 	//clock
 	vector<enComponentMeta*> clocks;
@@ -36,7 +39,23 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	COMPONENT_INSTANCE( logger_stdout, enComponentLoggerStdout, loggers.front() );
 	logger_stdout->Log( "Engine Kernel {%s} initialized.", "0" );
 
-	
+	//scheduler
+	vector<enComponentMeta*> schedulers;
+	engine_kernel.get_components_by_type( enComponentType::SCHEDULER, schedulers );
+	REQUIRE( schedulers.size() == 1 );
+
+	COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
+	Funwrap3 f;
+	std::function<void()> fun_print = []()->bool{
+	    cout << "function called." << endl;
+	    return true;
+	};
+	f.set( FunCallType::ASYNC, fun_print );
+	scheduler0->add( f );
+	Funwrap3 g;
+	scheduler0->get( g );
+	g.apply();
+		
 	engine_kernel.deinit();
     }
 }

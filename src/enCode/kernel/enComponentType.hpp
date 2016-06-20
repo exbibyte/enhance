@@ -8,10 +8,14 @@ enum class enComponentType {
     CLOCK,
     LOGGER,
     RENDER,
+    RENDERCOMPUTE,
     UI,
     LOGIC,
     SCHEDULER,
+    WORKERPOOL,
     UTILITY,
+    STAT,
+    MEMORYALLOC,
     //INSTANCE ENDS
 };
 
