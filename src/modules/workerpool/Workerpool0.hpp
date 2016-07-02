@@ -2,7 +2,7 @@
 #define WORKERPOOL0_H
 
 #include "IWorkerpool.hpp"
-#include "Thread0.hpp"
+#include "IThread.hpp"
 #include <vector>
 
 class Workerpool0 : public IWorkerpool {
@@ -13,7 +13,7 @@ public:
     void start_workers();
     void end_workers();
 private:
-    std::vector<Thread0*> _pool;
+    std::vector<IThread*> _pool;
 };
 
 #endif

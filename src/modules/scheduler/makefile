@@ -14,7 +14,7 @@ src_files = $(wildcard *.cpp) $(wildcard **/*.cpp)
 inc_folder_core := ../../core
 
 #get list of subdirectories in ../modules/
-inc_folder_module_subdirs := $(sort $(dir $(wildcard ./*/)))
+inc_folder_module_subdirs := $(sort $(dir $(wildcard ./../**/)))
 
 include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs)
 
