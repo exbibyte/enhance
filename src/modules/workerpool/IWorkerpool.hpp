@@ -1,23 +1,15 @@
 #ifndef IWORKERPOOL_H
 #define IWORKERPOOL_H
 
+#include <functional>
+
 class IWorkerpool {
 public:
-    enum class Status {
-	STOPPED,
-        BUSY,
-        PAUSED,
-    };
-    enum class Action {
-        STOP,
-	PAUSE,
-	START,
-    };
-    virtual void set_worker_num( unsigned int ){}
-    virtual void set_action( IWorkerpool::Action ){}
-    virtual IWorkerpool::Status get_status() const { return _status; }
-private:
-    IWorkerpool::Status _status;
+    virtual ~IWorkerpool(){}
+    virtual void set_worker_num( unsigned int ) = 0;
+    virtual void set_worker_task( std::function<void(void)> ) = 0;
+    virtual void start_workers() = 0;
+    virtual void end_workers() = 0;
 };
 
 #endif

@@ -13,13 +13,14 @@ public:
     ~Thread0();
     State getstate() const;
     void setaction( IThread::Action );
-    void runloop();
-    void runtask();
     void settask( std::function<void(void)> );
 private:
     std::atomic<IThread::State> _state;
     std::thread _thread;
     std::function<void(void)> _task;
+
+    void runloop();
+    void runtask();
 };
 
 #endif
