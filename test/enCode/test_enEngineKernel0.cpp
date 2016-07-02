@@ -39,19 +39,24 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	COMPONENT_INSTANCE( logger_stdout, enComponentLoggerStdout, loggers.front() );
 	logger_stdout->Log( "Engine Kernel {%s} initialized.", "0" );
 
+	enComponentLoggerStdout * logger = dynamic_cast< enComponentLoggerStdout * >( loggers.front() );
+	CHECK( nullptr != logger );
+
 	//scheduler
 	vector<enComponentMeta*> schedulers;
 	engine_kernel.get_components_by_type( enComponentType::SCHEDULER, schedulers );
 	REQUIRE( schedulers.size() == 1 );
 
 	COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
-	Funwrap3 f;
-	std::function<void()> fun_print = []()->bool{
-	    cout << "function called." << endl;
-	    return true;
-	};
-	f.set( FunCallType::ASYNC, fun_print );
-	scheduler0->add( f );
+	{
+	    Funwrap3 f;
+	    std::function<void()> fun_print = []()->bool{
+		cout << "function called." << endl;
+		return true;
+	    };
+	    f.set( FunCallType::ASYNC, fun_print );
+	    scheduler0->add( f );
+	}
 	Funwrap3 g;
 	scheduler0->get( g );
 	g.apply();

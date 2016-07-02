@@ -5,7 +5,7 @@
 enum class enComponentType {
     UNDEFINED,
     //INSTANCE STARTS
-    CLOCK,
+    CLOCK, 
     LOGGER,
     RENDER,
     RENDERCOMPUTE,

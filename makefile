@@ -5,8 +5,8 @@ src_folder_ui := ./src/ui
 src_folder_ui_imgui := ./src/ui/imgui
 src_folder_ui_imgui_gl := ./src/ui/imgui/GL
 src_folder_en := ./src/enCode
-src_folder_en_kernel := ./src/enCode/kernel
-src_folder_en_kernel_component := ./src/enCode/kernel/component
+src_folder_en_kernel := ./src/kernel
+src_folder_en_kernel_component := ./src/kernel/component
 src_folder_core := ./src/core
 src_folder_transition := ./src/transition
 src_folder_graph := ./src/graph
@@ -40,8 +40,9 @@ inc_folder_ui_imgui_gl := ./src/ui/imgui/GL
 inc_folder_catch := ./test
 inc_folder_en := ./src/enCode
 inc_folder_core := ./src/core
-inc_folder_en_kernel := ./src/enCode/kernel
-inc_folder_en_kernel_component := ./src/enCode/kernel/component
+inc_folder_en_kernel := ./src/kernel
+inc_folder_en_kernel_component := ./src/kernel/component
+inc_folder_en_kernel_interface := ./src/kernel/interface
 inc_folder_transition := ./src/transition
 inc_folder_graph := ./src/graph
 inc_folder_polymesh := ./src/polymesh
@@ -325,4 +326,4 @@ test_QueueLF:
 	g++ -g -std=c++11 $(src_folder_test_core)/test_QueueLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_QueueLF
 
 test_enEngineKernel0:
-	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineKernel0.cpp $(src_folder_en_kernel)/enEngineKernelAbstract.cpp $(src_folder_en_kernel)/enEngineKernel0.cpp $(src_folder_en_kernel)/enComponentMeta.cpp $(src_folder_core)/Clock0.cpp $(src_folder_core)/LoggerStdout.cpp $(src_folder_core)/Scheduler0.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -I$(inc_folder_en_kernel) -I$(inc_folder_en_kernel_component) -I$(inc_folder_core) -o $(build_dir)/test_enEngineKernel0
+	$(CXX) -std=c++14 -g $(src_folder_test_en)/test_enEngineKernel0.cpp $(src_folder_en_kernel)/enEngineKernelAbstract.cpp $(src_folder_en_kernel)/enEngineKernel0.cpp $(src_folder_en_kernel)/enComponentMeta.cpp $(src_folder_core)/Clock0.cpp $(src_folder_core)/LoggerStdout.cpp $(src_folder_core)/Scheduler0.cpp -I$(inc_folder_catch) -I$(inc_folder_en) -I$(inc_folder_en_kernel) -I$(inc_folder_en_kernel_component) -I$(inc_folder_en_kernel_interface) -I$(inc_folder_core) -o $(build_dir)/test_enEngineKernel0
