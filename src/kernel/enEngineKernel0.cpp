@@ -3,11 +3,15 @@
 #include "enComponentClock.hpp"
 #include "enComponentLogger.hpp"
 #include "enComponentScheduler.hpp"
+#include "enComponentStat.hpp"
+#include "enComponentThread.hpp"
 
 void enEngineKernel0::init(){
     register_component( new enComponentClock0( new Clock0 ) );
     register_component( new enComponentLoggerStdout( new LoggerStdout ) );
     register_component( new enComponentScheduler0( new Scheduler0 ) );
+    register_component( new enComponentStat0( new Stat0 ) );
+    register_component( new enComponentThread0( new Thread0 ) );
 }
 
 void enEngineKernel0::deinit(){

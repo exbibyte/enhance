@@ -16,6 +16,7 @@ enum class enComponentType {
     UTILITY,
     STAT,
     MEMORYALLOC,
+    THREAD,
     //INSTANCE ENDS
 };
 

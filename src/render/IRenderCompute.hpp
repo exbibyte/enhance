@@ -4,7 +4,7 @@
 class IRenderCompute {
 public:
     virtual ~IRenderCompute(){}
-    bool render_compute( vector<RenderContext> context, vector<RenderEntity> entities, vector<RenderLight> light, vector<RenderCamera> camera ){ return false; }
+    virtual bool compute( std::vector<RenderContext> context, std::vector<RenderEntity> entities, std::vector<RenderLight> light, std::vector<RenderCamera> camera ){ return false; }
 };
 
 #endif

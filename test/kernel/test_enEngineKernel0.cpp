@@ -7,10 +7,15 @@
 #include "enComponentClock.hpp"
 #include "enComponentLogger.hpp"
 #include "enComponentScheduler.hpp"
+#include "enComponentStat.hpp"
+#include "enComponentThread.hpp"
 
 #include "Funwrap3.hpp"
 
 #include <vector>
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -21,7 +26,7 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	CHECK( engine_kernel.get_num_components() == 0 );
 
 	engine_kernel.init();
-	CHECK( engine_kernel.get_num_components() == 3 );
+	CHECK( engine_kernel.get_num_components() > 0 );
 
 	//clock
 	vector<enComponentMeta*> clocks;
@@ -60,7 +65,36 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	Funwrap3 g;
 	scheduler0->get( g );
 	g.apply();
-		
+
+	//stat
+	vector<enComponentMeta*> stats;
+	engine_kernel.get_components_by_type( enComponentType::STAT, stats );
+	REQUIRE( stats.size() == 1 );
+	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
+	CHECK( 0 == strcmp( stat0->getstat(), "stat retrieved." ) );
+	std::cout << stat0->getstat() << std::endl;
+
+	//thread
+	vector<enComponentMeta*> threads;
+	engine_kernel.get_components_by_type( enComponentType::THREAD, threads );
+	REQUIRE( threads.size() == 1 );
+	COMPONENT_INSTANCE( thread0, enComponentThread0, threads.front() );
+	CHECK( IThread::State::STOPPED == thread0->getstate() );
+	{
+	    bool i = false;
+	    CHECK( i == false );
+	    Funwrap3 f;
+	    f.set( FunCallType::ASYNC, [&]{ i = true; } );
+	    std::function<void()> fun_set_bool = [&](){
+		f.apply();
+	    };
+	    thread0->settask( fun_set_bool );
+	    thread0->setaction( IThread::Action::START );
+	    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	    thread0->setaction( IThread::Action::END );
+	    CHECK( i == true );
+	}
+	
 	engine_kernel.deinit();
     }
 }

@@ -25,6 +25,7 @@
 *~*
 documentation/
 build/
+intermediate/
 
 # Generated Files
 *.ini
