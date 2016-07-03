@@ -1,22 +1,21 @@
 #include <string>
-#include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <fstream>
 
 #include "Stat0.hpp"
 #include "IStat.hpp"
 
 std::string const Stat0::getstat(){
-    FILE* file = fopen("/proc/self/status", "r");
-    int result = -1;
-    char line[128];
-
+    std::ifstream file( "/proc/self/status", std::ios::in );
     std::string statinfo;
-    while (fgets(line, 128, file) != NULL){
-	if (strncmp(line, "VmRSS:", 6) == 0){
-	    statinfo = line;
-	    break;
+    
+    if( file.is_open() ){
+	while( getline( file, statinfo ) ){
+	    if ( std::string::npos != statinfo.find("VmRSS:") ){
+		return statinfo;
+	    }
 	}
     }
-    fclose(file);
-    return statinfo;
+    return "";
 }
