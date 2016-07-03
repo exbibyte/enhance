@@ -10,7 +10,7 @@ Thread0::~Thread0(){
 	_thread.join();
 }
 
-void Thread0::setaction( IThread::Action a ){
+bool Thread0::setaction( IThread::Action a ){
 
     switch( a ){
     case IThread::Action::START:
@@ -18,7 +18,11 @@ void Thread0::setaction( IThread::Action a ){
 	//start thread only if current state is stopped
 	IThread::State expected_state = IThread::State::STOPPED;
 	if( atomic_compare_exchange_strong( &_state, &expected_state, IThread::State::SIGNAL_TO_BUSY ) ){
+	    if( _thread.joinable() ){
+		_thread.join();
+	    }
 	    _thread = std::thread( [=]{ runloop(); } );
+	    return true;
 	}
 	break;
     }
@@ -27,11 +31,13 @@ void Thread0::setaction( IThread::Action a ){
 	//end thread only if it is busy
 	IThread::State expected_state = IThread::State::BUSY;
 	atomic_compare_exchange_strong( &_state, &expected_state, IThread::State::SIGNAL_TO_STOP );
+	return true;
 	break;
     }
     default:
 	break;
     }
+    return false;
 }
 
 IThread::State Thread0::getstate() const {

@@ -6,7 +6,7 @@
 class IStat {
 public:
     virtual ~IStat(){}
-    virtual char const * getstat(){ return nullptr; }
+    virtual std::string const getstat(){ return ""; }
 };
 
 #endif

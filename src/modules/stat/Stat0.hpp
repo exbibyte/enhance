@@ -5,7 +5,7 @@
 
 class Stat0 : public IStat {
 public:
-    char const * getstat();
+    std::string const getstat();
 };
 
 #endif

@@ -30,7 +30,7 @@ $(shell mkdir -p $(dir_build))
 .PHONY: all
 
 all:
-	$(CXX) -std=c++14 -o $(dir_build)/$(target) $(target).cpp $(object_files) $(include_flags) $(specification_flags)
+	$(CXX) -g -std=c++14 -o $(dir_build)/$(target) $(target).cpp $(object_files) $(include_flags) $(specification_flags)
 
 .PHONY: clean
 

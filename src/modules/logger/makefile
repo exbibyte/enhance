@@ -29,7 +29,7 @@ dir_intermediate := ./intermediate
 $(shell mkdir -p $(dir_intermediate))
 
 %.o: %.cpp
-	$(CXX) -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
+	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 .PHONY: all
 

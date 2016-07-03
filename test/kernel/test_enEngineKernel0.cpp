@@ -71,7 +71,7 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	engine_kernel.get_components_by_type( enComponentType::STAT, stats );
 	REQUIRE( stats.size() == 1 );
 	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
-	CHECK( 0 == strcmp( stat0->getstat(), "stat retrieved." ) );
+	CHECK( 0 < stat0->getstat().size() );
 	std::cout << stat0->getstat() << std::endl;
 
 	//thread
@@ -81,18 +81,20 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	COMPONENT_INSTANCE( thread0, enComponentThread0, threads.front() );
 	CHECK( IThread::State::STOPPED == thread0->getstate() );
 	{
-	    bool i = false;
-	    CHECK( i == false );
-	    Funwrap3 f;
-	    f.set( FunCallType::ASYNC, [&]{ i = true; } );
-	    std::function<void()> fun_set_bool = [&](){
-		f.apply();
-	    };
-	    thread0->settask( fun_set_bool );
-	    thread0->setaction( IThread::Action::START );
-	    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	    thread0->setaction( IThread::Action::END );
-	    CHECK( i == true );
+	    for(int j = 0; j < 3; ++j ){
+		bool i = false;
+		CHECK( i == false );
+		Funwrap3 f;
+		f.set( FunCallType::ASYNC, [&]{ i = true; } );
+		std::function<void()> fun_set_bool = [&](){
+		    f.apply();
+		};
+		thread0->settask( fun_set_bool );
+		while( !thread0->setaction( IThread::Action::START ) );
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		while( !thread0->setaction( IThread::Action::END ) );
+		CHECK( i == true );
+	    }
 	}
 	
 	engine_kernel.deinit();

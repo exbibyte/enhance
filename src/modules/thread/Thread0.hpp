@@ -12,7 +12,7 @@ public:
     Thread0() : _state(IThread::State::STOPPED), _task(nullptr) {}
     ~Thread0();
     State getstate() const;
-    void setaction( IThread::Action );
+    bool setaction( IThread::Action );
     void settask( std::function<void(void)> );
 private:
     std::atomic<IThread::State> _state;
