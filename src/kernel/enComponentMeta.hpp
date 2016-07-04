@@ -17,8 +17,9 @@ public:
 	_strid[63] = '\0';
     }
     void SaveKernelInfo( enEngineKernelAbstract * kernel, uint_fast32_t cid );
-    enComponentType get_component_type();
-    int get_cid();
+    enComponentType get_component_type() const;
+    int get_cid() const;
+    char const * get_strid() const;
 protected:
     void send( enComponentType dest, std::vector<int_fast32_t> msg );
     void send( enComponentType dest, uint_fast32_t dest_cid, std::vector<int_fast32_t> msg );

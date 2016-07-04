@@ -3,12 +3,11 @@ inc_folder_core := ../../src/core
 inc_folder_test := ../
 inc_folder_kernel := ../../src/kernel
 inc_folder_kernel_component := ../../src/kernel/component
-inc_folder_modules_subdir := $(wildcard ../../src/modules/**/)
 
 #get list of subdirectories in ../modules/
-inc_folder_module_subdirs := $(sort $(dir $(wildcard ./*/)))
+inc_folder_module_subdirs := $(sort $(dir $(wildcard ../../src/modules/*/)))
 
-include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs) $(inc_folder_test) $(inc_folder_kernel_component) $(inc_folder_kernel) $(inc_folder_modules_subdir)
+include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs) $(inc_folder_test) $(inc_folder_kernel_component) $(inc_folder_kernel)
 
 #include directories end---
 

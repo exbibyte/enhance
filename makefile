@@ -58,7 +58,21 @@ $(shell mkdir -p $(build_dir))
 
 .PHONY: all
 
-all: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferInterface test_slerp test_sclerp test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
+old: test_vec test_quat test_dualquat test_dualscalar test_Mat test_enTable test_CircularBuffer test_BufferInterface test_slerp test_sclerp test_TransMatrix test_PolyMesh test_GraphDirected test_WingedEdge test_Trie test_Obj2PolyMesh test_StreamChannel test_StreamManager test_StreamInterface test_GraphSearch
+
+# kernel related starts
+kernel_modules := ./src/modules
+kernel := ./src/kernel
+
+build_kernel_modules:
+	$(MAKE) -C $(kernel_modules)
+
+build_kernel:
+	$(MAKE) -C $(kernel)
+
+all: build_kernel_modules build_kernel
+
+#kernel related ends
 
 parsing:
 	test_ParsePolyMesh test_DataTransformPolyMesh_osx
@@ -317,5 +331,5 @@ test_HashTable:
 test_Imgui_MemoryEditor:
 	g++ -g -std=c++1y $(src_folder_test_ui)/test_MemoryEditor.cpp $(src_folder_ui_imgui)/imgui.cpp $(src_folder_ui_imgui)/imgui_draw.cpp $(src_folder_ui_imgui)/imgui_demo.cpp $(src_folder_ui_imgui)/imgui_impl_glfw_gl3.cpp $(src_folder_ui_imgui_gl)/gl3w.c -I$(inc_folder_ui_imgui) -I$(inc_folder_ui_imgui_gl) -I/usr/local/include -pthread -lglfw3 -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo -framework Carbon -L/usr/local/lib -o $(build_dir)/test_Imgui_MemoryEditor
 
-test_QueueLF:
-	g++ -g -std=c++11 $(src_folder_test_core)/test_QueueLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_QueueLF
+# test_QueueLF:
+# 	g++ -g -std=c++11 $(src_folder_test_core)/test_QueueLF.cpp -I$(inc_folder_catch) -I$(src_folder_core) -pthread -o $(build_dir)/test_QueueLF

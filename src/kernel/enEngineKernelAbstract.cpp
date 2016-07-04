@@ -49,6 +49,16 @@ void enEngineKernelAbstract::get_components_by_type( enComponentType type, std::
     accumulate_components( f, accum );
 }
 
+void enEngineKernelAbstract::get_components_by_strid( char const * strid, std::vector< enComponentMeta * > & accum ){
+    auto f = [=]( enComponentMeta * x )->bool{
+	if( 0 == strcmp( x->get_strid(), strid ) )
+	    return true;
+	else
+	    return false;
+    };
+    accumulate_components( f, accum );
+}
+
 int enEngineKernelAbstract::get_num_components() const {
     return _components.size();
 }

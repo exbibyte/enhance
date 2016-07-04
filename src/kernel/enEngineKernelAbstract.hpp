@@ -22,6 +22,7 @@ public:
     enEngineKernelAbstract * get_core_engine();
     void accumulate_components( std::function<bool(enComponentMeta*)> f, std::vector<enComponentMeta * > & accum );
     void get_components_by_type( enComponentType type, std::vector< enComponentMeta * > & accum );
+    void get_components_by_strid( char const * strid, std::vector< enComponentMeta * > & accum );
     void transmit( enPacketTransmit packet ){}
     int get_num_components() const;
     //API section ends-----

@@ -10,11 +10,14 @@ void enComponentMeta::SaveKernelInfo( enEngineKernelAbstract * kernel, uint_fast
     _kernel = kernel;
     _cid = cid;
 }
-enComponentType enComponentMeta::get_component_type(){
+enComponentType enComponentMeta::get_component_type() const {
     return _component_type;
 }
-int enComponentMeta::get_cid(){
+int enComponentMeta::get_cid() const {
     return _cid;
+}
+char const * enComponentMeta::get_strid() const {
+    return _strid;
 }
 void enComponentMeta::send( enComponentType dest, std::vector<int_fast32_t> msg ){
     send( dest, 0, msg );
