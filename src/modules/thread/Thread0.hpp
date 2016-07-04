@@ -9,6 +9,7 @@
 
 class Thread0 : public IThread {
 public:
+    char const * get_id(){ return "thread0"; }
     Thread0() : _state(IThread::State::STOPPED), _task(nullptr) {}
     ~Thread0();
     State getstate() const;

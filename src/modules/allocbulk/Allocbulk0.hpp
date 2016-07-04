@@ -5,6 +5,7 @@
 
 class Allocbulk0 : public IAllocbulk {
 public:
+    char const * get_id(){ return "allocbulk0"; }
     Allocbulk0();
     ~Allocbulk0();
 };

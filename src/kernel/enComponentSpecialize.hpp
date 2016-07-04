@@ -19,7 +19,7 @@ template< class AbstractType, class ConcreteType >
 class enComponentSpecialize: public enComponentMeta {
 public:
     using InterfaceType = AbstractType;
-    enComponentSpecialize( ConcreteType * instance, enComponentType type ) : enComponentMeta( type ){
+    enComponentSpecialize( ConcreteType * instance, enComponentType type ) : enComponentMeta( type, instance->get_id() ){
 	_instance = instance;
     }
     ~enComponentSpecialize(){

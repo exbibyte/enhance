@@ -6,6 +6,7 @@
 
 class Scheduler0 : public IScheduler<Funwrap3> {
 public:
+    char const * get_id(){ return "scheduler0"; }
     using ItemType = Funwrap3;
     Scheduler0(){}
     ~Scheduler0(){}

@@ -8,6 +8,7 @@
 class Clock0 : public IClock {
 public:  
     Clock0() : _is_running(false) {}
+    char const *                                     get_id(){ return "clock0"; }
     void                                             run();
     void                                             pause();
     bool                                             is_running() const;

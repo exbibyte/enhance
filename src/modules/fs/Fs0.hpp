@@ -5,6 +5,7 @@
 
 class Fs0 : public IFs {
 public:
+    char const * get_id(){ return "fs0"; }
     Fs0();
     ~Fs0();
 };

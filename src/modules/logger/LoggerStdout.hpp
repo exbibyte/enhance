@@ -7,6 +7,7 @@
 
 class LoggerStdout : public ILogger {
 public:
+    char const * get_id(){ return "LoggerStdout"; }
     void Log( char const * format, ... );
     void Log( std::string & );
 private:

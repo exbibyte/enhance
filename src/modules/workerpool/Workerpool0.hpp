@@ -7,6 +7,7 @@
 
 class Workerpool0 : public IWorkerpool {
 public:
+    char const * get_id(){ return "workerpool0"; }
     ~Workerpool0();
     void set_worker_num( unsigned int );
     void set_worker_task( std::function<void(void)> );

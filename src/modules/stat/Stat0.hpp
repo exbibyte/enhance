@@ -5,6 +5,7 @@
 
 class Stat0 : public IStat {
 public:
+    char const * get_id(){ return "stat0"; }
     std::string const getstat();
 };
 
