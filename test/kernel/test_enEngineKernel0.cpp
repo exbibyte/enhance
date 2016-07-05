@@ -20,14 +20,14 @@
 using namespace std;
 
 TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
-    SECTION( "RegisterComponent, GetComponent" ) {
 
-	enEngineKernel0 engine_kernel;
-	CHECK( engine_kernel.get_num_components() == 0 );
+    enEngineKernel0 engine_kernel;
+    CHECK( engine_kernel.get_num_components() == 0 );
 
-	engine_kernel.init();
-	CHECK( engine_kernel.get_num_components() > 0 );
-
+    engine_kernel.init();
+    CHECK( engine_kernel.get_num_components() > 0 );
+	
+    SECTION( "clock, clock" ) {
 	//clock
 	vector<enComponentMeta*> clocks;
 	engine_kernel.get_components_by_type( enComponentType::CLOCK, clocks );
@@ -35,7 +35,9 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 
 	enComponentClock0 * clock0 = dynamic_cast< enComponentClock0 * >( clocks[0] );
 	CHECK( nullptr != clock0 );
+    }
 
+    SECTION( "logger, logger" ) {
 	//logger
 	vector<enComponentMeta*> loggers;
 	engine_kernel.get_components_by_type( enComponentType::LOGGER, loggers );
@@ -47,39 +49,8 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	enComponentLoggerStdout * logger = dynamic_cast< enComponentLoggerStdout * >( loggers.front() );
 	CHECK( nullptr != logger );
 
-	//scheduler
-	vector<enComponentMeta*> schedulers;
-	engine_kernel.get_components_by_type( enComponentType::SCHEDULER, schedulers );
-	REQUIRE( schedulers.size() == 1 );
-
-	{
-	    COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
-	    {
-		scheduler0->run();
-		Funwrap3 f;
-		std::function<void()> fun_print = []()->bool{
-		    cout << "function called." << endl;
-		    return true;
-		};
-		f.set( FunCallType::ASYNC, fun_print );
-		scheduler0->add( f );
-
-	    }
-	    Funwrap3 g;
-	    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	    scheduler0->get( g );
-	    g.apply();
-	    scheduler0->stop();
-	}
-
-	//stat
-	vector<enComponentMeta*> stats;
-	engine_kernel.get_components_by_type( enComponentType::STAT, stats );
-	REQUIRE( stats.size() == 1 );
-	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
-	CHECK( 0 < stat0->getstat().size() );
-	std::cout << stat0->getstat() << std::endl;
-
+    }
+    SECTION( "thread, thread" ) {
 	//thread
 	vector<enComponentMeta*> threads;
 	engine_kernel.get_components_by_type( enComponentType::THREAD, threads );
@@ -102,7 +73,39 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		CHECK( i == true );
 	    }
 	}
-	
-	engine_kernel.deinit();
     }
+    SECTION( "scheduler, scheduler" ) {
+
+	//scheduler
+	vector<enComponentMeta*> schedulers;
+	engine_kernel.get_components_by_type( enComponentType::SCHEDULER, schedulers );
+	REQUIRE( schedulers.size() == 1 );
+	COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
+	{
+	    scheduler0->run();
+	    Funwrap3 f;
+	    std::function<void()> fun_print = []()->bool{
+		cout << "function called." << endl;
+		return true;
+	    };
+	    f.set( FunCallType::ASYNC, fun_print );
+	    scheduler0->add( f );
+
+	}
+	Funwrap3 g;
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	scheduler0->get( g );
+	g.apply();
+	scheduler0->stop();
+    }
+    SECTION( "stat, stat" ) {
+	//stat
+	vector<enComponentMeta*> stats;
+	engine_kernel.get_components_by_type( enComponentType::STAT, stats );
+	REQUIRE( stats.size() == 1 );
+	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
+	CHECK( 0 < stat0->getstat().size() );
+	std::cout << stat0->getstat() << std::endl;
+    }
+    engine_kernel.deinit();
 }
