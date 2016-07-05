@@ -21,11 +21,11 @@ D = To do
 
 [C] Core utilities
 
-[C] Graphics Engine
+[C] Service infrastructure
 
-[C] Game Engine
+[D] Service Module Integration
 
-[D] Content Editor/Script
+[D] Script management
 
 --------------------------------------------
 
