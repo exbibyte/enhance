@@ -52,19 +52,25 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	engine_kernel.get_components_by_type( enComponentType::SCHEDULER, schedulers );
 	REQUIRE( schedulers.size() == 1 );
 
-	COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
 	{
-	    Funwrap3 f;
-	    std::function<void()> fun_print = []()->bool{
-		cout << "function called." << endl;
-		return true;
-	    };
-	    f.set( FunCallType::ASYNC, fun_print );
-	    scheduler0->add( f );
+	    COMPONENT_INSTANCE( scheduler0, enComponentScheduler0, schedulers.front() );
+	    {
+		scheduler0->run();
+		Funwrap3 f;
+		std::function<void()> fun_print = []()->bool{
+		    cout << "function called." << endl;
+		    return true;
+		};
+		f.set( FunCallType::ASYNC, fun_print );
+		scheduler0->add( f );
+
+	    }
+	    Funwrap3 g;
+	    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	    scheduler0->get( g );
+	    g.apply();
+	    scheduler0->stop();
 	}
-	Funwrap3 g;
-	scheduler0->get( g );
-	g.apply();
 
 	//stat
 	vector<enComponentMeta*> stats;

@@ -6,8 +6,10 @@
 #include <functional>
 
 Thread0::~Thread0(){
-    if( _thread.joinable() )
+    if( _thread.joinable() ){
+	while( !setaction( IThread::Action::END ) );
 	_thread.join();
+    }
 }
 
 bool Thread0::setaction( IThread::Action a ){
