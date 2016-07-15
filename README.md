@@ -19,11 +19,11 @@ D = To do
 
 [C] UI handling
 
-[C] Core utilities
+[C] Graphics utilities
 
 [C] Service infrastructure
 
-[D] Service Module Integration
+[C] Service Module Integration
 
 [D] Script management
 
