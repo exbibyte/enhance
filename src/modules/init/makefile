@@ -16,9 +16,9 @@ inc_folder_core := ../../core
 #get list of subdirectories in ../modules/
 inc_folder_module_subdirs := $(sort $(dir $(wildcard ./../**/)))
 
-inc_folder_gl3w = ../../gl3w/include
+# inc_folder_gl3w = ../../gl3w/include
 
-include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs) $(inc_folder_gl3w)
+include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs)
 
 #include directories end---
 
@@ -31,7 +31,7 @@ dir_intermediate := ./intermediate
 $(shell mkdir -p $(dir_intermediate))
 
 %.o: %.cpp
-	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags) -lglfw3 -lgl3w
+	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 .PHONY: all
 

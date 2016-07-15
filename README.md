@@ -38,6 +38,8 @@ Dependencies:
 
 GLFW, gl3w, OpenGL, GLM, Flex, Bison
 
+Linux: pkg-config
+
 --------------------------------------------
 
 Progress:

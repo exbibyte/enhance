@@ -116,6 +116,9 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	COMPONENT_INSTANCE( initGL, enComponentInitGL, inits.front() );
 	bool bret = initGL->init();
 	CHECK( true == bret );
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
     }
     engine_kernel.deinit();
 }

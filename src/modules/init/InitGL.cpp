@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 #include "InitGL.hpp"
 #include "IInit.hpp"
@@ -11,17 +12,35 @@
 // #include "GLSceneManager.h"
 // #include "GLSLProgram.h"
 // #include "enGameData.h"
-// #include <GLFW/glfw3.h>
 
-// #include "GLHelper.h"
+//#include "GLHelper.h"
 
-#include <iostream>
-#include <cstdio>
+InitGL::~InitGL(){
+    if( _window ){
+	glfwDestroyWindow( _window );
+	_window = nullptr;
+    }
+}
 
+void print_info_opengl(){
+    const GLubyte * renderer = glGetString( GL_RENDERER );
+    const GLubyte * vendor = glGetString( GL_VENDOR );
+    const GLubyte * version = glGetString( GL_VERSION );
+    const GLubyte * glslVersion = glGetString( GL_SHADING_LANGUAGE_VERSION );
+    
+    GLint major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+    printf("GL Vendor: %s\n", vendor);
+    printf("GL Renderer : %s\n", renderer);
+    printf("GL Version (string) : %s\n", version);
+    printf("GL Version (integer) : %d.%d\n", major, minor);
+    printf("GLSL Version : %s\n", glslVersion);
+}
 bool InitGL::init(){
 
-    if (!glfwInit()) {
-	printf("failed to initialize GLFW.\n");
+    if ( !glfwInit() ) {
+	printf( "failed to initialize GLFW.\n" );
 	return -1;
     }
 
@@ -29,29 +48,25 @@ bool InitGL::init(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow * window = glfwCreateWindow(1000, 600, "awesome", nullptr, nullptr);
-    if (!window) {
+    unsigned int width = 600;
+    unsigned int height = 600;
+    _window = glfwCreateWindow( width, height, "Render Window", nullptr, nullptr );
+    if ( !_window ) {
 	return -1;
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent( _window );
     if (gl3wInit()) {
-	printf("failed to initialize OpenGL\n");
+	printf( "failed to initialize OpenGL\n" );
 	return -1;
     }
 
-    printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
-    
-    // GLFWwindow * window = glfwCreateWindow( ui_width, ui_height, strTitle.c_str(), NULL, NULL );
-    
-    // glfwMakeContextCurrent( game_data->_Window );
+    // printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    // gl3wInit();
+    print_info_opengl();
 
-    // GLPrintInfo();
-
-    // glEnable(GL_DEPTH_TEST);
-    // glClearColor(0, 0, 0, 1.0);
+    glEnable( GL_DEPTH_TEST );
+    glClearColor( 0, 0, 0, 1.0 );
 
     std::cout << "InitGL::init invoked." << std::endl;
 
