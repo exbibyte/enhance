@@ -17,6 +17,7 @@ enum class enComponentType {
     STAT,
     MEMORYALLOC,
     THREAD,
+    INIT,
     //INSTANCE ENDS
 };
 

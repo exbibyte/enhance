@@ -1,11 +1,12 @@
 #ifndef IRENDERDRAW_H
 #define IRENDERDRAW_H
 
+#include "RenderData.h"
+
 class IRenderdraw {
 public:
-    virtual ~IRenderdraw(){}
-    //TODO
-    // bool render( RenderData );
+  virtual ~IRenderdraw(){}
+  virtual bool render( RenderData ){ return false; }
 };
 
 #endif

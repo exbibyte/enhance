@@ -24,12 +24,16 @@ object_files := $(objects_kernel) $(objects_modules)
 
 dir_build := ./build
 
+libs = -lgl3w `pkg-config --static --libs glfw3`
+
+pkg_config_flags = `pkg-config --cflags glfw3`
+
 $(shell mkdir -p $(dir_build))
 
 .PHONY: all
 
 all:
-	$(CXX) -g -std=c++14 -o $(dir_build)/$(target) $(target).cpp $(object_files) $(include_flags) $(specification_flags)
+	$(CXX) -g -std=c++14 $(pkg_config_flags) -o $(dir_build)/$(target) $(target).cpp $(object_files) $(include_flags) $(specification_flags) $(libs)
 
 .PHONY: clean
 

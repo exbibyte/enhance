@@ -6,6 +6,7 @@
 class Renderdraw0 : public IRenderdraw {
 public:
     char const * get_id(){ return "renderdraw0"; }
+    bool render( RenderData );
 };
 
 #endif

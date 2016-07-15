@@ -9,6 +9,7 @@
 #include "enComponentScheduler.hpp"
 #include "enComponentStat.hpp"
 #include "enComponentThread.hpp"
+#include "enComponentInit.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -106,6 +107,15 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
 	CHECK( 0 < stat0->getstat().size() );
 	std::cout << stat0->getstat() << std::endl;
+    }
+    SECTION( "initGL, initGL" ) {
+	//initGL
+	vector<enComponentMeta*> inits;
+	engine_kernel.get_components_by_type( enComponentType::INIT, inits );
+	REQUIRE( inits.size() == 1 );
+	COMPONENT_INSTANCE( initGL, enComponentInitGL, inits.front() );
+	bool bret = initGL->init();
+	CHECK( true == bret );
     }
     engine_kernel.deinit();
 }
