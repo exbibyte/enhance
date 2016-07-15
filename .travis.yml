@@ -13,6 +13,8 @@ before_install:
 
   - sudo apt-get update -qq
   - sudo apt-get install -y libglew-dev libgl1-mesa-dev freeglut3-dev libjemalloc-dev
+  - sudo apt-get install -y xorg-dev
+  - sudo apt-get install -y cmake
   - sudo git clone https://github.com/glfw/glfw && mkdir build_glfw && cd build_glfw && cmake ../glfw && make -j4 && sudo make install
   - sudo git clone https://github.com/skaslev/gl3w && mkdir build_gl3w && cd build_gl3w && cmake ../gl3w && make && sudo make install
 install:
