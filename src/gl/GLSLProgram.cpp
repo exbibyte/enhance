@@ -20,11 +20,11 @@ using namespace std;
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 
 GLSLProgram::GLSLProgram(){
-    // _HandleProgram = glCreateProgram();
-    // _Linked = false;
-    // _LogString = "";
-    // _vHandleShader.clear();
-    // glGenVertexArrays( 1, &_VertexArrayObj );
+    _HandleProgram = glCreateProgram();
+    _Linked = false;
+    _LogString = "";
+    _vHandleShader.clear();
+    glGenVertexArrays( 1, &_VertexArrayObj );
 }
 
 GLSLProgram::~GLSLProgram(){

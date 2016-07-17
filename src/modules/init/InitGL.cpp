@@ -4,16 +4,10 @@
 #include <fstream>
 #include <cstdio>
 
+#include "GLIncludes.hpp"
+
 #include "InitGL.hpp"
 #include "IInit.hpp"
-#include <GL/gl3w.h>
-#include <GLFW/glfw3.h>
-
-// #include "GLSceneManager.h"
-// #include "GLSLProgram.h"
-// #include "enGameData.h"
-
-//#include "GLHelper.h"
 
 #include "WindowInfo.hpp"
 
@@ -22,6 +16,7 @@ InitGL::~InitGL(){
 	glfwDestroyWindow( _window );
 	_window = nullptr;
     }
+    glfwTerminate();
 }
 
 void print_info_opengl(){
@@ -40,10 +35,9 @@ void print_info_opengl(){
     printf("GLSL Version : %s\n", glslVersion);
 }
 bool InitGL::init(){
-
     if ( !glfwInit() ) {
-	printf( "failed to initialize GLFW.\n" );
-	return -1;
+    	printf( "failed to initialize GLFW.\n" );
+    	return -1;
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -58,12 +52,11 @@ bool InitGL::init(){
     }
 
     glfwMakeContextCurrent( _window );
+
     if (gl3wInit()) {
 	printf( "failed to initialize OpenGL\n" );
 	return -1;
     }
-
-    // printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     print_info_opengl();
 
