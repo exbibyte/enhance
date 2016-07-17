@@ -7,7 +7,7 @@ enum class enComponentType {
     //INSTANCE STARTS
     CLOCK, 
     LOGGER,
-    RENDER,
+    RENDERDRAW,
     RENDERCOMPUTE,
     UI,
     LOGIC,

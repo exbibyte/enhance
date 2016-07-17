@@ -1,6 +1,8 @@
 #ifndef GLSLPROGRAM_H
 #define GLSLPROGRAM_H
 
+#include "GLIncludes.hpp"
+
 #include<iostream>
 #include<vector>
 #include<string>
@@ -8,7 +10,7 @@
 #include<utility>
 using namespace std;
 
-#include <GLFW/glfw3.h>
+/* #include <GLFW/glfw3.h> */
 
 /* #include <GL/glew.h> */
 /* #ifdef MAC_OS */

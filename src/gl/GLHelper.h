@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 /* #include <GL/glew.h> */
 

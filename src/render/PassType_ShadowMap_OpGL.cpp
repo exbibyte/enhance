@@ -8,7 +8,7 @@
 #include "RenderVertex.h"
 #include "RenderMaterial.h"
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 #include <vector>
 #include <cassert>

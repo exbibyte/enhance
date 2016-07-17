@@ -10,6 +10,7 @@
 #include "enComponentStat.hpp"
 #include "enComponentThread.hpp"
 #include "enComponentInit.hpp"
+#include "enComponentRenderdraw.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -17,6 +18,9 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 using namespace std;
 
@@ -119,6 +123,14 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
+    }
+    SECTION( "renderdraw0, renderdraw0" ) {
+	//renderdrawGL
+	vector<enComponentMeta*> renderdraws;
+	engine_kernel.get_components_by_type( enComponentType::RENDERDRAW, renderdraws );
+	REQUIRE( renderdraws.size() == 1 );
+	COMPONENT_INSTANCE( renderdraw0, enComponentRenderdraw0, renderdraws.front() );
+	renderdraw0->render( RenderData() );
     }
     engine_kernel.deinit();
 }

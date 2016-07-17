@@ -3,6 +3,8 @@
 
 #include "IInit.hpp"
 
+#include "WindowInfo.hpp"
+
 class GLFWwindow;
 
 class InitGL : public IInit {
@@ -11,8 +13,11 @@ public:
     ~InitGL();
     char const * get_id(){ return "initGL"; }
     bool init();
+    WindowInfo GetWindowResource();
 private:
     GLFWwindow * _window;
+    unsigned int _width;
+    unsigned int _height;
 };
 
 #endif

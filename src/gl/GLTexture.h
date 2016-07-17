@@ -9,7 +9,7 @@
 /* #include <GL/glut.h> */
 /* #endif */
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 #include <string>
 using namespace std;

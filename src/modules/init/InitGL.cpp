@@ -15,6 +15,8 @@
 
 //#include "GLHelper.h"
 
+#include "WindowInfo.hpp"
+
 InitGL::~InitGL(){
     if( _window ){
 	glfwDestroyWindow( _window );
@@ -48,9 +50,9 @@ bool InitGL::init(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    unsigned int width = 600;
-    unsigned int height = 600;
-    _window = glfwCreateWindow( width, height, "Render Window", nullptr, nullptr );
+    _width = 600;
+    _height = 600;
+    _window = glfwCreateWindow( _width, _height, "Render Window", nullptr, nullptr );
     if ( !_window ) {
 	return -1;
     }
@@ -71,4 +73,13 @@ bool InitGL::init(){
     std::cout << "InitGL::init invoked." << std::endl;
 
     return true;
+}
+
+WindowInfo InitGL::GetWindowResource(){
+    WindowInfo wininfo;
+    wininfo._window = _window;
+    wininfo._width = _width;
+    wininfo._height = _height;
+    wininfo._type = WindowType::GLFW;
+    return wininfo;
 }

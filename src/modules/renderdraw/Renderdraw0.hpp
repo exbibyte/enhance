@@ -2,6 +2,7 @@
 #define RENDERDRAW0_H
 
 #include "IRenderdraw.hpp"
+#include "RenderData.hpp"
 
 class Renderdraw0 : public IRenderdraw {
 public:

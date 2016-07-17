@@ -17,12 +17,12 @@ src_files = $(wildcard *.cpp) $(wildcard **/*.cpp)
 #include directories start---
 inc_folder_kernel := ./
 inc_folder_kernel_component := ./component
-inc_folder_core := ../core
+inc_folder_basic := $(dir $(wildcard ../*/))
 
 #get list of subdirectories in ../modules/
 inc_folder_module_subdirs := $(sort $(dir $(wildcard ../modules/*/)))
 
-include_dirs = $(inc_folder_kernel) $(inc_folder_kernel_component) $(inc_folder_core) $(inc_folder_module_subdirs)
+include_dirs = $(inc_folder_kernel) $(inc_folder_kernel_component) $(inc_folder_basic) $(inc_folder_module_subdirs)
 
 #include directories end---
 

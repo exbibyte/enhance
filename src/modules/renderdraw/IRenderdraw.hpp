@@ -1,7 +1,7 @@
 #ifndef IRENDERDRAW_H
 #define IRENDERDRAW_H
 
-#include "RenderData.h"
+#include "RenderData.hpp"
 
 class IRenderdraw {
 public:
