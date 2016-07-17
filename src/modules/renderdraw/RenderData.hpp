@@ -8,13 +8,14 @@
 #include "GLSLProgram.h"
 
 #include <list>
+#include <memory>
 
 class RenderData {
 public:
-    std::list<RenderEntity* > * _entities;
-    RenderCamera * _camera;
-    RenderContext * _context;
-    RenderLight * _light;
+    std::list<RenderEntity* > _entities;
+    std::shared_ptr<RenderCamera> _camera;
+    std::shared_ptr<RenderContext> _context;
+    std::shared_ptr<RenderLight> _light;
     GLSLProgram * _glslprogram;
 };
 

@@ -6,6 +6,7 @@
 #include "PassType_ShadowMap_OpGL.h"
 
 #include <iostream>
+#include <memory>
 
 bool Renderdraw0::render( RenderData renderdata ){
 
@@ -13,7 +14,7 @@ bool Renderdraw0::render( RenderData renderdata ){
     
     RenderPass< RenderBackEndOpenGL, PassType_ShadowMap_OpGL > renderpass;
 
-    return renderpass.Process( renderdata._glslprogram, renderdata._entities, renderdata._light, renderdata._camera, renderdata._context );
+    return renderpass.Process( renderdata._glslprogram, renderdata._entities, renderdata._light.get(), renderdata._camera.get(), renderdata._context.get() );
     
     // return true;
 }

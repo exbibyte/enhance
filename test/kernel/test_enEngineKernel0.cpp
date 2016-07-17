@@ -18,6 +18,8 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <ratio>
+#include <memory>
 
 #include "GLIncludes.hpp"
 
@@ -136,10 +138,6 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 
 	    RenderData renderdata;
 	    renderdata._glslprogram = new GLSLProgram;
-	    renderdata._light = new RenderLight;
-	    renderdata._camera = new RenderCamera;
-	    renderdata._context = new RenderContext;
-	    renderdata._entities = new std::list<RenderEntity*>;
 
 	    vector<double> vert_pos;
 	    vector<double> vert_norm;
@@ -275,98 +273,111 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 
 	    }
 
-	    //entities -------------------------------------------------------------------
-	    //orientation	
-	    vector<double> entity_translate    { 0, 0, 0};
-	    vector<double> entity_rotate_axis  { 1, 0, 0};
-	    // vector<double> entity_rotate_angle { 0 };
 	    double rotation_angle = 0;
-	    vector<double> entity_rotate_angle { rotation_angle };
-	    //set material data
-	    vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
-	    vector<double> entity_material_diffuse   { 1, 1, 1 };
-	    vector<double> entity_material_specular  { 1, 1, 1 };
-	    vector<double> entity_material_shininess { 2 };
-	    //set vertex data 
-	    vector<double> entity_vertices = vert_pos;
-	    vector<double> entity_normals = vert_norm;
+	    auto t1 = std::chrono::high_resolution_clock::now();
+	     
+	    while(true){
+		auto t2 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> duration_ms = t2 - t1;
+		if( duration_ms.count() > 10000 ){
+		    break;
+		}
+		//entities -------------------------------------------------------------------
+		//orientation	
+		vector<double> entity_translate    { 0, 0, 0};
+		vector<double> entity_rotate_axis  { 1, 0, 0};
+		// vector<double> entity_rotate_angle { 0 };
+	        rotation_angle += 0.15;
+		vector<double> entity_rotate_angle { rotation_angle };
+		//set material data
+		vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
+		vector<double> entity_material_diffuse   { 1, 1, 1 };
+		vector<double> entity_material_specular  { 1, 1, 1 };
+		vector<double> entity_material_shininess { 2 };
+		//set vertex data 
+		vector<double> entity_vertices = vert_pos;
+		vector<double> entity_normals = vert_norm;
 
-	    //light ----------------------------------------------------------------------
-	    vector<double> light_position     { 0, 0, 10 };
-	    vector<double> light_lookat       { 0, 0, 0 };
-	    vector<double> light_up           { 0, 1, 0 };
-	    vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
-	    vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
-	    vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
-	    vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
+		//light ----------------------------------------------------------------------
+		vector<double> light_position     { 0, 0, 10 };
+		vector<double> light_lookat       { 0, 0, 0 };
+		vector<double> light_up           { 0, 1, 0 };
+		vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
+		vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
+		vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
+		vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
 
-	    //camera ---------------------------------------------------------------------
-	    vector<double> camera_position    { -5, -5, 8.0 };
-	    vector<double> camera_lookat      { 0, 0, 0 };
-	    vector<double> camera_up          { 0, 1, 0 };
-	    vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
-	    vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
-	    vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
-	    vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
+		//camera ---------------------------------------------------------------------
+		vector<double> camera_position    { -5, -5, 8.0 };
+		vector<double> camera_lookat      { 0, 0, 0 };
+		vector<double> camera_up          { 0, 1, 0 };
+		vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
+		vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
+		vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
+		vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
 
-	    //context --------------------------------------------------------------------
-	    vector<int> context_windowsize { 500, 500 };
-	    vector<int> context_texturesize_shadowmap { 2500, 2500 };
-	    string context_title = "engine0";
+		//context --------------------------------------------------------------------
+		vector<int> context_windowsize { 500, 500 };
+		vector<int> context_texturesize_shadowmap { 2500, 2500 };
+		string context_title = "engine0";
 
-	    //apply settings -------------------------------------------------------------
-	    std::list< RenderEntity * > * entities = new std::list< RenderEntity * >;
-	    RenderEntity * entity_01 = new RenderEntity;
-	    entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
-	    entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
-	    entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
+		//apply settings -------------------------------------------------------------
+		std::list< RenderEntity * > entities = std::list< RenderEntity * >();
+		RenderEntity * entity_01 = new RenderEntity;
+		entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
+		entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
+		entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
 
-	    entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
-	    entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
-	    entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
-	    entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
-	    entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
-	    entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
+		entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
+		entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
+		entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
+		entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
+		entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
+		entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
 
-	    entities->push_back( entity_01 );
+		entities.push_back( entity_01 );
     
-	    RenderLight * light = new RenderLight;;
-	    light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
-	    light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
-	    light->AddDataSingle( RenderLightData::Up(),          light_up          );
-	    light->AddDataSingle( RenderLightData::Perspective(), light_perspective );
-	    light->AddDataSingle( RenderLightData::Ambient(),     light_ambient     );
-	    light->AddDataSingle( RenderLightData::Diffuse(),     light_diffuse     );
-	    light->AddDataSingle( RenderLightData::Specular(),    light_specular    );
+		std::shared_ptr<RenderLight> light = std::make_shared< RenderLight >();
+		light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
+		light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
+		light->AddDataSingle( RenderLightData::Up(),          light_up          );
+		light->AddDataSingle( RenderLightData::Perspective(), light_perspective );
+		light->AddDataSingle( RenderLightData::Ambient(),     light_ambient     );
+		light->AddDataSingle( RenderLightData::Diffuse(),     light_diffuse     );
+		light->AddDataSingle( RenderLightData::Specular(),    light_specular    );
 	    
-	    RenderCamera * camera = new RenderCamera;
-	    camera->AddDataSingle( RenderCameraData::Coordinate(),  camera_position    );
-	    camera->AddDataSingle( RenderCameraData::Lookat(),      camera_lookat      );
-	    camera->AddDataSingle( RenderCameraData::Up(),          camera_up          );
-	    camera->AddDataSingle( RenderCameraData::Perspective(), camera_perspective );
-	    camera->AddDataSingle( RenderCameraData::Ambient(),     camera_ambient     );
-	    camera->AddDataSingle( RenderCameraData::Diffuse(),     camera_diffuse     );
-	    camera->AddDataSingle( RenderCameraData::Specular(),    camera_specular    );
+		std::shared_ptr<RenderCamera> camera = std::make_shared< RenderCamera >();
+		camera->AddDataSingle( RenderCameraData::Coordinate(),  camera_position    );
+		camera->AddDataSingle( RenderCameraData::Lookat(),      camera_lookat      );
+		camera->AddDataSingle( RenderCameraData::Up(),          camera_up          );
+		camera->AddDataSingle( RenderCameraData::Perspective(), camera_perspective );
+		camera->AddDataSingle( RenderCameraData::Ambient(),     camera_ambient     );
+		camera->AddDataSingle( RenderCameraData::Diffuse(),     camera_diffuse     );
+		camera->AddDataSingle( RenderCameraData::Specular(),    camera_specular    );
 
-	    RenderContext * context = new RenderContext;
-	    context->AddDataSingle( RenderContextData::WindowSize(),           context_windowsize );
-	    context->AddDataSingle( RenderContextData::TextureSizeShadowMap(), context_texturesize_shadowmap );
-	    context->AddDataSingle( RenderContextData::Title(),                context_title );
+		std::shared_ptr<RenderContext> context = std::make_shared< RenderContext >();
+		context->AddDataSingle( RenderContextData::WindowSize(),           context_windowsize );
+		context->AddDataSingle( RenderContextData::TextureSizeShadowMap(), context_texturesize_shadowmap );
+		context->AddDataSingle( RenderContextData::Title(),                context_title );
 
-	    renderdata._entities = entities;
-	    renderdata._light = light;
-	    renderdata._camera = camera;
-	    renderdata._context = context;
+		renderdata._entities = entities;
+		renderdata._light = light;
+		renderdata._camera = camera;
+		renderdata._context = context;
 	    
-	    //render call ----------------------------------------------------------------
-	    renderdraw0->render( renderdata );
+		//render call ----------------------------------------------------------------
+		renderdraw0->render( renderdata );
 
-	    WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
-	    glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
-	    glfwSwapBuffers( windowinfo._window );
+		WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
+		glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
+		glfwSwapBuffers( windowinfo._window );
 	    
-	    std::cout << "post renderdraw0." << std::endl;
-	    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		std::cout << "post renderdraw0." << std::endl;
+
+		delete entity_01;
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(70));
+	    }
 	}
 	// SECTION( "GLSLProgram, GLSLProgram" ) {
 	//     GLSLProgram glslprogram;

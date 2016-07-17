@@ -32,9 +32,9 @@ public:
 	DEPTH,
     };
     // bool Process( GLSLProgram *, PassType pass_type, list< RenderEntity * > entity, RenderLight * light, RenderCamera * camera, RenderContext * context );
-    bool Process( GLSLProgram *, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context );
+    bool Process( GLSLProgram *, list< RenderEntity * > entities, RenderLight * light, RenderCamera * camera, RenderContext * context );
 private:
-    bool ProcessPassCommon( PassType, GLSLProgram *, list< RenderEntity * > * entity, RenderLight * light, RenderCamera * camera, RenderContext * context );
+    bool ProcessPassCommon( PassType, GLSLProgram *, list< RenderEntity * > entity, RenderLight * light, RenderCamera * camera, RenderContext * context );
 };
 
 #endif
