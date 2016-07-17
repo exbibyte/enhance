@@ -1,4 +1,6 @@
-#version 410
+#version 330
+//#version 410
+
 // Declare any uniforms needed for the Phong shading model
 uniform sampler2DShadow ShadowMap;
 //uniform sampler2D Tex1;

@@ -11,12 +11,6 @@ using namespace std;
 #include "GLTexture.h"
 #include "GLBufferInfo.h"
 
-// #ifdef __APPLE__
-// #include <OpenGL/gl3.h>
-// #elif __linux__
-// #include <GLFW/glfw3.h>
-// #endif
-
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 
 GLSLProgram::GLSLProgram(){

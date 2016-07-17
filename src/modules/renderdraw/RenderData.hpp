@@ -7,13 +7,15 @@
 #include "RenderLight.h"
 #include "GLSLProgram.h"
 
+#include <list>
+
 class RenderData {
 public:
-    RenderEntity _entity;
-    RenderCamera _camera;
-    RenderContext _context;
-    RenderLight _light;
-    GLSLProgram _glslprogram;
+    std::list<RenderEntity* > * _entities;
+    RenderCamera * _camera;
+    RenderContext * _context;
+    RenderLight * _light;
+    GLSLProgram * _glslprogram;
 };
 
 #endif

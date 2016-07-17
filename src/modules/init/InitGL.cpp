@@ -44,8 +44,8 @@ bool InitGL::init(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    _width = 600;
-    _height = 600;
+    _width = 500;
+    _height = 500;
     _window = glfwCreateWindow( _width, _height, "Render Window", nullptr, nullptr );
     if ( !_window ) {
 	return -1;
