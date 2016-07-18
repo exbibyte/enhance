@@ -5,7 +5,7 @@ Enhance
 
 =======
 
-Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser through a common infrastructure (kernel-based approach).
+Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser through a common infrastructure (kernel-based services approach).
 
 Checklist:
 
@@ -41,6 +41,16 @@ GLFW, gl3w, OpenGL, GLM, Flex, Bison
 Linux: pkg-config
 
 These can be obtained via paackage manager or built with their respective source code.
+
+--------------------------------------------
+
+Building:
+
+Linux (supported):
+
+make all
+
+Mac/Windows (not yet supported)
 
 --------------------------------------------
 
