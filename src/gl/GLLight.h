@@ -9,6 +9,7 @@
 #include <glm/gtx/transform2.hpp>
 using glm::mat4;
 using glm::vec3;
+using glm::vec4;
 
 class GLLight {
 public:

@@ -8,7 +8,7 @@
 #include "RenderVertex.h"
 #include "RenderMaterial.h"
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 #include <vector>
 #include <cassert>
@@ -18,14 +18,13 @@
 
 using namespace std;
 
-bool PassType_ShadowMap_OpGL::Process( GLSLProgram * glsl_program, list< RenderEntity *> * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
+bool PassType_ShadowMap_OpGL::Process( GLSLProgram * glsl_program, list< RenderEntity *> entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
     bool bRet = true;
     if( !glsl_program ){
 	assert( 0 && "GLSLProgram invalid in GLRenderPassShadowMap::Process()");
 	return false;
     }
-    if( !entities ||
-	!light ||
+    if( !light ||
     	!camera ||
     	!context ){
     	return false;
@@ -102,7 +101,7 @@ bool PassType_ShadowMap_OpGL::Process( GLSLProgram * glsl_program, list< RenderE
     return true;
 }
 
-bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram * glsl_program, list< RenderEntity * > * entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
+bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram * glsl_program, list< RenderEntity * > entities, RenderLight * light, RenderCamera * camera, RenderContext * context ){
     bool bRet = true;
 
     if( !glsl_program ){
@@ -156,7 +155,7 @@ bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram
     }
 
     /// per entity ---------------------------------------------------------
-    for( auto * entity : *entities ){
+    for( auto * entity : entities ){
 	// if( !entity ){
 	//     assert( 0 && "entity data invalid." );
 	//     return false;

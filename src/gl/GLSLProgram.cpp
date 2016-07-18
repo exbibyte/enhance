@@ -1,14 +1,15 @@
-#include<iostream>
-#include<vector>
-#include<string>
-#include<map>
+#include "GLIncludes.hpp"
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
 #include <cassert>
 using namespace std;
 
 #include "GLSLProgram.h"
 #include "GLTexture.h"
 #include "GLBufferInfo.h"
-#include <OpenGL/gl3.h>
 
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 

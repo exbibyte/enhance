@@ -19,13 +19,13 @@ D = To do
 
 [C] UI handling
 
-[C] Core utilities
+[C] Graphics utilities
 
-[C] Graphics Engine
+[C] Service infrastructure
 
-[C] Game Engine
+[C] Service Module Integration
 
-[D] Content Editor/Script
+[D] Script management
 
 --------------------------------------------
 
@@ -37,6 +37,8 @@ https://github.com/philsquared/Catch
 Dependencies:
 
 GLFW, gl3w, OpenGL, GLM, Flex, Bison
+
+Linux: pkg-config
 
 --------------------------------------------
 

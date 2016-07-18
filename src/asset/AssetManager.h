@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 #include <cassert>
+#include <map>
 
 template< class IdType, class Asset >
 class AssetManager {

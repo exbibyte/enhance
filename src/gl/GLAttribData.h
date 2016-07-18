@@ -1,15 +1,13 @@
 #ifndef GLATTRIBDATA_H
 #define GLATTRIBDATA_H
 
-/* #include <GL/glew.h> */
-
 /* #ifdef MAC_OS */
 /* #include <GLUT/glut.h> */
 /* #else */
 /* #include <GL/glut.h> */
 /* #endif */
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 #include <algorithm>
 
