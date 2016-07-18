@@ -1,10 +1,9 @@
-#ifndef TreeRb_H
-#define TreeRb_H
+#ifndef TREE_RB_H
+#define TREE_RB_H
 
 #include <iostream>
 #include <vector>
 #include <utility>
-using namespace std;
  
 typedef enum eRbColour {
     eRbColour_Red = 0,
@@ -37,7 +36,7 @@ public:
     static bool RotateRight( CTreeNodeRb * Tree );
     static bool ConvertToRoot( CTreeNodeRb * Node );
     static bool GetRoot( CTreeNodeRb * Node, CTreeNodeRb * & NodeRoot );
-    static bool GetKeysSubTreeInOrder( CTreeNodeRb * Tree, vector< pair<TypeKey, eRbColour> > & KeysResult );
+    static bool GetKeysSubTreeInOrder( CTreeNodeRb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult );
 
     static bool SetFuncRbCompareKey( FuncRbCompareKey Func );    
     
@@ -490,14 +489,14 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::GetRoot( CTreeNodeRb * Node, CTreeNo
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::GetKeysSubTreeInOrder( CTreeNodeRb * Tree, vector< pair<TypeKey, eRbColour> > & KeysResult ){
+bool CTreeNodeRb< TypeKey, TypeContainer >::GetKeysSubTreeInOrder( CTreeNodeRb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult ){
     if( !Tree || !_FuncRbCompareKey ){
         return false;
     }
     GetKeysSubTreeInOrder( Tree->_Left, KeysResult );
     eRbColour CurrentColour = Tree->_Colour;
     TypeKey CurrentKey = Tree->_Key;
-    pair<TypeKey, eRbColour> CurrentPair( CurrentKey, CurrentColour );
+    std::pair<TypeKey, eRbColour> CurrentPair( CurrentKey, CurrentColour );
     KeysResult.push_back( CurrentPair );
     GetKeysSubTreeInOrder( Tree->_Right, KeysResult );
 
