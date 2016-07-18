@@ -52,7 +52,7 @@ https://youtu.be/x8cADzdhJhs
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
-Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service and initial port of older rendering code to the new infrastructure is in progress.
+Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service; initial port of older rendering code to the new infrastructure has being tested with a test stub and is currently being integrated further into a more specific service module.
 
 Current development will be using OpenGL as the rendering backend and targeted for Linux.
 
