@@ -40,7 +40,7 @@ GLFW, gl3w, OpenGL, GLM, Flex, Bison
 
 Linux: pkg-config
 
-These can be obtained via paackage manager or built with their respective source code.
+These can be obtained via their respective package manager or built with source code.
 
 --------------------------------------------
 
