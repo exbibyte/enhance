@@ -7,6 +7,7 @@
 #include "enComponentThread.hpp"
 #include "enComponentInit.hpp"
 #include "enComponentRenderdraw.hpp"
+#include "enComponentRendercompute.hpp"
 
 void enEngineKernel0::init(){
     register_component( new enComponentClock0( new Clock0 ) );
@@ -16,6 +17,7 @@ void enEngineKernel0::init(){
     register_component( new enComponentThread0( new Thread0 ) );
     register_component( new enComponentInitGL( new InitGL ) );
     register_component( new enComponentRenderdraw0( new Renderdraw0 ) );
+    register_component( new enComponentRendercompute0( new Rendercompute0 ) );
 }
 
 void enEngineKernel0::deinit(){

@@ -12,7 +12,7 @@
 
 class RenderData {
 public:
-    std::list<RenderEntity* > _entities;
+    std::list<std::shared_ptr<RenderEntity> > _entities;
     std::shared_ptr<RenderCamera> _camera;
     std::shared_ptr<RenderContext> _context;
     std::shared_ptr<RenderLight> _light;

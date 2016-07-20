@@ -11,6 +11,7 @@
 #include "enComponentThread.hpp"
 #include "enComponentInit.hpp"
 #include "enComponentRenderdraw.hpp"
+#include "enComponentRendercompute.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -139,17 +140,16 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	    REQUIRE( renderdraws.size() == 1 );
 	    COMPONENT_INSTANCE( renderdraw0, enComponentRenderdraw0, renderdraws.front() );
 
-	    RenderData renderdata;
-	    renderdata._glslprogram = new GLSLProgram;
+	    std::shared_ptr<GLSLProgram> glslprogram = std::make_shared<GLSLProgram>();
 
 	    vector<double> vert_pos;
 	    vector<double> vert_norm;
-	    {
+
 		bool bRet;
 		cout << "set shaders" << endl;
-		renderdata._glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
-		renderdata._glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.frag", GLSLShader::FRAGMENT );
-		renderdata._glslprogram->AttachShaders();
+		glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
+		glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.frag", GLSLShader::FRAGMENT );
+		glslprogram->AttachShaders();
 
 		//set buffer data
 		GLAttribData<float> * pPositionData = new GLAttribData<float>;
@@ -214,10 +214,10 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		map< string, GLBufferInfoSequence * > map_buffer_info_sequence;
 		polymesh_data_arrays->GetMapBufferInfoSequence( map_buffer_info_sequence );
 		for( auto i : map_buffer_info ){
-		    renderdata._glslprogram->SetBufferInfo( i.second );
+		    glslprogram->SetBufferInfo( i.second );
 		}
 		for( auto i : map_buffer_info_sequence ){
-		    renderdata._glslprogram->SetBufferInfoSequence( i.second );
+		    glslprogram->SetBufferInfoSequence( i.second );
 		}
         
 		if( !data_transform_driver.CleanUpPasses() ){
@@ -239,22 +239,22 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		// cout << endl;
     
 		//save mapping of data
-		renderdata._glslprogram->AddMapAttrib( "VertexPosition", pPositionData );
-		renderdata._glslprogram->AddMapAttrib( "VertexNormal", pNormalData );
+		glslprogram->AddMapAttrib( "VertexPosition", pPositionData );
+		glslprogram->AddMapAttrib( "VertexNormal", pNormalData );
 		//bind the above attributes to vertex array object
-		renderdata._glslprogram->BindMapAttrib();
+		glslprogram->BindMapAttrib();
 
-		renderdata._glslprogram->BindFragDataLocation( 0, "FragColor" );
+		glslprogram->BindFragDataLocation( 0, "FragColor" );
 
-		renderdata._glslprogram->Link();
+		glslprogram->Link();
 
-		renderdata._glslprogram->PrintActiveUniforms();
+		glslprogram->PrintActiveUniforms();
 
-		renderdata._glslprogram->PrintActiveAttribs();
+		glslprogram->PrintActiveAttribs();
 
-		renderdata._glslprogram->Use();
+		glslprogram->Use();
     
-		renderdata._glslprogram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
+		glslprogram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
 
 		cout << "After linking program" << endl;
 
@@ -274,8 +274,6 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
     
 		cout << "End of Init Phase" << endl;
 
-	    }
-
 	    double rotation_angle = 0;
 	    auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -286,95 +284,23 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	    ImGui_ImplGlfwGL3_Init( windowinfo._window, bInstallCallback );
 
 	    auto t_prev_frame = std::chrono::high_resolution_clock::now();
+	    
 	    while(true){
 		auto t2 = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double, std::milli> duration_ms = t2 - t1;
-		if( duration_ms.count() > 10000 ){
+		if( duration_ms.count() > 5000 ){
+		    cout << "End rendering..." << endl;
 		    break;
 		}
-		//entities -------------------------------------------------------------------
-		//orientation	
-		vector<double> entity_translate    { 0, 0, 0};
-		vector<double> entity_rotate_axis  { 1, 0, 0};
-		// vector<double> entity_rotate_angle { 0 };
-	        rotation_angle += 0.05;
-		vector<double> entity_rotate_angle { rotation_angle };
-		//set material data
-		vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
-		vector<double> entity_material_diffuse   { 1, 1, 1 };
-		vector<double> entity_material_specular  { 1, 1, 1 };
-		vector<double> entity_material_shininess { 2 };
-		//set vertex data 
-		vector<double> entity_vertices = vert_pos;
-		vector<double> entity_normals = vert_norm;
 
-		//light ----------------------------------------------------------------------
-		vector<double> light_position     { 0, 0, 10 };
-		vector<double> light_lookat       { 0, 0, 0 };
-		vector<double> light_up           { 0, 1, 0 };
-		vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
-		vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
-		vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
-		vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
+		vector<enComponentMeta*> rendercomputes;
+		engine_kernel.get_components_by_type( enComponentType::RENDERCOMPUTE, rendercomputes );
+		REQUIRE( rendercomputes.size() == 1 );
+		COMPONENT_INSTANCE( rendercompute0, enComponentRendercompute0, rendercomputes.front() );
 
-		//camera ---------------------------------------------------------------------
-		vector<double> camera_position    { -5, -5, 8.0 };
-		vector<double> camera_lookat      { 0, 0, 0 };
-		vector<double> camera_up          { 0, 1, 0 };
-		vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
-		vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
-		vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
-		vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
-
-		//context --------------------------------------------------------------------
-		vector<int> context_windowsize { 500, 500 };
-		vector<int> context_texturesize_shadowmap { 2500, 2500 };
-		string context_title = "engine0";
-
-		//apply settings -------------------------------------------------------------
-		std::list< RenderEntity * > entities = std::list< RenderEntity * >();
-		RenderEntity * entity_01 = new RenderEntity;
-		entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
-		entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
-		entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
-
-		entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
-		entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
-		entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
-		entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
-		entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
-		entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
-
-		entities.push_back( entity_01 );
-    
-		std::shared_ptr<RenderLight> light = std::make_shared< RenderLight >();
-		light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
-		light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
-		light->AddDataSingle( RenderLightData::Up(),          light_up          );
-		light->AddDataSingle( RenderLightData::Perspective(), light_perspective );
-		light->AddDataSingle( RenderLightData::Ambient(),     light_ambient     );
-		light->AddDataSingle( RenderLightData::Diffuse(),     light_diffuse     );
-		light->AddDataSingle( RenderLightData::Specular(),    light_specular    );
-	    
-		std::shared_ptr<RenderCamera> camera = std::make_shared< RenderCamera >();
-		camera->AddDataSingle( RenderCameraData::Coordinate(),  camera_position    );
-		camera->AddDataSingle( RenderCameraData::Lookat(),      camera_lookat      );
-		camera->AddDataSingle( RenderCameraData::Up(),          camera_up          );
-		camera->AddDataSingle( RenderCameraData::Perspective(), camera_perspective );
-		camera->AddDataSingle( RenderCameraData::Ambient(),     camera_ambient     );
-		camera->AddDataSingle( RenderCameraData::Diffuse(),     camera_diffuse     );
-		camera->AddDataSingle( RenderCameraData::Specular(),    camera_specular    );
-
-		std::shared_ptr<RenderContext> context = std::make_shared< RenderContext >();
-		context->AddDataSingle( RenderContextData::WindowSize(),           context_windowsize );
-		context->AddDataSingle( RenderContextData::TextureSizeShadowMap(), context_texturesize_shadowmap );
-		context->AddDataSingle( RenderContextData::Title(),                context_title );
-
-		renderdata._entities = entities;
-		renderdata._light = light;
-		renderdata._camera = camera;
-		renderdata._context = context;
-
+		//compute render information
+		RenderData renderdata = rendercompute0->compute( vert_pos, vert_norm );
+		renderdata._glslprogram = glslprogram.get();
 		//WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
 		glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
 
@@ -413,8 +339,6 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		}
 		t_prev_frame = t_current_frame;
 
-		delete entity_01;
-
 		if( glfwWindowShouldClose( windowinfo._window ) )
 		{
 		    break;
@@ -422,12 +346,6 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		glfwPollEvents();
 	    }
 	}
-	// SECTION( "GLSLProgram, GLSLProgram" ) {
-	//     GLSLProgram glslprogram;
-	//     // GLSLProgram * glslprogram = new GLSLProgram;
-	//     std::cout << "glslprogram allocated." << std::endl;
-	//     // delete glslprogram;
-	// }
     }
 
     engine_kernel.deinit();
