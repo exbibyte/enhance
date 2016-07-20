@@ -28,6 +28,9 @@
 #include "DataTransformDriver.h"
 #include "PolyMesh_Data_Arrays.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+
 using namespace std;
 
 TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
@@ -275,7 +278,14 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 
 	    double rotation_angle = 0;
 	    auto t1 = std::chrono::high_resolution_clock::now();
-	     
+
+	    //imgui init
+	    bool bInstallCallback = false;
+	    WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
+	    glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
+	    ImGui_ImplGlfwGL3_Init( windowinfo._window, bInstallCallback );
+
+	    auto t_prev_frame = std::chrono::high_resolution_clock::now();
 	    while(true){
 		auto t2 = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double, std::milli> duration_ms = t2 - t1;
@@ -287,7 +297,7 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		vector<double> entity_translate    { 0, 0, 0};
 		vector<double> entity_rotate_axis  { 1, 0, 0};
 		// vector<double> entity_rotate_angle { 0 };
-	        rotation_angle += 0.15;
+	        rotation_angle += 0.05;
 		vector<double> entity_rotate_angle { rotation_angle };
 		//set material data
 		vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
@@ -364,19 +374,52 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 		renderdata._light = light;
 		renderdata._camera = camera;
 		renderdata._context = context;
-	    
+
+		//WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
+		glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
+
 		//render call ----------------------------------------------------------------
 		renderdraw0->render( renderdata );
 
-		WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
-		glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
+		ImVec4 clear_color = ImColor(60, 60, 90);
+
+		//Imgui renderig starts
+		ImGui_ImplGlfwGL3_NewFrame();
+		{
+		    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
+		    ImGui::SetNextWindowSize(ImVec2(200,80), ImGuiSetCond_FirstUseEver);
+		    ImGui::Begin("Status UI");
+		    ImGui::ColorEdit3("clear color", (float*)&clear_color);
+		    ImGui::Text("Rendering: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		    ImGui::End();
+
+		    int display_w, display_h;
+		    glfwGetFramebufferSize( windowinfo._window, &display_w, &display_h);
+		    glViewport(0, 0, display_w, display_h);
+		    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		}
+		ImGui::Render();
+
 		glfwSwapBuffers( windowinfo._window );
-	    
+
 		std::cout << "post renderdraw0." << std::endl;
 
+		auto t_current_frame= std::chrono::high_resolution_clock::now();
+
+		std::chrono::duration<double, std::milli> duration_frame = t_current_frame - t_prev_frame;
+		while( duration_frame.count() < 40 ){
+		    t_current_frame= std::chrono::high_resolution_clock::now();
+		    duration_frame = t_current_frame - t_prev_frame;
+		}
+		t_prev_frame = t_current_frame;
+
 		delete entity_01;
-		
-		std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
+		if( glfwWindowShouldClose( windowinfo._window ) )
+		{
+		    break;
+		}
+		glfwPollEvents();
 	    }
 	}
 	// SECTION( "GLSLProgram, GLSLProgram" ) {

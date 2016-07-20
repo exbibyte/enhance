@@ -3,11 +3,12 @@ inc_folder_basic := $(dir $(wildcard ../../src/*/))
 inc_folder_test := ../
 inc_folder_kernel := ../../src/kernel
 inc_folder_kernel_component := ../../src/kernel/component
+inc_folder_ui_imgui := ../../src/ui/imgui
 
 #get list of subdirectories in ../modules/
 inc_folder_module_subdirs := $(sort $(dir $(wildcard ../../src/modules/*/)))
 
-include_dirs = $(inc_folder_basic) $(inc_folder_module_subdirs) $(inc_folder_test) $(inc_folder_kernel_component) $(inc_folder_kernel)
+include_dirs = $(inc_folder_basic) $(inc_folder_module_subdirs) $(inc_folder_test) $(inc_folder_kernel_component) $(inc_folder_kernel) $(inc_folder_ui_imgui)
 
 #include directories end---
 
@@ -23,10 +24,11 @@ objects_render := $(wildcard ../../src/render/intermediate/*.o)
 objects_math := $(wildcard ../../src/math/intermediate/*.o)
 objects_file := $(wildcard ../../src/file/intermediate/*.o)
 objects_datatransform := $(wildcard ../../src/DataTransform/intermediate/*.o)
+objects_ui := $(wildcard ../../src/ui/intermediate/*.o)
 
-target := test_enEngineKernel0
+targets := test_enEngineKernel0 test_render
 
-object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_datatransform)
+object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_datatransform) $(objects_ui)
 
 dir_build := ./build
 
@@ -36,13 +38,13 @@ pkg_config_flags = `pkg-config --cflags glfw3`
 
 $(shell mkdir -p $(dir_build))
 
-.PHONY: all
+%: %.cpp
+	$(CXX) -g -std=c++14 $(pkg_config_flags) -o $(dir_build)/$@ $^ $(object_files) $(include_flags) $(specification_flags) $(libs)
 
-all:
-	$(CXX) -g -std=c++14 $(pkg_config_flags) -o $(dir_build)/$(target) $(target).cpp $(object_files) $(include_flags) $(specification_flags) $(libs)
+.PHONY: all
+all: $(targets)
 
 .PHONY: clean
-
 clean:
 	rm -f -r ./build 
 
