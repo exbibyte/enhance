@@ -5,7 +5,7 @@ Enhance
 
 =======
 
-Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizable functionalities for developing 3D applications eaiser through a common infrastructure (kernel-based services approach).
+Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications eaiser through common modular service oriented approach.
 
 Checklist:
 
