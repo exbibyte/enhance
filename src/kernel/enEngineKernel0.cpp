@@ -10,6 +10,7 @@
 #include "enComponentRendercompute.hpp"
 
 void enEngineKernel0::init(){
+    //TODO: consider bulk memory allocation
     register_component( new enComponentClock0( new Clock0 ) );
     register_component( new enComponentLoggerStdout( new LoggerStdout ) );
     register_component( new enComponentScheduler0( new Scheduler0 ) );
