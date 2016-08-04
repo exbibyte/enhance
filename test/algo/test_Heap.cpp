@@ -10,11 +10,11 @@
 using namespace std;
 
 TEST_CASE( "Heap", "[Heap]" ) {
-    Heap< int, HeapMax > heap_max;
-    vector< Heap< int, HeapMax >::Unit > unsorted { { 0, 100 }, { 9, 101 }, { -5, 102 }, { 6, 103 }, { -6, 104 }, { -8, 105 }, };
-    vector< Heap< int, HeapMax >::Unit > empty;
-    vector< Heap< int, HeapMax >::Unit > retrieve_sorted;
-    Heap< int, HeapMax >::Unit retrieve;
+    HeapMax< int > heap_max;
+    vector< HeapMax< int >::Unit > unsorted { { 0, 100 }, { 9, 101 }, { -5, 102 }, { 6, 103 }, { -6, 104 }, { -8, 105 }, };
+    vector< HeapMax< int >::Unit > empty;
+    vector< HeapMax< int >::Unit > retrieve_sorted;
+    HeapMax< int >::Unit retrieve;
     SECTION( "Heap Empty" ) {
 	bool bRet;
 	heap_max.BuildHeap( empty );
@@ -78,11 +78,11 @@ TEST_CASE( "Heap", "[Heap]" ) {
     }
     SECTION( "Heap Insert" ) {
 	bool bRet;
-	Heap< int, HeapMax >::Unit unit_2 {10,3};
-	Heap< int, HeapMax >::Unit unit_3 {6,4};
-	Heap< int, HeapMax >::Unit unit_4 {15,5};
-	Heap< int, HeapMax >::Unit unit_1 {3,2};
-	Heap< int, HeapMax >::Unit unit_0 {4,1};
+	HeapMax< int >::Unit unit_2 {10,3};
+	HeapMax< int >::Unit unit_3 {6,4};
+	HeapMax< int >::Unit unit_4 {15,5};
+	HeapMax< int >::Unit unit_1 {3,2};
+	HeapMax< int >::Unit unit_0 {4,1};
 
 	bRet = heap_max.Insert( unit_0 );
 	bRet &= heap_max.Insert( unit_1 );

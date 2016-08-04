@@ -43,6 +43,7 @@ public:
 	    return lhs._weight > rhs._weight;
 	}
     };
+    //to be used with Kruskal algorithm
     bool GenerateGraphFromWeightMap( std::map< std::pair<int, int> , int > & weightmap ){
 	for( auto & i : weightmap ){
 	    int k1_id = i.first.first;
@@ -55,6 +56,10 @@ public:
 	}
 	return true;
     }
+    //to be used with Prim algorithm
+    bool GenerateGraphFromWeightMap_Prim( std::map< std::pair<int, int> , int > & weightmap ){
+	return true;
+    }
     std::shared_ptr< MinSpanTree::VertexNode > CreateVertexIfNotExist( int id ){
 	DisjointSetForrest::SetNode * new_set_node;
 	DisjointSetForrest::MakeSet( new_set_node );
@@ -64,6 +69,7 @@ public:
 	auto it = _SetVertices.find( new_vertex );
 	return *it;
     }
+    //global approach
     bool GenerateMinSpanTreeKruskal( std::vector< MinSpanTree::EdgeWeight > & min_span_tree ){
 	min_span_tree.clear();
 	while( !_EdgeWeights.empty() ){
@@ -78,6 +84,16 @@ public:
 	}
 	return true;
     }
+    //localized greedy approach
+    bool GenerateMinSpanTreePrim( std::vector< MinSpanTree::EdgeWeight > & min_span_tree ){
+	min_span_tree.clear();
+        //choose a starting node
+        
+        //repeatedly grow from the choosen node until all nodes in the graph are visisted
+
+	return true;
+    }
+private:
     std::set< std::shared_ptr< MinSpanTree::VertexNode >, MinSpanTree::CompareVertexId > _SetVertices;
     std::priority_queue< EdgeWeight, std::vector< EdgeWeight >, MinSpanTree::CompareWeight > _EdgeWeights;
 };

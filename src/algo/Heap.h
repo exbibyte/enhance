@@ -4,20 +4,29 @@
 #include <vector>
 #include <limits>
 
-class HeapMin;
-class HeapMax;
-
-template< class TypeData, class HeapType >
-class Heap {};
-
-template< class TypeData >
-class Heap< TypeData, HeapMax > {
+class Unit {
 public:
-    class Unit {
-    public:
-	int _val;
-	TypeData _data;
-    };
+    int _val;
+    TypeData _data;
+};
+
+class compare_heap_max {
+public:
+    static bool operator()( Unit const & a, Unit const & b ){
+        return a._val > b._val;
+    }
+};
+
+class compare_heap_min {
+    static bool operator()( Unit const & a, Unit const & b ){
+        return a._val < b._val;
+    }
+};
+
+template< class TypeData, class Compare >
+class Heap< TypeData, Compare > {
+public:
+    using Unit = Unit;
     Heap(){
 	_size_heap_internal = 0;
     }
@@ -28,13 +37,14 @@ public:
 	int i_child_left = GetIndexChildLeft( i );
 	int i_child_right = GetIndexChildRight( i );
 	int i_largest = i;
-	if( i_child_left < size_heap && _arr[ i_child_left ]._val > _arr[ i_largest ]._val ){
+	if( i_child_left < size_heap && Compare( _arr[ i_child_left ]._val, _arr[ i_largest ]._val ) ){
 	    i_largest = i_child_left;
 	}
-	if( i_child_right < size_heap && _arr[ i_child_right ]._val > _arr[ i_largest ]._val ){
+	if( i_child_right < size_heap && Compare( _arr[ i_child_right ]._val,  _arr[ i_largest ]._val ) ){
 	    i_largest = i_child_right;
 	}
 	if( i_largest != i ){
+            //swap with a child to satisfy heap property
 	    Unit swap = _arr[ i ];
 	    _arr[ i ] = _arr[ i_largest ];
 	    _arr[ i_largest ] = swap;
@@ -70,7 +80,9 @@ public:
 	if( i >= _arr.size() ) return false;
 	if( val < _arr[i]._val ) return false;
 	_arr[i]._val = val;
-	while( i > 0 && _arr[ GetIndexParent( i ) ]._val < _arr[ i ]._val ){
+        //trickle up the item to get it in order with respect to heap property
+	while( i > 0 && Compare( _arr[ i ]._val, _arr[ GetIndexParent( i ) ]._val ) ){
+            //swap with parent
 	    Unit temporary = _arr[ GetIndexParent( i ) ];
 	    _arr[ GetIndexParent( i ) ] = _arr[ i ];
 	    _arr[ i ] = temporary;
@@ -118,5 +130,11 @@ private:
     std::vector< Unit > _arr;
     int _size_heap_internal;
 };
+
+template< class TypeData >
+class HeapMin : public Heap< TypeData, compare_heap_min >;
+
+template< class TypeData >
+class HeapMax : public Heap< TypeData, compare_heap_max >;
 
 #endif
