@@ -93,7 +93,6 @@ public:
 
 	return true;
     }
-private:
     std::set< std::shared_ptr< MinSpanTree::VertexNode >, MinSpanTree::CompareVertexId > _SetVertices;
     std::priority_queue< EdgeWeight, std::vector< EdgeWeight >, MinSpanTree::CompareWeight > _EdgeWeights;
 };
