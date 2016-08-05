@@ -74,7 +74,7 @@ public:
             }
             i_middle++;
         }
-	return std::pair<int,int>( i_middle_startm, i_middle );
+	return std::pair<int,int>( i_middle_start, i_middle );
     }
 };
 

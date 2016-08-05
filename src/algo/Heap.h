@@ -4,29 +4,33 @@
 #include <vector>
 #include <limits>
 
+template< class TypeData >
 class Unit {
 public:
     int _val;
     TypeData _data;
 };
 
+template< class TypeData >
 class compare_heap_max {
 public:
-    static bool operator()( Unit const & a, Unit const & b ){
-        return a._val > b._val;
+    bool operator()( TypeData const & a, TypeData const & b ){
+	return a > b;
     }
 };
 
+template< class TypeData >
 class compare_heap_min {
-    static bool operator()( Unit const & a, Unit const & b ){
-        return a._val < b._val;
+public:
+    bool operator()( TypeData const & a, TypeData const & b ){
+	return a < b;
     }
 };
 
-template< class TypeData, class Compare >
-class Heap< TypeData, Compare > {
+template< class TypeData, template<typename> class Compare >
+class Heap {
 public:
-    using Unit = Unit;
+    using Unit = Unit<TypeData>;
     Heap(){
 	_size_heap_internal = 0;
     }
@@ -37,10 +41,11 @@ public:
 	int i_child_left = GetIndexChildLeft( i );
 	int i_child_right = GetIndexChildRight( i );
 	int i_largest = i;
-	if( i_child_left < size_heap && Compare( _arr[ i_child_left ]._val, _arr[ i_largest ]._val ) ){
+	Compare<TypeData> comp;
+	if( i_child_left < size_heap && comp( _arr[ i_child_left ]._val, _arr[ i_largest ]._val ) ){
 	    i_largest = i_child_left;
 	}
-	if( i_child_right < size_heap && Compare( _arr[ i_child_right ]._val,  _arr[ i_largest ]._val ) ){
+	if( i_child_right < size_heap && comp( _arr[ i_child_right ]._val,  _arr[ i_largest ]._val ) ){
 	    i_largest = i_child_right;
 	}
 	if( i_largest != i ){
@@ -81,7 +86,8 @@ public:
 	if( val < _arr[i]._val ) return false;
 	_arr[i]._val = val;
         //trickle up the item to get it in order with respect to heap property
-	while( i > 0 && Compare( _arr[ i ]._val, _arr[ GetIndexParent( i ) ]._val ) ){
+	Compare<TypeData> comp;
+	while( i > 0 && comp( _arr[ i ]._val, _arr[ GetIndexParent( i ) ]._val ) ){
             //swap with parent
 	    Unit temporary = _arr[ GetIndexParent( i ) ];
 	    _arr[ GetIndexParent( i ) ] = _arr[ i ];
@@ -132,9 +138,9 @@ private:
 };
 
 template< class TypeData >
-class HeapMin : public Heap< TypeData, compare_heap_min >;
+class HeapMin : public Heap< TypeData, compare_heap_min >{};
 
 template< class TypeData >
-class HeapMax : public Heap< TypeData, compare_heap_max >;
+class HeapMax : public Heap< TypeData, compare_heap_max >{};
 
 #endif
