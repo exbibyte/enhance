@@ -2,6 +2,7 @@
 kernel_modules := ./src/modules
 kernel := ./src/kernel
 test_kernel := ./test/kernel
+test_algo := ./test/algo
 
 build_render:
 	$(MAKE) -C ./src/render
@@ -20,6 +21,9 @@ build_kernel_modules: build_render build_math build_file build_gl
 
 build_kernel: build_kernel_modules
 	$(MAKE) -C $(kernel)
+
+build_test_algo:
+	$(MAKE) -C $(test_algo)
 
 build_test_kernel: build_kernel
 	$(MAKE) -C $(test_kernel)
