@@ -8,6 +8,7 @@
 #include "enComponentInit.hpp"
 #include "enComponentRenderdraw.hpp"
 #include "enComponentRendercompute.hpp"
+#include "enComponentRenderserver.hpp"
 
 void enEngineKernel0::init(){
     //TODO: consider bulk memory allocation
@@ -19,6 +20,7 @@ void enEngineKernel0::init(){
     register_component( new enComponentInitGL( new InitGL ) );
     register_component( new enComponentRenderdraw0( new Renderdraw0 ) );
     register_component( new enComponentRendercompute0( new Rendercompute0 ) );
+    register_component( new enComponentRenderserver0( new Renderserver0 ) );
 }
 
 void enEngineKernel0::deinit(){

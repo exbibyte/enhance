@@ -9,6 +9,7 @@
 #include "enComponentInit.hpp"
 #include "enComponentRenderdraw.hpp"
 #include "enComponentRendercompute.hpp"
+#include "enComponentRenderserver.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -56,21 +57,16 @@ int main(){
     assert( renderdraws.size() == 1 );
     COMPONENT_INSTANCE( renderdraw0, enComponentRenderdraw0, renderdraws.front() );
 
-    std::shared_ptr<GLSLProgram> glslprogram = std::make_shared<GLSLProgram>();
-
-    vector<double> vert_pos;
-    vector<double> vert_norm;
-
-    bool bRet;
-    cout << "set shaders" << endl;
-    glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.vert", GLSLShader::VERTEX );
-    glslprogram->CompileShaderFromFile("../../src/gl/shaders/Shadow.frag", GLSLShader::FRAGMENT );
-    glslprogram->AttachShaders();
-
-    //set buffer data
-    GLAttribData<float> * pPositionData = new GLAttribData<float>;
-    GLAttribData<float> * pNormalData = new GLAttribData<float>;
-
+    //renderserver0
+    vector<enComponentMeta*> renderservers;
+    engine_kernel.get_components_by_type( enComponentType::RENDERSERVER, renderservers );
+    assert( renderservers.size() == 1 );
+    COMPONENT_INSTANCE( renderserver0, enComponentRenderserver0, renderservers.front() );
+    renderserver0->init();
+    std::shared_ptr<GLSLProgram> glslprogram = ((Renderserver0*)renderserver0)->_glslprogram;
+    assert( glslprogram.get() && "resource(glslprogram*) invalid" );
+    
+    ///TODO: put parsing activities into a separate astraction ----------------------------------- start
     //parse input polymesh file
     PassParsePolyMesh pass_parse_polymesh;
     PassParsePolyMesh * p_pass_parse_polymesh = & pass_parse_polymesh;
@@ -87,7 +83,7 @@ int main(){
     meta_info_parse_polymesh.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
     meta_info_parse_polymesh.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");
     if( !pass_parse_polymesh.RegisterDataTransformMetaInfo( & meta_info_parse_polymesh ) ){
-	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
+    	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
     }
 
     //set meta info for converting polymesh to array
@@ -95,21 +91,21 @@ int main(){
     meta_info_convert_polymesh_to_array.AddMetaInfo( "INPUT_DATATYPE", "DATASTRUCT_POLYMESH" );
     meta_info_convert_polymesh_to_array.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH_ARRAY");
     if( !pass_convert_polymesh_to_array.RegisterDataTransformMetaInfo( & meta_info_convert_polymesh_to_array ) ){
-	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
+    	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
     }    
 
     //register passes
     if( !data_transform_driver.RegisterPass( p_pass_parse_polymesh ) ){
-	assert( 0 && "DataTransformDriver::RegisterPass failed.");
+    	assert( 0 && "DataTransformDriver::RegisterPass failed.");
     }
     if( !data_transform_driver.RegisterPass( p_pass_convert_polymesh_to_array ) ){
-	assert( 0 && "DataTransformDriver::RegisterPass failed.");
+    	assert( 0 && "DataTransformDriver::RegisterPass failed.");
     }
 
     void * data_in;
     void * data_out;
     if( !data_transform_driver.ExecutePasses( data_in, data_out ) ){
-	assert( 0 && "DataTransformDriver::ExecutePasses failed.");
+    	assert( 0 && "DataTransformDriver::ExecutePasses failed.");
     }
 
     PolyMesh_Data_Arrays * polymesh_data_arrays = ( PolyMesh_Data_Arrays * ) data_out;
@@ -119,10 +115,10 @@ int main(){
     int iNumDataVertex;
     int iNumDataNormal;
     if( !polymesh_data_arrays->Get( PolyMesh_Data_Arrays_Type::VERTEX, data_vertex, iNumDataVertex ) ){
-	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
+    	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
     }
     if( !polymesh_data_arrays->Get( PolyMesh_Data_Arrays_Type::NORMAL, data_normal, iNumDataNormal ) ){
-	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
+    	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
     }
 
     map< string, GLBufferInfo * > map_buffer_info;
@@ -130,44 +126,28 @@ int main(){
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence;
     polymesh_data_arrays->GetMapBufferInfoSequence( map_buffer_info_sequence );
     for( auto i : map_buffer_info ){
-	glslprogram->SetBufferInfo( i.second );
+    	glslprogram->SetBufferInfo( i.second );
     }
     for( auto i : map_buffer_info_sequence ){
-	glslprogram->SetBufferInfoSequence( i.second );
+    	glslprogram->SetBufferInfoSequence( i.second );
     }
         
     if( !data_transform_driver.CleanUpPasses() ){
-	assert( 0 && "DataTransformDriver::CleanUpPasses failed.");
+    	assert( 0 && "DataTransformDriver::CleanUpPasses failed.");
     }
-    
-    float * current_vertex = data_vertex;
-    float * current_normal = data_normal;
-    
-    //save mapping of data
-    glslprogram->AddMapAttrib( "VertexPosition", pPositionData );
-    glslprogram->AddMapAttrib( "VertexNormal", pNormalData );
-    //bind the above attributes to vertex array object
-    glslprogram->BindMapAttrib();
 
-    glslprogram->BindFragDataLocation( 0, "FragColor" );
+    ///TODO: put parsing activities into a separate astraction ----------------------------------- end
 
-    glslprogram->Link();
+    // //TODO: put glsl related studd into separate abstraction-------------------------------------starts
 
-    glslprogram->PrintActiveUniforms();
-
-    glslprogram->PrintActiveAttribs();
-
-    glslprogram->Use();
-    
-    glslprogram->AddNewTexture("ShadowTexture", GLTexture::DEPTH, 2500, 2500, 0, 0 );
-
-    cout << "After linking program" << endl;
+    vector<double> vert_pos;
+    vector<double> vert_norm;
 
     for( int i = 0; i < iNumDataVertex; ++i ){
-	vert_pos.push_back( data_vertex[i] );
+    	vert_pos.push_back( data_vertex[i] );
     }
     for( int i = 0; i < iNumDataNormal; ++i ){
-	vert_norm.push_back( data_normal[i] );
+    	vert_norm.push_back( data_normal[i] );
     }
     cout << "Size of vert_pos: " << vert_pos.size() << endl;
     cout << "Size of vert_norm: " << vert_norm.size() << endl;
@@ -176,7 +156,8 @@ int main(){
     data_vertex = nullptr;
     delete [] data_normal;
     data_normal = nullptr;
-    
+
+    // //TODO: put glsl related studd into separate abstraction-------------------------------------ends
     cout << "End of Init Phase" << endl;
 
     double rotation_angle = 0;

@@ -16,7 +16,10 @@ public:
     std::shared_ptr<RenderCamera> _camera;
     std::shared_ptr<RenderContext> _context;
     std::shared_ptr<RenderLight> _light;
-    GLSLProgram * _glslprogram;
+    union {
+	GLSLProgram * _glslprogram;
+	//TODO: add other rendering backends
+    };
 };
 
 #endif

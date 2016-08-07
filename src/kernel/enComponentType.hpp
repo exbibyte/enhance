@@ -9,6 +9,7 @@ enum class enComponentType {
     LOGGER,
     RENDERDRAW,
     RENDERCOMPUTE,
+    RENDERSERVER,
     UI,
     LOGIC,
     SCHEDULER,
