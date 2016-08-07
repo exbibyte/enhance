@@ -16,21 +16,21 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
     string data_path;
     DataTransformMetaInfo * meta_info;
     if( !GetDataTransformMetaInfo( meta_info ) ){
-	return false;
+        return false;
     }
     //check input data type
     if( !QueryFromMetaInfo( meta_info, DataQuery::INPUT, data_type, data_path ) ){
-	return false;
+        return false;
     }
     if( DataType::DATASTRUCT_POLYMESH != data_type ){
-	return false;
+        return false;
     }
     //check output data type
     if( !QueryFromMetaInfo( meta_info, DataQuery::OUTPUT, data_type, data_path ) ){
-	return false;
+        return false;
     }
     if( DataType::DATASTRUCT_POLYMESH_ARRAY != data_type ){
-	return false;
+        return false;
     }
 
     Filter_ParsePolyMesh * filter_polymesh = ( Filter_ParsePolyMesh * ) data_in;
@@ -49,34 +49,34 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
     float * normal_current = normal_data;
     
     for( auto i : filter_polymesh->_vec_PolyMesh_Data_Vert ){
-	double * data;
-	int iCount;
-    	bRet = i->GetArray( data, iCount );
-	double * data_start = data;
-	if( !bRet || iCount < 3 ){ //assume 3 counts per vertex
-	    delete [] vertex_data;
-	    delete [] data_start;
-	    return false;
-	}
-	for( int j = 0; j < 3; j++ ){
-	    *vertex_current++ = *data++;
-	}
-	delete [] data_start;
+        double * data;
+        int iCount;
+        bRet = i->GetArray( data, iCount );
+        double * data_start = data;
+        if( !bRet || iCount < 3 ){ //assume 3 counts per vertex
+            delete [] vertex_data;
+            delete [] data_start;
+            return false;
+        }
+        for( int j = 0; j < 3; j++ ){
+            *vertex_current++ = *data++;
+        }
+        delete [] data_start;
     }
     for( auto i : filter_polymesh->_vec_PolyMesh_Data_Normal ){
-	double * data;
-	int iCount;
-    	bRet = i->GetArray( data, iCount );
-	double * data_start = data;
-	if( !bRet || iCount < 3 ){ //assume 3 counts per normal
-	    delete [] normal_data;
-	    delete [] data_start;
-	    return false;
-	}
-	for( int j = 0; j < 3; j++ ){
-	    *normal_current++ = *data++;
-	}
-	delete [] data_start;
+        double * data;
+        int iCount;
+        bRet = i->GetArray( data, iCount );
+        double * data_start = data;
+        if( !bRet || iCount < 3 ){ //assume 3 counts per normal
+            delete [] normal_data;
+            delete [] data_start;
+            return false;
+        }
+        for( int j = 0; j < 3; j++ ){
+            *normal_current++ = *data++;
+        }
+        delete [] data_start;
     }
 
     _ArrayData = new PolyMesh_Data_Arrays;
@@ -84,26 +84,26 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
     bRet &= _ArrayData->Set( PolyMesh_Data_Arrays_Type::NORMAL, normal_data, iNumNormalData );
 
     for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfo ){
-	GLBufferInfo * buffer_info = new GLBufferInfo;
-	buffer_info->_Name = i->_name;
-	buffer_info->_Offset = i->_offset;
-	buffer_info->_Length = i->_length;
-	_ArrayData->SetBufferInfo( buffer_info );	
+        GLBufferInfo * buffer_info = new GLBufferInfo;
+        buffer_info->_Name = i->_name;
+        buffer_info->_Offset = i->_offset;
+        buffer_info->_Length = i->_length;
+        _ArrayData->SetBufferInfo( buffer_info );       
     }
     for( auto i : filter_polymesh->_vec_PolyMesh_Data_BufferInfoSequence ){
-	GLBufferInfoSequence * buffer_info_sequence = new GLBufferInfoSequence;
+        GLBufferInfoSequence * buffer_info_sequence = new GLBufferInfoSequence;
         buffer_info_sequence->_Name = i->_name;
-	for( auto j : i->_vec_sequence ){
-	    string strName = j;
-	    GLBufferInfo * buffer_info;
-	    if( !_ArrayData->GetBufferInfo( strName, buffer_info ) ){
-		assert( 0 && "PolyMesh_Data_Arrays::GetBufferInfo failed" );
-		return false;
-	    }
-	    buffer_info_sequence->_Vec_BufferInfo.push_back( buffer_info );
-	}
-	buffer_info_sequence->_Loop = i->_loop;
-	_ArrayData->SetBufferInfoSequence( buffer_info_sequence );
+        for( auto j : i->_vec_sequence ){
+            string strName = j;
+            GLBufferInfo * buffer_info;
+            if( !_ArrayData->GetBufferInfo( strName, buffer_info ) ){
+                assert( 0 && "PolyMesh_Data_Arrays::GetBufferInfo failed" );
+                return false;
+            }
+            buffer_info_sequence->_Vec_BufferInfo.push_back( buffer_info );
+        }
+        buffer_info_sequence->_Loop = i->_loop;
+        _ArrayData->SetBufferInfoSequence( buffer_info_sequence );
     }
     
     delete [] vertex_data;
@@ -117,8 +117,8 @@ bool PassConvertPolyMeshDataStructToArray::ExecutePass( void * & data_in, void *
 }
 bool PassConvertPolyMeshDataStructToArray::CleanPass(){
     if( !_ArrayData ){
-	delete _ArrayData;
-	_ArrayData = nullptr;
+        delete _ArrayData;
+        _ArrayData = nullptr;
     }
     cout << "PassConvertPolyMeshDataStructToArray::CleanPass returned" << endl;
     return true;

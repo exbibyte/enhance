@@ -6,6 +6,7 @@
 class IParser {
 public:
     virtual ~IParser(){}
+    virtual bool parse(){ return false; }
 };
 
 #endif

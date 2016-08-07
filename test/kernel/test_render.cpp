@@ -10,6 +10,7 @@
 #include "enComponentRenderdraw.hpp"
 #include "enComponentRendercompute.hpp"
 #include "enComponentRenderserver.hpp"
+#include "enComponentParser.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -65,99 +66,20 @@ int main(){
     renderserver0->init();
     std::shared_ptr<GLSLProgram> glslprogram = ((Renderserver0*)renderserver0)->_glslprogram;
     assert( glslprogram.get() && "resource(glslprogram*) invalid" );
-    
-    ///TODO: put parsing activities into a separate astraction ----------------------------------- start
-    //parse input polymesh file
-    PassParsePolyMesh pass_parse_polymesh;
-    PassParsePolyMesh * p_pass_parse_polymesh = & pass_parse_polymesh;
 
-    PassConvertPolyMeshDataStructToArray pass_convert_polymesh_to_array;
-    PassConvertPolyMeshDataStructToArray * p_pass_convert_polymesh_to_array = & pass_convert_polymesh_to_array;
-    
-    DataTransformDriver data_transform_driver;
+    //parserpolymesh0
+    vector<enComponentMeta*> parserpolymeshes;
+    engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
+    assert( parserpolymeshes.size() == 1 );
+    COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
 
-    //set meta info for parsing polymesh
-    DataTransformMetaInfo meta_info_parse_polymesh("parse_polymesh");
-    string strFilePathPolyMesh = "../../testcase/file/BS_Skate_v2.pmesh";
-    meta_info_parse_polymesh.AddMetaInfo( "INPUT_DATATYPE", "FILE_POLYMESH" );
-    meta_info_parse_polymesh.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
-    meta_info_parse_polymesh.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");
-    if( !pass_parse_polymesh.RegisterDataTransformMetaInfo( & meta_info_parse_polymesh ) ){
-    	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
-    }
-
-    //set meta info for converting polymesh to array
-    DataTransformMetaInfo meta_info_convert_polymesh_to_array("convert_polymesh_to_array");
-    meta_info_convert_polymesh_to_array.AddMetaInfo( "INPUT_DATATYPE", "DATASTRUCT_POLYMESH" );
-    meta_info_convert_polymesh_to_array.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH_ARRAY");
-    if( !pass_convert_polymesh_to_array.RegisterDataTransformMetaInfo( & meta_info_convert_polymesh_to_array ) ){
-    	assert( 0 && "PassParsePolyMesh::RegisterDataTransformMetaInfo failed" );
-    }    
-
-    //register passes
-    if( !data_transform_driver.RegisterPass( p_pass_parse_polymesh ) ){
-    	assert( 0 && "DataTransformDriver::RegisterPass failed.");
-    }
-    if( !data_transform_driver.RegisterPass( p_pass_convert_polymesh_to_array ) ){
-    	assert( 0 && "DataTransformDriver::RegisterPass failed.");
-    }
-
-    void * data_in;
-    void * data_out;
-    if( !data_transform_driver.ExecutePasses( data_in, data_out ) ){
-    	assert( 0 && "DataTransformDriver::ExecutePasses failed.");
-    }
-
-    PolyMesh_Data_Arrays * polymesh_data_arrays = ( PolyMesh_Data_Arrays * ) data_out;
-
-    float * data_vertex;
-    float * data_normal;
-    int iNumDataVertex;
-    int iNumDataNormal;
-    if( !polymesh_data_arrays->Get( PolyMesh_Data_Arrays_Type::VERTEX, data_vertex, iNumDataVertex ) ){
-    	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
-    }
-    if( !polymesh_data_arrays->Get( PolyMesh_Data_Arrays_Type::NORMAL, data_normal, iNumDataNormal ) ){
-    	assert( 0 && "PolyMesh_Data_Arrays::Get failed.");
-    }
-
-    map< string, GLBufferInfo * > map_buffer_info;
-    polymesh_data_arrays->GetMapBufferInfo( map_buffer_info );
-    map< string, GLBufferInfoSequence * > map_buffer_info_sequence;
-    polymesh_data_arrays->GetMapBufferInfoSequence( map_buffer_info_sequence );
-    for( auto i : map_buffer_info ){
-    	glslprogram->SetBufferInfo( i.second );
-    }
-    for( auto i : map_buffer_info_sequence ){
-    	glslprogram->SetBufferInfoSequence( i.second );
-    }
-        
-    if( !data_transform_driver.CleanUpPasses() ){
-    	assert( 0 && "DataTransformDriver::CleanUpPasses failed.");
-    }
-
-    ///TODO: put parsing activities into a separate astraction ----------------------------------- end
-
-    // //TODO: put glsl related studd into separate abstraction-------------------------------------starts
-
+    //parse polymesh files and obtain asset information
+    map< string, GLBufferInfo * > map_buffer_info; //unused for now
+    map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
     vector<double> vert_pos;
     vector<double> vert_norm;
-
-    for( int i = 0; i < iNumDataVertex; ++i ){
-    	vert_pos.push_back( data_vertex[i] );
-    }
-    for( int i = 0; i < iNumDataNormal; ++i ){
-    	vert_norm.push_back( data_normal[i] );
-    }
-    cout << "Size of vert_pos: " << vert_pos.size() << endl;
-    cout << "Size of vert_norm: " << vert_norm.size() << endl;
-
-    delete [] data_vertex;
-    data_vertex = nullptr;
-    delete [] data_normal;
-    data_normal = nullptr;
-
-    // //TODO: put glsl related studd into separate abstraction-------------------------------------ends
+    ((ParserPolymesh0*)parserpolymesh0)->parse( map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
+    
     cout << "End of Init Phase" << endl;
 
     double rotation_angle = 0;
@@ -189,7 +111,7 @@ int main(){
 	//compute render information
 	RenderData renderdata = rendercompute0->compute( vert_pos, vert_norm );
 	renderdata._glslprogram = glslprogram.get();
-	//WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
+	
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
 
 	//render call ----------------------------------------------------------------

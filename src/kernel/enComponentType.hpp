@@ -19,6 +19,7 @@ enum class enComponentType {
     MEMORYALLOC,
     THREAD,
     INIT,
+    PARSER,
     //INSTANCE ENDS
 };
 
