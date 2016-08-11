@@ -42,6 +42,12 @@ int main(){
     engine_kernel.init();
     assert( engine_kernel.get_num_components() > 0 );
 
+    //clock0
+    vector<enComponentMeta*> clocks;
+    engine_kernel.get_components_by_type( enComponentType::CLOCK, clocks );
+    assert( clocks.size() == 1 );
+    COMPONENT_INSTANCE( clock0, enComponentClock0, clocks.front() );
+
     //initGL
     vector<enComponentMeta*> inits;
     engine_kernel.get_components_by_type( enComponentType::INIT, inits );
@@ -83,7 +89,6 @@ int main(){
     cout << "End of Init Phase" << endl;
 
     double rotation_angle = 0;
-    auto t1 = std::chrono::high_resolution_clock::now();
 
     //imgui init
     bool bInstallCallback = false;
@@ -91,13 +96,22 @@ int main(){
     glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
     ImGui_ImplGlfwGL3_Init( windowinfo._window, bInstallCallback );
 
-    auto t_prev_frame = std::chrono::high_resolution_clock::now();
+    //setup clock tick callback
+    bool ticked = false;
+    std::function<void(std::uint64_t,std::uint64_t,std::uint64_t)> tick_cb = [&](auto a, auto b, auto c){
+	ticked = true;
+    };
+    clock0->reset_start_time();
+    clock0->set_frequency(25);
+    clock0->set_func_cb( tick_cb );
+    clock0->run();
 
     bool bQuit = false;
     while(true){
-	auto t2 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double, std::milli> duration_ms = t2 - t1;
-	if( duration_ms.count() > 5000 ){
+	std::uint64_t time_since_start_ms;
+	std::uint64_t ticks_since_start;
+	clock0->get_time( time_since_start_ms, ticks_since_start );
+	if( time_since_start_ms > 5000 ){
 	    cout << "End rendering..." << endl;
 	    bQuit = true;
 	    break;
@@ -140,21 +154,21 @@ int main(){
 
 	std::cout << "post renderdraw0." << std::endl;
 
-	auto t_current_frame= std::chrono::high_resolution_clock::now();
-
-	std::chrono::duration<double, std::milli> duration_frame = t_current_frame - t_prev_frame;
-	while( duration_frame.count() < 40 ){
-	    t_current_frame= std::chrono::high_resolution_clock::now();
-	    duration_frame = t_current_frame - t_prev_frame;
+	//wait for clock tick
+	while( !ticked ){
+	    clock0->tick();
+	    std::this_thread::sleep_for(std::chrono::milliseconds(3));
 	}
-	t_prev_frame = t_current_frame;
-
+	ticked = false;
+	
 	if( glfwWindowShouldClose( windowinfo._window ) )
 	{
 	    break;
 	}
 	glfwPollEvents();
     }
+
+    clock0->pause();
     
     engine_kernel.deinit();
 
