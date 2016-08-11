@@ -11,13 +11,13 @@ bool enEngineKernelAbstract::register_component( enComponentMeta * component ){
     if( !component )
 	return false;
     component->SaveKernelInfo( this, _cid );
-    _components[ std::pair<enComponentType,uint_fast32_t>( component->get_component_type(), _cid) ] = component;
+    _components[ std::pair<enComponentType, uint32_t>( component->get_component_type(), _cid) ] = component;
     ++_cid;
     return true;
 }
 
-enComponentMeta * enEngineKernelAbstract::get_component( enComponentType type, uint_fast32_t cid ){
-  auto it_find = _components.find( std::pair<enComponentType, uint_fast32_t>( type, cid) );
+enComponentMeta * enEngineKernelAbstract::get_component( enComponentType type, uint32_t cid ){
+  auto it_find = _components.find( std::pair<enComponentType, uint32_t>( type, cid) );
     if( _components.end() == it_find )
 	return nullptr;
     return it_find->second;

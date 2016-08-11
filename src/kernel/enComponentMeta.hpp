@@ -16,20 +16,21 @@ public:
 	strncpy( _strid, strid, 64 );
 	_strid[63] = '\0';
     }
-    void SaveKernelInfo( enEngineKernelAbstract * kernel, uint_fast32_t cid );
+    void SaveKernelInfo( enEngineKernelAbstract * kernel, uint32_t cid );
     enComponentType get_component_type() const;
     int get_cid() const;
     char const * get_strid() const;
 protected:
-    void send( enComponentType dest, std::vector<int_fast32_t> msg );
-    void send( enComponentType dest, uint_fast32_t dest_cid, std::vector<int_fast32_t> msg );
-    void receive( enPacketTransmit packet );
-    void process_received_messages( std::function<void(enPacketTransmit &)> func );
+    void add_to_sent( std::vector<uint32_t> msg, enComponentType dest, uint32_t dest_cid = 0 );
+    void add_to_received( enPacketTransmit packet );
+    void flush_sent();
+    void process_received( std::function<bool(enPacketTransmit &)> func );
 private:
     enComponentType _component_type;
-    uint_fast32_t _cid;
+    uint32_t _cid;
     enEngineKernelAbstract * _kernel;
     std::deque< enPacketTransmit > _queue_receive;
+    std::deque< enPacketTransmit > _queue_send;
     char _strid[64] = "\0";
 };
 

@@ -18,7 +18,7 @@ public:
 
     //API section starts-----
     bool register_component( enComponentMeta * component );
-    enComponentMeta * get_component( enComponentType type, uint_fast32_t cid = 0 );
+    enComponentMeta * get_component( enComponentType type, uint32_t cid = 0 );
     enEngineKernelAbstract * get_core_engine();
     void accumulate_components( std::function<bool(enComponentMeta*)> f, std::vector<enComponentMeta * > & accum );
     void get_components_by_type( enComponentType type, std::vector< enComponentMeta * > & accum );
@@ -36,8 +36,8 @@ protected:
     bool remove_component_all();
     
 private:
-    std::map< std::pair<enComponentType,uint_fast32_t>, enComponentMeta * > _components;
-    uint_fast32_t _cid = 0; //component id
+    std::map< std::pair<enComponentType,uint32_t>, enComponentMeta * > _components;
+    uint32_t _cid = 0; //component id
 };
 
 #endif

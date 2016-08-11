@@ -8,11 +8,11 @@
 
 //structure of a transmitted message between components
 struct enPacketTransmit {
-    enComponentType _src;
-    enComponentType _dest;
-    uint_fast32_t _src_cid;
-    uint_fast32_t _dest_cid;
-    std::vector<int_fast32_t> _data;
+    enComponentType _type_src;
+    enComponentType _type_dest;
+    uint32_t _cid_src;
+    uint32_t _cid_dest;
+    std::vector<uint32_t> _data;
 };
 
 #endif

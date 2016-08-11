@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void enComponentMeta::SaveKernelInfo( enEngineKernelAbstract * kernel, uint_fast32_t cid ){
+void enComponentMeta::SaveKernelInfo( enEngineKernelAbstract * kernel, uint32_t cid ){
     _kernel = kernel;
     _cid = cid;
 }
@@ -19,26 +19,32 @@ int enComponentMeta::get_cid() const {
 char const * enComponentMeta::get_strid() const {
     return _strid;
 }
-void enComponentMeta::send( enComponentType dest, std::vector<int_fast32_t> msg ){
-    send( dest, 0, msg );
-}
-void enComponentMeta::send( enComponentType dest, uint_fast32_t dest_cid, std::vector<int_fast32_t> msg ){
+void enComponentMeta::add_to_sent( std::vector<uint32_t> msg, enComponentType dest_type, uint32_t dest_cid ){
     enPacketTransmit packet;
-    packet._src = _component_type;
-    packet._dest = dest;
-    packet._src_cid = _cid;
-    packet._dest_cid = dest_cid;
+    packet._type_src = _component_type;
+    packet._type_dest = dest_type;
+    packet._cid_src = _cid;
+    packet._cid_dest = dest_cid;
     packet._data = std::move( msg );
-    _kernel->transmit( packet ); 
+    _queue_send.push_back( std::move( packet ) );
 }
-void enComponentMeta::receive( enPacketTransmit packet ){
-    _queue_receive.push_back( packet );
+void enComponentMeta::add_to_received( enPacketTransmit packet ){
+    _queue_receive.push_back( std::move(packet) );
 }
-void enComponentMeta::process_received_messages( std::function<void(enPacketTransmit &)> func ){
-    std::deque< enPacketTransmit > obtained;
+void enComponentMeta::flush_sent(){
+    while( !_queue_send.empty() ){
+	enPacketTransmit & packet = _queue_send.front();
+	_kernel->transmit( std::move( packet ) );
+	_queue_send.pop_front();
+    }
+}
+void enComponentMeta::process_received( std::function<bool(enPacketTransmit &)> func ){
+    std::deque< enPacketTransmit > obtained {};
     obtained.swap( _queue_receive );
     while( !obtained.empty() ){
-	func( obtained.front() );
+	bool continue_process = func( obtained.front() );
 	obtained.pop_front();
+	if( !continue_process )
+	    break;
     }
 }
