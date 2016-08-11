@@ -21,18 +21,18 @@ dir_intermediate := ./intermediate
 
 $(shell mkdir -p $(dir_intermediate))
 
-%.o: %.cpp
-	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
-
 flex_PolyMesh.yy.o: flex_PolyMesh.yy.c
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 bison_PolyMesh.tab.o: bison_PolyMesh.tab.c
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
+%.o: %.cpp flex_PolyMesh.yy.o bison_PolyMesh.tab.o
+	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
+
 .PHONY: all
 
-all: $(objects) flex_PolyMesh.yy.o bison_PolyMesh.tab.o
+all: $(objects)
 
 .PHONY: clean
 
