@@ -1,10 +1,13 @@
 # kernel related starts
-kernel_modules := ./src/modules
-kernel := ./src/kernel
-test_kernel := ./test/kernel
-test_algo := ./test/algo
+kernel_modules = ./src/modules
+kernel = ./src/kernel
+test_kernel = ./test/kernel
+test_algo = ./test/algo
 
-build_render:
+build_gl:
+	$(MAKE) -C ./src/gl
+
+build_render: build_gl
 	$(MAKE) -C ./src/render
 
 build_math:
@@ -13,16 +16,13 @@ build_math:
 build_file:
 	$(MAKE) -C ./src/file
 
-build_datatransform:
+build_datatransform: build_file
 	$(MAKE) -C ./src/DataTransform
 
 build_ui:
 	$(MAKE) -C ./src/ui
 
-build_gl:
-	$(MAKE) -C ./src/gl
-
-build_kernel_modules: build_render build_math build_file build_datatransform build_ui build_gl
+build_kernel_modules: build_render build_math build_datatransform build_gl build_ui
 	$(MAKE) -C $(kernel_modules)
 
 build_kernel: build_kernel_modules

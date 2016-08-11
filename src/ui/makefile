@@ -12,9 +12,9 @@ include_dirs = ./imgui ./imgui/GL
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
-objects := $(patsubst %.cpp,%.o,$(src_files))
+objects = $(patsubst %.cpp,%.o,$(src_files))
 
-dir_intermediate := ./intermediate
+dir_intermediate = ./intermediate
 
 $(shell mkdir -p $(dir_intermediate))
 
