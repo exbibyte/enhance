@@ -1,6 +1,7 @@
 #include "allocpool.hpp"
 
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -25,33 +26,38 @@ public:
     B(){
 	cout << "B constructed." << endl;
     }
+    B( int a, int b, int c ){
+	cout << "B constructed with arguments: " << a << ", " << b << ", " << c << endl;	
+    }
     ~B(){
 	cout << "B destructed." << endl;
     }
-    char data[2000000];
+    char data[300'000'000];
 };
 
 int main(){
     allocpool _allocpool;
     
-    // A * a = new(&_allocpool) A;
-    // a->~A();
-    // _allocpool.free(a);
-
-    B * b = new(&_allocpool) B;
+    B* b = _allocpool.pool_new<B>( 6, 7, 8 );
+    cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
     if( b ){	
-	b->~B();
-	_allocpool.free(b);
+	allocpool::pool_delete(b);
     }
-
+    cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
+    
     B * b2 = new(&_allocpool) B;
     if( b2 ){	
 	b2->~B();
 	_allocpool.free(b2);
     }
-
+    cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
     try{
 	B * b3 = new(&_allocpool) B;
+	cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
+	for( auto & i : b3->data ){
+	    i = 5;
+	}
+	getchar();
 	if( b3 ){	
 	    b3->~B();
 	    operator delete( b3, &_allocpool );
