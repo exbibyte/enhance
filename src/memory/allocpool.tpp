@@ -9,6 +9,6 @@ void allocpool::pool_delete( T * p ){
     p->~T();
     auto it = _map_allocpools.find((void*)p);
     if( it != _map_allocpools.end() ){
-        it->second->free(p);
+        it->second->pool_free(p);
     }
 }

@@ -32,7 +32,7 @@ public:
     ~B(){
 	cout << "B destructed." << endl;
     }
-    char data[300'000'000];
+    char data[200'000'000];
 };
 
 int main(){
@@ -40,20 +40,27 @@ int main(){
     
     B* b = _allocpool.pool_new<B>( 6, 7, 8 );
     cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
-    if( b ){	
+    if( b ){
+	for( auto & i : b->data ){
+	    i = 5;
+	}
 	allocpool::pool_delete(b);
     }
     cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
     
     B * b2 = new(&_allocpool) B;
-    if( b2 ){	
+    if( b2 ){
+	for( auto & i : b2->data ){
+	    i = 5;
+	}
 	b2->~B();
-	_allocpool.free(b2);
+	_allocpool.pool_free(b2);
     }
     cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
     try{
 	B * b3 = new(&_allocpool) B;
 	cout << "alloc pool loading: " << _allocpool.get_loading() << endl;
+	cout << "size of class data: " << sizeof(b3->data) << endl;
 	for( auto & i : b3->data ){
 	    i = 5;
 	}
