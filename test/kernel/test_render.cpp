@@ -34,8 +34,14 @@
 
 using namespace std;
 
-int main(){
+int main( int argc, char ** argv ){
 
+    string path_poly;
+    if( argc > 1 )
+        path_poly = argv[1];
+    else
+	path_poly = "../../testcase/file/arrow.pmesh";
+    
     enEngineKernel0 engine_kernel;
     assert( engine_kernel.get_num_components() == 0 );
 
@@ -84,7 +90,7 @@ int main(){
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
     vector<double> vert_pos;
     vector<double> vert_norm;
-    ((ParserPolymesh0*)parserpolymesh0)->parse( map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
+    ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
     
     cout << "End of Init Phase" << endl;
 

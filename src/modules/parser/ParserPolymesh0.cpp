@@ -16,7 +16,7 @@
 
 using namespace std;
 
-bool ParserPolymesh0::parse( map< string, GLBufferInfo * > & map_buffer_info, map< string, GLBufferInfoSequence * > & map_buffer_info_sequence, vector<double> & vert_pos, vector<double> & vert_norm ){
+bool ParserPolymesh0::parse( string path, map< string, GLBufferInfo * > & map_buffer_info, map< string, GLBufferInfoSequence * > & map_buffer_info_sequence, vector<double> & vert_pos, vector<double> & vert_norm ){
 
     //parse input polymesh file
     PassParsePolyMesh pass_parse_polymesh;
@@ -29,7 +29,8 @@ bool ParserPolymesh0::parse( map< string, GLBufferInfo * > & map_buffer_info, ma
 
     //set meta info for parsing polymesh
     DataTransformMetaInfo meta_info_parse_polymesh("parse_polymesh");
-    string strFilePathPolyMesh = "../../testcase/file/BS_Skate_v2.pmesh";
+    // string strFilePathPolyMesh = "../../testcase/file/BS_Skate_v2.pmesh";
+    string strFilePathPolyMesh = path;
     meta_info_parse_polymesh.AddMetaInfo( "INPUT_DATATYPE", "FILE_POLYMESH" );
     meta_info_parse_polymesh.AddMetaInfo( "INPUT_DATAPATH", strFilePathPolyMesh );
     meta_info_parse_polymesh.AddMetaInfo( "OUTPUT_DATATYPE", "DATASTRUCT_POLYMESH");

@@ -39,3 +39,5 @@ all: $(objects)
 clean:
 	rm -f $(dir_intermediate)/*.o 
 
+obj2polymesh:
+	$(CXX) -g -std=c++14 Obj2PolyMesh.cpp -o Obj2PolyMesh
