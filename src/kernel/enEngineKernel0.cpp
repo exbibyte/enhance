@@ -10,6 +10,7 @@
 #include "enComponentRendercompute.hpp"
 #include "enComponentRenderserver.hpp"
 #include "enComponentParser.hpp"
+#include "enComponentUi.hpp"
 
 void enEngineKernel0::init(){
     //TODO: consider bulk memory allocation
@@ -23,6 +24,7 @@ void enEngineKernel0::init(){
     register_component( new enComponentRendercompute0( new Rendercompute0 ) );
     register_component( new enComponentRenderserver0( new Renderserver0 ) );
     register_component( new enComponentParserPolymesh0( new ParserPolymesh0 ) );
+    register_component( new enComponentUi0( new Ui0 ) );
 }
 
 void enEngineKernel0::deinit(){

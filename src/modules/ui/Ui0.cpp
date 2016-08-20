@@ -4,7 +4,6 @@
 #include <fstream>
 
 #include "Ui0.hpp"
-#include "IUi.hpp"
 
 #include <GLFW/glfw3.h>
 

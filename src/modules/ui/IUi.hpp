@@ -46,7 +46,7 @@ public:
     virtual bool get_characters( std::list<character> & ) { return false; }
     virtual bool init() { return false; }
     virtual bool deinit() { return false; }
-    virtual bool register_resource_to_monitor( void * ){ return false; }
+    virtual bool register_resource_to_monitor( handle_resource ){ return false; }
 };
 
 #endif
