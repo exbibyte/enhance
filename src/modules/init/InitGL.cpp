@@ -19,7 +19,7 @@ InitGL::~InitGL(){
     glfwTerminate();
 }
 
-void print_info_opengl(){
+void InitGL::print_info_opengl(){
     const GLubyte * renderer = glGetString( GL_RENDERER );
     const GLubyte * vendor = glGetString( GL_VENDOR );
     const GLubyte * version = glGetString( GL_VERSION );

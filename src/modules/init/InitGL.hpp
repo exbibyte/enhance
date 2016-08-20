@@ -15,6 +15,7 @@ public:
     bool init();
     WindowInfo GetWindowResource();
 private:
+    void print_info_opengl();
     GLFWwindow * _window;
     unsigned int _width;
     unsigned int _height;

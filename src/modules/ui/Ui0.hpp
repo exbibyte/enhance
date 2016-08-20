@@ -3,15 +3,15 @@
 
 #include "IUi.hpp"
 
-#include <GLFW/glfw3.h>
+#include "GLIncludes.hpp"
 
 #include <set>
 #include <list>
 #include <unordered_map>
 
-class UiMouse0 : public IUi {
+class Ui0 : public IUi {
 public:
-    char const * get_id(){ return "uimouse0"; }
+    char const * get_id(){ return "ui0"; }
     bool get_coordinates_3( std::list<coordinate> & );
     bool get_characters( std::list<character> & );
     bool init();
@@ -19,10 +19,12 @@ public:
     bool register_resource_to_monitor( handle_resource ); //resource handle is assumed to be GLFwindow *
 private:
     static void process_mouse_move( GLFWwindow * window, double xpos, double ypos );
+    static void process_mouse_button( GLFWwindow * window, int button, int action, int mods );
+    static void process_key_input( GLFWwindow * window, int key, int scancode, int action, int mods );
     std::set< handle_resource > _resources_to_monitor;
     std::list<coordinate> _coords;
     std::list<character> _chars;
-    static std::unordered_multimap<handle_resource, UiMouse0*> _map_resource_to_instance;
+    static std::unordered_multimap<handle_resource, Ui0*> _map_resource_to_instance;
 };
 
 #endif
