@@ -11,6 +11,7 @@
 #include "enComponentRenderserver.hpp"
 #include "enComponentParser.hpp"
 #include "enComponentUi.hpp"
+#include "enComponentFilter.hpp"
 
 void enEngineKernel0::init(){
     //TODO: consider bulk memory allocation
@@ -25,6 +26,7 @@ void enEngineKernel0::init(){
     register_component( new enComponentRenderserver0( new Renderserver0 ) );
     register_component( new enComponentParserPolymesh0( new ParserPolymesh0 ) );
     register_component( new enComponentUi0( new Ui0 ) );
+    register_component( new enComponentFilterUiDrag( new FilterUiDrag ) );
 }
 
 void enEngineKernel0::deinit(){

@@ -8,20 +8,20 @@
 class IUi {
 public:
     using key_character = char;
-    enum class input_type {
-	KEY,
+    enum class input_type : int {
+	KEY = 1,
 	MOUSE,
 	MOUSE_COORD,
 	OTHER,
     };
-    enum class mouse_character {
-	LEFT,
+    enum class mouse_character : int {
+	LEFT = 1,
 	RIGHT,
 	MID,
 	OTHER,
     };
-    enum class state {
-	DOWN,
+    enum class state : int {
+	DOWN = 1,
 	UP,
 	REPEAT, //applicable to key input
 	OTHER,
