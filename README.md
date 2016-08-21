@@ -15,15 +15,15 @@ C = In Progress
 D = To do
 
 
-[A] Math utilites
+[A] Math Utilites
 
-[C] UI handling
+[C] UI Handling
 
-[C] Graphics utilities
+[B] Graphics Utilities
 
-[C] Service infrastructure
+[B] Service Module and Infrastructure
 
-[C] Service Module Integration
+[C] Memory Management
 
 [D] Script management
 
