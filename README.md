@@ -56,6 +56,8 @@ Mac/Windows (not yet supported)
 
 Progress:
 
+Addition of stream even filtering, trackball UI utility.
+
 Testing of rotation and shadow mapping.
 https://youtu.be/x8cADzdhJhs
 
