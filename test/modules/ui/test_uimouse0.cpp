@@ -61,24 +61,16 @@ int main(){
 
     ui.register_resource_to_monitor( _window );
 
-    std::list<IUi::coordinate> coords{};
     std::list<IUi::character> characters{};
     
     std::cout << "mouse coordinates" << std::endl;
     while(1){
 	glfwPollEvents();
 	
-	ui.get_coordinates_3( coords );
-
-	for( auto & i : coords ){
-	    std::cout << "x: " << i._a << ", y: " << i._b << std::endl;
-	}
-	coords.clear();
-	
 	ui.get_characters( characters );
 
 	for( auto & i : characters ){
-	    if( IUi::character_type::MOUSE == i._character_type ){
+	    if( IUi::input_type::MOUSE == i._input_type ){
 		if( IUi::mouse_character::LEFT == i._mouse_character ){
 		    std::cout << "mouse L ";
 		}
@@ -96,7 +88,7 @@ int main(){
 		    std::cout << "up" << std::endl;
 		}
 	    }
-	    else if( IUi::character_type::KEY == i._character_type ){
+	    else if( IUi::input_type::KEY == i._input_type ){
 		std::cout << "key " << i._key_character << " ";
 
 		if( IUi::state::DOWN == i._state ){
@@ -112,6 +104,8 @@ int main(){
 		else if( IUi::state::REPEAT == i._state ){
 		    std::cout << "repeat" << std::endl;
 		}
+	    }else{ //MOUSE_COORD
+		std::cout << "x: " << i._coordinate._a << ", y: " << i._coordinate._b << std::endl;
 	    }
 	}
         characters.clear();

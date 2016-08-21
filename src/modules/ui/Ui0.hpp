@@ -12,7 +12,6 @@
 class Ui0 : public IUi {
 public:
     char const * get_id(){ return "ui0"; }
-    bool get_coordinates_3( std::list<coordinate> & );
     bool get_characters( std::list<character> & );
     bool init();
     bool deinit();
@@ -22,7 +21,6 @@ private:
     static void process_mouse_button( GLFWwindow * window, int button, int action, int mods );
     static void process_key_input( GLFWwindow * window, int key, int scancode, int action, int mods );
     std::set< handle_resource > _resources_to_monitor;
-    std::list<coordinate> _coords;
     std::list<character> _chars;
     static std::unordered_multimap<handle_resource, Ui0*> _map_resource_to_instance;
 };

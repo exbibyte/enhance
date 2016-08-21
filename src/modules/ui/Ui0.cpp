@@ -14,10 +14,6 @@
 
 std::unordered_multimap<IUi::handle_resource, Ui0*> Ui0:: _map_resource_to_instance {};
 
-bool Ui0::get_coordinates_3( std::list<coordinate> & coords ){
-    coords.splice( coords.end(), _coords );
-    return true;
-}
 bool Ui0::get_characters( std::list<character> & characters ){
     characters.splice( characters.end(), _chars );
     return true;
@@ -34,7 +30,11 @@ void Ui0::process_mouse_move( GLFWwindow * window, double xpos, double ypos ){
     auto it = it_range.first;
     while( it != it_range.second ){
 	Ui0 * instance = it->second;
-	instance->_coords.push_back( { window, xpos, ypos, 0 } );
+	character c;
+	c._handle_resource = window;
+	c._input_type = input_type::MOUSE_COORD;
+        c._coordinate = { xpos, ypos, 0 };
+	instance->_chars.push_back( std::move(c) );
 	++it;
     }
 }
@@ -68,7 +68,7 @@ void Ui0::process_mouse_button( GLFWwindow * window, int button, int action, int
 	}
 	character c;
 	c._handle_resource = window;
-	c._character_type = character_type::MOUSE;
+	c._input_type = input_type::MOUSE;
 	c._mouse_character = mouse_char;
 	c._state = mouse_state;
 	instance->_chars.push_back( std::move(c) );
@@ -98,7 +98,7 @@ void Ui0::process_key_input( GLFWwindow * window, int key, int scancode, int act
 	}
 	character c;
 	c._handle_resource = window;
-	c._character_type = character_type::KEY;
+	c._input_type = input_type::KEY;
 	c._key_character = key_char;
 	c._state = key_state;
 	instance->_chars.push_back( std::move(c) );

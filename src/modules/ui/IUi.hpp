@@ -8,9 +8,10 @@
 class IUi {
 public:
     using key_character = char;
-    enum class character_type {
+    enum class input_type {
 	KEY,
 	MOUSE,
+	MOUSE_COORD,
 	OTHER,
     };
     enum class mouse_character {
@@ -27,22 +28,21 @@ public:
     };
     using handle_resource = void *;
     struct coordinate {
-	handle_resource _handle_resource;
 	double _a;
 	double _b;
 	double _c;
     };
     struct character {
 	handle_resource _handle_resource;
-	character_type _character_type;
+	input_type _input_type;
         union {
 	    key_character _key_character;
 	    mouse_character _mouse_character;
+	    coordinate _coordinate;
 	};
 	state _state;
     };
     virtual ~IUi(){}
-    virtual bool get_coordinates_3( std::list<coordinate> & ) { return false; }
     virtual bool get_characters( std::list<character> & ) { return false; }
     virtual bool init() { return false; }
     virtual bool deinit() { return false; }
