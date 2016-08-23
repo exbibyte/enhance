@@ -1,4 +1,4 @@
-Enhance
+# Enhance
 
 [![Build Status](https://travis-ci.org/bilbil/enhance.svg?branch=master)](https://travis-ci.org/bilbil/enhance)
 [![License](https://img.shields.io/:license-bsd-blue.svg?style=round-square)](https://github.com/bilbil/enhance/blob/master/LICENSE.txt)
@@ -7,61 +7,45 @@ Enhance
 
 Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications eaiser through a common modular service oriented approach.
 
-Checklist:
+## Checklist:
 
-A = Working
-B = Partial
-C = In Progress
-D = To do
+A = Working  
+B = Partial  
+C = In Progress  
+D = To do  
 
+[A] Math Utilites  
+[C] UI Handling  
+[B] Graphics Utilities  
+[B] Service Module and Infrastructure  
+[C] Memory Management  
+[D] Script management  
 
-[A] Math Utilites
+## Dependencies:
 
-[C] UI Handling
-
-[B] Graphics Utilities
-
-[B] Service Module and Infrastructure
-
-[C] Memory Management
-
-[D] Script management
-
---------------------------------------------
-
-Unit test with Catch:
-https://github.com/philsquared/Catch
-
---------------------------------------------
-
-Dependencies:
-
-GLFW, gl3w, OpenGL, GLM, Flex, Bison
-
-Linux: pkg-config
-
+GLFW, gl3w, OpenGL, GLM, Flex, Bison  
+Linux: pkg-config  
 These can be obtained via their respective package manager or built with source code.
 
 --------------------------------------------
 
-Building:
+## Building:
 
-Linux (supported):
-
+Linux (supported):  
 make all
 
 Mac/Windows (not yet supported)
 
 --------------------------------------------
 
-Progress:
+## Progress:
 
 Addition of stream event filtering, trackball UI utility.
 
-Testing of rotation and shadow mapping.
+Testing of rotation and shadow mapping.  
 https://youtu.be/x8cADzdhJhs
 
-Addition of Imgui UI toolkit:
+Addition of Imgui UI toolkit:  
 https://youtu.be/Je6lmugDkJc
 
 Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service; initial port of older rendering code to the new infrastructure has been tested with a test stub and is currently being integrated further into a more specific service module.
@@ -72,6 +56,6 @@ Current development will be using OpenGL as the rendering backend and targeted f
 
 --------------------------------------------
 
-License:
+## License:
 
 See LICENSE file.
