@@ -12,6 +12,7 @@ enum class enComponentType {
     RENDERSERVER,
     UI,
     FILTER,
+    ORIENTATIONMANIP,
     LOGIC,
     SCHEDULER,
     WORKERPOOL,

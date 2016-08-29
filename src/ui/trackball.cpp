@@ -1,12 +1,10 @@
-
-// Quaternion Trackball, by A.J. Tavakoli
-
-#include "Trackball.h"
+// Quaternion trackball, by A.J. Tavakoli
+#include "trackball.hpp"
 
 /////////////////////////////////////
 
 
-Trackball::Trackball() {
+trackball::trackball() {
   lastPos.SetDim(3);
   lastPos._vec[0] = 0.0f;
   lastPos._vec[1] = 0.0f;
@@ -14,7 +12,7 @@ Trackball::Trackball() {
 }
 
 // move() should be called whenever the mouse is moving
-void Trackball::move(int x, int y, int w, int h) {
+void trackball::move(int x, int y, int w, int h) {
    Vec currPos, d;
 
    // map x, y onto hemi-sphere
@@ -51,19 +49,23 @@ void Trackball::move(int x, int y, int w, int h) {
       // q
       q = currQuat*q;      
    } // if
-} // Trackball::move()
+} // trackball::move()
 
 //////////////////////////////////
 
 // stores trackball's transformation matrix in mat.
-void Trackball::look(float *mat) {   
+void trackball::look(float *mat) {   
    q.ToMatrixRot(mat);   
-} // Trackball::look()
+} // trackball::look()
+
+Quat trackball::get_quat() {
+    return q;
+} // trackball::look()
 
 //////////////////////////////////
 
 // project cursor position (x and y) onto trackball hemi-sphere
-void Trackball::pToV(int x, int y, int w, int h, Vec &p) {
+void trackball::pToV(int x, int y, int w, int h, Vec &p) {
    float fX = (float)x, fY = (float)y,
          fW = (float)w, fH = (float)h;
 
@@ -81,15 +83,15 @@ void Trackball::pToV(int x, int y, int w, int h, Vec &p) {
    p._vec[2] = (float)cos( double((PI/2.0f) * ( (d < 1.0f) ? d : 1.0f)) );
    
    p.Normalize();
-} // Trackball::pToV()
+} // trackball::pToV()
 
 //////////////////////////////////
 
 // This function should be called when you are starting
 // to move the trackball.  x and y are the current cursor
 // coordinates. w and h are the window dimensions.
-void Trackball::startMotion(int x, int y, int w, int h) {
+void trackball::startMotion(int x, int y, int w, int h) {
    pToV(x, y, w, h, lastPos);   
-} // Trackball::startMotion()
+} // trackball::startMotion()
 
 ////////////////////////////

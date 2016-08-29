@@ -1,12 +1,14 @@
 #source files---
 
-src_files = $(wildcard imgui/*.cpp)
+src_files = $(wildcard imgui/*.cpp) trackball.cpp
 
 #source files end---
 
 #include directories start---
 
-include_dirs = ./imgui ./imgui/GL
+inc_folder_basic = $(dir $(wildcard ../../src/*/))
+
+include_dirs = ./imgui ./imgui/GL $(inc_folder_basic)
 
 #include directories end---
 
