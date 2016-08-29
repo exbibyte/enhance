@@ -40,7 +40,7 @@ Mac/Windows (not yet supported)
 
 ## Progress:
 
-Addition of UI eventing and stream filtering modules. Testing of initial version of trackball functionality:
+Addition of UI eventing and stream filtering modules. Testing of initial version of trackball functionality on top of these:
 https://youtu.be/hnAWd_QL_XY
 
 Testing of rotation and shadow mapping:
