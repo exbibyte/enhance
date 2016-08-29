@@ -40,12 +40,13 @@ Mac/Windows (not yet supported)
 
 ## Progress:
 
-Addition of stream event filtering, trackball UI utility.
+Addition of UI stream event filtering. Testing of initial version of trackball functionality:
+https://youtu.be/hnAWd_QL_XY
 
-Testing of rotation and shadow mapping.  
+Testing of rotation and shadow mapping:
 https://youtu.be/x8cADzdhJhs
 
-Addition of Imgui UI toolkit:  
+Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
 Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service; initial port of older rendering code to the new infrastructure has been tested with a test stub and is currently being integrated further into a more specific service module.
