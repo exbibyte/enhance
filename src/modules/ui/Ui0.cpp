@@ -116,3 +116,14 @@ bool Ui0::register_resource_to_monitor( handle_resource resource ){
     _map_resource_to_instance.insert( std::pair<handle_resource,Ui0*>( resource, this ) );
     return true;
 }
+bool Ui0::deregister_resource_to_monitor( handle_resource resource ){
+    if( !resource )
+	return false;
+    //assume resource is a valid GLFWwindow *
+    _resources_to_monitor.erase( resource );
+    glfwSetCursorPosCallback( (GLFWwindow *)resource, 0 );
+    glfwSetMouseButtonCallback( (GLFWwindow *)resource, 0 );
+    glfwSetKeyCallback( (GLFWwindow *)resource, 0 );
+    _map_resource_to_instance.erase( resource );
+    return true;
+}

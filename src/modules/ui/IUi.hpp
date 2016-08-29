@@ -47,6 +47,7 @@ public:
     virtual bool init() { return false; }
     virtual bool deinit() { return false; }
     virtual bool register_resource_to_monitor( handle_resource ){ return false; }
+    virtual bool deregister_resource_to_monitor( handle_resource ){ return false; }
 };
 
 #endif

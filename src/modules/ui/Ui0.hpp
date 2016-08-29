@@ -13,9 +13,10 @@ class Ui0 : public IUi {
 public:
     char const * get_id(){ return "ui0"; }
     bool get_characters( std::list<character> & );
-    bool init();
-    bool deinit();
-    bool register_resource_to_monitor( handle_resource ); //resource handle is assumed to be GLFwindow *
+    bool init() override;
+    bool deinit() override;
+    bool register_resource_to_monitor( handle_resource ) override; //resource handle is assumed to be GLFwindow *
+    bool deregister_resource_to_monitor( handle_resource ) override; //resource handle is assumed to be GLFwindow *
 private:
     static void process_mouse_move( GLFWwindow * window, double xpos, double ypos );
     static void process_mouse_button( GLFWwindow * window, int button, int action, int mods );
