@@ -12,7 +12,8 @@
 
 struct drag_coordinate {
     IUi::mouse_character _mouse_character;
-    IUi::coordinate _coordinate;
+    IUi::coordinate _coordinate_start;
+    IUi::coordinate _coordinate_delta;
 };
 
 class FilterUiDrag : public IFilter<drag_coordinate,IUi::character> {

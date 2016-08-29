@@ -5,6 +5,8 @@
 
 #include "WindowInfo.hpp"
 
+#include <initializer_list>
+
 class GLFWwindow;
 
 class InitGL : public IInit {
@@ -12,7 +14,7 @@ public:
     InitGL() : _window(nullptr) {}
     ~InitGL();
     char const * get_id(){ return "initGL"; }
-    bool init();
+    bool init( std::initializer_list<unsigned> const & window_args );
     WindowInfo GetWindowResource();
 private:
     void print_info_opengl();

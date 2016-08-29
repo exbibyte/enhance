@@ -4,9 +4,33 @@
 #include "Quat.h"
 
 #include <list>
+#include <initializer_list>
 
-bool Orientationmanip0::init(){
+#include <iostream>
 
+bool Orientationmanip0::init( std::initializer_list<int> const & args ){
+    if( args.size() < 4 ){
+	return false;
+    }
+    size_t count = 0;
+    for( auto & i : args ){
+	switch( count ){
+	case 0:
+	    _w = i;
+	    break;
+	case 1:
+	    _h = i;
+	    break;
+	case 2:
+	    _start_x = i;
+	    break;
+	case 3:
+	    _start_y = i;
+	    break;
+	default:
+	    break;
+	}
+    }
     return true;
 }
 bool Orientationmanip0::deinit(){
@@ -17,17 +41,17 @@ bool Orientationmanip0::deinit(){
 bool Orientationmanip0::process( std::list<Quat> & out, std::list<drag_coordinate> & in ){
 
     trackball tb;
-    int x_start, y_start, w, h;
-    x_start = 0;
-    y_start = 0;
-    w = 50;
-    h = 50;
-    tb.startMotion( x_start, y_start, w, h );
 
     for( auto & i : in ){
-	tb.move(i._coordinate._a, i._coordinate._b, w, h );
+	if( i._coordinate_delta._a == 0 && i._coordinate_delta._b == 0 ){
+	    continue;
+	}
+	tb.startMotion( i._coordinate_start._a, i._coordinate_start._b, _w, _h );
+	tb.move( i._coordinate_start._a + i._coordinate_delta._a, i._coordinate_start._b + i._coordinate_delta._b, _w, _h );
 	Quat q = tb.get_quat();
-        out.push_back( q );
+	q.NormalizeQuatCurrent();
+	out.push_back( q );
+
     }
     
     return true;

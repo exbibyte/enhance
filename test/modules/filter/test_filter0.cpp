@@ -125,7 +125,7 @@ int main(){
 		continue;
 		// std::cout << "drag: other, ";
 	    }
-	    std::cout << "x: " << i._coordinate._a << ", y: " << i._coordinate._b << std::endl;
+	    std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
 	}
 			  
         characters.clear();

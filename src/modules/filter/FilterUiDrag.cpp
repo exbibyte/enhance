@@ -46,7 +46,7 @@ bool FilterUiDrag::process( std::list<drag_coordinate> & out, std::list<IUi::cha
 		}
 	    }
 	    //output no drag value
-	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 } } );
+	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	}
 	else if( IUi::input_type::MOUSE_COORD == i._input_type ){
 	    auto key = i._handle_resource;
@@ -67,22 +67,23 @@ bool FilterUiDrag::process( std::list<drag_coordinate> & out, std::list<IUi::cha
 			//output valid drag value
 			int int_mouse_character = it_coord_cache->first;
 			IUi::mouse_character mouse_character = static_cast<IUi::mouse_character>( int_mouse_character );
-			out.push_back( { mouse_character, { delta_a, delta_b, delta_c } } );
+			//output valid starting coordinate and drag delta
+			out.push_back( { mouse_character, { c._a, c._b, c._c }, { delta_a, delta_b, delta_c } } );
 		    }else{
 			//save coordinate
 			it_coord_cache->second._coordinate = i._coordinate;
 			//output no drag value
-			out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 } } );
+			out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 		    }
 		    ++it_coord_cache;
 		}
 	    }else{
 		//output no drag value
-		out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 } } );
+		out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	    }
 	}else{
 	    //output no drag value
-	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 } } );
+	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	}
     }
     return true;

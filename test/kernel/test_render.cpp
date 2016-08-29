@@ -11,6 +11,9 @@
 #include "enComponentRendercompute.hpp"
 #include "enComponentRenderserver.hpp"
 #include "enComponentParser.hpp"
+#include "enComponentUi.hpp"
+#include "enComponentFilter.hpp"
+#include "enComponentOrientationmanip.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -59,7 +62,7 @@ int main( int argc, char ** argv ){
     engine_kernel.get_components_by_type( enComponentType::INIT, inits );
     assert( inits.size() == 1 );
     COMPONENT_INSTANCE( initGL, enComponentInitGL, inits.front() );
-    bool bret = initGL->init();
+    bool bret = initGL->init( { 500, 500 } );
     assert( true == bret );
 
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -79,6 +82,27 @@ int main( int argc, char ** argv ){
     std::shared_ptr<GLSLProgram> glslprogram = ((Renderserver0*)renderserver0)->_glslprogram;
     assert( glslprogram.get() && "resource(glslprogram*) invalid" );
 
+    //filterdrag0
+    vector<enComponentMeta*> filters;
+    engine_kernel.get_components_by_type( enComponentType::FILTER, filters );
+    assert( filters.size() == 1 );
+    COMPONENT_INSTANCE( filterdrag0, enComponentFilterUiDrag, filters.front() );
+
+    //Ui0
+    vector<enComponentMeta*> uis;
+    engine_kernel.get_components_by_type( enComponentType::UI, uis );
+    assert( uis.size() == 1 );
+    COMPONENT_INSTANCE( ui0, enComponentUi0, uis.front() );
+	
+    //orientationmanip0
+    vector<enComponentMeta*> orientationmanips;
+    engine_kernel.get_components_by_type( enComponentType::ORIENTATIONMANIP, orientationmanips );
+    assert( orientationmanips.size() == 1 );
+    COMPONENT_INSTANCE( orientationmanip0, enComponentOrientationmanip0, orientationmanips.front() );
+
+    //set trackball window size
+    orientationmanip0->init( { 500, 500, 250, 250 } );
+
     //parserpolymesh0
     vector<enComponentMeta*> parserpolymeshes;
     engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
@@ -94,13 +118,14 @@ int main( int argc, char ** argv ){
     
     cout << "End of Init Phase" << endl;
 
-    double rotation_angle = 0;
-
     //imgui init
     bool bInstallCallback = false;
     WindowInfo windowinfo = ((InitGL*)initGL)->GetWindowResource();
     glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
     ImGui_ImplGlfwGL3_Init( windowinfo._window, bInstallCallback );
+
+    //register window resource for UI event handler
+    ui0->register_resource_to_monitor( windowinfo._window );
 
     //setup clock tick callback
     bool ticked = false;
@@ -112,24 +137,117 @@ int main( int argc, char ** argv ){
     clock0->set_func_cb( tick_cb );
     clock0->run();
 
+    Vec orient_axis;
+    float orient_angle;
+    orient_axis[0] = 1;
+    orient_angle = 0.000;
+
+    double auto_rotate = 0.4;
+    
     bool bQuit = false;
     while(true){
 	std::uint64_t time_since_start_ms;
 	std::uint64_t ticks_since_start;
 	clock0->get_time( time_since_start_ms, ticks_since_start );
-	if( time_since_start_ms > 5000 ){
-	    cout << "End rendering..." << endl;
-	    bQuit = true;
-	    break;
-	}
+	// if( time_since_start_ms > 5000 ){
+	//     cout << "End rendering..." << endl;
+	//     bQuit = true;
+	//     break;
+	// }
 
 	vector<enComponentMeta*> rendercomputes;
 	engine_kernel.get_components_by_type( enComponentType::RENDERCOMPUTE, rendercomputes );
 	assert( rendercomputes.size() == 1 );
 	COMPONENT_INSTANCE( rendercompute0, enComponentRendercompute0, rendercomputes.front() );
 
+	//process UI events
+	std::list<IUi::character> characters{};
+	ui0->get_characters( characters );
+	for( auto & i : characters ){
+	    if( IUi::input_type::MOUSE == i._input_type ){
+		if( IUi::mouse_character::LEFT == i._mouse_character ){
+		    std::cout << "mouse L ";
+		}
+		else if( IUi::mouse_character::RIGHT == i._mouse_character ){
+		    std::cout << "mouse R ";
+		}
+		else if( IUi::mouse_character::MID == i._mouse_character ){
+		    std::cout << "mouse M ";
+		}
+
+		if( IUi::state::DOWN == i._state ){
+		    std::cout << "down" << std::endl;
+		}
+		else if( IUi::state::UP == i._state ){
+		    std::cout << "up" << std::endl;
+		}
+	    }
+	    else if( IUi::input_type::KEY == i._input_type ){
+		std::cout << "key " << i._key_character << " ";
+
+		if( IUi::state::DOWN == i._state ){
+		    std::cout << "down" << std::endl;
+		    if( 'Q' == i._key_character ){
+			std::cout << "exit" << std::endl;
+			return 0;
+		    }
+		}
+		else if( IUi::state::UP == i._state ){
+		    std::cout << "up" << std::endl;
+		}
+		else if( IUi::state::REPEAT == i._state ){
+		    std::cout << "repeat" << std::endl;
+		}
+	    }else{ //MOUSE_COORD
+		// std::cout << "x: " << i._coordinate._a << ", y: " << i._coordinate._b << std::endl;
+	    }
+	}
+
+	//drag filter
+	std::list<drag_coordinate> drag{};
+        filterdrag0->process( drag, characters );
+	for( auto & i : drag ){
+	    if( IUi::mouse_character::LEFT == i._mouse_character ){
+		std::cout << "drag: left, ";
+	    }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
+		std::cout << "drag: right, ";
+	    }else if( IUi::mouse_character::MID == i._mouse_character ){
+		std::cout << "drag: mid, ";
+	    }else {
+		continue;
+		// std::cout << "drag: other, ";
+	    }
+	    std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
+	}
+	
+	//orientation manipulation
+	std::list<Quat> orientation;
+        orientationmanip0->process( orientation, drag );
+	for( auto & i : orientation ){
+	    Vec axis{};
+	    float angle;
+	    i.ToAxisAngle( axis, angle );
+	    std::cout << "axis: ";
+	    std::cout << axis._vec[0] << ", ";
+	    std::cout << axis._vec[1] << ", ";
+	    std::cout << axis._vec[2];
+	    std::cout << ", angle: " << angle << std::endl;
+
+	    Vec orient_axis_temp;
+	    i.ToAxisAngle( orient_axis_temp, orient_angle );
+	    if( orient_angle == 0 ){
+		continue;
+	    }else{
+		orient_axis = orient_axis_temp;
+		orient_angle = orient_angle / 3.14 * 180;
+		break;
+	    }
+	}
+
+	orient_angle += auto_rotate;
+	
 	//compute render information
-	RenderData renderdata = rendercompute0->compute( vert_pos, vert_norm );
+	RenderData renderdata = rendercompute0->compute( vert_pos, vert_norm, orient_axis, orient_angle );
 	renderdata._glslprogram = glslprogram.get();
 	
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
@@ -158,7 +276,7 @@ int main( int argc, char ** argv ){
 
 	glfwSwapBuffers( windowinfo._window );
 
-	std::cout << "post renderdraw0." << std::endl;
+	// std::cout << "post renderdraw0." << std::endl;
 
 	//wait for clock tick
 	while( !ticked ){

@@ -1,15 +1,16 @@
-#include <string>
-#include <cstring>
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-
 #include "GLIncludes.hpp"
 
 #include "InitGL.hpp"
 #include "IInit.hpp"
 
 #include "WindowInfo.hpp"
+
+#include <string>
+#include <cstring>
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <initializer_list>
 
 InitGL::~InitGL(){
     if( _window ){
@@ -34,18 +35,32 @@ void InitGL::print_info_opengl(){
     printf("GL Version (integer) : %d.%d\n", major, minor);
     printf("GLSL Version : %s\n", glslVersion);
 }
-bool InitGL::init(){
+bool InitGL::init( std::initializer_list<unsigned> const & window_args ){
     if ( !glfwInit() ) {
     	printf( "failed to initialize GLFW.\n" );
     	return -1;
     }
 
+    if( window_args.size() < 2 ){
+	std::cout << "window_args not specified. Using default 500x500." << std::endl;
+	_width = 500;
+	_height = 500;
+    }else{
+	size_t arg_count = 0;
+	for( auto & i : window_args ){
+	    if( arg_count == 0 )
+		_width = i;
+	    else
+		_height = i;
+	    ++arg_count;
+	}
+
+    }
+    
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    _width = 500;
-    _height = 500;
     _window = glfwCreateWindow( _width, _height, "Render Window", nullptr, nullptr );
     if ( !_window ) {
 	return -1;

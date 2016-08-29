@@ -11,7 +11,7 @@
 
 bool Renderdraw0::render( RenderData renderdata ){
 
-    std::cout << "Renderdraw0::render invoked." << std::endl;
+    // std::cout << "Renderdraw0::render invoked." << std::endl;
     
     RenderPass< RenderBackEndOpenGL, PassType_ShadowMap_OpGL > renderpass;
     std::list<RenderEntity *> entities;

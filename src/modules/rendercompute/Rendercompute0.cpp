@@ -7,22 +7,28 @@
 #include "DataTransformDriver.h"
 #include "PolyMesh_Data_Arrays.h"
 
+#include "Vec.h"
+
 #include <vector>
 #include <iostream>
 #include <memory>
 #include <list>
 
-RenderData Rendercompute0::compute( std::vector<double> vert_coord, std::vector<double> vert_normal ){
+RenderData Rendercompute0::compute( std::vector<double> vert_coord, std::vector<double> vert_normal, Vec orient_axis, double orient_angle ){
 
     RenderData renderdata;
 
     //entities -------------------------------------------------------------------
     //orientation	
     vector<double> entity_translate    { 0, 0, 0};
-    vector<double> entity_rotate_axis  { 1, 0, 0};
-    // vector<double> entity_rotate_angle { 0 };
-    _rotation_angle += 0.05;
-    vector<double> entity_rotate_angle { _rotation_angle };
+    // vector<double> entity_rotate_axis  { 1, 0, 0};
+    // // vector<double> entity_rotate_angle { 0 };
+    _rotation_angle += 0.00;
+    // vector<double> entity_rotate_angle { _rotation_angle };
+
+    vector<double> entity_rotate_axis  { orient_axis._vec[0], orient_axis._vec[1], orient_axis._vec[2] };
+    vector<double> entity_rotate_angle { orient_angle + _rotation_angle };
+    
     //set material data
     vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
     vector<double> entity_material_diffuse   { 1, 1, 1 };

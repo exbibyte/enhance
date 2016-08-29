@@ -128,20 +128,22 @@ int main(){
 		continue;
 		// std::cout << "drag: other, ";
 	    }
-	    std::cout << "x: " << i._coordinate._a << ", y: " << i._coordinate._b << std::endl;
+	    std::cout << "x: " << i._coordinate_start._a << ", y: " << i._coordinate_start._b;
+	    std::cout << ", x_delta: " << i._coordinate_delta._a << ", y_delta: " << i._coordinate_delta._b << std::endl;
 	}
 
 	//orientation manipulation
 	std::list<Quat> orientation;
 	om.process( orientation, drag );
-	float mat_rot[16];
 	for( auto & i : orientation ){
-	    i.ToMatrixRot( mat_rot );
-	    std::cout << "mat_rot: ";
-	    for( auto & j : mat_rot ){
-		std::cout << j << " ";
-	    }
-	    std::cout << std::endl;
+	    Vec axis{};
+	    float angle;
+	    i.ToAxisAngle( axis, angle );
+	    std::cout << "axis: ";
+	    std::cout << axis._vec[0] << ", ";
+	    std::cout << axis._vec[1] << ", ";
+	    std::cout << axis._vec[2];
+	    std::cout << ", angle: " << angle << std::endl;
 	}
 	
         characters.clear();
