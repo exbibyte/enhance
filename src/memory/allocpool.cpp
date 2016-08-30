@@ -7,6 +7,15 @@
 //static member
 std::unordered_map<void*, allocpool*> allocpool::_map_allocpools{};
 
+allocpool::allocpool(){
+    _reserve = nullptr;
+    _occupied = 0;
+    _next_block = nullptr;
+    _reserve_size = 0;
+    _chunk_size = 0;
+    reserve( 250000000, 4 );
+}
+
 void * allocpool::pool_alloc( size_t n ){
 #ifdef DEBUG_PRINT
     std::cout << "custom allocation( " << n << " bytes)." << std::endl;

@@ -64,7 +64,6 @@ int main(){
 	for( auto & i : b3->data ){
 	    i = 5;
 	}
-	getchar();
 	if( b3 ){	
 	    b3->~B();
 	    operator delete( b3, &_allocpool );
