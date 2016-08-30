@@ -23,7 +23,7 @@ D = To do
 
 ## Dependencies:
 
-GLFW, gl3w, OpenGL, GLM, Flex, Bison  
+GLFW, gl3w, OpenGL, GLM (to be removed), Flex, Bison  
 Linux: pkg-config  
 These can be obtained via their respective package manager or built with source code.
 
