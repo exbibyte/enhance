@@ -11,7 +11,7 @@ class DataContainer{
     int data;
 };
 
-int FuncCompareInt(int a, int b){
+int FuncCompareInt(int const & a, int const & b){
     if(a < b){
         return 1;
     }else if( a > b){
@@ -23,7 +23,7 @@ int FuncCompareInt(int a, int b){
 
 TEST_CASE( "red_black_tree", "[red_black_tree]" ) {
 
-    int (*FuncCompare)(int,int) = &FuncCompareInt;
+    int (*FuncCompare)(int const & ,int const & ) = &FuncCompareInt;
     
     DataContainer container;
     DataContainer container1;

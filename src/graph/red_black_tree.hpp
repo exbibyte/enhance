@@ -4,7 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <utility>
- 
+#include <functional>
+
 typedef enum eRbColour {
     eRbColour_Red = 0,
     eRbColour_Black
@@ -15,7 +16,7 @@ template< typename TypeKey, typename TypeContainer >
 class tree_node_rb{
 public:    
 
-    typedef int (*FuncRbCompareKey)( TypeKey KeyA, TypeKey KeyB );
+    using FuncRbCompareKey = std::function<int(TypeKey const & a, TypeKey const & b )>;
 
     tree_node_rb( TypeKey Key, TypeContainer * Container );
     tree_node_rb();
