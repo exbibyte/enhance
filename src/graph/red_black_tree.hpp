@@ -12,75 +12,75 @@ typedef enum eRbColour {
 
 
 template< typename TypeKey, typename TypeContainer >
-class CTreeNodeRb{
+class tree_node_rb{
 public:    
 
     typedef int (*FuncRbCompareKey)( TypeKey KeyA, TypeKey KeyB );
 
-    CTreeNodeRb( TypeKey Key, TypeContainer * Container );
-    CTreeNodeRb();
+    tree_node_rb( TypeKey Key, TypeContainer * Container );
+    tree_node_rb();
 
-    CTreeNodeRb & operator=( const CTreeNodeRb & ) = delete;
-    CTreeNodeRb( const CTreeNodeRb & ) = delete;
+    tree_node_rb & operator=( const tree_node_rb & ) = delete;
+    tree_node_rb( const tree_node_rb & ) = delete;
 
     bool GetKeyColour( TypeKey & Key, eRbColour & Colour ) const;
 
-    static bool Insert( CTreeNodeRb * Tree, CTreeNodeRb * NodeInsert );
-    static bool Remove( CTreeNodeRb * NodeInsert );
-    static bool Find( CTreeNodeRb * Tree, TypeKey KeyFind, CTreeNodeRb * & NodeFound );
-    static bool Maximum( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound );
-    static bool MaximumLocal( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound );
-    static bool Minimum( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound );
-    static bool MinimumLocal( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound );
-    static bool RotateLeft( CTreeNodeRb * Tree );
-    static bool RotateRight( CTreeNodeRb * Tree );
-    static bool ConvertToRoot( CTreeNodeRb * Node );
-    static bool GetRoot( CTreeNodeRb * Node, CTreeNodeRb * & NodeRoot );
-    static bool GetKeysSubTreeInOrder( CTreeNodeRb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult );
+    static bool Insert( tree_node_rb * Tree, tree_node_rb * NodeInsert );
+    static bool Remove( tree_node_rb * NodeInsert );
+    static bool Find( tree_node_rb * Tree, TypeKey KeyFind, tree_node_rb * & NodeFound );
+    static bool Maximum( tree_node_rb * Tree, tree_node_rb * & NodeFound );
+    static bool MaximumLocal( tree_node_rb * Tree, tree_node_rb * & NodeFound );
+    static bool Minimum( tree_node_rb * Tree, tree_node_rb * & NodeFound );
+    static bool MinimumLocal( tree_node_rb * Tree, tree_node_rb * & NodeFound );
+    static bool RotateLeft( tree_node_rb * Tree );
+    static bool RotateRight( tree_node_rb * Tree );
+    static bool ConvertToRoot( tree_node_rb * Node );
+    static bool GetRoot( tree_node_rb * Node, tree_node_rb * & NodeRoot );
+    static bool GetKeysSubTreeInOrder( tree_node_rb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult );
 
     static bool SetFuncRbCompareKey( FuncRbCompareKey Func );    
     
-    static bool SetContainer( CTreeNodeRb * Node, TypeContainer * Container );
-    static bool GetContainer( CTreeNodeRb * Node, TypeContainer * & Container );
+    static bool SetContainer( tree_node_rb * Node, TypeContainer * Container );
+    static bool GetContainer( tree_node_rb * Node, TypeContainer * & Container );
 
 private:
-    CTreeNodeRb * _Parent;
-    CTreeNodeRb * _Left;
-    CTreeNodeRb * _Right;
+    tree_node_rb * _Parent;
+    tree_node_rb * _Left;
+    tree_node_rb * _Right;
     eRbColour _Colour;
     TypeKey _Key;
     TypeContainer * _Container;
     static FuncRbCompareKey _FuncRbCompareKey;
-    static bool FixUpInsert( CTreeNodeRb * NodeFix );
-    static bool FixUpRemove( CTreeNodeRb * NodeFix );
-    static bool Transplant( CTreeNodeRb * NodeOriginal, CTreeNodeRb * NodeReplace );
+    static bool FixUpInsert( tree_node_rb * NodeFix );
+    static bool FixUpRemove( tree_node_rb * NodeFix );
+    static bool Transplant( tree_node_rb * NodeOriginal, tree_node_rb * NodeReplace );
 };
 
 template< typename TypeKey, typename TypeContainer >
-typename CTreeNodeRb< TypeKey, TypeContainer >::FuncRbCompareKey CTreeNodeRb< TypeKey, TypeContainer >::_FuncRbCompareKey = 0;
+typename tree_node_rb< TypeKey, TypeContainer >::FuncRbCompareKey tree_node_rb< TypeKey, TypeContainer >::_FuncRbCompareKey = 0;
 
 template< typename TypeKey, typename TypeContainer >
-CTreeNodeRb< TypeKey, TypeContainer >::CTreeNodeRb( TypeKey Key, TypeContainer * Container ): _Parent(0), _Left(0), _Right(0), _Colour(eRbColour_Red), _Key(Key), _Container(Container) {
+tree_node_rb< TypeKey, TypeContainer >::tree_node_rb( TypeKey Key, TypeContainer * Container ): _Parent(0), _Left(0), _Right(0), _Colour(eRbColour_Red), _Key(Key), _Container(Container) {
 }
 
 template< typename TypeKey, typename TypeContainer >
-CTreeNodeRb< TypeKey, TypeContainer >::CTreeNodeRb(): _Parent(0), _Left(0), _Right(0), _Colour(eRbColour_Red), _Key(0), _Container(0) {
+tree_node_rb< TypeKey, TypeContainer >::tree_node_rb(): _Parent(0), _Left(0), _Right(0), _Colour(eRbColour_Red), _Key(0), _Container(0) {
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::GetKeyColour( TypeKey & Key, eRbColour & Colour ) const {
+bool tree_node_rb< TypeKey, TypeContainer >::GetKeyColour( TypeKey & Key, eRbColour & Colour ) const {
     Key = _Key;
     Colour = _Colour;
     return true;
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Insert( CTreeNodeRb * Tree, CTreeNodeRb * NodeInsert ){
+bool tree_node_rb< TypeKey, TypeContainer >::Insert( tree_node_rb * Tree, tree_node_rb * NodeInsert ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * current;
+    tree_node_rb * current;
     bool bFoundRoot = GetRoot( Tree, current );
     if( !bFoundRoot ){
         return false;
@@ -122,14 +122,14 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Insert( CTreeNodeRb * Tree, CTreeNod
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Remove( CTreeNodeRb * NodeRemove ){
+bool tree_node_rb< TypeKey, TypeContainer >::Remove( tree_node_rb * NodeRemove ){
     if( !NodeRemove ){
         return false;
     }
 
     eRbColour original_colour = NodeRemove->_Colour;
-    CTreeNodeRb * NodeChild;
-    CTreeNodeRb * NodeMove = NodeRemove;
+    tree_node_rb * NodeChild;
+    tree_node_rb * NodeMove = NodeRemove;
 
     if( !NodeRemove->_Left ){ //single child in NodeRemove
         NodeChild = NodeRemove->_Right;
@@ -166,18 +166,18 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Remove( CTreeNodeRb * NodeRemove ){
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpInsert( CTreeNodeRb * NodeFix ){
+bool tree_node_rb< TypeKey, TypeContainer >::FixUpInsert( tree_node_rb * NodeFix ){
 
-    CTreeNodeRb * current = NodeFix;
+    tree_node_rb * current = NodeFix;
     if( !current ){
         return false;
     }
 
     while( current->_Parent && eRbColour_Red == current->_Parent->_Colour){
-        CTreeNodeRb * parent = current->_Parent; 
+        tree_node_rb * parent = current->_Parent; 
         if( parent->_Parent && parent == parent->_Parent->_Left )
         {
-            CTreeNodeRb * parent_sibling = current->_Parent->_Parent->_Right;
+            tree_node_rb * parent_sibling = current->_Parent->_Parent->_Right;
             if( parent_sibling && parent_sibling->_Colour == eRbColour_Red ){
                 parent->_Parent->_Colour = eRbColour_Red;
                 parent->_Colour = eRbColour_Black;
@@ -194,7 +194,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpInsert( CTreeNodeRb * NodeFix )
             }
         }else if( parent->_Parent && parent == parent->_Parent->_Right )
         {
-            CTreeNodeRb * parent_sibling = current->_Parent->_Parent->_Left;
+            tree_node_rb * parent_sibling = current->_Parent->_Parent->_Left;
             if( parent_sibling && parent_sibling->_Colour == eRbColour_Red ){
                 parent->_Parent->_Colour = eRbColour_Red;
                 parent->_Colour = eRbColour_Black;
@@ -214,7 +214,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpInsert( CTreeNodeRb * NodeFix )
         }
     }
     
-    CTreeNodeRb * NodeRoot;
+    tree_node_rb * NodeRoot;
     if( GetRoot( current, NodeRoot ) ){
         NodeRoot->_Colour = eRbColour_Black;
     }
@@ -223,13 +223,13 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpInsert( CTreeNodeRb * NodeFix )
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpRemove( CTreeNodeRb * NodeFix ){
+bool tree_node_rb< TypeKey, TypeContainer >::FixUpRemove( tree_node_rb * NodeFix ){
     
-    CTreeNodeRb * current;
+    tree_node_rb * current;
 
     while( current->_Parent && eRbColour_Black == current->_Colour ){
         if( current->_Parent->_Left == current ){
-            CTreeNodeRb * NodeSibling;
+            tree_node_rb * NodeSibling;
             NodeSibling = current->_Parent->_Right;
             if( !NodeSibling ){
                 GetRoot( current, current );
@@ -257,7 +257,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpRemove( CTreeNodeRb * NodeFix )
                 GetRoot( current, current );
             }
         }else{
-            CTreeNodeRb * NodeSibling;
+            tree_node_rb * NodeSibling;
             NodeSibling = current->_Parent->_Left;
             if( !NodeSibling ){
                 GetRoot( current, current );
@@ -292,7 +292,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::FixUpRemove( CTreeNodeRb * NodeFix )
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Transplant( CTreeNodeRb * NodeOriginal, CTreeNodeRb * NodeReplace ){
+bool tree_node_rb< TypeKey, TypeContainer >::Transplant( tree_node_rb * NodeOriginal, tree_node_rb * NodeReplace ){
     if( !NodeOriginal ){
         return false;
     }
@@ -311,12 +311,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Transplant( CTreeNodeRb * NodeOrigin
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Find( CTreeNodeRb * Tree, TypeKey KeyFind, CTreeNodeRb * & NodeFound ){
+bool tree_node_rb< TypeKey, TypeContainer >::Find( tree_node_rb * Tree, TypeKey KeyFind, tree_node_rb * & NodeFound ){
     if( !Tree || !_FuncRbCompareKey ){
         return false;
     }
     
-    CTreeNodeRb * current;
+    tree_node_rb * current;
     bool bFoundRoot = GetRoot( Tree, current );
     if( !bFoundRoot ){
         return false;
@@ -337,12 +337,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Find( CTreeNodeRb * Tree, TypeKey Ke
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Maximum( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound ){
+bool tree_node_rb< TypeKey, TypeContainer >::Maximum( tree_node_rb * Tree, tree_node_rb * & NodeFound ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * current;
+    tree_node_rb * current;
     bool bFoundRoot = GetRoot( Tree, current );
     if( !bFoundRoot ){
         return false;
@@ -352,12 +352,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Maximum( CTreeNodeRb * Tree, CTreeNo
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::MaximumLocal( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound ){
+bool tree_node_rb< TypeKey, TypeContainer >::MaximumLocal( tree_node_rb * Tree, tree_node_rb * & NodeFound ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * current = Tree;
+    tree_node_rb * current = Tree;
     while( current->_Right ){
         current = current->_Right;
     }
@@ -367,12 +367,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::MaximumLocal( CTreeNodeRb * Tree, CT
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::Minimum( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound ){
+bool tree_node_rb< TypeKey, TypeContainer >::Minimum( tree_node_rb * Tree, tree_node_rb * & NodeFound ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * current;
+    tree_node_rb * current;
     bool bFoundRoot = GetRoot( Tree, current );
     if( !bFoundRoot ){
         return false;
@@ -382,12 +382,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::Minimum( CTreeNodeRb * Tree, CTreeNo
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::MinimumLocal( CTreeNodeRb * Tree, CTreeNodeRb * & NodeFound ){
+bool tree_node_rb< TypeKey, TypeContainer >::MinimumLocal( tree_node_rb * Tree, tree_node_rb * & NodeFound ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * current = Tree;
+    tree_node_rb * current = Tree;
     while( current->_Left ){
         current = current->_Left;
     }
@@ -397,12 +397,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::MinimumLocal( CTreeNodeRb * Tree, CT
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::RotateLeft( CTreeNodeRb * Tree ){
+bool tree_node_rb< TypeKey, TypeContainer >::RotateLeft( tree_node_rb * Tree ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * y = Tree->_Right;
+    tree_node_rb * y = Tree->_Right;
     if( !y ){
         return true;
     }
@@ -427,12 +427,12 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::RotateLeft( CTreeNodeRb * Tree ){
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::RotateRight( CTreeNodeRb * Tree ){
+bool tree_node_rb< TypeKey, TypeContainer >::RotateRight( tree_node_rb * Tree ){
     if( !Tree ){
         return false;
     }
 
-    CTreeNodeRb * y = Tree->_Left;
+    tree_node_rb * y = Tree->_Left;
     if( !y ){
         return true;
     }
@@ -456,7 +456,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::RotateRight( CTreeNodeRb * Tree ){
     return true; 
 }
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::ConvertToRoot( CTreeNodeRb * Node ){
+bool tree_node_rb< TypeKey, TypeContainer >::ConvertToRoot( tree_node_rb * Node ){
     if( !Node ){
         return false;
     }
@@ -476,11 +476,11 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::ConvertToRoot( CTreeNodeRb * Node ){
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::GetRoot( CTreeNodeRb * Node, CTreeNodeRb * & NodeRoot ){
+bool tree_node_rb< TypeKey, TypeContainer >::GetRoot( tree_node_rb * Node, tree_node_rb * & NodeRoot ){
     if( !Node ){
         return false;
     }
-    CTreeNodeRb * current = Node;
+    tree_node_rb * current = Node;
     while( current->_Parent ){
         current = current->_Parent;
     }
@@ -489,7 +489,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::GetRoot( CTreeNodeRb * Node, CTreeNo
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::GetKeysSubTreeInOrder( CTreeNodeRb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult ){
+bool tree_node_rb< TypeKey, TypeContainer >::GetKeysSubTreeInOrder( tree_node_rb * Tree, std::vector< std::pair<TypeKey, eRbColour> > & KeysResult ){
     if( !Tree || !_FuncRbCompareKey ){
         return false;
     }
@@ -504,13 +504,13 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::GetKeysSubTreeInOrder( CTreeNodeRb *
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::SetFuncRbCompareKey( FuncRbCompareKey Func ){
+bool tree_node_rb< TypeKey, TypeContainer >::SetFuncRbCompareKey( FuncRbCompareKey Func ){
     _FuncRbCompareKey = Func;
     return true;
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::SetContainer( CTreeNodeRb * Node, TypeContainer * Container ){
+bool tree_node_rb< TypeKey, TypeContainer >::SetContainer( tree_node_rb * Node, TypeContainer * Container ){
     if( !Node ){
         return false;
     }
@@ -519,7 +519,7 @@ bool CTreeNodeRb< TypeKey, TypeContainer >::SetContainer( CTreeNodeRb * Node, Ty
 }
 
 template< typename TypeKey, typename TypeContainer >
-bool CTreeNodeRb< TypeKey, TypeContainer >::GetContainer( CTreeNodeRb * Node, TypeContainer * & Container ){
+bool tree_node_rb< TypeKey, TypeContainer >::GetContainer( tree_node_rb * Node, TypeContainer * & Container ){
     if( !Node ){
         return false;
     }

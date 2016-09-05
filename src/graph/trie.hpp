@@ -7,26 +7,26 @@
 #include <set>
 
 template< typename KeyType, typename DataType >
-class NodeTrie {
+class node_trie {
 public:
-    NodeTrie(){
+    node_trie(){
 	_is_root = false;
 	_is_data_valid = false;
     }
-    std::map< KeyType, NodeTrie<KeyType, DataType> * > _MapSubNode;
+    std::map< KeyType, node_trie<KeyType, DataType> * > _MapSubNode;
     DataType _data;
     bool _is_root;
     bool _is_data_valid;
 };
 
 template< typename KeyType, typename DataType >
-class Trie{
+class trie{
 public:
-    Trie(){
+    trie(){
 	_proot = &_root;
 	_root._is_root = true;
     }
-    ~Trie(){
+    ~trie(){
 	for( auto i : _root._MapSubNode ){
 	    RemoveSubBranch( i.second );
 	}
@@ -46,7 +46,7 @@ public:
     bool GetFromRoot( std::queue< KeyType > keys, DataType & data ){
         return Get( _proot, keys, data );
     }
-    bool Add( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType data ){
+    bool Add( node_trie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType data ){
 	if( keys.empty() ){
 	    //save data
 	    node->_data = data;
@@ -56,10 +56,10 @@ public:
 	KeyType current_key = keys.front();
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie<KeyType, DataType> * subnode;
+	node_trie<KeyType, DataType> * subnode;
 	if( found == node->_MapSubNode.end() ){
 	    //create new subnode if it does not exist
-	    subnode = new NodeTrie< KeyType, DataType >;
+	    subnode = new node_trie< KeyType, DataType >;
 	    node->_MapSubNode[ current_key ] = subnode;
 	}
 	else
@@ -68,7 +68,7 @@ public:
 	}
 	return Add( subnode, keys, data );
     }
-    void Remove( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys ){
+    void Remove( node_trie<KeyType, DataType> * node, std::queue< KeyType > keys ){
 	if( keys.empty() ){
 	    //save data
 	    node->_is_data_valid = false;
@@ -77,7 +77,7 @@ public:
 	KeyType current_key = keys.front();
 	keys.pop();	
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie<KeyType, DataType> * subnode;
+	node_trie<KeyType, DataType> * subnode;
 	if( found == node->_MapSubNode.end() ){
 	    //return if it does not exist
 	    return;
@@ -88,7 +88,7 @@ public:
 	}
 	return Remove( subnode, keys );
     }
-    void RemoveSubBranch( NodeTrie<KeyType, DataType> * node ){	
+    void RemoveSubBranch( node_trie<KeyType, DataType> * node ){	
 	for( auto i : node->_MapSubNode ){
 	    RemoveSubBranch( i.second );
 	}
@@ -96,7 +96,7 @@ public:
 	delete node;
         node = 0;
     }    
-    bool Get( NodeTrie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType & data ){
+    bool Get( node_trie<KeyType, DataType> * node, std::queue< KeyType > keys, DataType & data ){
 	if( keys.empty() ){
 	    //return data
 	    if( node->_is_data_valid ){
@@ -110,7 +110,7 @@ public:
 	KeyType current_key = keys.front();
 	keys.pop();
 	auto found = node->_MapSubNode.find( current_key );
-	NodeTrie<KeyType, DataType> * subnode;
+	node_trie<KeyType, DataType> * subnode;
 	if( found == node->_MapSubNode.end() ){	    
             if( !node->_is_data_valid ){
                 //return if it does not exist and current node doesn't contain valid data
@@ -131,7 +131,7 @@ public:
 	data.clear();
 	GetPartial( _proot, keys, data );
     }
-    void GetPartial( NodeTrie<KeyType, DataType> * node, std::set< KeyType > keys, std::vector< DataType > & data ){
+    void GetPartial( node_trie<KeyType, DataType> * node, std::set< KeyType > keys, std::vector< DataType > & data ){
 	if( node->_is_data_valid ){
 	    //save data if node stores valid data
 	    data.push_back( node->_data );
@@ -149,14 +149,14 @@ public:
 		KeyType found_key = *j;
 		keys_copy.erase(j);
 		//search in sub-branch
-		NodeTrie<KeyType, DataType> * subnode = i.second;
+		node_trie<KeyType, DataType> * subnode = i.second;
 		GetPartial( subnode, keys_copy, data );
 	    }
 	}
     }
 private:
-    NodeTrie<KeyType, DataType> _root;
-    NodeTrie<KeyType, DataType> * _proot;
+    node_trie<KeyType, DataType> _root;
+    node_trie<KeyType, DataType> * _proot;
 };
 
 #endif
