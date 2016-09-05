@@ -1,5 +1,5 @@
-#ifndef TRANSMATRIX_H
-#define TRANSMATRIX_H
+#ifndef TRANSITION_MATRIX_H
+#define TRANSITION_MATRIX_H
 
 #include <map>
 #include <utility>

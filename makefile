@@ -17,7 +17,7 @@ build_file:
 	$(MAKE) -C ./src/file
 
 build_datatransform: build_file
-	$(MAKE) -C ./src/DataTransform
+	$(MAKE) -C ./src/datatransform
 
 build_ui:
 	$(MAKE) -C ./src/ui

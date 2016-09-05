@@ -1,17 +1,10 @@
 //=====================================================================
-//
-// File:                TransitionTable.h
-//
-// Subsystem:   
-//
-// Summary:             Implements a template transition table 
-//
 // Notes:               Looks up a pair<KeyType Source, KeyType Destination> and gives stored DataType data.
 //                      More complex pair structures might need custom comparator in the future. However, standard datatype works ok with default comparator.                  
 //=============================================================================
 
-#ifndef TRANSITIONTABLE_H
-#define TRANSITIONTABLE_H
+#ifndef TRANSITION_TABLE_H
+#define TRANSITION_TABLE_H
 
 #include <map>
 #include <utility>

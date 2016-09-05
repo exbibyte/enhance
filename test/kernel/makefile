@@ -23,7 +23,7 @@ objects_gl := $(wildcard ../../src/gl/intermediate/*.o)
 objects_render := $(wildcard ../../src/render/intermediate/*.o)
 objects_math := $(wildcard ../../src/math/intermediate/*.o)
 objects_file := $(wildcard ../../src/file/intermediate/*.o)
-objects_datatransform := $(wildcard ../../src/DataTransform/intermediate/*.o)
+objects_datatransform := $(wildcard ../../src/datatransform/intermediate/*.o)
 objects_ui := $(wildcard ../../src/ui/intermediate/*.o)
 
 targets := test_enEngineKernel0 test_render
