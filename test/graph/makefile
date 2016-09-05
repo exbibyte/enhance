@@ -13,6 +13,10 @@ src_files = $(wildcard *.cpp)
 
 #src files end---
 
+objects_graph = $(wildcard ../../src/graph/intermediate/*.o)
+
+object_files := $(objects_graph)
+
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
 dir_build = build
@@ -22,7 +26,7 @@ $(shell mkdir -p $(dir_build))
 targets := $(patsubst %.cpp,%,$(src_files))
 
 % : %.cpp
-	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $< $(include_flags)
+	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $< $(object_files) $(include_flags)
 
 .PHONY: all
 all: $(targets)

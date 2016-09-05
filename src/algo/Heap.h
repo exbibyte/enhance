@@ -5,7 +5,7 @@
 #include <limits>
 
 template< class TypeData >
-class Unit {
+class unit {
 public:
     int _val;
     TypeData _data;
@@ -30,7 +30,7 @@ public:
 template< class TypeData, template<typename> class Compare >
 class Heap {
 public:
-    using Unit = Unit<TypeData>;
+    using Unit = unit<TypeData>;
     Heap(){
 	_size_heap_internal = 0;
     }
