@@ -2,7 +2,7 @@
 #define SORT_INSERTION_H
 
 template< class TypeVal >
-class SortInsertion {
+class sort_insertion {
 public:
     class CompDefault {
     public:
@@ -17,7 +17,7 @@ public:
 	}
     };
     template< class Comp = CompDefault >
-    static void Sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
+    static void sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
 	for( int i = i_start + 1; i <= i_end; ++i ){
 	    TypeVal swap = values[i];
 	    int k = i - 1;

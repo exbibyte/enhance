@@ -1,7 +1,7 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "SortInsertion.h"
+#include "sort_quick.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -9,11 +9,11 @@
 
 using namespace std;
 
-TEST_CASE( "SortInsertion", "[SortInsertion]" ) {
+TEST_CASE( "sort_quick", "[sort_quick]" ) {
     vector< int > unsorted { 9, 3, -1, 6, 7, 23, -8 };
-    SECTION( "SortInsertion" ) {
+    SECTION( "sort_quick Max" ) {
 	vector< int > sorted = unsorted;
-	SortInsertion< int >::Sort( sorted, 0, sorted.size() -1 );
+	sort_quick< int >::sort( sorted, 0, sorted.size() -1 );
 	int size = sorted.size();
 	CHECK( ( unsorted.size() == size ) );
 	int val_prev;

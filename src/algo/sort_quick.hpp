@@ -7,7 +7,7 @@
 #include <random>
 
 template< class TypeVal >
-class SortQuick {
+class sort_quick {
 public:
     //default non-descending order comparator with < operator
     class CompDefault {
@@ -24,17 +24,17 @@ public:
 	}
     };
     template< class Comp = CompDefault >
-    static void Sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
+    static void sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
 	if( i_end - i_start <= 0 ) return; //ends if only single element
 	//partition into 3 ranges: [less, equal, greater]
-        std::pair<int,int> i_middle_range = Partition( values, i_start, i_end, comparator );
+        std::pair<int,int> i_middle_range = partition( values, i_start, i_end, comparator );
 	//sort lower partition
-	Sort( values, i_start, i_middle_range.first - 1, comparator );
+	sort( values, i_start, i_middle_range.first - 1, comparator );
 	//sort higher partition
-	Sort( values, i_middle_range.second + 1, i_end, comparator );
+	sort( values, i_middle_range.second + 1, i_end, comparator );
     }
     template< class Comp >
-    static std::pair<int,int> Partition( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator ){
+    static std::pair<int,int> partition( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator ){
         //select a random index for pivot point
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine generator(seed);

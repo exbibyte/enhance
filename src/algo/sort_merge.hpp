@@ -2,7 +2,7 @@
 #define SORT_MERGE_H
 
 template< class TypeVal >
-class SortMerge {
+class sort_merge {
 public:
     class CompDefault {
     public:
@@ -17,25 +17,25 @@ public:
 	}
     };
     template< class Comp = CompDefault >
-    static void Sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
-	Split( values, i_start, i_end, comparator );
+    static void sort( std::vector< TypeVal > & values, int i_start, int i_end, Comp comparator = Comp() ){
+	split( values, i_start, i_end, comparator );
     }
     template< class Comp >
-    static void Split( std::vector< TypeVal > & values, int index_start, int index_end, Comp comparator ){
+    static void split( std::vector< TypeVal > & values, int index_start, int index_end, Comp comparator ){
 	if( index_end - index_start <= 1 ){
 	    //base case with 2 items to merge
-	    Merge( values, index_start, index_end, index_end, comparator );
+	    merge( values, index_start, index_end, index_end, comparator );
 	    return;
 	}else{
 	    //split first before merging
 	    int mid = ( index_end + index_start )/2;
-	    Split( values, index_start, mid, comparator );
-	    Split( values, mid + 1, index_end, comparator );
-	    Merge( values, index_start, mid + 1, index_end, comparator );
+	    split( values, index_start, mid, comparator );
+	    split( values, mid + 1, index_end, comparator );
+	    merge( values, index_start, mid + 1, index_end, comparator );
 	}
     }
     template< class Comp >
-    static void Merge( std::vector< TypeVal > & values, int index_start, int index_arr2_start, int index_end, Comp comparator ){
+    static void merge( std::vector< TypeVal > & values, int index_start, int index_arr2_start, int index_end, Comp comparator ){
 	if( index_arr2_start < index_start || index_end < index_arr2_start ){
 	    return;
 	}
