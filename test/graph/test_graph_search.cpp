@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "GraphSearch.h"
-#include "GraphNodeG.h"
+#include "graph_search.hpp"
+#include "graph_node_generic.hpp"
 
 #include <queue>
 #include <map>
@@ -14,15 +14,15 @@
 #include <memory>
 using namespace std;
 
-TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
+TEST_CASE( "graph_search<graph_node_weighted_simple> ", "[graph_search]" ) {
   bool bRet;
 
-  map< int, shared_ptr< GraphNodeWeightedSimple<std::string> > > nodes;
+  map< int, shared_ptr< graph_node_weighted_simple<std::string> > > nodes;
   char szNewString [256];
   for( int i = 0; i < 6; ++i ){
       sprintf( szNewString , "Value_%d", i );
       string newString( szNewString );
-      nodes.emplace( i, make_shared< GraphNodeWeightedSimple<string> >( i, newString ) );
+      nodes.emplace( i, make_shared< graph_node_weighted_simple<string> >( i, newString ) );
   }
 
   //wire up the graph
@@ -43,7 +43,7 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
   weightmap.insert( make_pair( make_pair( 0, 5 ), -1 ) );
   weightmap.insert( make_pair( make_pair( 4, 5 ), 6 ) );
 
-  map< pair< shared_ptr< GraphNodeWeightedSimple<std::string> >, shared_ptr< GraphNodeWeightedSimple<std::string> > >, int > capacitymap;
+  map< pair< shared_ptr< graph_node_weighted_simple<std::string> >, shared_ptr< graph_node_weighted_simple<std::string> > >, int > capacitymap;
   capacitymap.insert( make_pair( make_pair( nodes[0], nodes[1] ), 5 ) );
   capacitymap.insert( make_pair( make_pair( nodes[0], nodes[2] ), 3 ) );
   capacitymap.insert( make_pair( make_pair( nodes[1], nodes[4] ), 2 ) );
@@ -52,10 +52,10 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
   capacitymap.insert( make_pair( make_pair( nodes[0], nodes[5] ), 3 ) );
   capacitymap.insert( make_pair( make_pair( nodes[4], nodes[5] ), 2 ) );
 
-  map< pair< shared_ptr< GraphNodeWeightedSimple<std::string> >, shared_ptr< GraphNodeWeightedSimple<std::string> > >, int > flowmap;
+  map< pair< shared_ptr< graph_node_weighted_simple<std::string> >, shared_ptr< graph_node_weighted_simple<std::string> > >, int > flowmap;
   
   //lambda of the edge weight function given 2 nodes
-  auto weight_func = [&weightmap]( shared_ptr< GraphNodeWeightedSimple< string > > node_src, shared_ptr< GraphNodeWeightedSimple< string > > node_dest, int & edge_weight ){
+  auto weight_func = [&weightmap]( shared_ptr< graph_node_weighted_simple< string > > node_src, shared_ptr< graph_node_weighted_simple< string > > node_dest, int & edge_weight ){
       auto it = weightmap.find( make_pair( node_src->_id, node_dest->_id ) );
       if( weightmap.end() != it ){
 	  edge_weight = it->second;
@@ -67,7 +67,7 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
 
   SECTION( "BreathFirstSearch Check" ) {
 
-      GraphSearch< GraphNodeWeightedSimple<std::string>, std::string >::BreathFirstSearch( weight_func, nodes[0] );
+      graph_search< graph_node_weighted_simple<std::string>, std::string >::BreathFirstSearch( weight_func, nodes[0] );
       
       auto node4_pred_1x = nodes[4]->_pred;
       auto node4_pred_2x = nodes[4]->_pred->_pred;
@@ -88,7 +88,7 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
 
   SECTION( "DepthFirstSearch Check" ) {
 
-      GraphSearch< GraphNodeWeightedSimple<std::string>, std::string >::DepthFirstSearch( weight_func, nodes[0] );
+      graph_search< graph_node_weighted_simple<std::string>, std::string >::DepthFirstSearch( weight_func, nodes[0] );
       
       auto node4_pred_1x = nodes[4]->_pred;
       auto node4_pred_2x = nodes[4]->_pred->_pred;
@@ -109,7 +109,7 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
 
   SECTION( "DijstraSearch Check" ) {
 
-      GraphSearch< GraphNodeWeightedSimple<std::string>, std::string >::DijstraSearch( weight_func, nodes[0] );
+      graph_search< graph_node_weighted_simple<std::string>, std::string >::DijstraSearch( weight_func, nodes[0] );
       
       auto node4_pred_1x = nodes[4]->_pred;
       auto node4_pred_2x = nodes[4]->_pred->_pred;
@@ -130,21 +130,21 @@ TEST_CASE( "GraphSearch<GraphNodeWeightedSimple> ", "[GraphSearch]" ) {
 
   SECTION( "MaxFlowEdmondsKarp Check" ) {
       int netflow;
-      bool bRet = GraphSearch< GraphNodeWeightedSimple<std::string>, std::string >::MaxFlowEdmondsKarp( capacitymap, flowmap, nodes[0], nodes[5], netflow );
+      bool bRet = graph_search< graph_node_weighted_simple<std::string>, std::string >::MaxFlowEdmondsKarp( capacitymap, flowmap, nodes[0], nodes[5], netflow );
       CHECK( true == bRet );
       CHECK( 5 == netflow );
   }
 }
 
-TEST_CASE( "GraphSearch<GraphNodeRelaxation> ", "[GraphSearch]" ) {
+TEST_CASE( "graph_search<graph_node_relaxation> ", "[graph_search]" ) {
   bool bRet;
 
-  map< int, shared_ptr< GraphNodeRelaxation<std::string> > > nodes;
+  map< int, shared_ptr< graph_node_relaxation<std::string> > > nodes;
   char szNewString [256];
   for( int i = 0; i < 6; ++i ){
       sprintf( szNewString , "Value_%d", i );
       string newString( szNewString );
-      nodes.emplace( i, make_shared< GraphNodeRelaxation<string> >( i, newString ) );
+      nodes.emplace( i, make_shared< graph_node_relaxation<string> >( i, newString ) );
   }
 
   SECTION( "BreathFirstSearch Check" ) {

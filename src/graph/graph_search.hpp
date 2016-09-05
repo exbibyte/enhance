@@ -1,7 +1,7 @@
 #ifndef GRAPH_SEARCH_H
 #define GRAPH_SEARCH_H
 
-#include "GraphNodeG.h"
+#include "graph_node_generic.hpp"
 
 #include <queue>
 #include <memory>
@@ -9,18 +9,18 @@
 #include <algorithm>
 
 template< typename NodeType, typename DataType >
-class GraphSearch {
+class graph_search {
 public:
 };
 
-//specialization on node type GraphNodeWeightedSimple
+//specialization on node type graph_node_weighted_simple
 template< typename DataType >
-class GraphSearch< GraphNodeWeightedSimple<DataType>, DataType > : public GraphNodeWeightedSimple< DataType > {
+class graph_search< graph_node_weighted_simple<DataType>, DataType > : public graph_node_weighted_simple< DataType > {
 public:
-    using NodeType = GraphNodeWeightedSimple< DataType >;
+    using NodeType = graph_node_weighted_simple< DataType >;
 
-    using NodeRelaxationType = GraphNodeRelaxation< DataType >;
-    using EdgeWeightedType = GraphEdgeWeighted< DataType >;
+    using NodeRelaxationType = graph_node_relaxation< DataType >;
+    using EdgeWeightedType = graph_edge_weighted< DataType >;
 
     template < typename FuncWeight >
     static bool Relax( std::shared_ptr< NodeType > node_src, std::shared_ptr< NodeType > node_dest, FuncWeight func_weight ){
@@ -42,7 +42,7 @@ public:
     template < typename FuncWeight >
     static bool BreathFirstSearch( FuncWeight func_weight, std::shared_ptr< NodeType > node_src ){
 	std::queue< std::shared_ptr< NodeType > > queue_vertex;
-	node_src->_node_colour = GraphNodeG_Colour::GREY;
+	node_src->_node_colour = graph_node_generic_colour::GREY;
 	node_src->_relaxed_weight = 0;
 	queue_vertex.push( node_src );
 	while( !queue_vertex.empty() ){
@@ -50,21 +50,21 @@ public:
 	    queue_vertex.pop();
 	    int id_current_node = current_node->_id;
 	    for( auto & adjacent : current_node->_desc ){
-//		if( GraphNodeG_Colour::WHITE == adjacent->_node_colour ){
-		    adjacent->_node_colour = GraphNodeG_Colour::GREY;
+//		if( graph_node_generic_colour::WHITE == adjacent->_node_colour ){
+		    adjacent->_node_colour = graph_node_generic_colour::GREY;
 		    if( Relax( current_node, adjacent, func_weight ) ){
 			queue_vertex.push( adjacent ); //if relaxed, descendents of adjacent node needs to be updated
 		    }
 //		}
 	    }
-//	    current_node->_node_colour = GraphNodeG_Colour::BLACK;
+//	    current_node->_node_colour = graph_node_generic_colour::BLACK;
 	}
 	return true;
     }
     
     template < typename FuncWeight >
     static bool DepthFirstSearch( FuncWeight func_weight, std::shared_ptr< NodeType > node_src ){
-	node_src->_node_colour = GraphNodeG_Colour::GREY;
+	node_src->_node_colour = graph_node_generic_colour::GREY;
 	node_src->_relaxed_weight = 0;
 	DepthFirstVisit( func_weight, node_src );
 	return true;
@@ -74,7 +74,7 @@ public:
     static void DepthFirstVisit( FuncWeight func_weight, std::shared_ptr< NodeType > node_src ){
 	int id_current_node = node_src->_id;
 	for( auto & adjacent : node_src->_desc ){
-	    adjacent->_node_colour = GraphNodeG_Colour::GREY;
+	    adjacent->_node_colour = graph_node_generic_colour::GREY;
 	    if( Relax( node_src, adjacent, func_weight ) ){
                 DepthFirstVisit( func_weight, adjacent ); //if relaxed, descendents of adjacent node needs to be updated
 	    }

@@ -9,29 +9,29 @@
 #include <memory>
 #include <list>
 
-#include "DisjointSetForrest.h"
+#include "disjoint_set_forrest.hpp"
 
-class ShortestPathBellmanFord {
+class shortest_path_bellmanford {
 public:
     class VertexNode {
     public:
 	VertexNode() = delete;
 	VertexNode& operator=( const VertexNode & ) = delete;
-	VertexNode( DisjointSetForrest::SetNode * set_node, int id ) : _set_node( set_node ), _id( id ), _relaxed_weight( std::numeric_limits<int>::max() ), _pred( nullptr ) {}
-	std::unique_ptr< DisjointSetForrest::SetNode >_set_node;
+	VertexNode( disjoint_set_forrest::SetNode * set_node, int id ) : _set_node( set_node ), _id( id ), _relaxed_weight( std::numeric_limits<int>::max() ), _pred( nullptr ) {}
+	std::unique_ptr< disjoint_set_forrest::SetNode >_set_node;
 	int _id;
 	int _relaxed_weight;
-        std::shared_ptr< ShortestPathBellmanFord::VertexNode > _pred;
+        std::shared_ptr< shortest_path_bellmanford::VertexNode > _pred;
     };
     class EdgeWeight {
     public:
-	EdgeWeight( std::shared_ptr< ShortestPathBellmanFord::VertexNode > vert_a, std::shared_ptr< ShortestPathBellmanFord::VertexNode > vert_b, int weight ){
+	EdgeWeight( std::shared_ptr< shortest_path_bellmanford::VertexNode > vert_a, std::shared_ptr< shortest_path_bellmanford::VertexNode > vert_b, int weight ){
 	    _vert_a = vert_a;
 	    _vert_b = vert_b;
 	    _weight = weight;
 	}
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > _vert_a;
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > _vert_b;
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > _vert_a;
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > _vert_b;
 	int _weight;
     };
     bool GenerateGraphFromWeightMap( std::map< std::pair<int, int> , int > & weightmap ){
@@ -39,8 +39,8 @@ public:
 	    int k1_id = i.first.first;
 	    int k2_id = i.first.second;
 	    int weight = i.second;
-	    std::shared_ptr< ShortestPathBellmanFord::VertexNode > vert_a = CreateVertexIfNotExist( k1_id );
-	    std::shared_ptr< ShortestPathBellmanFord::VertexNode > vert_b = CreateVertexIfNotExist( k2_id );
+	    std::shared_ptr< shortest_path_bellmanford::VertexNode > vert_a = CreateVertexIfNotExist( k1_id );
+	    std::shared_ptr< shortest_path_bellmanford::VertexNode > vert_b = CreateVertexIfNotExist( k2_id );
 	    EdgeWeight newEdgeWeight( vert_a, vert_b, weight );
 	    _EdgeWeights.push_back( newEdgeWeight );
 	}
@@ -48,24 +48,24 @@ public:
     }
     class CompareVertexId {
     public:
-	bool operator()( std::shared_ptr< ShortestPathBellmanFord::VertexNode > const & lhs, std::shared_ptr< ShortestPathBellmanFord::VertexNode > const & rhs ) const {
+	bool operator()( std::shared_ptr< shortest_path_bellmanford::VertexNode > const & lhs, std::shared_ptr< shortest_path_bellmanford::VertexNode > const & rhs ) const {
 	    return lhs->_id < rhs->_id;
 	}
     };
-    std::shared_ptr< ShortestPathBellmanFord::VertexNode > CreateVertexIfNotExist( int id ){
-	DisjointSetForrest::SetNode * new_set_node;
-	DisjointSetForrest::MakeSet( new_set_node );
-        ShortestPathBellmanFord::VertexNode * new_vertex_node = new ShortestPathBellmanFord::VertexNode( new_set_node, id );
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > new_vertex( new_vertex_node );
+    std::shared_ptr< shortest_path_bellmanford::VertexNode > CreateVertexIfNotExist( int id ){
+	disjoint_set_forrest::SetNode * new_set_node;
+	disjoint_set_forrest::MakeSet( new_set_node );
+        shortest_path_bellmanford::VertexNode * new_vertex_node = new shortest_path_bellmanford::VertexNode( new_set_node, id );
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > new_vertex( new_vertex_node );
 	_SetVertices.insert( new_vertex );
 	auto it = _SetVertices.find( new_vertex );
 	return *it;
     }
-    bool FindVertex( int id, std::shared_ptr< ShortestPathBellmanFord::VertexNode > & found_vertex ){
-	DisjointSetForrest::SetNode * new_set_node;
-	DisjointSetForrest::MakeSet( new_set_node );
-        ShortestPathBellmanFord::VertexNode * new_vertex_node = new ShortestPathBellmanFord::VertexNode( new_set_node, id );
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > new_vertex( new_vertex_node );
+    bool FindVertex( int id, std::shared_ptr< shortest_path_bellmanford::VertexNode > & found_vertex ){
+	disjoint_set_forrest::SetNode * new_set_node;
+	disjoint_set_forrest::MakeSet( new_set_node );
+        shortest_path_bellmanford::VertexNode * new_vertex_node = new shortest_path_bellmanford::VertexNode( new_set_node, id );
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > new_vertex( new_vertex_node );
 	auto it = _SetVertices.find( new_vertex );
 	if( it == _SetVertices.end() ){
 	    return false;
@@ -75,8 +75,8 @@ public:
     }
     bool GenerateShortestPath( int id_src, int id_dest, std::list< int > & path_vertices ){
 	path_vertices.clear();
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > vertex_src;
-	std::shared_ptr< ShortestPathBellmanFord::VertexNode > vertex_dest;
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > vertex_src;
+	std::shared_ptr< shortest_path_bellmanford::VertexNode > vertex_dest;
 	if( !FindVertex( id_src, vertex_src ) ){
 	    return false; //src vertex doesn't exist
 	}
@@ -121,7 +121,7 @@ public:
 	return true;
     }
     std::vector< EdgeWeight > _EdgeWeights;
-    std::set< std::shared_ptr< ShortestPathBellmanFord::VertexNode >, ShortestPathBellmanFord::CompareVertexId > _SetVertices;
+    std::set< std::shared_ptr< shortest_path_bellmanford::VertexNode >, shortest_path_bellmanford::CompareVertexId > _SetVertices;
 };
 
 #endif

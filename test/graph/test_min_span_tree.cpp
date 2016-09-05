@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "MinSpanTree.h"
+#include "min_span_tree.hpp"
 
 #include <queue>
 #include <map>
@@ -11,9 +11,9 @@
 #include <vector>
 using namespace std;
 
-TEST_CASE( "MinSpanTree", "[MinSpanTree]" ) {
+TEST_CASE( "min_span_tree", "[min_span_tree]" ) {
   bool bRet;
-  MinSpanTree tree;
+  min_span_tree tree;
 
   map< pair<int, int>, int > weightmap;
   weightmap.insert( make_pair( make_pair( 0, 1 ), 5 ) );
@@ -29,16 +29,16 @@ TEST_CASE( "MinSpanTree", "[MinSpanTree]" ) {
       CHECK( 6 == tree._EdgeWeights.size() );
       int current_edge_weight = -1;
       while( !tree._EdgeWeights.empty() ){
-	  MinSpanTree::EdgeWeight edge = tree._EdgeWeights.top();
+	  min_span_tree::EdgeWeight edge = tree._EdgeWeights.top();
 	  tree._EdgeWeights.pop();
 	  CHECK( current_edge_weight <= edge._weight );
 	  current_edge_weight = edge._weight;
       }
   }
 
-  SECTION( "GenerateMinSpanTreeKruskal" ) {
-      vector< MinSpanTree::EdgeWeight > min_span_tree;
-      bRet = tree.GenerateMinSpanTreeKruskal( min_span_tree );
+  SECTION( "Generatemin_span_treeKruskal" ) {
+      vector< min_span_tree::EdgeWeight > min_span_tree;
+      bRet = tree.Generatemin_span_treeKruskal( min_span_tree );
       CHECK( bRet );
       CHECK( 4 == min_span_tree.size() );
       std::set<int> expected_min_span_tree_vertices { 0, 1, 2, 3, 4 };

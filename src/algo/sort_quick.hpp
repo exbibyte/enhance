@@ -9,6 +9,7 @@
 template< class TypeVal >
 class sort_quick {
 public:
+    using _t_data = TypeVal;
     //default non-descending order comparator with < operator
     class CompDefault {
     public:

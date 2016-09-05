@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "ShortestPathBellmanFord.h"
+#include "shortest_path_bellmanford.hpp"
 
 #include <queue>
 #include <map>
@@ -11,9 +11,9 @@
 #include <vector>
 using namespace std;
 
-TEST_CASE( "ShortestPathBellmanFord", "[ShortestPathBellmanFord]" ) {
+TEST_CASE( "shortest_path_bellmanford", "[shortest_path_bellmanford]" ) {
   bool bRet;
-  ShortestPathBellmanFord tree;
+  shortest_path_bellmanford tree;
 
   map< pair<int, int>, int > weightmap;
   weightmap.insert( make_pair( make_pair( 0, 1 ), 5 ) );

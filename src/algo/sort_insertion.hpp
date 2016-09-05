@@ -4,6 +4,7 @@
 template< class TypeVal >
 class sort_insertion {
 public:
+    using _t_data = TypeVal;
     class CompDefault {
     public:
 	bool operator()( TypeVal const & a, TypeVal const & b ){

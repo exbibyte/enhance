@@ -1,15 +1,15 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 
-#include "GraphDirected.h"
+#include "graph_directed.hpp"
 
 #include <map>
 #include <utility>
 using namespace std;
 
-TEST_CASE( "GraphDirected", "[GraphDirected]" ) {
+TEST_CASE( "graph_directed", "[graph_directed]" ) {
 
-  GraphDirected<int> _Optimizer;
+  graph_directed<int> _Optimizer;
 
   map< pair< int, int >, int > _Connections;
   _Connections.insert( make_pair( std::pair<int,int>(0,1), 1 ) );
