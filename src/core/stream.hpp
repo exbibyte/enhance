@@ -1,8 +1,12 @@
 #ifndef STREAM_H
 #define STREAM_H
 
+#include "queue_lock_free.hpp"
+
+templace< typename T >
 class stream {
 public:
+    using _t_item = T;
     enum class eProcessArgType {
 	START = 0,
 	END,
@@ -10,21 +14,16 @@ public:
 	ADD_INSPECTOR,
 	REMOVE_INSPECTOR,
 	RESET_INSPECTOR,
-	GET_STAT,
-    };
-    class unit {
-    public:
-	enum {
-	    char _str[256];
-	    double _num;
-	    void * _ptr;
-	};
-	eProcessArgType _type_request;
     };
     bool init();
     bool deinit();
-    template< typename TypePacket >
     unit process( eProcessArgType );
+private:
+    bool start();
+    bool end();
+    bool add_inspector();
+    bool remove_inspector();
+    queue_lock_free< _t_item > _queue;
 };
 
 #endif
