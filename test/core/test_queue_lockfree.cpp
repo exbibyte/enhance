@@ -15,89 +15,89 @@ TEST_CASE( "queue_lockfree", "[queue]" ) {
 
     SECTION( "push" ) {
 
-	queue_lockfree<int> queue;
-	    
-	size_t count = queue.size();
-	CHECK( 0 == count );
-	int val = 5;
-	queue.push(val);
-	count = queue.size();
-	CHECK( 1 == count );
+        queue_lockfree<int> queue;
+            
+        size_t count = queue.size();
+        CHECK( 0 == count );
+        int val = 5;
+        queue.enqueue(val);
+        count = queue.size();
+        CHECK( 1 == count );
 
-	SECTION( "pop" ) {
-	    int retrieve;
-	    bool bRet = queue.pop( retrieve );
-	    count = queue.size();
-	    CHECK( 0 == count );
-	    CHECK( true == bRet );
-	    CHECK( 5 == retrieve );
-	}
+        SECTION( "pop" ) {
+            int retrieve;
+            bool bRet = queue.dequeue( retrieve );
+            count = queue.size();
+            CHECK( 0 == count );
+            CHECK( true == bRet );
+            CHECK( 5 == retrieve );
+        }
     }    
 
     SECTION( "pop empty" ) {
 
-	queue_lockfree<int> queue;
-	
-    	int retrieve;
-    	size_t count;
-    	bool bRet = queue.pop( retrieve );
-    	count = queue.size();
-    	CHECK( 0 == count );
-    	CHECK( false == bRet );
+        queue_lockfree<int> queue;
+        
+        int retrieve;
+        size_t count;
+        bool bRet = queue.dequeue( retrieve );
+        count = queue.size();
+        CHECK( 0 == count );
+        CHECK( false == bRet );
     }
     
     SECTION( "multi-thread push-pop" ) {
 
-	queue_lockfree<int> queue;
+        queue_lockfree<int> queue;
 
-	int count_loop = 20;
-	while( --count_loop >=0 ){
-	    size_t count;
-	    unsigned int num_threads = 100;
-	    vector<thread> threads( num_threads );
-	    for( int i = 0; i < num_threads; ++i ){
-		threads[i] = std::thread( [ &, i ](){
-			int val = i;
-			queue.push( val );
-		    } );
-	    }
-	    count = queue.size();
-	    cout << "queue size after push threads started: " << count << endl;
+        int count_loop = 20;
+        while( --count_loop >=0 ){
+            size_t count;
+            unsigned int num_threads = 100;
+            vector<thread> threads( num_threads );
+            for( int i = 0; i < num_threads; ++i ){
+                threads[i] = std::thread( [ &, i ](){
+                        int val = i;
+                        queue.enqueue( val );
+                    } );
+            }
+            count = queue.size();
+            cout << "queue size after push threads started: " << count << endl;
 
-	    vector<thread> threads2( num_threads );
-	    set<int> vals_retrieve;
-	    for( int i = 0; i < num_threads * 0.1; ++i ){
-		threads2[i] = std::thread( [&](){
-			int pop_val;
-			bool bRet = queue.pop( pop_val );
-			if( bRet ){
-			    std::cout << pop_val << std::endl;
-			}
-		    } );
-	    }
-	    for( int i = 0; i < num_threads * 0.1; ++i ){
-		threads2[i].join();
-	    }
-	    for( auto & i : threads ){
-		i.join();
-	    }
-	    count = queue.size();
-	    CHECK( (num_threads * 0.9 ) == count );
+            vector<thread> threads2( num_threads );
+            set<int> vals_retrieve;
+            for( int i = 0; i < num_threads * 0.1; ++i ){
+                threads2[i] = std::thread( [&](){
+                        int pop_val;
+                        bool bRet = queue.dequeue( pop_val );
+                        if( bRet ){
+                            std::cout << pop_val << std::endl;
+                        }
+                    } );
+            }
+            for( int i = 0; i < num_threads * 0.1; ++i ){
+                threads2[i].join();
+            }
+            for( auto & i : threads ){
+                i.join();
+            }
+            count = queue.size();
+            CHECK( (num_threads * 0.9 ) == count );
 
-	    for( int i = 0; i < num_threads * 0.9; ++i ){
-		threads2[i] = std::thread( [&](){
-			int pop_val;
-			bool bRet = queue.pop( pop_val );
-			if( bRet ){
-			    std::cout << pop_val << std::endl;
-			}
-		    } );
-	    }
-	    for( int i = 0; i < num_threads * 0.9; ++i ){
-		threads2[i].join();
-	    }
-	    count = queue.size();
-	    CHECK( 0 == count );
-	}
+            for( int i = 0; i < num_threads * 0.9; ++i ){
+                threads2[i] = std::thread( [&](){
+                        int pop_val;
+                        bool bRet = queue.dequeue( pop_val );
+                        if( bRet ){
+                            std::cout << pop_val << std::endl;
+                        }
+                    } );
+            }
+            for( int i = 0; i < num_threads * 0.9; ++i ){
+                threads2[i].join();
+            }
+            count = queue.size();
+            CHECK( 0 == count );
+        }
     }
 }

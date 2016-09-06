@@ -27,7 +27,7 @@ TEST_CASE( "queue_lockfree multithread push pop", "[push pop]" ) {
 	for( int i = 0; i < num_threads; ++i ){
 	    threads[i] = std::thread( [ &, i ](){
 		    int val = i;
-		    queue.push( val );
+		    queue.enqueue( val );
 		} );
 	}
 	count = queue.size();
@@ -36,7 +36,7 @@ TEST_CASE( "queue_lockfree multithread push pop", "[push pop]" ) {
 	for( int i = 0; i < num_threads; ++i ){
 	    threads2[i] = std::thread( [&](){
 		    int pop_val;
-		    bool bRet = queue.pop( pop_val );
+		    bool bRet = queue.dequeue( pop_val );
 		    if( bRet ){
 			// std::cout << pop_val << " ";
 		    }
