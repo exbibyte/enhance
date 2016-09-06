@@ -1,0 +1,15 @@
+proposed components for the infrastructure system:
+
+* stream : core subsystem, one for each stream data type, composite class for multi data type
+** broadcast vs directionality control options
+* packet inspector interface (complementary to stream) : core subsystem
+* packet inspector implementation (complementary to stream) :core subsystem
+* packet router interface (to other bus/endpoint consumer or enpoint producer) :core subsystem
+* concurrency implementation (need to benchmark latency and throughput)
+  
+pending modifications:
+* replace glm related references and functions with core components ( core/matrix, core/vec, ... ). add computation for frustum.
+  
+  
+  
+  
