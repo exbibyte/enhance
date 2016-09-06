@@ -5,7 +5,7 @@
 #include <cstddef>
 
 template< class T >
-class StackLF {
+class stack_lockfree {
 public:
     class Node {
     public:
@@ -13,7 +13,7 @@ public:
 	Node * _next;
 	Node( T val ) : _val( val ), _next( nullptr ) {}
     };
-    StackLF() : _head( nullptr ) {}
+    stack_lockfree() : _head( nullptr ) {}
    // bool empty() const;
     size_t size() const; //not guaranteed to be consistent when threads are accesing stack
     bool top( T & val );
@@ -23,14 +23,14 @@ private:
     std::atomic< Node * > _head;
 };
 template< class T >
-void StackLF<T>::push( T const & val ){
+void stack_lockfree<T>::push( T const & val ){
     Node * new_node = new Node( val );
     Node * head = _head.load( std::memory_order_relaxed );
     new_node->_next = head;
     while( !_head.compare_exchange_weak( new_node->_next, new_node, std::memory_order_release ) );
 }
 template< class T >
-bool StackLF<T>::pop( T & val ){
+bool stack_lockfree<T>::pop( T & val ){
     Node * head = _head.load( std::memory_order_relaxed );
     while( head && !_head.compare_exchange_weak( head, head->_next, std::memory_order_acquire ) );
     if( !head )
@@ -41,7 +41,7 @@ bool StackLF<T>::pop( T & val ){
 }
 
 template< class T >
-bool StackLF<T>::top( T & val ){
+bool stack_lockfree<T>::top( T & val ){
     Node * head = _head.load( std::memory_order_relaxed );
     while( head && !_head.compare_exchange_weak( head, head, std::memory_order_acquire ) );
     if( !head )
@@ -51,7 +51,7 @@ bool StackLF<T>::top( T & val ){
 }
 
 template< class T >
-size_t StackLF<T>::size() const {
+size_t stack_lockfree<T>::size() const {
     Node * current_node = _head.load( std::memory_order_relaxed );
     size_t count = 0;
     while( current_node ){

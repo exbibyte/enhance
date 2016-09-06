@@ -8,13 +8,13 @@
 #include <chrono>
 
 #include "catch.hpp"
-#include "StackLF_SplitReference.h"
+#include "stack_lockfree_split_reference.hpp"
 
 using namespace std;
 
-TEST_CASE( "StackLF_SplitReference", "[stack split reference]" ) { 
+TEST_CASE( "stack_lockfree_split_reference", "[stack split reference]" ) { 
 
-    StackLF_SplitReference<int> stack;
+    stack_lockfree_split_reference<int> stack;
 
     SECTION( "push" ) {
 	size_t count = stack.size();

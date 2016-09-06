@@ -1,14 +1,13 @@
+//implementation of split reference lock free stack based on C++ Concurrency in Action Section 7.2
 #ifndef STACK_LF_SPLIT_REF_H
 #define STACK_LF_SPLIT_REF_H
-
-//implementation of split reference lock free stack based on C++ Concurrency in Action Section 7.2
 
 #include <atomic>
 #include <cstddef>
 #include <mutex>
 
 template< class T >
-class StackLF_SplitReference {
+class stack_lockfree_split_reference {
 public:
     class Node;
     class NodeExternal {
@@ -24,7 +23,7 @@ public:
 	NodeExternal * _next;
 	Node( T val ) : _val( val ), _next( nullptr ), _count_internal(0) {}
     };
-    StackLF_SplitReference() : _head( nullptr ) {}
+    stack_lockfree_split_reference() : _head( nullptr ) {}
     size_t size() const; //not guaranteed to be consistent when threads are accessing stack
     //bool top( T & val );
     void push( T const & val );
@@ -34,7 +33,7 @@ private:
     std::atomic< NodeExternal * > _head;
 };
 template< class T >
-void StackLF_SplitReference<T>::push( T const & val ){
+void stack_lockfree_split_reference<T>::push( T const & val ){
     //create new external and internal nodes for the associated value
     NodeExternal * new_node = new NodeExternal;
     new_node->_node = new Node( val );
@@ -44,7 +43,7 @@ void StackLF_SplitReference<T>::push( T const & val ){
     while( !_head.compare_exchange_weak( new_node->_node->_next, new_node, std::memory_order_release, std::memory_order_relaxed ) );
 }
 template< class T >
-void StackLF_SplitReference<T>::AcquireNode( NodeExternal * & external_node ){
+void stack_lockfree_split_reference<T>::AcquireNode( NodeExternal * & external_node ){
     //gain ownership of the head
     NodeExternal * temp = new NodeExternal;
     do {
@@ -63,7 +62,7 @@ void StackLF_SplitReference<T>::AcquireNode( NodeExternal * & external_node ){
 }
 /////////
 template< class T >
-bool StackLF_SplitReference<T>::pop( T & val ){
+bool stack_lockfree_split_reference<T>::pop( T & val ){
     NodeExternal * head = _head.load( std::memory_order_relaxed );
     while( true ) {
 	AcquireNode( head );
@@ -103,7 +102,7 @@ bool StackLF_SplitReference<T>::pop( T & val ){
 }
 
 template< class T >
-size_t StackLF_SplitReference<T>::size() const {
+size_t stack_lockfree_split_reference<T>::size() const {
     NodeExternal * current_node = _head.load( std::memory_order_relaxed );
     size_t count = 0;
     while( current_node ){

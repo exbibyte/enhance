@@ -7,13 +7,13 @@
 #include <set>
 
 #include "catch.hpp"
-#include "StackLF.h"
+#include "stack_lockfree.hpp"
 
 using namespace std;
 
-TEST_CASE( "StackLF", "[stack]" ) { 
+TEST_CASE( "stack_lockfree", "[stack]" ) { 
 
-    StackLF<int> stack;
+    stack_lockfree<int> stack;
 
     SECTION( "push" ) {
 	size_t count = stack.size();
