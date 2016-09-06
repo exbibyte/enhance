@@ -11,7 +11,7 @@ src_files = $(wildcard *.cpp) $(wildcard **/*.cpp)
 #source files end---
 
 #include directories start---
-inc_folder_core := ../../core ../../DataTransform ../../gl ../../file
+inc_folder_core := ../../core ../../datatransform ../../gl ../../file
 
 #get list of subdirectories in ../modules/
 inc_folder_module_subdirs := $(sort $(dir $(wildcard ./../**/)))
