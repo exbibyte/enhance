@@ -14,29 +14,9 @@
 #include <memory>
 #include <list>
 
-RenderData Rendercompute0::compute( std::vector<double> vert_coord, std::vector<double> vert_normal, Vec orient_axis, double orient_angle ){
+RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > render_data ){
 
     RenderData renderdata;
-
-    //entities -------------------------------------------------------------------
-    //orientation	
-    vector<double> entity_translate    { 0, 0, 0};
-    // vector<double> entity_rotate_axis  { 1, 0, 0};
-    // // vector<double> entity_rotate_angle { 0 };
-    _rotation_angle += 0.00;
-    // vector<double> entity_rotate_angle { _rotation_angle };
-
-    vector<double> entity_rotate_axis  { orient_axis._vec[0], orient_axis._vec[1], orient_axis._vec[2] };
-    vector<double> entity_rotate_angle { orient_angle + _rotation_angle };
-    
-    //set material data
-    vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
-    vector<double> entity_material_diffuse   { 1, 1, 1 };
-    vector<double> entity_material_specular  { 1, 1, 1 };
-    vector<double> entity_material_shininess { 2 };
-    //set vertex data 
-    vector<double> & entity_vertices = vert_coord;
-    vector<double> & entity_normals = vert_normal;
 
     //light ----------------------------------------------------------------------
     vector<double> light_position     { 0, 0, 10 };
@@ -61,19 +41,13 @@ RenderData Rendercompute0::compute( std::vector<double> vert_coord, std::vector<
     vector<int> context_texturesize_shadowmap { 2500, 2500 };
     string context_title = "engine0";
 
-    //apply settings -------------------------------------------------------------
-    std::shared_ptr<RenderEntity> entity_01 = std::make_shared<RenderEntity>();
-    entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
-    entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
-    entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
+    //set material data, TODO: per entity attribute
+    vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
+    vector<double> entity_material_diffuse   { 1, 1, 1 };
+    vector<double> entity_material_specular  { 1, 1, 1 };
+    vector<double> entity_material_shininess { 2 };
 
-    entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
-    entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
-    entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
-    entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
-    entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
-    entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
-    
+    //apply settings -------------------------------------------------------------
     std::shared_ptr<RenderLight> light = std::make_shared< RenderLight >();
     light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
     light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
@@ -97,10 +71,42 @@ RenderData Rendercompute0::compute( std::vector<double> vert_coord, std::vector<
     context->AddDataSingle( RenderContextData::TextureSizeShadowMap(), context_texturesize_shadowmap );
     context->AddDataSingle( RenderContextData::Title(),                context_title );
 
-    renderdata._entities.push_back( entity_01 );
     renderdata._light = light;
     renderdata._camera = camera;
     renderdata._context = context;
+
+    //entities -------------------------------------------------------------------
+    for( auto & i : render_data )
+    {
+	//orientation	
+	vector<double> entity_translate    { 0, 0, 0 };
+	// vector<double> entity_rotate_axis  { 1, 0, 0};
+	// // vector<double> entity_rotate_angle { 0 };
+	// _rotation_angle += 0.00;
+	// vector<double> entity_rotate_angle { _rotation_angle };
+
+	vector<double> entity_rotate_axis  { i.orient_axis._vec[0], i.orient_axis._vec[1], i.orient_axis._vec[2] };
+	vector<double> entity_rotate_angle { i.orient_angle + _rotation_angle };
+    
+	//set vertex data 
+	vector<double> & entity_vertices = i.vert_coord;
+	vector<double> & entity_normals = i.vert_normal;
+
+	//apply settings -------------------------------------------------------------
+	std::shared_ptr<RenderEntity> entity_01 = std::make_shared<RenderEntity>();
+	entity_01->AddDataSingle( RenderPolyData::Coordinate(),    entity_translate );
+	entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
+	entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
+
+	entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
+	entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
+	entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
+	entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
+	entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
+	entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
+	
+	renderdata._entities.push_back( entity_01 );
+    }
 
     return renderdata;
 }

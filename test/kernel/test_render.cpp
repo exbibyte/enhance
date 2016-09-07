@@ -115,6 +115,11 @@ int main( int argc, char ** argv ){
     vector<double> vert_pos;
     vector<double> vert_norm;
     ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
+
+    vector<double> vert_pos_2 = vert_pos; //duplicate position data and offset it
+    for( auto & i : vert_pos_2 ){
+	i += 5;
+    }
     
     cout << "End of Init Phase" << endl;
 
@@ -247,7 +252,19 @@ int main( int argc, char ** argv ){
 	orient_angle += auto_rotate;
 	
 	//compute render information
-	RenderData renderdata = rendercompute0->compute( vert_pos, vert_norm, orient_axis, orient_angle );
+	IRendercompute::RenderDataPack render_data_0;
+	render_data_0.vert_coord = vert_pos;
+	render_data_0.vert_normal = vert_norm;
+	render_data_0.orient_axis = orient_axis;
+	render_data_0.orient_angle = orient_angle;
+
+	IRendercompute::RenderDataPack render_data_1;
+	render_data_1.vert_coord = vert_pos_2;
+	render_data_1.vert_normal = vert_norm;
+	render_data_1.orient_axis = orient_axis;
+	render_data_1.orient_angle = orient_angle;
+
+	RenderData renderdata = rendercompute0->compute( { render_data_0, render_data_1 } );
 	renderdata._glslprogram = glslprogram.get();
 	
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
