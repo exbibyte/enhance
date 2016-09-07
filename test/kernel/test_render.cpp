@@ -118,7 +118,7 @@ int main( int argc, char ** argv ){
 
     vector<double> vert_pos_2 = vert_pos; //duplicate position data and offset it
     for( auto & i : vert_pos_2 ){
-	i += 5;
+	i += 4;
     }
     
     cout << "End of Init Phase" << endl;

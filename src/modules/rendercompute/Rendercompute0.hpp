@@ -13,7 +13,6 @@ class Rendercompute0 : public IRendercompute {
 public:
     char const * get_id(){ return "rendercompute0"; }
     RenderData compute( std::list< IRendercompute::RenderDataPack > render_data );
-    double _rotation_angle = 0;
 };
 
 #endif

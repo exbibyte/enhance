@@ -74,19 +74,15 @@ RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > 
     renderdata._light = light;
     renderdata._camera = camera;
     renderdata._context = context;
-
+	
     //entities -------------------------------------------------------------------
     for( auto & i : render_data )
     {
 	//orientation	
 	vector<double> entity_translate    { 0, 0, 0 };
-	// vector<double> entity_rotate_axis  { 1, 0, 0};
-	// // vector<double> entity_rotate_angle { 0 };
-	// _rotation_angle += 0.00;
-	// vector<double> entity_rotate_angle { _rotation_angle };
 
 	vector<double> entity_rotate_axis  { i.orient_axis._vec[0], i.orient_axis._vec[1], i.orient_axis._vec[2] };
-	vector<double> entity_rotate_angle { i.orient_angle + _rotation_angle };
+	vector<double> entity_rotate_angle { i.orient_angle };
     
 	//set vertex data 
 	vector<double> & entity_vertices = i.vert_coord;
