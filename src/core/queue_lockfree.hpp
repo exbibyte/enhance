@@ -25,6 +25,8 @@ public:
 
                queue_lockfree_impl();
                ~queue_lockfree_impl();
+          void clear();
+          bool empty();
        _t_size size();                                                 //approximate count of the container size
           bool enqueue( _t_val & val ){ return push_back( val ); }
           bool dequeue( _t_val & val ){ return pop_front( val ); }

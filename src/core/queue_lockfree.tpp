@@ -63,3 +63,15 @@ size_t queue_lockfree_impl<T>::size(){
     }
     return count - 1; //discount for sentinel node
 }
+template< typename T >
+bool queue_lockfree_impl<T>::empty(){
+    return size() == 0 ;
+}
+
+template< typename T >
+void queue_lockfree_impl<T>::clear(){
+    while( !empty() ){
+	T t;
+	pop_front( t );
+    }
+}

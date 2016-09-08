@@ -9,6 +9,7 @@ public:
     using const_reference = T const &;
     using size_type = typename ContainerType<T>::_t_size;
 
+    bool empty(){ return ContainerType<T>::empty(); }
     size_type size(){ return ContainerType<T>::size(); }
     bool enqueue( value_type & item ){ return ContainerType<T>::enqueue( item ); }
     bool dequeue( value_type & item ){ return ContainerType<T>::dequeue( item ); }
