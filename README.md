@@ -7,19 +7,14 @@
 
 Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications eaiser through a common modular service oriented approach.
 
-## Checklist:
+## Brief Status:
 
-A = Working  
-B = Partial  
-C = In Progress  
-D = To do  
-
-[A] Math Utilites  
-[C] UI Handling  
-[B] Graphics Utilities  
-[B] Service Module and Infrastructure  
-[C] Memory Management  
-[D] Script management  
+Math Utilites  - Working  
+UI Handling  - In Progress  
+Graphics Utilities  - Partial  
+Service Module and Infrastructure - Partial  
+Memory Management  - In Progress  
+Script management  - To Do  
 
 ## Dependencies:
 
