@@ -89,32 +89,74 @@ TEST_CASE( "avl_tree", "[avl_tree]" ) {
 	CHECK( !bRet );
     }
 
-    //expect failure
+    //check 6 is absent
     found = nullptr;
     bRet = tree_node_avl<int, int>::find( root, 6, found );
     CHECK( !bRet );
     CHECK( nullptr == found );
 
+    //check root is valid
     bRet = tree_node_avl<int, int>::get_root( root, found );
     CHECK( bRet );
     CHECK( root == found );
 
+    //remove non-existent node in tree
     tree_node_avl<int, int> * n3 = new tree_node_avl<int, int>();
     gc.push_back( n3 );
     bRet = tree_node_avl<int, int>::remove( root, n3 );
     CHECK( !bRet );
 
-    bRet = tree_node_avl<int, int>::find( root, 5, found );
+    // //remove 5
+    // bRet = tree_node_avl<int, int>::find( root, 5, found );
+    // CHECK( bRet );
+    // CHECK( nullptr != found );
+    // bRet = tree_node_avl<int, int>::remove( root, found );
+    // CHECK( bRet );
+
+    // //check 5 is absent
+    // bRet = tree_node_avl<int, int>::find( root, 5, found );
+    // CHECK( !bRet );
+    // CHECK( nullptr == found );
+
+    //insert 20
+    tree_node_avl<int, int> * n4 = new tree_node_avl<int, int>( 20, 400 );
+    gc.push_back(n4);
+    bRet = tree_node_avl<int, int>::insert( root, n4 );
+    bRet = tree_node_avl<int, int>::find( root, 20, found );
     CHECK( bRet );
     CHECK( nullptr != found );
-    
+
+    // //remove 15
+    // bRet = tree_node_avl<int, int>::find( root, 15, found );
+    // CHECK( bRet );
+    // CHECK( nullptr != found );
+    // bRet = tree_node_avl<int, int>::remove( root, found );
+    // CHECK( bRet );
+
+    // //checek 15 is absent
+    // bRet = tree_node_avl<int, int>::find( root, 15, found );
+    // CHECK( !bRet );
+    // CHECK( nullptr == found );
+    //check 20 is present
+    bRet = tree_node_avl<int, int>::find( root, 20, found );
+    CHECK( bRet );
+    CHECK( nullptr != found );
+
+    //remove 10
+    bRet = tree_node_avl<int, int>::find( root, 10, found );
+    CHECK( bRet );
+    CHECK( nullptr != found );
     bRet = tree_node_avl<int, int>::remove( root, found );
     CHECK( bRet );
-
-    bRet = tree_node_avl<int, int>::find( root, 5, found );
+    //check 10 is absent
+    bRet = tree_node_avl<int, int>::find( root, 10, found );
     CHECK( !bRet );
     CHECK( nullptr == found );
-    
+    //check 20 is present
+    bRet = tree_node_avl<int, int>::find( root, 20, found );
+    CHECK( bRet );
+    CHECK( nullptr != found );
+
     for( auto & i : gc ){
 	delete i;
     }

@@ -10,17 +10,11 @@ class tree_node_avl{
 public:
     static bool find( tree_node_avl * tree, TypeKey key, tree_node_avl * & found );
     static bool get_root( tree_node_avl * node, tree_node_avl * & root );
-    static bool insert( tree_node_avl * tree, tree_node_avl * node_insert );    
+    static bool insert( tree_node_avl * & root, tree_node_avl * node_insert );    
     static bool remove( tree_node_avl * & root, tree_node_avl * node_remove );
     static bool next( tree_node_avl * node, tree_node_avl * & next );
     static bool prev( tree_node_avl * node, tree_node_avl * & prev );
-    static bool left_descendent( tree_node_avl * node, tree_node_avl * & descendent );
-    static bool right_descendent( tree_node_avl * node, tree_node_avl * & descendent );
-    static bool left_ancestor( tree_node_avl * node, tree_node_avl * & ancestor );
-    static bool right_ancestor( tree_node_avl * node, tree_node_avl * & ancestor );
-    
     tree_node_avl() : _parent( nullptr ), _left( nullptr ), _right( nullptr ), _height(1), _deleted(false) {}
-
     tree_node_avl( TypeKey key, TypeVal val ) : _parent( nullptr ), _left( nullptr ), _right( nullptr ), _height(1), _deleted(false) {
 	_key = key;
 	_val = val;
@@ -28,9 +22,18 @@ public:
     TypeKey get_key() const;
     TypeVal get_val() const;
 private:
-    // static void rebalance( tree_node_avl * Node );
+    static void rebalance( tree_node_avl * & root, tree_node_avl * Node );
+    static void rebalance_left( tree_node_avl * & root, tree_node_avl * node );
+    static void rebalance_right( tree_node_avl * & root, tree_node_avl * node );
     static bool link_left( tree_node_avl * node_parent, tree_node_avl * node_left );
     static bool link_right( tree_node_avl * node_parent, tree_node_avl * node_right );
+    static bool left_descendent( tree_node_avl * node, tree_node_avl * & descendent );
+    static bool right_descendent( tree_node_avl * node, tree_node_avl * & descendent );
+    static bool left_ancestor( tree_node_avl * node, tree_node_avl * & ancestor );
+    static bool right_ancestor( tree_node_avl * node, tree_node_avl * & ancestor );
+    static bool update_height( tree_node_avl * node );
+    static void rotate_left( tree_node_avl * & root, tree_node_avl * node );
+    static void rotate_right( tree_node_avl * & root, tree_node_avl * node );
     tree_node_avl * _parent;
     tree_node_avl * _left;
     tree_node_avl * _right;
@@ -71,8 +74,9 @@ bool tree_node_avl< TypeKey, TypeVal >::get_root( tree_node_avl * node, tree_nod
     }
 }
 template< typename TypeKey, typename TypeVal >
-bool tree_node_avl< TypeKey, TypeVal >::insert( tree_node_avl * tree, tree_node_avl * node_insert ){
+bool tree_node_avl< TypeKey, TypeVal >::insert( tree_node_avl * & root, tree_node_avl * node_insert ){
     tree_node_avl * prev = nullptr;
+    tree_node_avl * tree = root;
     while( tree ){
 	if( node_insert->_key == tree->_key ){ //already exist
 	    return false;
@@ -82,8 +86,11 @@ bool tree_node_avl< TypeKey, TypeVal >::insert( tree_node_avl * tree, tree_node_
 		tree = tree->_left;
 	    }else{ //attach node as leaf
 		tree->_left = node_insert;
-		if( node_insert )
+		if( node_insert ){
 		    node_insert->_parent = tree;
+		}
+		//avl specific routine
+		rebalance( root, node_insert );
 		return true;
 	    }
 	}else{
@@ -92,8 +99,11 @@ bool tree_node_avl< TypeKey, TypeVal >::insert( tree_node_avl * tree, tree_node_
 		tree = tree->_right;		
 	    }else{ //attach node as leaf
 		tree->_right = node_insert;
-		if( node_insert )
+		if( node_insert ){
 		    node_insert->_parent = tree;
+		}
+		//avl specific routine
+		rebalance( root, node_insert );
 		return true;
 	    }
 	}
@@ -113,6 +123,8 @@ bool tree_node_avl< TypeKey, TypeVal>::remove( tree_node_avl * & root, tree_node
 		node_remove->_deleted = true;
 		root = node_remove->_left;
 		root->_parent = nullptr;
+		//avl specific routine
+		update_height( root );
 		return true;
 	    }
 	}else{ //node to delete is not root
@@ -122,6 +134,8 @@ bool tree_node_avl< TypeKey, TypeVal>::remove( tree_node_avl * & root, tree_node
 		link_right( node_remove->_parent, node_remove->_left );
 	    }
 	    node_remove->_deleted = true;
+	    //avl specific routine
+	    update_height( node_remove->_parent );
 	    return true;
 	}
     }else{ //node to delete has right child
@@ -129,7 +143,7 @@ bool tree_node_avl< TypeKey, TypeVal>::remove( tree_node_avl * & root, tree_node
         if( !next( node_remove, next_node ) ){ //get next node
 	    return false;
 	}
-	next_node = nullptr; //should be null
+	// next_node->_left = nullptr; //should be null anyways
 	if( nullptr == node_remove->_parent ){ //node to delete is root?
 	    if( root != node_remove ){ //root invalid
 		return false;
@@ -144,6 +158,8 @@ bool tree_node_avl< TypeKey, TypeVal>::remove( tree_node_avl * & root, tree_node
 		}
 		root->_parent = nullptr;
 		node_remove->_deleted = true;
+		//avl specific routine
+		update_height( root );
 		return true;
 	    }
 	}else{ //node to delete is not root
@@ -160,6 +176,8 @@ bool tree_node_avl< TypeKey, TypeVal>::remove( tree_node_avl * & root, tree_node
 		link_right( node_remove->_parent, next_node );
 	    }
 	    node_remove->_deleted = true;
+	    //avl specific routine
+	    update_height( node_remove->_parent );
 	    return true;
 	}
     }
@@ -243,6 +261,32 @@ bool tree_node_avl< TypeKey, TypeVal >::right_ancestor( tree_node_avl * node, tr
     return false; //not found
 }
 template< typename TypeKey, typename TypeVal >
+void tree_node_avl< TypeKey, TypeVal >::rebalance( tree_node_avl * & root, tree_node_avl * node ){
+    if( nullptr == node ){
+	return;
+    }else{
+	tree_node_avl * parent = node->_parent;
+	int height_left = 0;
+	int height_right = 0;
+	if( node->_left ){
+	    height_left = node->_left->_height;
+	}
+	if( node->_right ){
+	    height_right = node->_right->_height;
+	}
+	if( height_left > height_right + 1 ){
+	    rebalance_right( root, node );
+	}
+	if( height_right > height_left + 1 ){
+	    rebalance_left( root, node );
+	}
+	update_height( node );
+	if( nullptr != parent ){
+	    rebalance( root, parent );
+	}
+    }
+}
+template< typename TypeKey, typename TypeVal >
 bool tree_node_avl< TypeKey, TypeVal >::link_left( tree_node_avl * node_parent, tree_node_avl * node_left ){
     if( node_parent ){
 	node_parent->_left = node_left;
@@ -270,5 +314,102 @@ template< typename TypeKey, typename TypeVal >
 TypeVal tree_node_avl< TypeKey, TypeVal >::get_val() const {
     return _val;
 }
-
+template< typename TypeKey, typename TypeVal >
+bool tree_node_avl< TypeKey, TypeVal >::update_height( tree_node_avl * node ){
+    if( nullptr == node ){
+	return false;
+    }else{
+	int height_left = node->_left ? node->_left->_height : 0;
+	int height_right = node->_right ? node->_right->_height : 0;
+	int height_max = height_left > height_right ? height_left : height_right;
+	node->_height = height_max + 1;
+	return true;
+    }
+}
+template< typename TypeKey, typename TypeVal >
+void tree_node_avl< TypeKey, TypeVal >::rebalance_right( tree_node_avl * & root, tree_node_avl * node ){
+    if( nullptr == node || nullptr == node->_left ){
+	return;
+    }else{
+	int height_right = node->_left->_right ? node->_left->_right->_height : 0;
+	int height_left = node->_left->_left ? node->_left->_left->_height : 0;
+	if( height_right > height_left ){
+	    rotate_left( root, node->_left );
+	}
+	rotate_right( root, node );
+	return;
+    }
+}
+template< typename TypeKey, typename TypeVal >
+void tree_node_avl< TypeKey, TypeVal >::rebalance_left( tree_node_avl * & root, tree_node_avl * node ){
+    if( nullptr == node || nullptr == node->_right ){
+	return;
+    }else{
+	int height_left = node->_right->_left ? node->_right->_left->_height : 0;
+	int height_right = node->_right->_right ? node->_right->_right->_height : 0;
+	if( height_left > height_right ){
+	    rotate_right( root, node->_right );
+	}
+	rotate_left( root, node );
+	return;
+    }
+}
+template< typename TypeKey, typename TypeVal >
+void tree_node_avl< TypeKey, TypeVal >::rotate_right( tree_node_avl * & root, tree_node_avl * node ){
+    if( !node || !node->_left ){
+	return;
+    }else{
+	tree_node_avl * parent = node->_parent;
+	tree_node_avl * a = node->_left;
+	tree_node_avl * b = a->_right;
+	a->_parent = parent;
+	if( parent && parent->_left == node ){
+	    parent->_left = a;
+	}
+	else if( parent && parent->_right == node ){
+	    parent->_right = a;
+	}else{ //parent is root
+	    root = a;
+	}
+	node->_parent = a;
+	a->_right = node;
+	if( b ){
+	    b->_parent = node;
+	}
+	node->_left = b;
+	update_height(b);
+	update_height(node);
+	update_height(a);
+	return;
+    }
+}
+template< typename TypeKey, typename TypeVal >
+void tree_node_avl< TypeKey, TypeVal >::rotate_left( tree_node_avl * & root, tree_node_avl * node ){
+    if( !node || !node->_right ){
+	return;
+    }else{
+	tree_node_avl * parent = node->_parent;
+	tree_node_avl * a = node->_right;
+	tree_node_avl * b = a->_left;
+	a->_parent = parent;
+	if( parent && parent->_left == node ){
+	    parent->_left = a;
+	}
+	else if( parent && parent->_right == node ){
+	    parent->_right = a;
+	}else{ //parent is root
+	    root = a;
+	}
+	node->_parent = a;
+	a->_left = node;
+	if( b ){
+	    b->_parent = node;
+	}
+	node->_right = b;
+	update_height(b);
+	update_height(node);
+	update_height(a);
+	return;
+    }
+}
 #endif
