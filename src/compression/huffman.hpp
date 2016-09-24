@@ -72,7 +72,7 @@ public:
     }
 private:
     int index_internals;
-    node letters[26]; //convert converts input to lower case
+    node letters[26]; //converts input to lower case and stores frequency
     node internals[25]; //upper bounded by 26-1 = 25 in the pathological case (character freqeuncy resembles a fibonacci sequence)
 };
 
