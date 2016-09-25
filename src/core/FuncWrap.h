@@ -1,3 +1,4 @@
+//Deprecated. See Funwrap3.
 #ifndef FUNCWRAP_H
 #define FUNCWRAP_H
 
