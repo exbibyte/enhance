@@ -11,10 +11,10 @@ using namespace std;
 
 TEST_CASE( "Heap", "[Heap]" ) {
     heap_max< int > heap_max;
-    vector< typename heap_max< int >::_t_unit > unsorted { { 0, 100 }, { 9, 101 }, { -5, 102 }, { 6, 103 }, { -6, 104 }, { -8, 105 }, };
-    vector< typename heap_max< int >::_t_unit > empty;
-    vector< typename heap_max< int >::_t_unit > retrieve_sorted;
-    typename heap_max< int >::_t_unit retrieve;
+    vector< typename ::heap_max< int >::_t_unit > unsorted { { 0, 100 }, { 9, 101 }, { -5, 102 }, { 6, 103 }, { -6, 104 }, { -8, 105 }, };
+    vector< typename ::heap_max< int >::_t_unit > empty;
+    vector< typename ::heap_max< int >::_t_unit > retrieve_sorted;
+    typename ::heap_max< int >::_t_unit retrieve;
     SECTION( "Heap Empty" ) {
 	bool bRet;
 	heap_max.build_heap( empty );
@@ -78,11 +78,11 @@ TEST_CASE( "Heap", "[Heap]" ) {
     }
     SECTION( "Heap insert" ) {
 	bool bRet;
-	typename heap_max< int >::_t_unit unit_2 {10,3};
-	typename heap_max< int >::_t_unit unit_3 {6,4};
-	typename heap_max< int >::_t_unit unit_4 {15,5};
-	typename heap_max< int >::_t_unit unit_1 {3,2};
-	typename heap_max< int >::_t_unit unit_0 {4,1};
+	typename ::heap_max< int >::_t_unit unit_2 {10,3};
+	typename ::heap_max< int >::_t_unit unit_3 {6,4};
+	typename ::heap_max< int >::_t_unit unit_4 {15,5};
+	typename ::heap_max< int >::_t_unit unit_1 {3,2};
+	typename ::heap_max< int >::_t_unit unit_0 {4,1};
 
 	bRet = heap_max.insert( unit_0 );
 	bRet &= heap_max.insert( unit_1 );

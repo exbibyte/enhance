@@ -1,0 +1,128 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <list>
+using namespace std;
+
+struct col_range{
+    int _start;
+    int _end;
+};
+class comp{
+  public:
+    bool operator()( col_range const & a, col_range const & b ) const{
+        if( a._end < b._start ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+int main() {
+    long unsigned n,m,k;
+    cin >> n >> m >> k;
+    long unsigned total = n*m;
+    map< int, map<col_range, int, comp> > grid{};
+    for( int i = 0; i < k; ++i ){
+        long row, col_start, col_end;
+        cin >> row >> col_start >> col_end;
+        col_range c;
+        c._start = col_start;
+        c._end = col_end;
+        auto it_row = grid.find(row);
+        if( it_row == grid.end() ){
+            map< col_range, int, comp > new_map{};
+            grid[row] = new_map;
+            it_row = grid.find(row);
+        }
+        map<col_range,int,comp> & current_row = it_row->second;
+        //find overlapping range due to existing tracks
+        auto it_overlap_start = current_row.lower_bound(c);
+        auto it_overlap_end = current_row.upper_bound(c);
+        if( it_overlap_start != current_row.end() ){
+            auto it_erase_start = it_overlap_start;
+            auto it_erase_end = it_overlap_end;
+            list<col_range> overlapped {}; //to be deleted
+            list<col_range> new_ranges{}; //to be inserted
+            while( it_overlap_start != it_overlap_end ){
+                //cout << "overlap existing: " <<  it_overlap_start->first._start << ", " << it_overlap_start->first._end << endl;
+                overlapped.push_back(it_overlap_start->first);
+                ++it_overlap_start;
+            }
+            overlapped.push_back(c);
+
+            //cout << "---" <<endl;
+            vector<int> overlapped_index{}; //intermediate data
+            overlapped_index.reserve(2*overlapped.size());
+            for( auto & h : overlapped ){
+                overlapped_index.push_back(h._start);
+                overlapped_index.push_back(h._end);
+            }
+            sort(overlapped_index.begin(), overlapped_index.end());
+            auto it_new_end = std::unique(overlapped_index.begin(), overlapped_index.end() );
+            //resize
+            overlapped_index.resize(std::distance(overlapped_index.begin(), it_new_end));
+            /*
+            cout << "elements: ";
+            for( auto & ele : overlapped_index ){
+                cout << ele << ", ";
+            }
+            cout << endl;
+            */
+            auto it_h_start = overlapped_index.begin(), it_h_end = overlapped_index.end();
+            if(overlapped_index.size() == 1){ //only 1 element
+                col_range n1;
+                n1._start = *it_h_start;
+                n1._end = *it_h_start;
+                new_ranges.push_back( n1 );
+                //cout << "new range: " << n1._start << ", " << n1._end << endl;
+            }else{
+                while( it_h_start != it_h_end ){
+                    //create new ranges from sorted indices
+                    auto it_next = it_h_start + 1;
+                    if( it_next != it_h_end ){
+                        col_range n2;
+                        n2._start = *it_h_start;
+                        n2._end = (*it_next - 1);
+                        new_ranges.push_back( n2 );
+                        //cout << "new range: " << n2._start << ", " << n2._end << endl;
+                    }else{
+                        col_range n3;
+                        n3._start = *it_h_start;
+                        n3._end = *it_h_start;
+                        new_ranges.push_back( n3 );
+                        //cout << "new range: " << n3._start << ", " << n3._end << endl;
+                    }
+                    ++it_h_start;
+                }
+            }
+            //remove old overlapped ranges
+            current_row.erase( it_erase_start, it_erase_end );
+            //insert new non-overlapped ranges;
+            for( auto & n : new_ranges ){
+                current_row.insert( it_overlap_end, std::pair<col_range,int>(n,1) );
+            }
+        }else{
+            //new range is non-overlapping, so jsut insert it
+            current_row[c] = 1;
+        }
+    }
+    
+    unsigned long tracks = 0;
+    for( auto & i : grid ){
+        for( auto & j : i.second ){
+            col_range const & c = j.first;
+            tracks += c._end - c._start + 1;
+        }
+    }
+    /*
+    cout << "count tracks: " << tracks << endl;
+    cout << "empty: " << total - tracks << endl;
+    */
+    cout << total-tracks << endl;
+    return 0;
+}
