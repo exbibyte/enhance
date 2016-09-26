@@ -1,4 +1,4 @@
-//--unbounded lock free queue
+//--unbounded lock free total queue
 //---based on Art of Multiprocessor Programming section 10.5
 #ifndef QUEUE_LF_H
 #define QUEUE_LF_H
