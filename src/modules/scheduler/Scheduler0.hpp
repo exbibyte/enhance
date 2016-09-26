@@ -1,9 +1,9 @@
-//scheduler implementation using queue_lockfree( unbounded lockfree total queue ) containing Funwrap3 elements
+//scheduler implementation using queue_lockfree_total( unbounded lockfree total queue ) containing Funwrap3 elements
 
 #include "IScheduler.hpp"
 #include "Funwrap3.hpp"
 #include "Thread0.hpp"
-#include "queue_lockfree.hpp"
+#include "queue_lockfree_total.hpp"
 
 #include <deque>
 #include <thread>
@@ -23,7 +23,7 @@ public:
     size_t size_scheduled() override;
 private:
     void task(); // task loop for the scheduler
-    queue_lockfree<Funwrap3> _queue; //queued work, top half
-    queue_lockfree<Funwrap3> _queue_sched; //queued work, bottom half
+    queue_lockfree_total<Funwrap3> _queue; //queued work, top half
+    queue_lockfree_total<Funwrap3> _queue_sched; //queued work, bottom half
     Thread0 _thread;
 };
