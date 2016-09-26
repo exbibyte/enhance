@@ -1,14 +1,14 @@
 //--unbounded lock free total queue
 //---based on Art of Multiprocessor Programming section 10.5
-#ifndef QUEUE_LF_H
-#define QUEUE_LF_H
+#ifndef QUEUE_LF_TOTAL_H
+#define QUEUE_LF_TOTAL_H
 
 #include <mutex>
 #include <atomic>
 #include "IQueue.hpp"
 
 template< class T >
-class queue_lockfree_impl {
+class queue_lockfree_total_impl {
 public:
     using _t_size = size_t;
     using _t_val = T;
@@ -23,8 +23,8 @@ public:
                              Node( _t_val & val ): _val(val), _next( nullptr ) {}
 	      };
 
-               queue_lockfree_impl();
-               ~queue_lockfree_impl();
+               queue_lockfree_total_impl();
+               ~queue_lockfree_total_impl();
           void clear();
           bool empty();
        _t_size size();                                                 //approximate count of the container size
@@ -37,9 +37,9 @@ private:
        _t_node _tail;
 };
 
-#include "queue_lockfree.tpp"
+#include "queue_lockfree_total.tpp"
 
 template< class T >
-using queue_lockfree = IQueue< T, queue_lockfree_impl >;
+using queue_lockfree_total = IQueue< T, queue_lockfree_total_impl >;
 
 #endif

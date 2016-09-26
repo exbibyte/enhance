@@ -1,11 +1,11 @@
 template< typename T >
-queue_lockfree_impl<T>::queue_lockfree_impl(){
+queue_lockfree_total_impl<T>::queue_lockfree_total_impl(){
     Node * sentinel = new Node();
     _head.store( sentinel );
     _tail.store( sentinel );
 }
 template< typename T >
-queue_lockfree_impl<T>::~queue_lockfree_impl(){
+queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
     Node * node = _head.load();
     while( node ){
 	Node * next = node->_next.load();
@@ -14,7 +14,7 @@ queue_lockfree_impl<T>::~queue_lockfree_impl(){
     }    
 }
 template< typename T >
-bool queue_lockfree_impl<T>::push_back( T & val ){ //push item to the tail
+bool queue_lockfree_total_impl<T>::push_back( T & val ){ //push item to the tail
     Node * new_node = new Node( val );
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
@@ -30,7 +30,7 @@ bool queue_lockfree_impl<T>::push_back( T & val ){ //push item to the tail
     }
 }
 template< typename T >
-bool queue_lockfree_impl<T>::pop_front( T & val ){ //obtain item from the head
+bool queue_lockfree_total_impl<T>::pop_front( T & val ){ //obtain item from the head
     while( true ){
 	Node * head = _head.load( std::memory_order_relaxed );
 	Node * tail = _tail.load( std::memory_order_relaxed );
@@ -53,7 +53,7 @@ bool queue_lockfree_impl<T>::pop_front( T & val ){ //obtain item from the head
     }
 }
 template< typename T >
-size_t queue_lockfree_impl<T>::size(){
+size_t queue_lockfree_total_impl<T>::size(){
     size_t count = 0;
     Node * node = _head.load();
     while( node ){
@@ -64,12 +64,11 @@ size_t queue_lockfree_impl<T>::size(){
     return count - 1; //discount for sentinel node
 }
 template< typename T >
-bool queue_lockfree_impl<T>::empty(){
+bool queue_lockfree_total_impl<T>::empty(){
     return size() == 0 ;
 }
-
 template< typename T >
-void queue_lockfree_impl<T>::clear(){
+void queue_lockfree_total_impl<T>::clear(){
     while( !empty() ){
 	T t;
 	pop_front( t );

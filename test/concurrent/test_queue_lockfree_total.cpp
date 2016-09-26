@@ -7,15 +7,15 @@
 #include <set>
 
 #include "catch.hpp"
-#include "queue_lockfree.hpp"
+#include "queue_lockfree_total.hpp"
 
 using namespace std;
 
-TEST_CASE( "queue_lockfree", "[queue]" ) { 
+TEST_CASE( "queue_lockfree_total", "[queue]" ) { 
 
     SECTION( "push" ) {
 
-        queue_lockfree<int> queue;
+        queue_lockfree_total<int> queue;
             
         size_t count = queue.size();
         CHECK( 0 == count );
@@ -36,7 +36,7 @@ TEST_CASE( "queue_lockfree", "[queue]" ) {
 
     SECTION( "pop empty" ) {
 
-        queue_lockfree<int> queue;
+        queue_lockfree_total<int> queue;
         
         int retrieve;
         size_t count;
@@ -48,7 +48,7 @@ TEST_CASE( "queue_lockfree", "[queue]" ) {
     
     SECTION( "multi-thread push-pop" ) {
 
-        queue_lockfree<int> queue;
+        queue_lockfree_total<int> queue;
 
         int count_loop = 20;
         while( --count_loop >=0 ){

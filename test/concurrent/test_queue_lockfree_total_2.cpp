@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
-#include "queue_lockfree.hpp"
+#include "queue_lockfree_total.hpp"
 
 #include "catch.hpp"
 
@@ -14,9 +14,9 @@
 
 using namespace std;
 
-TEST_CASE( "queue_lockfree multithread push pop", "[push pop]" ) {
+TEST_CASE( "queue_lockfree_total multithread push pop", "[push pop]" ) {
     
-    queue_lockfree<int> queue;
+    queue_lockfree_total<int> queue;
     unsigned int num_threads = 11700;
     vector<thread> threads2( num_threads );
     vector<thread> threads( num_threads );    
