@@ -58,7 +58,8 @@ bool TransMatrix< KeyType >::UpdateClosure(){
         KeySet.insert( TransitionEnd );
         it_MapTransitionStart++;
     }
-    
+
+    //Bellman-Ford-Moore algorithm for compute closure for all pairs
     typename set< KeyType >::iterator it_KeySetIntermediate = KeySet.begin();
     while( it_KeySetIntermediate != KeySet.end() ){
         typename set< KeyType >::iterator it_KeySetStart = KeySet.begin();
