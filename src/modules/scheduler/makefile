@@ -1,7 +1,5 @@
 #source directories start---
 
-src_folder_core := ../../core
-
 #source directories end---
 
 #source files---
@@ -11,12 +9,12 @@ src_files = $(wildcard *.cpp) $(wildcard **/*.cpp)
 #source files end---
 
 #include directories start---
-inc_folder_core := ../../core
+inc_folder_basic := $(dir $(wildcard ../../*/))
 
 #get list of subdirectories in ../modules/
 inc_folder_module_subdirs := $(sort $(dir $(wildcard ./../**/)))
 
-include_dirs = $(inc_folder_core) $(inc_folder_module_subdirs)
+include_dirs = $(inc_folder_basic) $(inc_folder_module_subdirs)
 
 #include directories end---
 
