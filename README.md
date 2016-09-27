@@ -44,9 +44,7 @@ https://youtu.be/x8cADzdhJhs
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
-Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service; initial port of older rendering code to the new infrastructure has been tested with a test stub and is currently being integrated further into a more specific service module.
-
-Other on-going work which will make further changes to infrastructure interface will be related to message passing and routing between service modules and other long running instances, and dual data structures for synchroization.
+Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service, synchronous and asynchronous signaling for task processing and internal messaging.
 
 Current development will be using OpenGL as the rendering backend and targeted for Linux.
 
