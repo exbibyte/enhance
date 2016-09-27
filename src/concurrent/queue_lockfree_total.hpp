@@ -7,6 +7,7 @@
 #include <atomic>
 #include "IQueue.hpp"
 
+//A value of type T that a node holds is assumed to be default constructable
 template< class T >
 class queue_lockfree_total_impl {
 public:
