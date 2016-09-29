@@ -13,38 +13,6 @@ using namespace std;
 
 TEST_CASE( "queue_lockfree_sync", "[queue]" ) { 
 
-    SECTION( "push" ) {
-
-        queue_lockfree_sync<int> queue;
-            
-        size_t count = queue.size();
-        CHECK( 0 == count );
-        int val = 5;
-        queue.enqueue(val);
-        count = queue.size();
-        CHECK( 1 == count );
-
-        SECTION( "pop" ) {
-            int retrieve;
-            bool bRet = queue.dequeue( retrieve );
-            count = queue.size();
-            CHECK( 0 == count );
-            CHECK( true == bRet );
-            CHECK( 5 == retrieve );
-        }
-    }    
-
-    SECTION( "pop empty" ) {
-
-        queue_lockfree_sync<int> queue;
-        
-        int retrieve;
-        size_t count;
-        bool bRet = queue.dequeue( retrieve );
-        count = queue.size();
-        CHECK( 0 == count );
-        CHECK( false == bRet );
-    }
     
     SECTION( "multi-thread push-pop" ) {
 
