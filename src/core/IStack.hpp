@@ -13,7 +13,7 @@ public:
     size_type size(){ return ContainerType<T>::size(); }
     bool push( value_type & item ){ return ContainerType<T>::push( item ); }
     bool pop( value_type & item ){ return ContainerType<T>::pop( item ); }
-    ~IStack(){ this.~ContainerType<T>(); }
+    ~IStack(){ this->~ContainerType<T>(); }
 };
 
 #endif

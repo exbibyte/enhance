@@ -3,6 +3,7 @@
 #ifndef QUEUE_LF_TOTAL_H
 #define QUEUE_LF_TOTAL_H
 
+#include <cstring>
 #include <atomic>
 #include "IQueue.hpp"
 

@@ -7,12 +7,14 @@ queue_lockfree_sync_impl<T>::queue_lockfree_sync_impl(){
 template< typename T >
 queue_lockfree_sync_impl<T>::~queue_lockfree_sync_impl(){
     clear();
-    Node * node = _head.load();
-    while( node ){
-	Node * next = node->_next.load();
-	delete node;
-	node = next;
-    }    
+    Node * n = _head.load();
+    if( _head.compare_exchange_strong( n, nullptr, std::memory_order_relaxed ) ){
+	if( n ){
+	    delete n;
+	    _head.store(nullptr);
+	    _tail.store(nullptr);
+	}
+    }
 }
 template< typename T >
 bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the tail
@@ -20,6 +22,9 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
 	Node * head = _head.load( std::memory_order_relaxed );
+	if( nullptr == head ){ //TODO: stricter check if _head/_tail is deallocated during destruction
+	    return false;
+	}
 	if( tail == head || _t_node_type::ITEM == tail->_type ){ //try enque an item by putting an ITEM object in queue
 	    Node * tail_next = tail->_next.load( std::memory_order_relaxed );
 	    if( tail == _tail ){
@@ -89,6 +94,9 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
 	Node * head = _head.load( std::memory_order_relaxed );
+	if( nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
+	    return false;
+	}
 	if( tail == head || _t_node_type::RESERVATION == tail->_type ){ //try deque an item by putting a RESERVATION object in queue
 	    Node * tail_next = tail->_next.load( std::memory_order_relaxed );
 	    if( tail == _tail ){
@@ -155,6 +163,9 @@ template< typename T >
 size_t queue_lockfree_sync_impl<T>::size(){
     size_t count = 0;
     Node * node = _head.load();
+    if( nullptr == node ){
+	return 0;
+    }
     while( node ){
 	Node * next = node->_next.load();
 	node = next;

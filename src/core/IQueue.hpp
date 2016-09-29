@@ -14,7 +14,7 @@ public:
     size_type size(){ return ContainerType<T>::size(); }
     bool enqueue( value_type & item ){ return ContainerType<T>::enqueue( item ); }
     bool dequeue( value_type & item ){ return ContainerType<T>::dequeue( item ); }
-    ~IQueue(){ this.~ContainerType<T>(); }
+    ~IQueue(){ this->~ContainerType<T>(); }
 };
 
 #endif

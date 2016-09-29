@@ -1,7 +1,7 @@
 #include "Scheduler0.hpp"
 #include "Funwrap3.hpp"
 #include "Thread0.hpp"
-#include "queue_lockfree.hpp"
+#include "queue_lockfree_total.hpp"
 
 #include <thread>
 

@@ -8,6 +8,7 @@
 
 #include "catch.hpp"
 #include "queue_lockfree_sync.hpp"
+#include "IQueue.hpp"
 
 using namespace std;
 

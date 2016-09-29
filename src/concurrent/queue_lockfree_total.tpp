@@ -9,10 +9,12 @@ queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
     clear();
     if( _head ){
 	Node * n = _head.load();
-	if( n ){
-	    delete n;
-	    _head.store(nullptr);
-	    _tail.store(nullptr);
+	if( _head.compare_exchange_strong( n, nullptr, std::memory_order_relaxed ) ){
+	    if( n ){
+		delete n;
+		_head.store(nullptr);
+		_tail.store(nullptr);
+	    }
 	}
     }
 }
@@ -21,6 +23,9 @@ bool queue_lockfree_total_impl<T>::push_back( T & val ){ //push item to the tail
     Node * new_node = new Node( val );
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
+	if( nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
+	    return false;
+	}
 	Node * tail_next = tail->_next.load( std::memory_order_relaxed );
 	if( nullptr == tail_next ){  //determine if thread has reached tail
 	    if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //add new node
@@ -37,6 +42,9 @@ bool queue_lockfree_total_impl<T>::pop_front( T & val ){ //obtain item from the 
     while( true ){
 	Node * head = _head.load( std::memory_order_relaxed );
 	Node * tail = _tail.load( std::memory_order_relaxed );
+	if( nullptr == head ){ //TODO: stricter check if _head/_tail is deallocated during destruction
+	    return false;
+	}
 	Node * head_next = head->_next.load( std::memory_order_relaxed );
 	if( head == _head ){
 	    if( head == tail ){
@@ -60,6 +68,9 @@ template< typename T >
 size_t queue_lockfree_total_impl<T>::size(){
     size_t count = 0;
     Node * node = _head.load();
+    if( nullptr == node ){
+	return 0;
+    }
     while( node ){
 	Node * next = node->_next.load();
 	node = next;
