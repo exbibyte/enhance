@@ -6,12 +6,15 @@ queue_lockfree_total_impl<T>::queue_lockfree_total_impl(){
 }
 template< typename T >
 queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
-    Node * node = _head.load();
-    while( node ){
-	Node * next = node->_next.load();
-	delete node;
-	node = next;
-    }    
+    clear();
+    if( _head ){
+	Node * n = _head.load();
+	if( n ){
+	    delete n;
+	    _head.store(nullptr);
+	    _tail.store(nullptr);
+	}
+    }
 }
 template< typename T >
 bool queue_lockfree_total_impl<T>::push_back( T & val ){ //push item to the tail
@@ -46,6 +49,7 @@ bool queue_lockfree_total_impl<T>::pop_front( T & val ){ //obtain item from the 
 		val = head_next->_val;
 		if( _head.compare_exchange_weak( head, head_next, std::memory_order_relaxed ) ){ //try add new item
 		    delete head; //thread suceeds and returns
+		    head = nullptr;
 		    return true;
 		}
 	    }
@@ -65,12 +69,13 @@ size_t queue_lockfree_total_impl<T>::size(){
 }
 template< typename T >
 bool queue_lockfree_total_impl<T>::empty(){
-    return size() == 0 ;
+    return size() == 0;
 }
 template< typename T >
-void queue_lockfree_total_impl<T>::clear(){
+bool queue_lockfree_total_impl<T>::clear(){
     while( !empty() ){
 	T t;
 	pop_front( t );
     }
+    return true;
 }

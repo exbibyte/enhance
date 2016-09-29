@@ -3,7 +3,6 @@
 #ifndef QUEUE_LF_TOTAL_H
 #define QUEUE_LF_TOTAL_H
 
-#include <mutex>
 #include <atomic>
 #include "IQueue.hpp"
 
@@ -26,7 +25,7 @@ public:
 
                queue_lockfree_total_impl();
                ~queue_lockfree_total_impl();
-          void clear();
+          bool clear();
           bool empty();
        _t_size size();                                                 //approximate count of the container size
           bool enqueue( _t_val & val ){ return push_back( val ); }

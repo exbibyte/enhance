@@ -11,6 +11,8 @@
 
 using namespace std;
 
+//TODO: setup conditions for testing synchronicity
+
 TEST_CASE( "queue_lockfree_sync", "[queue]" ) { 
 
     

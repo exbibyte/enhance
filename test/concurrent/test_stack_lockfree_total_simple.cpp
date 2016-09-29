@@ -7,18 +7,19 @@
 #include <set>
 
 #include "catch.hpp"
-#include "stack_lockfree.hpp"
+#include "stack_lockfree_total_simple.hpp"
 
 using namespace std;
 
-TEST_CASE( "stack_lockfree", "[stack]" ) { 
+TEST_CASE( "stack_lockfree_total_simple", "[stack]" ) { 
 
-    stack_lockfree<int> stack;
+    stack_lockfree_total_simple<int> stack;
 
     SECTION( "push" ) {
 	size_t count = stack.size();
 	CHECK( 0 == count );
-	stack.push(5);
+	int num = 5;
+	stack.push(num);
 	count = stack.size();
 	CHECK( 1 == count );
 
@@ -27,17 +28,6 @@ TEST_CASE( "stack_lockfree", "[stack]" ) {
 	    bool bRet = stack.pop( retrieve );
 	    count = stack.size();
 	    CHECK( 0 == count );
-	    CHECK( true == bRet );
-	    CHECK( 5 == retrieve );
-	}
-
-	SECTION( "top" ) {
-	    int retrieve;
-	    count = stack.size();
-	    CHECK( 1 == count );
-	    bool bRet = stack.top( retrieve );
-	    count = stack.size();
-	    CHECK( 1 == count );
 	    CHECK( true == bRet );
 	    CHECK( 5 == retrieve );
 	}
@@ -58,7 +48,8 @@ TEST_CASE( "stack_lockfree", "[stack]" ) {
 	vector<thread> threads( num_threads );
 	for( int i = 0; i < num_threads; ++i ){
 	    threads[i] = std::thread( [ &stack, i ](){
-		    stack.push( i );
+		    int num = i;
+		    stack.push( num );
 		} );
 	}
 	for( auto & i : threads ){

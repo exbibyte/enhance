@@ -6,6 +6,7 @@ queue_lockfree_sync_impl<T>::queue_lockfree_sync_impl(){
 }
 template< typename T >
 queue_lockfree_sync_impl<T>::~queue_lockfree_sync_impl(){
+    clear();
     Node * node = _head.load();
     while( node ){
 	Node * next = node->_next.load();
@@ -40,6 +41,7 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
 			Node * node_recycle = head;
 			if( _head.compare_exchange_weak( head, new_node ) ){ //update head, linearization point 2 if successful
 			    delete node_recycle; //delete synchronized node
+			    node_recycle = nullptr;
 			}
 		    }
 		    //performance optimization end
@@ -70,9 +72,11 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
 	    Node * node_recycle = head;
 	    if( _head.compare_exchange_weak( head, n ) ){ //update head, deque linearization point 2 if successful
 		delete node_recycle; //delete synchronized node
+		node_recycle = nullptr;
 	    }
 	    if( success ){ //return for succeeding enquing thread
 		delete new_node; //delete unused node after succesful enquing thread synchronizes with an existing dequing RESERVATION node
+		new_node = nullptr;
 		return true;
 	    }
 	}
@@ -106,6 +110,7 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
 			Node * node_recycle = head;
 			if( _head.compare_exchange_weak( head, new_node ) ){ //update head, linearization point 2 if successful
 			    delete node_recycle; //delete synchronized node
+			    node_recycle = nullptr;
 			}
 		    }
 		    //performance optimization end
@@ -136,9 +141,11 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
 	    Node * node_recycle = head;
 	    if( _head.compare_exchange_weak( head, n ) ){ //update head, linearization point 2 if successful
 		delete node_recycle; //delete synchronized node
+		node_recycle = nullptr;
 	    }
 	    if( success ){ //return for succeeding dequing thread
 		delete new_node; //delete unused node after succesful dequing thread synchronizes with an existing enquing ITEM node
+		new_node = nullptr;
 		return true;
 	    }
 	}
@@ -160,10 +167,11 @@ bool queue_lockfree_sync_impl<T>::empty(){
     return size() == 0 ;
 }
 template< typename T >
-void queue_lockfree_sync_impl<T>::clear(){
+bool queue_lockfree_sync_impl<T>::clear(){
     while( !empty() ){
 	T t;
 	pop_front( t );
     }
+    return true;
 }
 
