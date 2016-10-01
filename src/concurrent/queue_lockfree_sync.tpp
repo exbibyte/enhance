@@ -3,6 +3,7 @@
 template< typename T >
 queue_lockfree_sync_impl<T>::queue_lockfree_sync_impl(){
     Node * sentinel = new Node();
+    sentinel->_type.store( NodeType::SENTINEL, std::memory_order_release );
     _head.store( sentinel );
     _tail.store( sentinel );
 }
@@ -25,7 +26,9 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
         Node * tail = _tail.load( std::memory_order_relaxed );
         Node * head = _head.load( std::memory_order_relaxed );
         if( nullptr == head || nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
-            return false;
+            // return false;
+	    std::this_thread::yield();
+	    continue;
         }
 
 	Node * n = head->_next.load( std::memory_order_relaxed );
@@ -120,7 +123,9 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
         Node * tail = _tail.load( std::memory_order_relaxed );
         Node * head = _head.load( std::memory_order_relaxed );
         if( nullptr == head || nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
-            return false;
+            // return false;
+	    std::this_thread::yield();
+	    continue;
         }
 	
 	Node * n = head->_next.load( std::memory_order_relaxed );
