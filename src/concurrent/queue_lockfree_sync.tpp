@@ -25,8 +25,7 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
         Node * tail = _tail.load( std::memory_order_relaxed );
         Node * head = _head.load( std::memory_order_relaxed );
         if( nullptr == head || nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
-            // return false;
-	    continue;
+            return false;
         }
 
 	Node * n = head->_next.load( std::memory_order_relaxed );
@@ -39,7 +38,9 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
                 }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successful
                     _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit, enque linearization point 2 if successful
                     //wait for synchronization with dequing thread for the signal that transaction is complete
-		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){}
+		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
+			std::this_thread::yield();
+		    }
 		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_relaxed );
 
 		    //performance optimization here
@@ -105,7 +106,9 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
 		}
 		//performance optimization end
 	    }
-        }
+        }else{
+	    std::this_thread::yield();
+	}
     }
     return false; //shouldn't come here
 }
@@ -130,7 +133,9 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
                 }else if( tail->_next.compare_exchange_weak( tail_next, new_node ) ){ //try commit item as the next node, enque linearization point 1 if successful
                     _tail.compare_exchange_weak( tail, new_node ); //try update tail after commit, enque linearization point 2 if successful
                     //wait for synchronization with dequing thread for the signal that transaction is complete
-		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){}
+		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
+			std::this_thread::yield();
+		    }
 		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_relaxed );
 		    
 		    //performance optimization here
@@ -196,7 +201,9 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
 		}
 		//performance optimization end
 	    }
-        }
+        }else{
+	    std::this_thread::yield();
+	}
     }
     return false; //shouldn't come here
 }

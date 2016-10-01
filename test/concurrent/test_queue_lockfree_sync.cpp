@@ -23,7 +23,7 @@ TEST_CASE( "queue_lockfree_sync", "[queue]" ) {
 
         queue_lockfree_sync<int> queue;
 
-	unsigned int num_threads = 30;
+	unsigned int num_threads = 100;
 	vector<thread> threads_enqueue( num_threads );
 	vector<thread> threads_dequeue( num_threads );
 	vector<int> ret_vals_enqueue( num_threads, 0 );
@@ -39,8 +39,6 @@ TEST_CASE( "queue_lockfree_sync", "[queue]" ) {
 		    ret = queue.enqueue( val );
 		    if( ret ){
 		        *ret_val_ptr = 1;
-		    }else{
-			cout << "enqueue unsuccessful." << endl;
 		    }
 		} );
 	}
@@ -58,8 +56,6 @@ TEST_CASE( "queue_lockfree_sync", "[queue]" ) {
 		    if( ret ){
 		        *ret_val_ptr = 1;
 		        *item_ptr = val;
-		    }else{
-			cout << "dequeue unsuccessful." << endl;
 		    }
 		} );
 	}
