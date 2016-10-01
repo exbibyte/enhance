@@ -15,24 +15,25 @@ public:
     class Node;
     using _t_node = std::atomic< Node * >;
     enum class NodeType;
-    using _t_node_type = NodeType;
+    using _t_node_type = std::atomic< NodeType >;
               enum class NodeType{
-                  UNSPECIFIED,
+                  SENTINEL,
                   ITEM,
                   RESERVATION,
+		  BUSY,
+		  FULFILLED,
+		  COMPLETE,    
               };
               class Node {
               public:
                      _t_node _next;
 		      _t_val _val; //container value storage
-     std::atomic< _t_val * > _val_guard;  //pointer indicating if _val is valid( == nullptr for deque reservation, != nullptr otherwise )
-         std::atomic< bool > _val_change; //ownership flag for indicating a node is undergoing value (_val) modification
-	        _t_node_type _type; //node type( ITEM: enquing thread waiting for synchronization, RESERVATION: dequing thread waiting for synchronization )
-		             Node(): _next( nullptr ), _type( _t_node_type::RESERVATION ) {
-				 _val_guard.store( nullptr );
+		_t_node_type _type; //node type( ITEM: enquing thread waiting for synchronization, RESERVATION: dequing thread waiting for synchronization )
+		             Node(): _next( nullptr ) {
+				 _type.store( NodeType::RESERVATION );
                              }
-                             Node( _t_val & val ): _val( val ), _next( nullptr ), _type( _t_node_type::ITEM ) {
-                                 _val_guard.store( &_val );
+                             Node( _t_val & val ): _val( val ), _next( nullptr ){
+				 _type.store( NodeType::ITEM );
                              }
               };
 
