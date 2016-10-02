@@ -1,5 +1,7 @@
 #include <iostream>
 
+//#define DEBUG_SPINLOCK
+
 template< typename T >
 queue_lockfree_sync_impl<T>::queue_lockfree_sync_impl(){
     Node * sentinel = new Node();
@@ -23,93 +25,83 @@ template< typename T >
 bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the tail
     Node * new_node = new Node( val ); //type is ITEM if value argument is present
     while( true ){
-        Node * tail = _tail.load( std::memory_order_relaxed );
-        Node * head = _head.load( std::memory_order_relaxed );
-        if( nullptr == head || nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
-            // return false;
+        Node * tail = _tail.load( std::memory_order_acquire );
+        Node * head = _head.load( std::memory_order_acquire );
+        if( nullptr == head || nullptr == tail || head->_type.load( std::memory_order_relaxed ) != NodeType::SENTINEL ){
 	    std::this_thread::yield();
 	    continue;
         }
 
 	Node * n = head->_next.load( std::memory_order_relaxed );
-
-        if( tail == head || NodeType::ITEM == tail->_type.load( std::memory_order_relaxed ) ){ //try enque an item by putting an ITEM object in queue
+	NodeType tail_type = tail->_type.load( std::memory_order_relaxed );
+        if( NodeType::ITEM == tail_type || NodeType::SENTINEL == tail_type ){ //try enque an item by putting an ITEM object in queue
             Node * tail_next = tail->_next.load( std::memory_order_relaxed );
-            if( tail == _tail ){
+            if( tail == _tail.load(std::memory_order_relaxed) ){
                 if( nullptr != tail_next ){ //tail is invalidated
                     _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry, enque lineariation point 2 if successful
-                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successful
+                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successfu
                     _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit, enque linearization point 2 if successful
                     //wait for synchronization with dequing thread for the signal that transaction is complete
 		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
+#ifdef DEBUG_SPINLOCK
+			std::cout << "spinning push" << std::endl;
+#endif
 			std::this_thread::yield();
 		    }
-		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_relaxed );
-
-		    //performance optimization here
-		    Node * current_head = _head.load( std::memory_order_relaxed );
-		    if( nullptr != current_head ){
-			Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-			if( nullptr != current_head_next ){
-			    Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			    if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-				if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				    delete current_head_next; //delete synchronized node
-				    current_head_next = nullptr;
+#ifdef DEBUG_SPINLOCK
+		    std::cout << "enqueing thread retrieved value." << std::endl;
+#endif
+		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release );
+		    //performance optimization starts
+		    Node * current_head = _head.load( std::memory_order_acquire);
+		    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
+			Node * recycle = current_head;
+			Node * current_head_next = current_head->_next.load( std::memory_order_acquire );
+			if( current_head_next ){
+			    if( current_head_next->_type.load( std::memory_order_acquire ) == NodeType::COMPLETE ){
+				if( _head.compare_exchange_weak( current_head, current_head_next, std::memory_order_acq_rel ) ){
+				    current_head_next->_type.store( NodeType::SENTINEL, std::memory_order_release );
+				    delete recycle;
+				    recycle = nullptr;
 				}
 			    }
 			}
 		    }
-		    //performance optimization end
+		    //performance optimization ends
                     return true;
                 }
             }
         }else if( nullptr != n && NodeType::RESERVATION == n->_type.load( std::memory_order_relaxed ) ){ //try fulfill a waiting dequing thread in queue
-            if( head != _head.load( std::memory_order_relaxed ) ){
+            if( head != _head.load( std::memory_order_relaxed ) || tail != _tail.load( std::memory_order_relaxed ) || head->_next.load( std::memory_order_relaxed ) != n ){
                 //nodes are invalidated, retry
                 continue;
             }
 	    NodeType expected_head_node_type = NodeType::RESERVATION;
-	    if( n->_type.compare_exchange_weak( expected_head_node_type, NodeType::BUSY ) ){ //fulfill a dequeing thread
+	    if( n->_type.compare_exchange_strong( expected_head_node_type, NodeType::BUSY ) ){ //fulfill a dequeing thread
 		n->_val = val;
-		n->_type.store( NodeType::FULFILLED, std::memory_order_acq_rel );
+		n->_type.store( NodeType::FULFILLED );
 		delete new_node;
 		new_node = nullptr;
-
-		//performance optimization here
-		Node * current_head = _head.load( std::memory_order_relaxed );
-		if( nullptr != current_head ){
-		    Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-		    if( nullptr != current_head_next ){
-			Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-			    if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				delete current_head_next; //delete synchronized node
-				current_head_next = nullptr;
-			    }
-			}
-		    }
-		}
-		//performance optimization end
 		return true;
-	    }else{ //unsuccessful fulfillment
-		//performance optimization here
-		Node * current_head = _head.load( std::memory_order_relaxed );
-		if( nullptr != current_head ){
-		    Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-		    if( nullptr != current_head_next ){
-			Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-			    if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				delete current_head_next; //delete synchronized node
-				current_head_next = nullptr;
-			    }
-			}
-		    }
-		}
-		//performance optimization end
+	    }else{ //unsuccessful fulfillmentm
 	    }
         }else{
+	    //performance optimization starts
+	    Node * current_head = _head.load( std::memory_order_acquire);
+	    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
+		Node * recycle = current_head;
+		Node * current_head_next = current_head->_next.load( std::memory_order_acquire );
+		if( current_head_next ){
+		    if( current_head_next->_type.load( std::memory_order_acquire ) == NodeType::COMPLETE ){
+			if( _head.compare_exchange_weak( current_head, current_head_next, std::memory_order_acq_rel ) ){
+			    current_head_next->_type.store( NodeType::SENTINEL, std::memory_order_release );
+			    delete recycle;
+			    recycle = nullptr;
+			}
+		    }
+		}
+	    }
+	    //performance optimization ends
 	    std::this_thread::yield();
 	}
     }
@@ -120,93 +112,82 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
     //mirror implementation to that of push_back
     Node * new_node = new Node(); //type is RESERVATION if value argument is absent
     while( true ){
-        Node * tail = _tail.load( std::memory_order_relaxed );
-        Node * head = _head.load( std::memory_order_relaxed );
-        if( nullptr == head || nullptr == tail ){ //TODO: stricter check if _head/_tail is deallocated during destruction
-            // return false;
+        Node * tail = _tail.load( std::memory_order_acquire );
+        Node * head = _head.load( std::memory_order_acquire );
+        if( nullptr == head || nullptr == tail || head->_type.load( std::memory_order_relaxed ) != NodeType::SENTINEL ){
 	    std::this_thread::yield();
 	    continue;
         }
-	
 	Node * n = head->_next.load( std::memory_order_relaxed );
-	
-        if( tail == head || NodeType::RESERVATION == tail->_type.load( std::memory_order_relaxed ) ){ //try dequeue an item by putting an RESERVATION object in queue
+	NodeType tail_type = tail->_type.load( std::memory_order_relaxed );
+        if( NodeType::SENTINEL == tail_type || NodeType::RESERVATION == tail_type ){ //try enque an item by putting an RESERVATION object in queue
             Node * tail_next = tail->_next.load( std::memory_order_relaxed );
-            if( tail == _tail ){
+            if( tail == _tail.load(std::memory_order_relaxed) ){
                 if( nullptr != tail_next ){ //tail is invalidated
-                    _tail.compare_exchange_weak( tail, tail_next ); //update tail before retry, enque lineariation point 2 if successful
-                }else if( tail->_next.compare_exchange_weak( tail_next, new_node ) ){ //try commit item as the next node, enque linearization point 1 if successful
-                    _tail.compare_exchange_weak( tail, new_node ); //try update tail after commit, enque linearization point 2 if successful
+                    _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry, enque lineariation point 2 if successful
+                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successfu
+                    _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit, enque linearization point 2 if successful
                     //wait for synchronization with dequing thread for the signal that transaction is complete
 		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
 			std::this_thread::yield();
+#ifdef DEBUG_SPINLOCK
+			std::cout << "spinning pop" << std::endl;
+#endif
 		    }
-		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_relaxed );
-		    
-		    //performance optimization here
-		    Node * current_head = _head.load( std::memory_order_relaxed );
-		    if( nullptr != current_head ){
-			Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-			if( nullptr != current_head_next ){
-			    Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			    if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-				if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				    delete current_head_next; //delete synchronized node
-				    current_head_next = nullptr;
+		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release );
+		    //performance optimization starts
+		    Node * current_head = _head.load( std::memory_order_acquire);
+		    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
+			Node * recycle = current_head;
+			Node * current_head_next = current_head->_next.load( std::memory_order_acquire );
+			if( current_head_next ){
+			    if( current_head_next->_type.load( std::memory_order_acquire ) == NodeType::COMPLETE ){
+				if( _head.compare_exchange_weak( current_head, current_head_next, std::memory_order_acq_rel ) ){
+				    current_head_next->_type.store( NodeType::SENTINEL, std::memory_order_release );
+				    delete recycle;
+				    recycle = nullptr;
 				}
 			    }
 			}
 		    }
-		    //performance optimization end
+		    //performance optimization ends
                     return true;
                 }
             }
         }else if( nullptr != n && NodeType::ITEM == n->_type.load( std::memory_order_relaxed ) ){ //try fulfill a waiting enqueing thread in queue
-            if( head != _head.load( std::memory_order_relaxed ) ){
+            if( head != _head.load( std::memory_order_relaxed ) || tail != _tail.load( std::memory_order_relaxed ) || head->_next.load( std::memory_order_relaxed ) != n ){
                 //nodes are invalidated, retry
                 continue;
             }
 	    NodeType expected_head_node_type = NodeType::ITEM;
-	    if( n->_type.compare_exchange_weak( expected_head_node_type, NodeType::BUSY ) ){ //fulfill a enqueing thread
+	    if( n->_type.compare_exchange_strong( expected_head_node_type, NodeType::BUSY ) ){ //fulfill a enqueing thread
 		val = n->_val;
-		n->_type.store( NodeType::FULFILLED, std::memory_order_acq_rel );
+		n->_type.store( NodeType::FULFILLED);
 		delete new_node;
 		new_node = nullptr;
-
-		//performance optimization here
-		Node * current_head = _head.load( std::memory_order_relaxed );
-		if( nullptr != current_head ){
-		    Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-		    if( nullptr != current_head_next ){
-			Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-			    if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				delete current_head_next; //delete synchronized node
-				current_head_next = nullptr;
-			    }
-			}
-		    }
-		}
-		//performance optimization end
+#ifdef DEBUG_SPINLOCK
+		std::cout << "fulfilled enqueing thread." << std::endl;
+#endif
 		return true;
 	    }else{ //unsuccessful fulfillment
-		//performance optimization here
-		Node * current_head = _head.load( std::memory_order_relaxed );
-		if( nullptr != current_head ){
-		    Node * current_head_next = current_head->_next.load( std::memory_order_relaxed );
-		    if( nullptr != current_head_next ){
-			Node * current_head_next_next = current_head_next->_next.load( std::memory_order_relaxed );
-			if( current_head_next->_type.load( std::memory_order_relaxed ) == NodeType::COMPLETE ){
-			    if( current_head->_next.compare_exchange_weak( current_head_next, current_head_next_next ) ){ //update head, linearization point 2 if successful
-				delete current_head_next; //delete synchronized node
-				current_head_next = nullptr;
-			    }
+	    }
+        }else{
+	    //performance optimization starts
+	    Node * current_head = _head.load( std::memory_order_acquire);
+	    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
+		Node * recycle = current_head;
+		Node * current_head_next = current_head->_next.load( std::memory_order_acquire );
+		if( current_head_next ){
+		    if( current_head_next->_type.load( std::memory_order_acquire ) == NodeType::COMPLETE ){
+			if( _head.compare_exchange_weak( current_head, current_head_next, std::memory_order_acq_rel ) ){
+			    current_head_next->_type.store( NodeType::SENTINEL, std::memory_order_release );
+			    delete recycle;
+			    recycle = nullptr;
 			}
 		    }
 		}
-		//performance optimization end
 	    }
-        }else{
+	    //performance optimization ends
 	    std::this_thread::yield();
 	}
     }
@@ -220,6 +201,9 @@ size_t queue_lockfree_sync_impl<T>::size(){
         return 0;
     }
     while( node ){
+#ifdef DEBUG_SPINLOCK
+	std::cout << "node type: " << static_cast<int>(node->_type.load()m) << std::endl;
+#endif
         Node * next = node->_next.load();
         node = next;
         ++count;
@@ -228,13 +212,30 @@ size_t queue_lockfree_sync_impl<T>::size(){
 }
 template< typename T >
 bool queue_lockfree_sync_impl<T>::empty(){
-    return size() == 0 ;
+    return size() == 0;
 }
 template< typename T >
 bool queue_lockfree_sync_impl<T>::clear(){
     while( !empty() ){
-        T t;
-        pop_front( t );
+#ifdef DmEBUG_SPINLOCK
+	std::cout << "clear: size: " << this->size() << std::endl;
+#endif
+	Node * node = _head.load();
+	if( nullptr == node ){
+	    break;
+	}
+	if( node->_type.load() == NodeType::ITEM ){
+	    T t;
+	    pop_front( t );
+	}else if( node->_type.load() == NodeType::ITEM ){
+	    T t;
+	    push_back( t );
+	}else{
+	    Node * node_next = node->_next.load();
+	    _head.store( node_next );
+	    delete node;
+	    node = nullptr;
+	}
     }
     return true;
 }
