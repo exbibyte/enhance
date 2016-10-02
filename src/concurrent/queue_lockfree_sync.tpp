@@ -38,11 +38,11 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
             Node * tail_next = tail->_next.load( std::memory_order_relaxed );
             if( tail == _tail.load(std::memory_order_relaxed) ){
                 if( nullptr != tail_next ){ //tail is invalidated
-                    _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry, enque lineariation point 2 if successful
-                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successfu
-                    _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit, enque linearization point 2 if successful
+                    _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry
+                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node
+                    _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit
                     //wait for synchronization with dequing thread for the signal that transaction is complete
-		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
+		    while( new_node->_type.load( std::memory_order_acquire ) != NodeType::FULFILLED ){
 #ifdef DEBUG_SPINLOCK
 			std::cout << "spinning push" << std::endl;
 #endif
@@ -51,7 +51,7 @@ bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the ta
 #ifdef DEBUG_SPINLOCK
 		    std::cout << "enqueing thread retrieved value." << std::endl;
 #endif
-		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release );
+		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release ); //signal for cleanup of the completed node
 		    //performance optimization starts
 		    Node * current_head = _head.load( std::memory_order_acquire);
 		    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
@@ -124,17 +124,18 @@ bool queue_lockfree_sync_impl<T>::pop_front( T & val ){ //pop an item from the h
             Node * tail_next = tail->_next.load( std::memory_order_relaxed );
             if( tail == _tail.load(std::memory_order_relaxed) ){
                 if( nullptr != tail_next ){ //tail is invalidated
-                    _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry, enque lineariation point 2 if successful
-                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node, enque linearization point 1 if successfu
-                    _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit, enque linearization point 2 if successful
+                    _tail.compare_exchange_weak( tail, tail_next, std::memory_order_relaxed ); //update tail before retry
+                }else if( tail->_next.compare_exchange_weak( tail_next, new_node, std::memory_order_relaxed ) ){ //try commit item as the next node
+                    _tail.compare_exchange_weak( tail, new_node, std::memory_order_relaxed ); //try update tail after commit
                     //wait for synchronization with dequing thread for the signal that transaction is complete
-		    while( new_node->_type.load( std::memory_order_relaxed ) != NodeType::FULFILLED ){
+		    while( new_node->_type.load( std::memory_order_acquire ) != NodeType::FULFILLED ){
 			std::this_thread::yield();
 #ifdef DEBUG_SPINLOCK
 			std::cout << "spinning pop" << std::endl;
 #endif
 		    }
-		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release );
+		    val = new_node->_val;
+		    new_node->_type.store( NodeType::COMPLETE, std::memory_order_release ); //signal for cleanup for this completed node
 		    //performance optimization starts
 		    Node * current_head = _head.load( std::memory_order_acquire);
 		    if( nullptr != current_head && current_head->_type.load( std::memory_order_acquire ) == NodeType::SENTINEL ){
