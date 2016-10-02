@@ -59,7 +59,6 @@ TEST_CASE( "queue_lockfree_sync bulk operations", "[bulk]" ) {
     auto start = std::chrono::system_clock::now();
     while(1){
 	cout << "." << flush;
-	// cout << "queue size: " << queue.size() << endl;
 	auto end = std::chrono::system_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 	if( elapsed.count() > 5000 ){
@@ -192,7 +191,7 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
 
     queue_lockfree_sync<int> queue;
 
-    unsigned int num_threads = 30;
+    unsigned int num_threads = 100;
     vector<thread> threads_enqueue( num_threads );
     vector<thread> threads_dequeue( num_threads );
     vector<int> ret_vals_enqueue( num_threads, 0 );
@@ -230,7 +229,8 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
 
     auto start = std::chrono::system_clock::now();
     while(1){
-	cout << "queue size: " << queue.size() << endl;
+	cout << "." << flush;
+	// cout << "queue size: " << queue.size() << endl;
 	auto end = std::chrono::system_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 	if( elapsed.count() > 5000 ){
@@ -239,6 +239,7 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
 	std::this_thread::yield();
 	std::this_thread::sleep_for (std::chrono::milliseconds(1000));
     }
+    cout << endl;
 
     CHECK( queue.size() == 0 );
 
