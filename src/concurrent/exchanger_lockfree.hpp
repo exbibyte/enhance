@@ -7,18 +7,28 @@
 template< class T >
 class exchanger_lockfree {
 public:
-    class Node;
+    enum class status {
+        EMPTY,
+        WAITING,
+        EXCHANGING,
+        EXCHANGING_2,
+        EXCHANGING_3,
+    };
+    //PROGRESS OF status:
+    //EMPTY->WAITING->WAIT FOR EXCHANGE_2->GET EXCHANGED OBJECT->EXCHANGING_3->EMPTY->RETURN
+    //WAITING->EXCHANGE->EXCHANGE OBJECTS->EXCHANGING_2->RETURN
+    using _t_val = T;
     using _t_node = std::atomic< Node * >;
+    using _t_status = std::atomic< status >;
               class Node {
               public:
-                          T _val;
-                     Node * _next;
-                            Node(): _next( nullptr ) {}
-                            Node( T val ) : _val( val ), _next( nullptr ) {}
+                     _t_val _val; //container value storage
+		  _t_status _status;
               };
-         bool exchange( T & item, long timeout_us );
-private:
-    _t_node _slot;
+              exchanger_lockfree();
+              ~exchanger_lockfree();
+      _t_node _node;
+         bool exchange( T & item, long timeout_us ); //true if exchanged with another thread, false if timedout
 };
 
 #include "exchanger_lockfree.tpp"
