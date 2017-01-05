@@ -1,4 +1,7 @@
+
 #include "MatrixMath.h"
+#include "Vec.h"
+#include "Mat.h"
 
 #include <iostream>
 #include <cmath>
@@ -370,4 +373,45 @@ void MatrixMath::Perspective( float fov, float aspect, float near, float far, fl
     out[10] = (-far+near)/(far-near);
     out[11] = -1;
     out[14] = (-2.0*far*near)/(far-near);
+}
+void MatrixMath::LookAt( float eye[], float center[], float up[], float out[] ){
+    //compute viewing plane's normal vector
+    Vec n(3);
+    for( int i = 0; i < 3; ++i )
+	n[i] = eye[i] - center[i];
+    n.NormalizeCurrent();
+
+    //compute 1 orthogonal vector to plane's normal vector
+    Vec up_vec(3);
+    up_vec.SetFromArray(3, up );
+    Vec u = up_vec.Cross( n );
+    u.NormalizeCurrent();
+    
+    //compute the other orthogonal vector to plane's normal vector
+    Vec v = n.Cross( u );
+    v.NormalizeCurrent();
+
+    //Space_original = A_inverse * Space_camera
+    //A is a rotation matrix, which means A_inverse = A_transpose
+    //A is finally augmented with translations on the last column
+    Mat camera_view;
+    camera_view( 0, 0 ) = u[0];
+    camera_view( 0, 1 ) = u[1];
+    camera_view( 0, 2 ) = u[2];
+    camera_view( 0, 3 ) = -1*(eye[0]*u[0] + eye[1]*u[1] + eye[2]*u[2]);
+    camera_view( 1, 0 ) = v[0];
+    camera_view( 1, 1 ) = v[1];
+    camera_view( 1, 2 ) = v[2];
+    camera_view( 1, 3 ) = -1*(eye[0]*v[0] + eye[1]*v[1] + eye[2]*v[2]);
+    camera_view( 2, 0 ) = n[0];
+    camera_view( 2, 1 ) = n[1];
+    camera_view( 2, 2 ) = n[2];
+    camera_view( 2, 3 ) = -1*(eye[0]*n[0] + eye[1]*n[1] + eye[2]*n[2]);
+    camera_view( 3, 0 ) = 0;
+    camera_view( 3, 1 ) = 0;
+    camera_view( 3, 2 ) = 0;
+    camera_view( 3, 3 ) = 1;
+
+    for( int i = 0; i < 16; ++i )
+	out[i] = camera_view._mat[i];
 }

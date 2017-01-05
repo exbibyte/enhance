@@ -22,5 +22,6 @@ namespace MatrixMath{
   void InvertRotateMat4x4(float in[], float out[]);
   void Trace4x4( float in[], float out[] );
   void Perspective( float fovy, float aspect, float near, float far, float out[] );
+  void LookAt( float eye[], float center[], float up[], float out[] );
 }
 #endif
