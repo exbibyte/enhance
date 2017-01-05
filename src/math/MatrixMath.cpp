@@ -359,15 +359,15 @@ void MatrixMath::Trace4x4( float in[], float out[] ){
     out[2] = in[10];
     out[3] = in[15];
 }
-void MatrixMath::Perspective( float fovy, float aspect, float near, float far, float out[] ){
-    float top = tan( fovy*PI/180.0 );
-    float right = top * aspect;
+void MatrixMath::Perspective( float fov, float aspect, float near, float far, float out[] ){
+    //fov is the full field of view in y-plane, eg: fovy = fov/2
+    float half_tan = tan( fov*PI/360.0 );
     for( int i = 0; i < 16; ++i ){
 	out[i] = 0;
     }
-    out[0] = near/right;
-    out[5] = near/top;
+    out[0] = 1.0/(aspect*half_tan);
+    out[5] = 1.0/half_tan;
     out[10] = (-far+near)/(far-near);
     out[11] = -1;
-    out[14] = (-2*far*near)/(far-near);
+    out[14] = (-2.0*far*near)/(far-near);
 }
