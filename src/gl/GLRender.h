@@ -2,6 +2,8 @@
 #define GLRENDER_H
 
 #include "WingedEdge.h"
+#include "MatrixMath.h"
+
 #include <vector>
 #include <tuple>
 #include <set>
@@ -45,7 +47,10 @@ void GLRender::RenderScene( void ) {
     mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
                                    vec3(0.0,0.0,0.0),
                                    vec3(0.0,1.0,0.0) );
-    mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f );
+    /* mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f ); */
+    float proj_matrix_light[16];
+    MatrixMath::Perspective( 90.0f, 1.0f, 0.1f, 100.0f, proj_matrix_light );
+    mat4 ProjectionMatrixLight = make_mat4( proj_matrix_light );
       
     GLTexture * ShadowTexture;
     if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
@@ -119,7 +124,10 @@ void GLRender::RenderScene( void ) {
 
     //draw on 2nd pass
     ModelViewMatrix = ViewMatrix * ModelMatrix;
-    mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f );
+    /* mat4 ProjectionMatrix = glm::perspective( 90.0f, 1.0f, 0.1f, 500.0f ); */
+    float proj_mat[16];
+    MatrixMath::Perspective( 90.0f, 1.0f, 0.1f, 500.0f, proj_mat );
+    mat4 ProjectionMatrix = make_mat4( proj_mat );
     MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
     NormalMatrix = glm::inverse( glm::transpose( glm::mat3(ModelViewMatrix) ) );
     bRet = _GLSLProgram->SetUniform( "MVP", (mat4 const) MVP );

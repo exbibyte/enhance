@@ -1,4 +1,5 @@
 #include "GLLight.h"
+#include "MatrixMath.h"
 
 //math library
 #define GLM_FORCE_RADIANS
@@ -10,7 +11,10 @@ using glm::mat4;
 using glm::vec3;
 
 GLLight::GLLight(){
-    _ProjectionMatLight = glm::perspective( 60.0f, 1.0f, 0.1f, 1000.0f );
+    // _ProjectionMatLight = glm::perspective( 60.0f, 1.0f, 0.1f, 1000.0f );
+    float perspective_mat[16];
+    MatrixMath::Perspective( 60.0f, 1.0f, 0.1f, 1000.0f, perspective_mat );
+    _ProjectionMatLight = glm::make_mat4( perspective_mat );
 }
 bool GLLight::SetProjectionMatLight( mat4 & proj_light ){
     _ProjectionMatLight = proj_light;

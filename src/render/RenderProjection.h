@@ -2,6 +2,7 @@
 #define RENDER_PROJECTION_H
 
 #include "AssetManager.h"
+#include "MatrixMath.h"
 
 #include <vector>
 #include <cassert>
@@ -125,7 +126,10 @@ public:
 	if( !GetDataSingle( RenderProjectionData::Lookat(), data_lookat ) )           return false;
 	if( !GetDataSingle( RenderProjectionData::Up(), data_up ) )                   return false;
 
-        projectionMatrix = glm::perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3] );
+        /* projectionMatrix = glm::perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3] ); */
+	float temp_projection_mat[16];
+	MatrixMath::Perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3], temp_projection_mat );
+	projectionMatrix = make_mat4( temp_projection_mat );
 
 	viewMatrix = glm::lookAt( vec3( data_coordinate[0], data_coordinate[1], data_coordinate[2] ), 
 				  vec3( data_lookat[0],     data_lookat[1],     data_lookat[2]     ),
