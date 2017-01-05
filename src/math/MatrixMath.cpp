@@ -352,3 +352,22 @@ void MatrixMath::InvertRotateMat4x4(float in[], float out[])
     }
   }
 }
+
+void MatrixMath::Trace4x4( float in[], float out[] ){
+    out[0] = in[0];
+    out[1] = in[5];
+    out[2] = in[10];
+    out[3] = in[15];
+}
+void MatrixMath::Perspective( float fovy, float aspect, float near, float far, float out[] ){
+    float top = tan( fovy*PI/180.0 );
+    float right = top * aspect;
+    for( int i = 0; i < 16; ++i ){
+	out[i] = 0;
+    }
+    out[0] = near/right;
+    out[5] = near/top;
+    out[10] = (-far+near)/(far-near);
+    out[11] = -1;
+    out[14] = (-2*far*near)/(far-near);
+}

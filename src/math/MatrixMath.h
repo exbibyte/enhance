@@ -20,5 +20,7 @@ namespace MatrixMath{
   void InvertTranslateMat4x4(float in[], float out[]);
   void InvertTranslateZMat4x4(float in[], float out[]);
   void InvertRotateMat4x4(float in[], float out[]);
+  void Trace4x4( float in[], float out[] );
+  void Perspective( float fovy, float aspect, float near, float far, float out[] );
 }
 #endif

@@ -6,13 +6,13 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
-#include "Trackball.h"
+#include "trackball.hpp"
 #include "Quat.h"
 
 using namespace std;
 
 // I wouldn't be using globals if this wasn't glut!
-Trackball trackball;
+trackball trackball;
 int windowWidth  = 640,
     windowHeight = 480;
 bool tracking = false;
