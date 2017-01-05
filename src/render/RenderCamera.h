@@ -131,9 +131,20 @@ public:
 	MatrixMath::Perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3], temp_perspective_frust_mat );
 	perspective_frust_matrix = glm::make_mat4( temp_perspective_frust_mat );
 
-        view_matrix = glm::lookAt( vec3( data_coordinate[0], data_coordinate[1], data_coordinate[2] ), 
-                                   vec3( data_lookat[0],     data_lookat[1],     data_lookat[2]     ),
-                                   vec3( data_up[0],         data_up[1],         data_up[2])        );
+        /* view_matrix = glm::lookAt( vec3( data_coordinate[0], data_coordinate[1], data_coordinate[2] ),  */
+        /*                            vec3( data_lookat[0],     data_lookat[1],     data_lookat[2]     ), */
+        /*                            vec3( data_up[0],         data_up[1],         data_up[2])        ); */
+	float eye[3];
+	float at[3];
+	float up[3];
+	for( int i = 0; i < 3; ++i ){
+	    eye[i] = data_coordinate[i];
+	    at[i] = data_lookat[i];
+	    up[i] = data_up[i];
+	}
+	float temp_view_matrix[16];
+	MatrixMath::LookAt( eye, at, up, temp_view_matrix );
+	view_matrix = glm::make_mat4( temp_view_matrix );
         return true;
     }
 };

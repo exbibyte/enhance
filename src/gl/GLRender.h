@@ -44,9 +44,16 @@ void GLRender::RenderScene( void ) {
 
     //first pass render for light POV    
     glViewport( 0, 0, 1000, 1000 );
-    mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0), 
-                                   vec3(0.0,0.0,0.0),
-                                   vec3(0.0,1.0,0.0) );
+    /* mat4 ViewMatrix = glm::lookAt( vec3(5.0,5.0,20.0),  */
+    /*                                vec3(0.0,0.0,0.0), */
+    /*                                vec3(0.0,1.0,0.0) ); */
+    float eye[3] = { 5, 5, 20 };
+    float at[3] = { 0, 0, 0 };
+    float up[3] = { 0, 1, 0 };
+    float temp_view_matrix[16];
+    MatrixMath::LookAt( eye, at, up, temp_view_matrix );
+    mat4 ViewMatrix = glm::make_mat4( temp_view_matrix );
+    
     /* mat4 ProjectionMatrixLight = glm::perspective( 90.0f, 1.0f, 0.1f, 100.0f ); */
     float proj_matrix_light[16];
     MatrixMath::Perspective( 90.0f, 1.0f, 0.1f, 100.0f, proj_matrix_light );
@@ -110,9 +117,16 @@ void GLRender::RenderScene( void ) {
     glCullFace(GL_FRONT);
 
     glViewport( 0, 0, 500, 500 );
-    ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0), 
-                                   vec3(0.0,0.0,0.0),
-                                   vec3(0.0,1.0,0.0) );
+    /* ViewMatrix = glm::lookAt( vec3(-5.0,-5.0,8.0),  */
+    /*                                vec3(0.0,0.0,0.0), */
+    /*                                vec3(0.0,1.0,0.0) ); */
+    float eye[3] = { -5, -5, 8 };
+    float at[3] = { 0, 0, 0 };
+    float up[3] = { 0, 1, 0 };
+    float temp_view_matrix_2[16];
+    MatrixMath::LookAt( eye, at, up, temp_view_matrix_2 );
+    ViewMatrix = glm::make_mat4( temp_view_matrix_2 );
+
     if( _GLSLProgram->GetMapTexture("ShadowTexture", ShadowTexture ) ) {
         ShadowTexture->UnbindFbo();
     }
