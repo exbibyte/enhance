@@ -168,4 +168,37 @@ TEST_CASE( "mat", "[mat]" ) {
     REQUIRE( a(5,0) == 10 );
     REQUIRE( a(2,1) == 4 );
   }
+
+  SECTION( "SetFromArray" ) {
+      float arr[25];
+      int col = 5;
+      int row = 5;
+      for( int i = 0; i < col * row; ++i ){
+	  arr[i] = i;
+      }
+      Mat m;
+      bool bret = m.SetFromArray( arr, col, row );
+      CHECK( bret );
+      for( int i = 0; i < col * row; ++i ){
+	  CHECK( m._mat[i] == i );
+      }
+  }
+  SECTION( "GetArray" ) {
+      float arr[25];
+      int col = 5;
+      int row = 5;
+      for( int i = 0; i < col * row; ++i ){
+	  arr[i] = i;
+      }
+      Mat m;
+      bool bret = m.SetFromArray( arr, col, row );
+      CHECK( bret );
+      float dest[25] {};
+      size_t actual_size = 0;
+      bret = m.GetArray( dest, 25, actual_size );
+      CHECK( bret );
+      for( int i = 0; i < col * row; ++i ){
+	  CHECK( dest[i] == i );
+      }
+  }  
 }
