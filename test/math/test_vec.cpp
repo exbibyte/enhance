@@ -98,7 +98,7 @@ TEST_CASE( "vector", "[vec]" ) {
     }  
   }
 
-  SECTION( "copy to array" ) {
+  SECTION( "copy to array with memory allocation" ) {
     float * test_array;
     
     Vec copiedArray;
@@ -115,6 +115,21 @@ TEST_CASE( "vector", "[vec]" ) {
 
     for( int i = 0; i < 7; i++ ){
       REQUIRE( test_array[i] == i );
+    }
+  }
+  SECTION( "copy to array without memory allocation" ) {    
+    Vec copiedArray;
+    copiedArray.SetDim(7);
+    for( int i = 0; i < 7; i++ ){
+      copiedArray._vec[i] = i;
+    }
+    size_t actual_num;
+    float dest[10];
+    bool bret = copiedArray.GetArray( dest, 10, actual_num );
+    CHECK( bret );
+    CHECK( actual_num == 7 );
+    for( int i = 0; i < 7; i++ ){
+      CHECK( dest[i] == i );
     }
   }
 }

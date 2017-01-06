@@ -17,7 +17,7 @@ dir_build := ./build
 $(shell mkdir -p $(dir_build))
 
 # targets := $(patsubst %.cpp, %, $(wildcard *.cpp))
-targets := test_perspective test_lookat test_mat
+targets := test_perspective test_lookat test_mat test_vec
 
 libs =  -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
 

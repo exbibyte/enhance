@@ -155,7 +155,7 @@ void Mat::SetFromVec( const Vec & v, bool column ){
 }
 
 bool Mat::SetFromArray( float * src, size_t col, size_t row ){
-    int dim[2] = { col, row };
+    int dim[2] { (int)col, (int)row };
     ResizeInt( 2, dim );
     for( int i = 0; i < col*row; ++i ){
 	_mat[i] = *src++;
@@ -163,7 +163,7 @@ bool Mat::SetFromArray( float * src, size_t col, size_t row ){
     return true;
 }
 
-bool Mat::GetArray( float * dest, size_t dest_num, size_t & actual_size ){
+bool Mat::GetArray( float * dest, size_t dest_num, size_t & actual_size ) const {
     if( dest_num < _size )
 	return false;
     actual_size = _size;

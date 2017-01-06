@@ -188,6 +188,16 @@ void Vec::GetArray(int & dim, float * & array ) const {
   }
 }
 
+bool Vec::GetArray( float * dest, size_t dest_num, size_t & actual_num ) const {
+    if( dest_num < _dim )
+	return false;
+    actual_num = _dim;
+    for( int i = 0; i < _dim; i++ ){
+	*dest++ = _vec[i];
+    }
+    return true;
+}
+
 Vec ScaleVec( float s, const Vec v ){
   Vec a;
   a = v;
