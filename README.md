@@ -18,7 +18,7 @@ Script management  - To Do
 
 ## Dependencies:
 
-GLFW, gl3w, OpenGL, GLM (to be removed), Flex, Bison  
+GLFW, gl3w, OpenGL 3.3+, Flex, Bison  
 Linux: pkg-config  
 These can be obtained via their respective package manager or built with source code.
 
