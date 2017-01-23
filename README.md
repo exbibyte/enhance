@@ -44,7 +44,7 @@ https://youtu.be/x8cADzdhJhs
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
 
-Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service, synchronous and asynchronous signaling for task processing and internal messaging.
+Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service, synchronous and asynchronous signaling. Current work is focused on lighting, rendering pipeline refinement, and  model file format refinement for animation.
 
 --------------------------------------------
 
