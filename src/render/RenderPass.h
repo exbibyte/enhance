@@ -3,15 +3,6 @@
 
 #include "RenderBackend.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform2.hpp>
-using glm::mat3;
-using glm::mat4;
-using glm::vec3;
-
 #include <string>
 #include <list>
 

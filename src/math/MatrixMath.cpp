@@ -8,7 +8,7 @@
 
 using namespace std;
 
-bool MatrixMath::InvertMatrix(const float m[16], float invOut[16])
+bool MatrixMath::InvertMatrix( float const m[16], float invOut[16])
 {
     double inv[16], det;
     int i;
@@ -142,6 +142,37 @@ bool MatrixMath::InvertMatrix(const float m[16], float invOut[16])
     return true;
 }
 
+bool MatrixMath::InvertMatrix3x3( float const m[9], float invOut[9]){
+    float determinant = m[0]*(m[4]*m[8]-m[5]*m[7]) - m[1]*(m[3]*m[8]-m[5]*m[6]) + m[2]*(m[3]*m[7]-m[4]*m[6]);
+    if( ( determinant < 0.000001 ) && ( determinant > -0.000001 ) ){
+	return false;
+    }
+    float t[9];
+    Mat3x3Transpose( m, t );
+    float m00 = t[4]*t[8]-t[5]*t[7];
+    float m10 = -(t[3]*t[8]-t[5]*t[6]);
+    float m20 = t[3]*t[7]-t[4]*t[6];
+    float m01 = t[1]*t[8]-t[2]*t[7];
+    float m11 = -(t[0]*t[8]-t[2]*t[6]);
+    float m21 = t[0]*t[7]-t[1]*t[6];
+    float m02 = t[1]*t[5]-t[2]*t[4];
+    float m12 = -(t[0]*t[5]-t[2]*t[3]);
+    float m22 = t[0]*t[4]-t[1]*t[3];
+    invOut[0] = m00;
+    invOut[1] = m10;
+    invOut[2] = m20;
+    invOut[3] = m01;
+    invOut[4] = m11;
+    invOut[5] = m21;
+    invOut[6] = m02;
+    invOut[7] = m12;
+    invOut[8] = m22;
+    for( int i = 0; i < 9; ++i ){
+	invOut[i] /= determinant;
+    }
+    return true;
+}
+
 void MatrixMath::Mat4x4Mult4x1(float FourByOne[], float FourbyFour[], float out[])
 {
   // for each column
@@ -191,7 +222,7 @@ void MatrixMath::Mat4x4Mult4x4(float Left[], float Right[], float out[])
   }
 }
 
-void MatrixMath::Mat4x4Transpose(float in[], float out[])
+void MatrixMath::Mat4x4Transpose(float const in[], float out[])
 {
   //for each output column
   for(int i = 0; i < 4; i++)
@@ -200,6 +231,19 @@ void MatrixMath::Mat4x4Transpose(float in[], float out[])
     for(int j = 0; j < 4; j++)
     {
       out[i*4+j] = in[j*4+i]; 
+    }
+  }
+}
+
+void MatrixMath::Mat3x3Transpose(float const in[], float out[])
+{
+  //for each output column
+  for(int i = 0; i < 3; i++)
+  {
+    //for each output row
+    for(int j = 0; j < 3; j++)
+    {
+      out[i*3+j] = in[j*3+i]; 
     }
   }
 }

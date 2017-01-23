@@ -3,19 +3,11 @@
 
 #include "AssetManager.h"
 #include "MatrixMath.h"
+#include "Mat.h"
 
 #include <vector>
 #include <cassert>
 #include <type_traits>
-
-//math library
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform2.hpp>
-using glm::mat4;
-using glm::vec3;
 
 class RenderProjectionData {
 public:
@@ -109,8 +101,8 @@ public:
 		  RenderProjectionData::Diffuse::Type & data_diffuse,
 		  RenderProjectionData::Specular::Type & data_specular,
 		  RenderProjectionData::Coordinate::Type & data_coordinate,
-		  mat4 & projectionMatrix,
-		  mat4 & viewMatrix ){
+		  Mat & projectionMatrix,
+		  Mat & viewMatrix ){
 	if( !CheckIsValid() ){
 	    return false;
 	}
@@ -126,14 +118,11 @@ public:
 	if( !GetDataSingle( RenderProjectionData::Lookat(), data_lookat ) )           return false;
 	if( !GetDataSingle( RenderProjectionData::Up(), data_up ) )                   return false;
 
-        /* projectionMatrix = glm::perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3] ); */
 	float temp_projection_mat[16];
 	MatrixMath::Perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3], temp_projection_mat );
-	projectionMatrix = make_mat4( temp_projection_mat );
+	size_t col = 4, row = 4;
+	projectionMatrix.SetFromArray( temp_projection_mat, col, row );
 
-	/* viewMatrix = glm::lookAt( vec3( data_coordinate[0], data_coordinate[1], data_coordinate[2] ),  */
-	/* 			  vec3( data_lookat[0],     data_lookat[1],     data_lookat[2]     ), */
-	/* 			  vec3( data_up[0],         data_up[1],         data_up[2])        ); */
 	float eye[3];
 	float at[3];
 	float up[3];
@@ -144,7 +133,7 @@ public:
 	}
 	float temp_view_matrix[16];
 	MatrixMath::LookAt( eye, at, up, temp_view_matrix );
-	view_matrix = glm::make_mat4( temp_view_matrix );
+	viewMatrix.SetFromArray( temp_view_matrix, col, row );
 	return true;
     }
 };

@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "GLIncludes.hpp"
 
 #include "GLHelper.h"
@@ -119,10 +121,10 @@ void GLBindFragDataLocation( GLuint Program, GLuint Loc, char const * Name ){
     glBindFragDataLocation( Program, Loc, (GLchar const * ) Name );
 }
 
-bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
+bool GLSetUniformVec3( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
-        glUniform3fv( location, 1, &v[0]);
+        glUniform3fv( location, 1, v );
         return true;
     }
     else{
@@ -130,30 +132,30 @@ bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v ){
     }
 }
 
-bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v ){
+bool GLSetUniformVec4( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
-        glUniform4fv( location, 1, &v[0]);
+        glUniform4fv( location, 1, v );
         return true;
     }
     else{
         return false;
     }
 }
-bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m ){
+bool GLSetUniformMat3( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
-        glUniformMatrix3fv( location, 1, GL_FALSE, &m[0][0]);
+        glUniformMatrix3fv( location, 1, GL_FALSE, m );
         return true;
     }
     else{
         return false;
     }
 }
-bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m ){
+bool GLSetUniformMat4( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
-        glUniformMatrix4fv( location, 1, GL_FALSE, &m[0][0]);
+        glUniformMatrix4fv( location, 1, GL_FALSE, m );
         return true;
     }
     else{

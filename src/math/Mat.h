@@ -1,3 +1,4 @@
+
 #ifndef MAT_H
 #define MAT_H
 
@@ -21,7 +22,7 @@ class Mat{
   float         operator ()( int m, int n ) const; //accessor
   void          SetFromVec( const Vec & v, bool column = true); //convert from a Vec, default is a column vector
   bool          SetFromArray( float * src, size_t col, size_t row ); //assumes a 2D matrix
-  bool          GetArray( float * dest, size_t dest_num, size_t & actual_size ) const;
+  bool          GetArray( float * dest, size_t dest_num, size_t & actual_size ) const; //no memory location
   bool          GetVec( Vec & v, int index, bool column = true ) const; //get a particular column or row of the current Mat
   bool          GetSubMat( Mat & m, int row, int col, int sizerow, int sizecol ) const; //get a sub Mat
   void          TransposeCurrent();

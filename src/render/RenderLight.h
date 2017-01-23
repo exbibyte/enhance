@@ -3,19 +3,11 @@
 
 #include "AssetManager.h"
 #include "MatrixMath.h"
+#include "Mat.h"
 
 #include <vector>
 #include <cassert>
 #include <type_traits>
-
-//math library
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform2.hpp>
-using glm::mat4;
-using glm::vec3;
 
 class RenderLightData {
 public:
@@ -109,8 +101,8 @@ public:
                   RenderLightData::Diffuse::Type & data_diffuse,
                   RenderLightData::Specular::Type & data_specular,
                   RenderLightData::Coordinate::Type & data_coordinate,
-                  mat4 & perspective_frust_matrix,
-                  mat4 & view_matrix ){
+		  Mat & perspective_frust_matrix,
+                  Mat & view_matrix ){
         if( !CheckIsValid() ){
             return false;
         }
@@ -126,14 +118,11 @@ public:
         if( !GetDataSingle( RenderLightData::Lookat(), data_lookat ) )           return false;
         if( !GetDataSingle( RenderLightData::Up(), data_up ) )                   return false;
 
-        /* perspective_frust_matrix = glm::perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3] ); */
 	float temp_perspective_frust_mat[16];
 	MatrixMath::Perspective( data_perspective[0], data_perspective[1], data_perspective[2], data_perspective[3], temp_perspective_frust_mat );
-	perspective_frust_matrix = glm::make_mat4( temp_perspective_frust_mat );
+	size_t col = 4, row = 4;
+	perspective_frust_matrix.SetFromArray( temp_perspective_frust_mat, col, row );
 
-        /* view_matrix = glm::lookAt( vec3( data_coordinate[0], data_coordinate[1], data_coordinate[2] ),  */
-        /*                            vec3( data_lookat[0],     data_lookat[1],     data_lookat[2]     ), */
-        /*                            vec3( data_up[0],         data_up[1],         data_up[2])        ); */
 	float eye[3];
 	float at[3];
 	float up[3];
@@ -144,7 +133,7 @@ public:
 	}
 	float temp_view_matrix[16];
 	MatrixMath::LookAt( eye, at, up, temp_view_matrix );
-	view_matrix = glm::make_mat4( temp_view_matrix );
+	view_matrix.SetFromArray( temp_view_matrix, col, row );
         return true;
     }
 };

@@ -7,15 +7,6 @@
 #include <cassert>
 #include <type_traits>
 
-//math library
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform2.hpp>
-using glm::mat4;
-using glm::vec3;
-
 class RenderMaterialData {
 public:
     struct Ambient {

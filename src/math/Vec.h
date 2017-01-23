@@ -26,6 +26,7 @@ class Vec {
   Vec           Normalize() const; //return a normalize vec
 
   void          SetFromArray(int dim, float array[] ); //copy from array
+  void          SetFromArray(int dim, double * array ); //copy from array
   void          GetArray(int & dim, float * & array ) const; //copy to array with memory allocation
   bool          GetArray(float * dest, size_t dest_count, size_t & actual_count ) const; //copy without memory allocation to destination
 

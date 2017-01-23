@@ -18,16 +18,6 @@
 #include <iostream>
 using namespace std;
 
-#define GLM_FORCE_RADIANS
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-using glm::mat3;
-using glm::mat4;
-using glm::vec3;
-using glm::vec4;
-
 #include "textfile.h"
 
 namespace GLSLShader {
@@ -46,10 +36,10 @@ void GLPrintInfo();
 
 void GLBindAttribLocation( GLuint Program, GLuint Loc, char const * Name );
 void GLBindFragDataLocation( GLuint Program, GLuint Loc, char const * Name );
-bool GLSetUniform( GLuint Program, char const * Name, vec3 const & v );
-bool GLSetUniform( GLuint Program, char const * Name, vec4 const & v );
-bool GLSetUniform( GLuint Program, char const * Name, mat3 const & m );
-bool GLSetUniform( GLuint Program, char const * Name, mat4 const & m );
+bool GLSetUniformVec3( GLuint Program, char const * Name, float * v );
+bool GLSetUniformVec4( GLuint Program, char const * Name, float * v );
+bool GLSetUniformMat3( GLuint Program, char const * Name, float * m );
+bool GLSetUniformMat4( GLuint Program, char const * Name, float * m );
 bool GLSetUniform( GLuint Program, char const * Name, float val );
 bool GLSetUniform( GLuint Program, char const * Name, int val );
 bool GLSetUniform( GLuint Program, char const * Name, bool val );

@@ -180,6 +180,13 @@ void Vec::SetFromArray(int dim, float array [] ) {
   }
 }
 
+void Vec::SetFromArray(int dim, double * array ){
+  SetDim( dim );
+  for( int i = 0; i < dim; i++ ){
+    _vec[i] = array[i];
+  }
+}
+
 void Vec::GetArray(int & dim, float * & array ) const {
   dim = _dim;
   array = new float[dim];

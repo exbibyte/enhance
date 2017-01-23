@@ -3,19 +3,11 @@
 
 #include "AssetManager.h"
 #include "DualQuat.h"
+#include "Mat.h"
 
 #include <vector>
 #include <cassert>
 #include <type_traits>
-
-//math library
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform2.hpp>
-using glm::mat4;
-using glm::vec3;
 
 class RenderPolyData {
 public:
@@ -64,7 +56,7 @@ public:
     bool Compute( RenderPolyData::Coordinate::Type & data_coordinate,
 		  RenderPolyData::RotationAxis::Type & data_rotation_axis,
 		  RenderPolyData::RotationAngle::Type & data_rotation_angle,
-                  mat4 & orientation_matrix ){
+		  Mat & orientation_matrix ){
         if( !CheckIsValid() ){
             return false;
         }
@@ -90,7 +82,8 @@ public:
 
 	float rigid_transform[16];
 	dual_quat.GetRigidTransform( rigid_transform );
-	orientation_matrix = glm::make_mat4( rigid_transform );
+	size_t col = 4, row = 4;
+	orientation_matrix.SetFromArray( rigid_transform, col, row );
 
         return true;
     }

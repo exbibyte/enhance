@@ -2,6 +2,8 @@
 #define GLSLPROGRAM_H
 
 #include "GLIncludes.hpp"
+#include "Mat.h"
+#include "Vec.h"
 
 #include<iostream>
 #include<vector>
@@ -9,15 +11,6 @@
 #include<map>
 #include<utility>
 using namespace std;
-
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-using glm::mat3;
-using glm::mat4;
-using glm::vec3;
-using glm::vec4;
 
 #include "GLHelper.h"
 #include "GLAttribData.h"
@@ -42,10 +35,10 @@ public:
     void BindAttribLocation( GLuint Loc, std::string Name );
     void BindFragDataLocation( GLuint Loc, std::string Name );
     bool SetUniform( std::string Name, float x, float y, float z );
-    bool SetUniform( std::string Name, vec3 const & v );
-    bool SetUniform( std::string Name, vec4 const & v );
-    bool SetUniform( std::string Name, mat3 const & m );
-    bool SetUniform( std::string Name, mat4 const & m );
+    bool SetUniformVec3( std::string Name, Vec const & v );
+    bool SetUniformVec4( std::string Name, Vec const & v );
+    bool SetUniformMat3( std::string Name, Mat const & m );
+    bool SetUniformMat4( std::string Name, Mat const & m );
     bool SetUniform( std::string Name, float val );
     bool SetUniform( std::string Name, int val );
     bool SetUniform( std::string Name, bool val );

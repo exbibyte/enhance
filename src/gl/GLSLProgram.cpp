@@ -10,6 +10,8 @@ using namespace std;
 #include "GLSLProgram.h"
 #include "GLTexture.h"
 #include "GLBufferInfo.h"
+#include "Mat.h"
+#include "Vec.h"
 
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 
@@ -85,17 +87,37 @@ void GLSLProgram::BindAttribLocation( GLuint Loc, string Name ){
 void GLSLProgram::BindFragDataLocation( GLuint Loc, string Name ){
     GLBindFragDataLocation( _HandleProgram, Loc, ( char const * ) Name.c_str() );
 }
-bool GLSLProgram::SetUniform( string Name, vec3 const & v ){
-    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
+bool GLSLProgram::SetUniformVec3( string Name, Vec const & v ){
+    float vec[3];
+    size_t actual_num;
+    if( !v.GetArray( vec, 3, actual_num ) )
+	return false;
+    assert( actual_num == 3 && "Vec3 GetArray unexpected count." );
+    return GLSetUniformVec3( _HandleProgram, ( char const * ) Name.c_str(), vec );
 }
-bool GLSLProgram::SetUniform( string Name, vec4 const & v ){
-    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), v );
+bool GLSLProgram::SetUniformVec4( string Name, Vec const & v ){
+    float vec[4];
+    size_t actual_num;
+    if( !v.GetArray( vec, 4, actual_num ) )
+	return false;
+    assert( actual_num == 4 && "Vec4 GetArray unexpected count." );    
+    return GLSetUniformVec4( _HandleProgram, ( char const * ) Name.c_str(), vec );
 }
-bool GLSLProgram::SetUniform( string Name, mat3 const & m ){
-    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
+bool GLSLProgram::SetUniformMat3( string Name, Mat const & m ){
+    float mat[9];
+    size_t actual_num;
+    if( !m.GetArray( mat, 9, actual_num ) )
+	return false;
+    assert( actual_num == 9 && "Mat3 GetArray unexpected count." );
+    return GLSetUniformMat3( _HandleProgram, ( char const * ) Name.c_str(), mat );
 }
-bool GLSLProgram::SetUniform( string Name, mat4 const & m ){
-    return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), m );
+bool GLSLProgram::SetUniformMat4( string Name, Mat const & m ){
+    float mat[16];
+    size_t actual_num;
+    if( !m.GetArray( mat, 16, actual_num ) )
+	return false;
+    assert( actual_num == 16 && "Mat4 GetArray unexpected count." );
+    return GLSetUniformMat4( _HandleProgram, ( char const * ) Name.c_str(), mat );
 }
 bool GLSLProgram::SetUniform( string Name, float val ){
     return GLSetUniform( _HandleProgram, ( char const * ) Name.c_str(), val );
