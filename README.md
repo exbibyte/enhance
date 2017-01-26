@@ -5,7 +5,7 @@
 
 =======
 
-Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications eaiser through a common modular service oriented approach.
+Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications through a common modular service oriented approach. Overall goal include small footprint, dependency minimization, filter pipelining approach for data processing, and high parallelism.
 
 ## Brief Status:
 
