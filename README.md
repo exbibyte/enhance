@@ -9,12 +9,14 @@ Experimental 3D rendering and engine tools for interactive application developme
 
 ## Brief Status:
 
-Math Utilites  - Working  
+Math Utilites  - Working, work in progress
 UI Handling  - In Progress  
-Graphics Utilities  - Partial  
+Graphics Utilities  - Partial, work in progress  
 Service Module and Infrastructure - Partial  
 Memory Management  - In Progress  
-Script management  - To Do  
+Script management  - To Do
+
+Current work is focused on lighting, rendering pipeline calculations, and  model file format refinement for animation.
 
 ## Dependencies:
 
@@ -43,8 +45,6 @@ https://youtu.be/x8cADzdhJhs
 
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
-
-Various service module types have been created and several sample implementation on top of these are being tested. Recent development have been focusing on the rendering service, synchronous and asynchronous signaling. Current work is focused on lighting, rendering pipeline refinement, and  model file format refinement for animation.
 
 --------------------------------------------
 
