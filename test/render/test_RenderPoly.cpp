@@ -8,6 +8,7 @@
 #include "catch.hpp"
 
 #include "RenderPoly.h"
+#include "Mat.h"
 
 #include <map>
 #include <vector>
@@ -35,7 +36,7 @@ TEST_CASE( "RenderPoly", "[ALL]" ) {
         RenderPolyData::Coordinate::Type data_coordinate;
 	RenderPolyData::RotationAxis::Type data_rotation_axis;
 	RenderPolyData::RotationAngle::Type data_rotation_angle;
-        mat4 orientation_matrix;
+        Mat orientation_matrix;
         bRet = render_poly.Compute( data_coordinate, data_rotation_axis, data_rotation_angle, orientation_matrix );
         CHECK( true == bRet );
 
@@ -64,7 +65,11 @@ TEST_CASE( "RenderPoly", "[ALL]" ) {
         CHECK( 0.0 == query_rotation_axis_2 );
 	CHECK( 45.0 == query_rotation_angle );
 
-	float const * orientation_array = glm::value_ptr(orientation_matrix);
+	float orientation_array[16];
+	size_t size_actual;
+	bool ret = orientation_matrix.GetArray( orientation_array, 16, size_actual );
+	CHECK( ret );
+	CHECK( 16 == size_actual );
 	for( int i = 0; i < 16; ++i ){
 	    cout << orientation_array[i] << " ";
 	}

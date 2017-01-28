@@ -8,6 +8,7 @@
 #include "catch.hpp"
 
 #include "RenderCamera.h"
+#include "Mat.h"
 
 #include <map>
 #include <vector>
@@ -44,8 +45,8 @@ TEST_CASE( "RenderCamera", "[ALL]" ) {
         RenderCameraData::Diffuse::Type data_diffuse;
         RenderCameraData::Specular::Type data_specular;
         RenderCameraData::Coordinate::Type data_coordinate;
-        mat4 projectionMatrix;
-        mat4 viewMatrix;
+        Mat projectionMatrix;
+        Mat viewMatrix;
         bRet = render_light.Compute( data_ambient, data_diffuse, data_specular, data_coordinate, projectionMatrix, viewMatrix );
         CHECK( true == bRet );
 
