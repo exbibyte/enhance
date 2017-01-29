@@ -20,9 +20,8 @@ Current work is focused on lighting, rendering pipeline calculations, and  model
 
 ## Dependencies:
 
-GLFW, gl3w, OpenGL 3.3+, Flex, Bison  
-Linux: pkg-config  
-These can be obtained via their respective package manager or built with source code.
+GLFW, gl3w(http://github.com/skaslev/gl3w), OpenGL 3.3+ hardware support, Flex, Bison, pkg-config
+These can be obtained via package manager or built with their repositories' source code.
 
 --------------------------------------------
 
