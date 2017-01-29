@@ -28,12 +28,12 @@ flex_PolyMesh.yy.o: flex_PolyMesh.yy.c
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 bison_PolyMesh.tab.c: bison_PolyMesh.y
-	bison -d -v bison_PolyMesh.y --outfile=bison_PolyMesh.tab.c
+	bison -d -v bison_PolyMesh.y
 
 bison_PolyMesh.tab.o: bison_PolyMesh.tab.c
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
-%.o: %.cpp flex_PolyMesh.yy.o bison_PolyMesh.tab.o
+%.o: %.cpp bison_PolyMesh.tab.o flex_PolyMesh.yy.o
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 .PHONY: all

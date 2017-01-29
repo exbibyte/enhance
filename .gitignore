@@ -29,3 +29,5 @@ intermediate/
 
 # Generated Files
 *.ini
+
+*.output
