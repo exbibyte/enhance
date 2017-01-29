@@ -7,7 +7,8 @@ class sphere {
 public:
     Vec   _offset;
     float _radius;
-    sphere() : _offset(4) {}
+    sphere();
+    sphere( sphere const & s ) : _offset( s._offset ), _radius( s._radius ) {}
     sphere & operator=( sphere const & s );
 };
 

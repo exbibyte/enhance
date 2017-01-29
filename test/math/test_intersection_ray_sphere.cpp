@@ -1,14 +1,14 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "intersection.hpp"
-#include "Vec.hpppp"
+#include "Vec.hpp"
 #include "ray.hpp"
 #include "sphere.hpp"
 
 #include <iostream>
 using namespace std;
 
-TEST_CASE( "ray_sphere hit", "[ray_sphere]" ) {
+TEST_CASE( "ray_sphere hit: outside of sphere, opposite direction", "[ray_sphere]" ) {
     ray r;
     r._offset[0] = 20.0;
     r._offset[1] = 0;
@@ -27,13 +27,15 @@ TEST_CASE( "ray_sphere hit", "[ray_sphere]" ) {
 
     float error = 0.0001;
     float t;
-    bool ret = intersection::ray_sphere( r, s, t );
+    bool hit_inside;
+    bool ret = intersection::ray_sphere( r, s, t, hit_inside );
     CHECK( ret );
+    CHECK( false == hit_inside );
     CHECK(t >= 15-error);
     CHECK(t <= 15+error);
 }
 
-TEST_CASE( "ray_sphere no hit", "[ray_sphere]" ) {
+TEST_CASE( "ray_sphere no hit: outside of sphere, oblique direction", "[ray_sphere]" ) {
     ray r;
     r._offset[0] = 20.0;
     r._offset[1] = 0;
@@ -52,11 +54,12 @@ TEST_CASE( "ray_sphere no hit", "[ray_sphere]" ) {
 
     float error = 0.0001;
     float t;
-    bool ret = intersection::ray_sphere( r, s, t );
+    bool hit_inside;
+    bool ret = intersection::ray_sphere( r, s, t, hit_inside );
     CHECK( false == ret );
 }
 
-TEST_CASE( "ray_sphere no hit opposite direction", "[ray_sphere]" ) {
+TEST_CASE( "ray_sphere no hit: outside of sphere, same direction", "[ray_sphere]" ) {
     ray r;
     r._offset[0] = 5.5;
     r._offset[1] = 0;
@@ -75,11 +78,12 @@ TEST_CASE( "ray_sphere no hit opposite direction", "[ray_sphere]" ) {
 
     float error = 0.0001;
     float t;
-    bool ret = intersection::ray_sphere( r, s, t );
+    bool hit_inside;
+    bool ret = intersection::ray_sphere( r, s, t, hit_inside );
     CHECK( false == ret );
 }
 
-TEST_CASE( "ray_sphere hits from inside", "[ray_sphere]" ) {
+TEST_CASE( "ray_sphere hits: inside of sphere", "[ray_sphere]" ) {
     ray r;
     r._offset[0] = 0;
     r._offset[1] = 0;
@@ -98,8 +102,10 @@ TEST_CASE( "ray_sphere hits from inside", "[ray_sphere]" ) {
 
     float error = 0.0001;
     float t;
-    bool ret = intersection::ray_sphere( r, s, t );
+    bool hit_inside;
+    bool ret = intersection::ray_sphere( r, s, t, hit_inside );
     CHECK( ret );
+    CHECK( hit_inside );
     CHECK(t <= 2+error);
     CHECK(t >= 2-error);
 }

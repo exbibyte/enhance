@@ -7,9 +7,8 @@ class ray {
 public:
     Vec _dir;
     Vec _offset;
-    ray() : _dir(4), _offset(4) {}
-    ray( ray const & );
-    ray & operator=( ray const & r );
+    ray();
+    ray( ray const & r ) : _dir(r._dir), _offset( r._offset ) {}
 };
 
 #endif
