@@ -37,7 +37,7 @@ $(shell mkdir -p $(dir_intermediate))
 %.o: %.cpp
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
-kernel: $(objects)
+all: $(objects)
 	@echo "built kernel objects"
 
 .PHONY: clean
