@@ -7,7 +7,7 @@
 #include "DataTransformDriver.h"
 #include "PolyMesh_Data_Arrays.h"
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 #include <vector>
 #include <iostream>

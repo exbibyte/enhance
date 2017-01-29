@@ -1,4 +1,4 @@
-#include "Vec.h"
+#include "Vec.hpp"
 #include <string.h>
 #include <math.h>
 #include <stdexcept>

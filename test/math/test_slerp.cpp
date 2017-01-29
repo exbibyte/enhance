@@ -8,7 +8,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include "Trackball.h"
-#include "Quat.h"
+#include "Quat.hpp"
 
 using namespace std;
 

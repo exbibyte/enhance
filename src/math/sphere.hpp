@@ -1,7 +1,7 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 class sphere {
 public:

@@ -8,7 +8,7 @@
 #include "catch.hpp"
 
 #include "WingedEdge.h"
-#include "Vec.h"
+#include "Vec.hpp"
 
 #include <map>
 #include <vector>

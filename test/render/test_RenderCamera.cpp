@@ -8,7 +8,7 @@
 #include "catch.hpp"
 
 #include "RenderCamera.h"
-#include "Mat.h"
+#include "Mat.hpp"
 
 #include <map>
 #include <vector>

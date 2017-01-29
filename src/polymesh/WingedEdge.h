@@ -13,7 +13,7 @@
 #include <utility>
 #include <set>
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 namespace Winged_Edge {
   

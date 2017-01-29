@@ -10,8 +10,8 @@ using namespace std;
 #include "GLSLProgram.h"
 #include "GLTexture.h"
 #include "GLBufferInfo.h"
-#include "Mat.h"
-#include "Vec.h"
+#include "Mat.hpp"
+#include "Vec.hpp"
 
 unsigned int GLSLProgram::_mVertexArrayIndexCount = 0;
 

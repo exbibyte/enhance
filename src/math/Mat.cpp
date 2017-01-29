@@ -1,4 +1,4 @@
-#include "Mat.h"
+#include "Mat.hpp"
 
 #include <math.h>
 #include <string.h>

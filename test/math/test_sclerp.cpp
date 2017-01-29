@@ -1,4 +1,4 @@
-#include "DualQuat.h"
+#include "DualQuat.hpp"
 #include <unistd.h>
 #include <iostream>
 #include <iostream>
@@ -7,7 +7,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #include "trackball.hpp"
-#include "Quat.h"
+#include "Quat.hpp"
 
 using namespace std;
 

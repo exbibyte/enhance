@@ -1,5 +1,5 @@
-#ifndef VEC_H
-#define VEC_H
+#ifndef VEC_HPP
+#define VEC_HPP
 
 #include <stdexcept>
 #include <string>

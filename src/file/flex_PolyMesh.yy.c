@@ -1,6 +1,6 @@
-#line 2 "./src/file/flex_PolyMesh.yy.c"
+#line 2 "flex_PolyMesh.yy.c"
 
-#line 4 "./src/file/flex_PolyMesh.yy.c"
+#line 4 "flex_PolyMesh.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -243,7 +243,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -472,8 +472,8 @@ static yyconst flex_int32_t yy_rule_can_match_eol[11] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "./src/file/flex_PolyMesh.l"
-#line 7 "./src/file/flex_PolyMesh.l"
+#line 1 "flex_PolyMesh.l"
+#line 7 "flex_PolyMesh.l"
 /*%option extra-type="struct ParseData_PolyMesh*"*/
   #include <stdlib.h>
   void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * );
@@ -483,9 +483,9 @@ static yyconst flex_int32_t yy_rule_can_match_eol[11] =
   #include <string.h>
   //#include <iostream>
   using namespace std;
-#line 19 "./src/file/flex_PolyMesh.l"
+#line 19 "flex_PolyMesh.l"
   #include "ParseData_PolyMesh.h"
-#line 489 "./src/file/flex_PolyMesh.yy.c"
+#line 489 "flex_PolyMesh.yy.c"
 
 #define INITIAL 0
 
@@ -514,7 +514,7 @@ struct yyguts_t
     size_t yy_buffer_stack_max; /**< capacity of stack. */
     YY_BUFFER_STATE * yy_buffer_stack; /**< Stack as an array. */
     char yy_hold_char;
-    yy_size_t yy_n_chars;
+    int yy_n_chars;
     yy_size_t yyleng_r;
     char *yy_c_buf_p;
     int yy_init;
@@ -760,14 +760,14 @@ YY_DECL
 		}
 
 	{
-#line 22 "./src/file/flex_PolyMesh.l"
+#line 22 "flex_PolyMesh.l"
 
 
 
 //  struct ParseData_PolyMesh * scanner_instance_data = yyextra;
 
 
-#line 771 "./src/file/flex_PolyMesh.yy.c"
+#line 771 "flex_PolyMesh.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -838,7 +838,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 28 "./src/file/flex_PolyMesh.l"
+#line 28 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACE_OPEN;
@@ -846,7 +846,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 33 "./src/file/flex_PolyMesh.l"
+#line 33 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACE_CLOSE;
@@ -854,7 +854,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "./src/file/flex_PolyMesh.l"
+#line 37 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACKET_OPEN;
@@ -862,7 +862,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 41 "./src/file/flex_PolyMesh.l"
+#line 41 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return BRACKET_CLOSE;
@@ -870,7 +870,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 45 "./src/file/flex_PolyMesh.l"
+#line 45 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return COLON;
@@ -878,7 +878,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 49 "./src/file/flex_PolyMesh.l"
+#line 49 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return COMMA;
@@ -886,7 +886,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 53 "./src/file/flex_PolyMesh.l"
+#line 53 "flex_PolyMesh.l"
 {
                 yylval->str = strdup(yytext);
                 return VARIABLE;
@@ -895,20 +895,20 @@ YY_RULE_SETUP
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 57 "./src/file/flex_PolyMesh.l"
+#line 57 "flex_PolyMesh.l"
 { }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 58 "./src/file/flex_PolyMesh.l"
+#line 58 "flex_PolyMesh.l"
 return(0);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "./src/file/flex_PolyMesh.l"
+#line 60 "flex_PolyMesh.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 912 "./src/file/flex_PolyMesh.yy.c"
+#line 912 "flex_PolyMesh.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1165,9 +1165,9 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 	else
 		ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	if ((yy_size_t) (yyg->yy_n_chars + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
+	if ((int) (yyg->yy_n_chars + number_to_move) > YY_CURRENT_BUFFER_LVALUE->yy_buf_size) {
 		/* Extend the array by 50%, plus the number we really need. */
-		yy_size_t new_size = yyg->yy_n_chars + number_to_move + (yyg->yy_n_chars >> 1);
+		int new_size = yyg->yy_n_chars + number_to_move + (yyg->yy_n_chars >> 1);
 		YY_CURRENT_BUFFER_LVALUE->yy_ch_buf = (char *) yy_PolyMesh_realloc((void *) YY_CURRENT_BUFFER_LVALUE->yy_ch_buf,new_size ,yyscanner );
 		if ( ! YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
 			YY_FATAL_ERROR( "out of dynamic memory in yy_get_next_buffer()" );
@@ -1609,7 +1609,7 @@ static void yy_PolyMesh_ensure_buffer_stack (yyscan_t yyscanner)
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
          */
-		num_to_alloc = 1; // After all that talk, this was set to 1 anyways...
+		num_to_alloc = 1; /* After all that talk, this was set to 1 anyways... */
 		yyg->yy_buffer_stack = (struct yy_buffer_state**)yy_PolyMesh_alloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								, yyscanner);
@@ -2100,7 +2100,7 @@ void yy_PolyMesh_free (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 60 "./src/file/flex_PolyMesh.l"
+#line 60 "flex_PolyMesh.l"
 
 
 

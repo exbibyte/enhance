@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED
-# define YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED
+#ifndef YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED
+# define YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -60,13 +60,13 @@ extern int yy_PolyMesh_debug;
 
 union YYSTYPE
 {
-#line 18 "./src/file/bison_PolyMesh.y" /* yacc.c:1909  */
+#line 18 "bison_PolyMesh.y" /* yacc.c:1909  */
 
     int num;
     char * str;
     ParseNode * data_node;
 
-#line 70 "./src/file/bison_PolyMesh.tab.h" /* yacc.c:1909  */
+#line 70 "bison_PolyMesh.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -78,4 +78,4 @@ typedef union YYSTYPE YYSTYPE;
 
 int yy_PolyMesh_parse (struct ParseData_PolyMesh * pp);
 
-#endif /* !YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED  */
+#endif /* !YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED  */

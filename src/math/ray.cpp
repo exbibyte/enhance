@@ -1,5 +1,5 @@
 #include "ray.hpp"
-#include "Vec.h"
+#include "Vec.hpp"
 
 #include <iostream>
 

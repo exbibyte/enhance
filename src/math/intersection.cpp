@@ -1,7 +1,7 @@
 #include "intersection.hpp"
 #include "ray.hpp"
 #include "sphere.hpp"
-#include "Vec.h"
+#include "Vec.hpp"
 
 #include <cmath>
 #include <iostream>

@@ -12,7 +12,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h> 
 
-#include "Quat.h"
+#include "Quat.hpp"
 #include "Lex.h"
 
 class MD5Model : public Lex {

@@ -4,7 +4,7 @@
 #include "enComponentSpecialize.hpp"
 #include "IOrientationmanip.hpp"
 #include "Orientationmanip0.hpp"
-#include "Quat.h"
+#include "Quat.hpp"
 
 class enComponentOrientationmanip0 : public enComponentSpecialize<IOrientationmanip<Quat,drag_coordinate>, Orientationmanip0> {
 public:

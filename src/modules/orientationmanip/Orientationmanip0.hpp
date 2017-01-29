@@ -3,7 +3,7 @@
 
 #include "IOrientationmanip.hpp"
 #include "FilterUiDrag.hpp"
-#include "Quat.h"
+#include "Quat.hpp"
 
 #include <list>
 #include <initializer_list>

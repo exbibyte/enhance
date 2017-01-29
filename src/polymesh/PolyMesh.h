@@ -7,7 +7,7 @@
 #ifndef POLYMESH_H
 #define POLYMESH_H
 
-#include "Vec.h"
+#include "Vec.hpp"
 #include <vector>
 #include <tuple>
 #include <set>

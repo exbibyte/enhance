@@ -1,5 +1,5 @@
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#ifndef THREADPOOL_HPP
+#define THREADPOOL_HPP
 
 #include <future>
 #include <memory>
@@ -8,8 +8,8 @@
 #include <tuple>
 #include <functional>
 
-#include "FuncWrap.h"
-#include "FuncWrap2.h"
+#include "FuncWrap.hpp"
+#include "FuncWrap2.hpp"
 
 class ThreadPool {
 public:

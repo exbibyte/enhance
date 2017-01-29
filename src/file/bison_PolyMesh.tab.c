@@ -68,7 +68,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 6 "./src/file/bison_PolyMesh.y" /* yacc.c:339  */
+#line 6 "bison_PolyMesh.y" /* yacc.c:339  */
 
   #include "ParseNode.h"
   #include <stdio.h>
@@ -79,7 +79,7 @@
   #include <utility>
   using namespace std;
 
-#line 83 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:339  */
+#line 83 "bison_PolyMesh.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -99,8 +99,8 @@
 
 /* In a future release of Bison, this section will be replaced
    by #include "bison_PolyMesh.tab.h".  */
-#ifndef YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED
-# define YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED
+#ifndef YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED
+# define YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -129,13 +129,13 @@ extern int yy_PolyMesh_debug;
 
 union YYSTYPE
 {
-#line 18 "./src/file/bison_PolyMesh.y" /* yacc.c:355  */
+#line 18 "bison_PolyMesh.y" /* yacc.c:355  */
 
     int num;
     char * str;
     ParseNode * data_node;
 
-#line 139 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:355  */
+#line 139 "bison_PolyMesh.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -147,21 +147,21 @@ typedef union YYSTYPE YYSTYPE;
 
 int yy_PolyMesh_parse (struct ParseData_PolyMesh * pp);
 
-#endif /* !YY_YY_POLYMESH_SRC_FILE_BISON_POLYMESH_TAB_H_INCLUDED  */
+#endif /* !YY_YY_POLYMESH_BISON_POLYMESH_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
-#line 24 "./src/file/bison_PolyMesh.y" /* yacc.c:358  */
+#line 24 "bison_PolyMesh.y" /* yacc.c:358  */
 
   #include "ParseData_PolyMesh.h"
-#line 28 "./src/file/bison_PolyMesh.y" /* yacc.c:358  */
+#line 28 "bison_PolyMesh.y" /* yacc.c:358  */
 
   #include "Flex_PolyMesh.h"
   void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char *);
-#line 34 "./src/file/bison_PolyMesh.y" /* yacc.c:358  */
+#line 34 "bison_PolyMesh.y" /* yacc.c:358  */
 
   #define scanner pp->scaninfo
 
-#line 165 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:358  */
+#line 165 "bison_PolyMesh.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1246,173 +1246,173 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 56 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 56 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	          pp->data_node = (yyvsp[0].data_node);
                }
-#line 1254 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1254 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 59 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 59 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	          printf("nothing found\n");
                }
-#line 1262 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1262 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 64 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 64 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
                                  (yyval.data_node) = (yyvsp[-1].data_node);				 
 				 (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1271 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1271 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 68 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 68 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
                                  (yyval.data_node) = (yyvsp[-1].data_node);				 
 				 (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1280 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1280 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 72 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 72 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
                                  (yyval.data_node) = new ParseNode();
 				 (yyval.data_node)->_strVarName = "";
 				 (yyval.data_node)->_strVarVal = "";
 				 (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1291 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1291 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 78 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 78 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
                                  (yyval.data_node) = new ParseNode();
 				 (yyval.data_node)->_strVarName = "";
 				 (yyval.data_node)->_strVarVal = "";
 				 (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1302 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1302 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 86 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 86 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          //printf("var_array: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[-1].data_node);
 				  (yyval.data_node)->_strVarName = (yyvsp[-4].str);
                               }
-#line 1312 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1312 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 91 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 91 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 				  //printf("var_list: %s\n", $1 );
 				  (yyval.data_node) = (yyvsp[0].data_node);
 				  (yyval.data_node)->_strVarName = (yyvsp[-2].str);
                               }
-#line 1322 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1322 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 98 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 98 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          (yyval.data_node) = (yyvsp[-1].data_node);
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1331 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1331 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 102 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 102 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
                                   (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
 				  (yyval.data_node)->_strVarVal = "";
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1342 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1342 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 110 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 110 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 				  (yyval.data_node) = (yyvsp[-1].data_node);
                               }
-#line 1350 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1350 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 115 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 115 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          (yyval.data_node) = (yyvsp[-2].data_node);
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1359 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1359 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 119 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 119 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 				  (yyval.data_node) = (yyvsp[-2].data_node);				  
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1368 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1368 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 123 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 123 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
 				  (yyval.data_node)->_strVarVal = "";
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1379 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1379 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 129 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 129 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
 				  (yyval.data_node)->_strVarVal = "";
 				  (yyval.data_node)->_children.push_back( (yyvsp[0].data_node) );
                               }
-#line 1390 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1390 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 137 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 137 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 	                          //printf("key: %s, val: %s\n", $1, $3 );
 				  (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = (yyvsp[-2].str);
 				  (yyval.data_node)->_strVarVal = (yyvsp[0].str);
                               }
-#line 1401 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1401 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 144 "./src/file/bison_PolyMesh.y" /* yacc.c:1646  */
+#line 144 "bison_PolyMesh.y" /* yacc.c:1646  */
     {
 				  //printf("val: %s\n", $1 );
 				  (yyval.data_node) = new ParseNode();
 				  (yyval.data_node)->_strVarName = "";
 				  (yyval.data_node)->_strVarVal = (yyvsp[0].str);
 			      }
-#line 1412 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1412 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1416 "./src/file/bison_PolyMesh.tab.c" /* yacc.c:1646  */
+#line 1416 "bison_PolyMesh.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1640,7 +1640,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 152 "./src/file/bison_PolyMesh.y" /* yacc.c:1906  */
+#line 152 "bison_PolyMesh.y" /* yacc.c:1906  */
 
 
 void yy_PolyMesh_error( struct ParseData_PolyMesh * pp, char * s){

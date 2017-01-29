@@ -1,7 +1,7 @@
 #include "Orientationmanip0.hpp"
 #include "trackball.hpp"
 #include "FilterUiDrag.hpp"
-#include "Quat.h"
+#include "Quat.hpp"
 
 #include <list>
 #include <initializer_list>

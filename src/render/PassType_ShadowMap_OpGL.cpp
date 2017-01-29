@@ -10,7 +10,7 @@
 
 #include "GLIncludes.hpp"
 
-#include "Mat.h"
+#include "Mat.hpp"
 #include "MatrixMath.h"
 
 #include <vector>

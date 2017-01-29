@@ -6,8 +6,8 @@
 
 #include <stdexcept>
 
-#include "Quat.h"
-#include "Vec.h"
+#include "Quat.hpp"
+#include "Vec.hpp"
 #include "DualScalar.h"
 
 class DualQuat{

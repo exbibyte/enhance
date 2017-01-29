@@ -1,5 +1,5 @@
-#include "DualQuat.h"
-#include "Vec.h"
+#include "DualQuat.hpp"
+#include "Vec.hpp"
 
 #include <iostream>
 #include <math.h>

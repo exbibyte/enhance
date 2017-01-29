@@ -3,7 +3,7 @@
 
 #include "RenderData.hpp"
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 #include <vector>
 #include <list>

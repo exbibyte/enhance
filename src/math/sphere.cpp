@@ -1,5 +1,5 @@
 #include "sphere.hpp"
-#include "Vec.h"
+#include "Vec.hpp"
 
 sphere & sphere::operator=( sphere const & s ){
     _offset = s._offset;

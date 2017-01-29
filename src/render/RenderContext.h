@@ -2,7 +2,7 @@
 #define RENDER_CONTEXT_H
 
 #include "AssetManager.h"
-#include "DualQuat.h"
+#include "DualQuat.hpp"
 
 #include <vector>
 #include <cassert>

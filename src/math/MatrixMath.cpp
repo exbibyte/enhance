@@ -1,7 +1,7 @@
 
 #include "MatrixMath.h"
-#include "Vec.h"
-#include "Mat.h"
+#include "Vec.hpp"
+#include "Mat.hpp"
 
 #include <iostream>
 #include <cmath>

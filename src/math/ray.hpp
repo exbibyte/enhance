@@ -1,7 +1,7 @@
 #ifndef MATH_RAY_HPP
 #define MATH_RAY_HPP
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 class ray {
 public:

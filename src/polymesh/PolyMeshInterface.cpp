@@ -1,5 +1,5 @@
 #include "PolyMeshInterface.h"
-#include "Vec.h"
+#include "Vec.hpp"
 #include <list>
 #include <set>
 #include <vector>

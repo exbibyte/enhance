@@ -4,8 +4,8 @@
 #define TRACKBALL_H
 
 #include <cmath>
-#include "Vec.h"
-#include "Quat.h"
+#include "Vec.hpp"
+#include "Quat.hpp"
 
 #define PI 3.14159265f
 

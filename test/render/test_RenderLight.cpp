@@ -8,7 +8,7 @@
 #include "catch.hpp"
 
 #include "RenderLight.h"
-#include "Mat.h"
+#include "Mat.hpp"
 
 #include <map>
 #include <vector>

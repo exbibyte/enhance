@@ -4,8 +4,8 @@
 
 using namespace std;
 
-#include "Quat.h"
-#include "Vec.h"
+#include "Quat.hpp"
+#include "Vec.hpp"
 
 Quat::Quat(){
     _quat[0] = 0.0f;

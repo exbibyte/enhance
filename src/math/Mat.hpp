@@ -1,8 +1,7 @@
+#ifndef MAT_HPP
+#define MAT_HPP
 
-#ifndef MAT_H
-#define MAT_H
-
-#include "Vec.h"
+#include "Vec.hpp"
 
 ///column major matrix
 class Mat{

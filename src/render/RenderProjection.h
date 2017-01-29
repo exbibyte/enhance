@@ -3,7 +3,7 @@
 
 #include "AssetManager.h"
 #include "MatrixMath.h"
-#include "Mat.h"
+#include "Mat.hpp"
 
 #include <vector>
 #include <cassert>

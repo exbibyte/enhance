@@ -19,7 +19,7 @@
 
 #include "MD5Model.h"
 #include "Lex.h"
-#include "Quat.h"
+#include "Quat.hpp"
 #include "PPM.hpp"
 
 #define IS_WHITESPACE(c) (' ' == c || '\t' == c || '\r' ==c || '\n' == c )

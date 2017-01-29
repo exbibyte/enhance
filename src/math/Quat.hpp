@@ -3,7 +3,7 @@
 #ifndef QUAT_H
 #define QUAT_H
 
-#include "Vec.h"
+#include "Vec.hpp"
 
 #define QUAT_X 0
 #define QUAT_Y 1

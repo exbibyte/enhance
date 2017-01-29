@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
-#include "DualQuat.h"
-#include "Quat.h"
+#include "DualQuat.hpp"
+#include "Quat.hpp"
 #include <math.h>
 #include <iostream>
 

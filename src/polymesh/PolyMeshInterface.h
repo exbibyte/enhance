@@ -7,7 +7,7 @@
 #ifndef POLYMESH_INTERFACE_H
 #define POLYMESH_INTERFACE_H
 
-#include "Vec.h"
+#include "Vec.hpp"
 #include <list>
 #include <set>
 #include <vector>

@@ -2,8 +2,8 @@
 #define RENDER_POLY_H
 
 #include "AssetManager.h"
-#include "DualQuat.h"
-#include "Mat.h"
+#include "DualQuat.hpp"
+#include "Mat.hpp"
 
 #include <vector>
 #include <cassert>

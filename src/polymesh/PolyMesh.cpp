@@ -1,5 +1,5 @@
 #include "PolyMesh.h"
-#include "Vec.h"
+#include "Vec.hpp"
 #include "TransMatrix.h"
 
 #include <vector>

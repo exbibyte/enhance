@@ -2,8 +2,8 @@
 #define GLSLPROGRAM_H
 
 #include "GLIncludes.hpp"
-#include "Mat.h"
-#include "Vec.h"
+#include "Mat.hpp"
+#include "Vec.hpp"
 
 #include<iostream>
 #include<vector>

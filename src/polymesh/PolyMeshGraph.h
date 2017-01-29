@@ -2,7 +2,7 @@
 #define POLYMESH_GRAPH_H
 
 #include "PolyMeshInterface.h"
-#include "Vec.h"
+#include "Vec.hpp"
 #include <vector>
 #include <set>
 #include <list>
