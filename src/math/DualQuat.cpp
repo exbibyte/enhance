@@ -311,8 +311,8 @@ float DualQuat::GetScrewParameters(Vec & screwaxis, Vec & moment, Vec & angles )
     //         angles[0] -= Math.PI;
     //      }
     angles[1] = -2 * _B._quat[3] / normA;
-    Vec m1 = ScaleVec( 1.0 / normA, q_B );
-    Vec m2 = ScaleVec(  _A._quat[3] * _B._quat[3] / (normA * normA), screwaxis );
+    Vec m1 = Vec::ScaleVec( 1.0 / normA, q_B );
+    Vec m2 = Vec::ScaleVec(  _A._quat[3] * _B._quat[3] / (normA * normA), screwaxis );
     moment = m1 + m2;
     return normA;
   }

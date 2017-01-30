@@ -64,8 +64,10 @@ bool intersection::ray_plane( ray const & r, plane const & p, float & t ){
     // p(t) = -dot(p.offset,p.normal) + dot(p.normal, r.offset + r.dir*t) = 0
     //      = -dot(p.offset,p.normal) + dot(p.normal, r.offset) + t*dot(p.normal, r.dir) = 0
     // t = ( dot(p.offset,p.normal) - dot(p.normal, r.offset) )/( dot(p.normal, r.dir) )
-    float numerator = p._offset.Dot(p._normal) - p._normal.Dot( r._offset );
-    float denominator = p._normal.Dot( r._dir );
+    plane p2 = p;
+    p2._normal.NormalizeCurrent();
+    float numerator = p2._offset.Dot(p2._normal) - p2._normal.Dot( r._offset );
+    float denominator = p2._normal.Dot( r._dir.Normalize() );
     if( denominator == 0 ){
 	//ray direction is coplannar to the plane
 	return false;
@@ -79,5 +81,36 @@ bool intersection::ray_plane( ray const & r, plane const & p, float & t ){
     if( t < 0 ){
 	return false;
     }
+    return true;
+}
+
+Vec intersection::coord_from_ray( ray const & r, float & t ){
+    ray r2 = r;
+    r2._dir.NormalizeCurrent();
+    Vec v = Vec::ScaleVecAdd( t, r2._dir, r2._offset );
+    return v;
+}
+
+bool intersection::intersect_info_ray_sphere( ray const & r, sphere const & s, Vec & intersect_pos, Vec & sphere_normal ){
+    float t;
+    bool hit_inside;
+    bool ret = ray_sphere( r, s, t, hit_inside );
+    if( !ret ){
+	return false;
+    }
+    intersect_pos = coord_from_ray( r, t );
+    sphere_normal = intersect_pos - s._offset;
+    sphere_normal.NormalizeCurrent();
+    return true;
+}
+
+bool intersection::intersect_info_ray_plane( ray const & r, plane const & p, Vec & intersect_pos, Vec & plane_normal ){
+    float t;
+    bool ret = ray_plane( r, p, t );
+    if( !ret ){
+	return false;
+    }
+    intersect_pos = coord_from_ray( r, t );
+    plane_normal = p._normal;
     return true;
 }

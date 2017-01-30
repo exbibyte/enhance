@@ -34,9 +34,9 @@ class Vec {
   public:
     Exception(const std::string &msg): std::runtime_error(msg) { }
   };
+  
+static Vec      ScaleVec(float s, const Vec v); //s * v
+static Vec      ScaleVecAdd(float s, const Vec v1, const Vec v2);//s * v1 + v2
 };
-
-  Vec           ScaleVec(float s, const Vec v); //s * v
-  Vec           ScaleVecAdd(float s, const Vec v1, const Vec v2);//s * v1 + v2
 
 #endif

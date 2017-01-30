@@ -190,7 +190,7 @@ Quat Quat::Log() const{
 
     //get arccos(a/||v||)
     float m = acos( _quat[3] / q_len );
-    v = ScaleVec( m, v );
+    v = Vec::ScaleVec( m, v );
 
     //set x,y,z of quat
     for( int i = 0; i < 3; i++ ){

@@ -205,7 +205,7 @@ bool Vec::GetArray( float * dest, size_t dest_num, size_t & actual_num ) const {
     return true;
 }
 
-Vec ScaleVec( float s, const Vec v ){
+Vec Vec::ScaleVec( float s, const Vec v ){
   Vec a;
   a = v;
   for( int i = 0; i < v._dim; i++ ){
@@ -213,7 +213,7 @@ Vec ScaleVec( float s, const Vec v ){
   }
   return a;
 }
-Vec ScaleVecAdd( float s, const Vec v1, const Vec v2 ){
+Vec Vec::ScaleVecAdd( float s, const Vec v1, const Vec v2 ){
   Vec a = ScaleVec( s, v1 );
   return a + v2;
 }
