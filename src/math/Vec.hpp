@@ -13,9 +13,12 @@ class Vec {
   float *       _vec; // vector data
   int           _dim; // vector dimension
   void          SetDim(int); //resize dimension and preserve existing data if possible
+  int           GetDim() const { return _dim; }
   Vec &         operator = (const Vec & v);
   Vec           operator + (const Vec & v) const;
   Vec           operator - (const Vec & v) const;
+  Vec           operator / (const Vec & v) const;
+  bool          IsEqual(const Vec & v, float error) const;
   inline float &    operator [] ( int i ){ return _vec[i]; };
   inline float      operator [] ( int i ) const{ return _vec[i]; };
   float         Dot(const Vec & v) const;
@@ -29,7 +32,7 @@ class Vec {
   void          SetFromArray(int dim, double * array ); //copy from array
   void          GetArray(int & dim, float * & array ) const; //copy to array with memory allocation
   bool          GetArray(float * dest, size_t dest_count, size_t & actual_count ) const; //copy without memory allocation to destination
-
+  Vec           GetSubVector( int index_start, int index_end ) const;
   class Exception : public std::runtime_error {
   public:
     Exception(const std::string &msg): std::runtime_error(msg) { }

@@ -5,6 +5,8 @@
 
 #include <cmath>
 #include <iostream>
+#include <cassert>
+
 using namespace std;
 
 bool intersection::ray_sphere( ray const & r, sphere const & s, float & t, bool & hit_inside ){
@@ -112,5 +114,74 @@ bool intersection::intersect_info_ray_plane( ray const & r, plane const & p, Vec
     }
     intersect_pos = coord_from_ray( r, t );
     plane_normal = p._normal;
+    return true;
+}
+
+bool intersection::intersect_rays( ray const & a, ray const & b, float & t ){
+    if( a._dir.GetDim() != b._dir.GetDim() ){
+	return false;
+    }
+    if( a._offset.GetDim() != a._dir.GetDim() ){
+	return false;
+    }
+    if( b._offset.GetDim() != b._dir.GetDim() ){
+	return false;
+    }
+    if( a._dir.GetDim() == 0 ){
+	return false;
+    }
+    Vec a1, b1, a1_offset, b1_offset;
+    if( a._dir.GetDim() > 3 ){
+	a1 = a._dir.GetSubVector( 0, 3 );
+	b1 = b._dir.GetSubVector( 0, 3 );
+	a1_offset = a._offset.GetSubVector( 0, 3 );
+	b1_offset = b._offset.GetSubVector( 0, 3 );
+    }else{
+	a1 = a._dir;
+	b1 = b._dir;
+	a1_offset = a._offset;
+	b1_offset = b._offset;
+    }
+    Vec c = b1 - a1;
+    Vec v = a1.Cross( b1 );
+    float error = 0.0001;
+    float dot_v_c = v.Dot( c );
+    if( ( dot_v_c < 0 - error ) && ( dot_v_c > 0 + error ) ){
+	//no intersection because lines are not in a same plane
+	return false;
+    }
+    //test for colinearity
+    Vec zero( c.GetDim() );
+    Vec d = b1_offset - a1_offset;
+    if( v.IsEqual( zero, 0.0001 ) ){
+	//check triangle area forms by points on ray a and b
+	Vec point1 = a1_offset + a1;
+	Vec triangle = point1.Cross( b1_offset );
+	float triangle_area = triangle.Magnitude();
+	if( triangle_area < 0 - error || triangle_area > 0 + error ){
+	    //lines are parallel but no overlap
+	    return false;
+	}
+	//lines are colinear
+	float direction = (b1_offset-a1_offset).Dot( a1 ) < 0 ? -1 : 1;
+	float distance = direction * (b1_offset-a1_offset).Magnitude()/a1.Magnitude();
+	if( distance < 0 ){
+	    // intersection at offset of ray a, so clamp paramter t to 0
+	    t = 0;
+	}else{
+	    //intersection at offset of ray b
+	    t = distance;
+	}
+	return true;
+    }
+    //there is a solvable intersection
+    Vec numerator = d.Cross( b1 );
+    float t2 = numerator.Magnitude()/v.Magnitude();
+    if( t2 < 0 ){
+	//not possible with ray translation
+	return false;
+    }
+
+    t = t2;
     return true;
 }

@@ -12,6 +12,7 @@ public:
     static Vec coord_from_ray( ray const & r, float & t ); //returns offset coordinates in direction of ray
     static bool intersect_info_ray_sphere( ray const & r, sphere const & s, Vec & intersect_pos, Vec & sphere_normal );
     static bool intersect_info_ray_plane( ray const & r, plane const & p, Vec & intersect_pos, Vec & plane_normal );
+    static bool intersect_rays( ray const & a, ray const & b, float & t );
 };
 
 #endif

@@ -102,6 +102,33 @@ Vec Vec::operator - (const Vec & v) const{
   return newVec;
 }
 
+Vec Vec::operator / (const Vec & v) const{
+    if( _dim != v._dim )
+	throw Exception( "Vec::operator/(): dimension not match" );
+
+    Vec newVec( _dim );
+
+    for( int i = 0; i < _dim; i++ ){
+	if( v[i] == 0 ){
+	    throw Exception( "Vec::operator/(): zero division" );
+	}
+	newVec._vec[i] = _vec[i] / v._vec[i];
+    }
+
+    return newVec;
+}
+bool Vec::IsEqual(const Vec & v, float error) const{
+    if( _dim != v._dim ){
+	return false;
+    }
+    for( int i = 0; i < _dim; ++i ){
+	if( ( _vec[i] < v._vec[i] - error ) || ( _vec[i] > v._vec[i] + error ) ){
+	    return false;
+	}
+    }
+    return true;
+}
+
 float Vec::Dot(const Vec & v) const{
   if( _dim != v._dim )
     throw Exception( "Vec::Dot(): dimension not match" );
@@ -123,9 +150,11 @@ Vec Vec::Cross(const Vec & v) const{
   if( _dim != v._dim )
     throw Exception( "Vec::Cross(): dimension not match" );
 
-  if( _dim != 3 )
-    throw Exception( "Vec::Cross(): dimension should be 3" );
+  if( _dim < 3 ){
+      throw Exception( "Vec::Cross(): dimension invalid" );
+  }
 
+  //ignore higher dimensions than 3
   Vec newVec(_dim);
 
   newVec._vec[0] = _vec[1]*v._vec[2] - _vec[2]*v._vec[1];
@@ -216,4 +245,22 @@ Vec Vec::ScaleVec( float s, const Vec v ){
 Vec Vec::ScaleVecAdd( float s, const Vec v1, const Vec v2 ){
   Vec a = ScaleVec( s, v1 );
   return a + v2;
+}
+
+Vec Vec::GetSubVector( int index_start, int index_end ) const{
+    if( index_start < 0 || index_start >= _dim ){
+	throw Exception( "Vec::GetSubVector(): invalid index" );
+    }
+    if( index_end < 0 || index_end >= _dim ){
+	throw Exception( "Vec::GetSubVector(): invalid index" );
+    }
+    int n = index_end - index_start;
+    if( n > _dim ){
+	throw Exception( "Vec::GetSubVector(): invalid size" );
+    }
+    Vec v(n);
+    for( int i = 0; i < n; ++i ){
+	v._vec[i] = _vec[index_start + i];
+    }
+    return v;
 }
