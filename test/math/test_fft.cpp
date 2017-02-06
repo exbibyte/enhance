@@ -46,7 +46,7 @@ TEST_CASE( "fft cooley-tukey radix-2 decimate in time", "[fft]" ) {
     vector<double> arr { 0, 2, 2, 0 };
     CHECK( 4 == arr.size() );
     vector<complex<double> > arr_fft;
-    fft::fft_cooley_tukey( arr, arr_fft );
+    fft::fft_cooley_tukey_dit( arr, arr_fft );
     CHECK( arr.size() == arr_fft.size() );
     vector<complex<double> > arr_fft_expected { {4,0}, {-2,-2}, {0,0}, {-2,2} };
     for( int i = 0; i < 4; ++i ){
@@ -66,7 +66,41 @@ TEST_CASE( "ifft cooley-tukey radix-2 decimate in time", "[fft]" ) {
     CHECK( 4 == arr.size() );
     vector<double> arr_ifft {};
     vector<double> arr_ifft_expect { 0, 2, 2, 0 };
-    fft::ifft_cooley_tukey( arr, arr_ifft );
+    fft::ifft_cooley_tukey_dit( arr, arr_ifft );
+    CHECK( arr.size() == arr_ifft.size() );
+    for( int i = 0; i < 4; ++i ){
+	double ifft_real = arr_ifft[i];
+	double ifft_real_expect = arr_ifft_expect[i];
+	double error = 0.01;
+	CHECK( ifft_real >= ifft_real_expect - error );
+	CHECK( ifft_real <= ifft_real_expect + error );
+    }
+}
+TEST_CASE( "fft cooley-tukey radix-2 decimate in frequency", "[fft]" ) {
+    vector<double> arr { 0, 2, 2, 0 };
+    CHECK( 4 == arr.size() );
+    vector<complex<double> > arr_fft;
+    fft::fft_cooley_tukey_dif( arr, arr_fft );
+    CHECK( arr.size() == arr_fft.size() );
+    vector<complex<double> > arr_fft_expected { {4,0}, {-2,-2}, {0,0}, {-2,2} };
+    for( int i = 0; i < 4; ++i ){
+	double real = arr_fft[i].real();
+	double img = arr_fft[i].imag();
+	double real_expect = arr_fft_expected[i].real();
+	double img_expect = arr_fft_expected[i].imag();
+	double error = 0.01;
+	CHECK( real >= real_expect - error );
+	CHECK( real <= real_expect + error );
+	CHECK( img >= img_expect - error );
+	CHECK( img <= img_expect + error );
+    }
+}
+TEST_CASE( "ifft cooley-tukey radix-2 decimate in frequency", "[fft]" ) {
+    vector<complex<double> > arr { {4,0}, {-2,-2}, {0,0}, {-2,2} };
+    CHECK( 4 == arr.size() );
+    vector<double> arr_ifft {};
+    vector<double> arr_ifft_expect { 0, 2, 2, 0 };
+    fft::ifft_cooley_tukey_dif( arr, arr_ifft );
     CHECK( arr.size() == arr_ifft.size() );
     for( int i = 0; i < 4; ++i ){
 	double ifft_real = arr_ifft[i];
