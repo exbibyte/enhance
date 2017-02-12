@@ -11,9 +11,10 @@ include_dirs = $(inc_folder_basic) $(inc_folder_test)
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
-objects_concurrent = $(wildcard ../../src/core/intermediate/*.o)
+objects_concurrent = $(wildcard ../../src/concurrent/intermediate/*.o)
+objects_core = $(wildcard ../../src/core/intermediate/*.o)
 
-object_files = $(objects_concurrent)
+object_files = $(objects_concurrent) $(objects_core)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))
