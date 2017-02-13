@@ -1,4 +1,4 @@
-//--unbounded lock free synchronous queue
+//--unbounded lock free synchronous queue via dual structures
 //---based on Art of Multiprocessor Programming section 10.7
 #ifndef QUEUE_LF_SYNC_H
 #define QUEUE_LF_SYNC_H
