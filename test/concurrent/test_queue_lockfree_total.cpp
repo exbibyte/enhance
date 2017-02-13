@@ -71,7 +71,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
                         int pop_val;
                         bool bRet = queue.get( pop_val );
                         if( bRet ){
-                            std::cout << pop_val << std::endl;
+                            // std::cout << pop_val << std::endl;
                         }
                     } );
             }
@@ -89,7 +89,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
                         int pop_val;
                         bool bRet = queue.get( pop_val );
                         if( bRet ){
-                            std::cout << pop_val << std::endl;
+                            // std::cout << pop_val << std::endl;
                         }
                     } );
             }

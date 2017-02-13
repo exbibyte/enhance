@@ -171,7 +171,7 @@ TEST_CASE( "queue_lockfree_sync bulk operations reversed", "[bulk_rev]" ) {
     CHECK( num_threads == count_put );
     CHECK( num_threads == count_get );
 
-    //check getd items
+    //check dequeued items
     sort( items_get.begin(), items_get.end() );
     vector<int> expected_get_items( num_threads );
     for( int i = 0; i < num_threads; ++i ){
@@ -256,7 +256,7 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
     CHECK( num_threads == count_put );
     CHECK( num_threads == count_get );
 
-    //check getd items
+    //check dequeued items
     sort( items_get.begin(), items_get.end() );
     vector<int> expected_get_items( num_threads );
     for( int i = 0; i < num_threads; ++i ){
