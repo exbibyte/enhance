@@ -8,7 +8,6 @@
 
 #include "catch.hpp"
 #include "queue_lockfree_sync.hpp"
-#include "IQueue.hpp"
 
 #include <chrono>
 #include <thread>
@@ -20,19 +19,19 @@ TEST_CASE( "queue_lockfree_sync bulk operations", "[bulk]" ) {
     queue_lockfree_sync<int> queue;
 
     unsigned int num_threads = 100;
-    vector<thread> threads_enqueue( num_threads );
-    vector<thread> threads_dequeue( num_threads );
-    vector<int> ret_vals_enqueue( num_threads, 0 );
-    vector<int> ret_vals_dequeue( num_threads, 0 );
-    vector<int> items_dequeue( num_threads, -1 );
+    vector<thread> threads_put( num_threads );
+    vector<thread> threads_get( num_threads );
+    vector<int> ret_vals_put( num_threads, 0 );
+    vector<int> ret_vals_get( num_threads, 0 );
+    vector<int> items_get( num_threads, -1 );
 
-    //enqueue
+    //put
     for( int i = 0; i < num_threads; ++i ){
-	int * ret_val_ptr = & ret_vals_enqueue[i];
-	threads_enqueue[i] = std::thread( [i,ret_val_ptr,&queue](){
+	int * ret_val_ptr = & ret_vals_put[i];
+	threads_put[i] = std::thread( [i,ret_val_ptr,&queue](){
 		int val = i;
 		bool ret;
-		ret = queue.enqueue( val );
+		ret = queue.put( val );
 		if( ret ){
 		    *ret_val_ptr = 1;
 		}
@@ -41,14 +40,14 @@ TEST_CASE( "queue_lockfree_sync bulk operations", "[bulk]" ) {
     std::this_thread::sleep_for (std::chrono::milliseconds(5000));
     CHECK( queue.size() == num_threads );
 
-    //dequeue
+    //get
     for( int i = 0; i < num_threads; ++i ){
-	int * ret_val_ptr = & ret_vals_dequeue[i];
-	int * item_ptr = & items_dequeue[i];
-	threads_dequeue[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
+	int * ret_val_ptr = & ret_vals_get[i];
+	int * item_ptr = & items_get[i];
+	threads_get[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
 		int val;
 		bool ret;
-		ret = queue.dequeue( val );
+		ret = queue.get( val );
 		if( ret ){
 		    *ret_val_ptr = 1;
 		    *item_ptr = val;
@@ -72,32 +71,32 @@ TEST_CASE( "queue_lockfree_sync bulk operations", "[bulk]" ) {
     CHECK( queue.size() == 0 );
 
     //check return values
-    int count_enqueue = 0;
-    for( auto & i : ret_vals_enqueue ){
+    int count_put = 0;
+    for( auto & i : ret_vals_put ){
 	if( i == 1 )
-	    ++count_enqueue;
+	    ++count_put;
     }
-    int count_dequeue = 0;
-    for( auto & i : ret_vals_dequeue ){
+    int count_get = 0;
+    for( auto & i : ret_vals_get ){
 	if( i == 1 )
-	    ++count_dequeue;
+	    ++count_get;
     }
-    CHECK( num_threads == count_enqueue );
-    CHECK( num_threads == count_dequeue );
+    CHECK( num_threads == count_put );
+    CHECK( num_threads == count_get );
 
-    //check dequeued items
-    sort( items_dequeue.begin(), items_dequeue.end() );
-    vector<int> expected_dequeue_items( num_threads );
+    //check getd items
+    sort( items_get.begin(), items_get.end() );
+    vector<int> expected_get_items( num_threads );
     for( int i = 0; i < num_threads; ++i ){
-	expected_dequeue_items[i] = i;
+	expected_get_items[i] = i;
     }
-    CHECK( ( expected_dequeue_items == items_dequeue ) );
+    CHECK( ( expected_get_items == items_get ) );
 
     for( int i = 0; i < num_threads; ++i ){
-	threads_enqueue[i].join();
+	threads_put[i].join();
     }
     for( int i = 0; i < num_threads; ++i ){
-	threads_dequeue[i].join();
+	threads_get[i].join();
     }
 }
 TEST_CASE( "queue_lockfree_sync bulk operations reversed", "[bulk_rev]" ) { 
@@ -105,20 +104,20 @@ TEST_CASE( "queue_lockfree_sync bulk operations reversed", "[bulk_rev]" ) {
     queue_lockfree_sync<int> queue;
 
     unsigned int num_threads = 100;
-    vector<thread> threads_enqueue( num_threads );
-    vector<thread> threads_dequeue( num_threads );
-    vector<int> ret_vals_enqueue( num_threads, 0 );
-    vector<int> ret_vals_dequeue( num_threads, 0 );
-    vector<int> items_dequeue( num_threads, -1 );
+    vector<thread> threads_put( num_threads );
+    vector<thread> threads_get( num_threads );
+    vector<int> ret_vals_put( num_threads, 0 );
+    vector<int> ret_vals_get( num_threads, 0 );
+    vector<int> items_get( num_threads, -1 );
 
-    //dequeue
+    //get
     for( int i = 0; i < num_threads; ++i ){
-	int * ret_val_ptr = & ret_vals_dequeue[i];
-	int * item_ptr = & items_dequeue[i];
-	threads_dequeue[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
+	int * ret_val_ptr = & ret_vals_get[i];
+	int * item_ptr = & items_get[i];
+	threads_get[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
 		int val;
 		bool ret;
-		ret = queue.dequeue( val );
+		ret = queue.get( val );
 		if( ret ){
 		    *ret_val_ptr = 1;
 		    *item_ptr = val;
@@ -129,13 +128,13 @@ TEST_CASE( "queue_lockfree_sync bulk operations reversed", "[bulk_rev]" ) {
     std::this_thread::sleep_for (std::chrono::milliseconds(5000));
     CHECK( queue.size() == num_threads );
 
-    //enqueue
+    //put
     for( int i = 0; i < num_threads; ++i ){
-	int * ret_val_ptr = & ret_vals_enqueue[i];
-	threads_enqueue[i] = std::thread( [i,ret_val_ptr,&queue](){
+	int * ret_val_ptr = & ret_vals_put[i];
+	threads_put[i] = std::thread( [i,ret_val_ptr,&queue](){
 		int val = i;
 		bool ret;
-		ret = queue.enqueue( val );
+		ret = queue.put( val );
 		if( ret ){
 		    *ret_val_ptr = 1;
 		}
@@ -159,32 +158,32 @@ TEST_CASE( "queue_lockfree_sync bulk operations reversed", "[bulk_rev]" ) {
     CHECK( queue.size() == 0 );
 
     //check return values
-    int count_enqueue = 0;
-    for( auto & i : ret_vals_enqueue ){
+    int count_put = 0;
+    for( auto & i : ret_vals_put ){
 	if( i == 1 )
-	    ++count_enqueue;
+	    ++count_put;
     }
-    int count_dequeue = 0;
-    for( auto & i : ret_vals_dequeue ){
+    int count_get = 0;
+    for( auto & i : ret_vals_get ){
 	if( i == 1 )
-	    ++count_dequeue;
+	    ++count_get;
     }
-    CHECK( num_threads == count_enqueue );
-    CHECK( num_threads == count_dequeue );
+    CHECK( num_threads == count_put );
+    CHECK( num_threads == count_get );
 
-    //check dequeued items
-    sort( items_dequeue.begin(), items_dequeue.end() );
-    vector<int> expected_dequeue_items( num_threads );
+    //check getd items
+    sort( items_get.begin(), items_get.end() );
+    vector<int> expected_get_items( num_threads );
     for( int i = 0; i < num_threads; ++i ){
-	expected_dequeue_items[i] = i;
+	expected_get_items[i] = i;
     }
-    CHECK( ( expected_dequeue_items == items_dequeue ) );
+    CHECK( ( expected_get_items == items_get ) );
 
     for( int i = 0; i < num_threads; ++i ){
-	threads_enqueue[i].join();
+	threads_put[i].join();
     }
     for( int i = 0; i < num_threads; ++i ){
-	threads_dequeue[i].join();
+	threads_get[i].join();
     }
 }
 TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
@@ -192,20 +191,20 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
     queue_lockfree_sync<int> queue;
 
     unsigned int num_threads = 100;
-    vector<thread> threads_enqueue( num_threads );
-    vector<thread> threads_dequeue( num_threads );
-    vector<int> ret_vals_enqueue( num_threads, 0 );
-    vector<int> ret_vals_dequeue( num_threads, 0 );
-    vector<int> items_dequeue( num_threads, -1 );
+    vector<thread> threads_put( num_threads );
+    vector<thread> threads_get( num_threads );
+    vector<int> ret_vals_put( num_threads, 0 );
+    vector<int> ret_vals_get( num_threads, 0 );
+    vector<int> items_get( num_threads, -1 );
 
-    //enqueue and dequeue
+    //put and get
     for( int i = 0; i < num_threads; ++i ){
 	{
-	    int * ret_val_ptr = & ret_vals_enqueue[i];
-	    threads_enqueue[i] = std::thread( [i,ret_val_ptr,&queue](){
+	    int * ret_val_ptr = & ret_vals_put[i];
+	    threads_put[i] = std::thread( [i,ret_val_ptr,&queue](){
 		    int val = i;
 		    bool ret;
-		    ret = queue.enqueue( val );
+		    ret = queue.put( val );
 		    if( ret ){
 			*ret_val_ptr = 1;
 		    }
@@ -213,12 +212,12 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
 	}
 	// std::this_thread::sleep_for (std::chrono::milliseconds(1000));	
 	{
-	    int * ret_val_ptr = & ret_vals_dequeue[i];
-	    int * item_ptr = & items_dequeue[i];
-	    threads_dequeue[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
+	    int * ret_val_ptr = & ret_vals_get[i];
+	    int * item_ptr = & items_get[i];
+	    threads_get[i] = std::thread( [i,ret_val_ptr,item_ptr,&queue](){
 		    int val;
 		    bool ret;
-		    ret = queue.dequeue( val );
+		    ret = queue.get( val );
 		    if( ret ){
 			*ret_val_ptr = 1;
 			*item_ptr = val;
@@ -244,31 +243,31 @@ TEST_CASE( "queue_lockfree_sync interleaved operations", "[interleaved]" ) {
     CHECK( queue.size() == 0 );
 
     //check return values
-    int count_enqueue = 0;
-    for( auto & i : ret_vals_enqueue ){
+    int count_put = 0;
+    for( auto & i : ret_vals_put ){
 	if( i == 1 )
-	    ++count_enqueue;
+	    ++count_put;
     }
-    int count_dequeue = 0;
-    for( auto & i : ret_vals_dequeue ){
+    int count_get = 0;
+    for( auto & i : ret_vals_get ){
 	if( i == 1 )
-	    ++count_dequeue;
+	    ++count_get;
     }
-    CHECK( num_threads == count_enqueue );
-    CHECK( num_threads == count_dequeue );
+    CHECK( num_threads == count_put );
+    CHECK( num_threads == count_get );
 
-    //check dequeued items
-    sort( items_dequeue.begin(), items_dequeue.end() );
-    vector<int> expected_dequeue_items( num_threads );
+    //check getd items
+    sort( items_get.begin(), items_get.end() );
+    vector<int> expected_get_items( num_threads );
     for( int i = 0; i < num_threads; ++i ){
-	expected_dequeue_items[i] = i;
+	expected_get_items[i] = i;
     }
-    CHECK( ( expected_dequeue_items == items_dequeue ) );
+    CHECK( ( expected_get_items == items_get ) );
 
     for( int i = 0; i < num_threads; ++i ){
-	threads_enqueue[i].join();
+	threads_put[i].join();
     }
     for( int i = 0; i < num_threads; ++i ){
-	threads_dequeue[i].join();
+	threads_get[i].join();
     }
 }

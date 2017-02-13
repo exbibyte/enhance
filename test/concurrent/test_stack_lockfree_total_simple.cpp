@@ -15,17 +15,17 @@ TEST_CASE( "stack_lockfree_total_simple", "[stack]" ) {
 
     stack_lockfree_total_simple<int> stack;
 
-    SECTION( "push" ) {
+    SECTION( "put" ) {
 	size_t count = stack.size();
 	CHECK( 0 == count );
 	int num = 5;
-	stack.push(num);
+	stack.put(num);
 	count = stack.size();
 	CHECK( 1 == count );
 
-	SECTION( "pop" ) {
+	SECTION( "get" ) {
 	    int retrieve;
-	    bool bRet = stack.pop( retrieve );
+	    bool bRet = stack.get( retrieve );
 	    count = stack.size();
 	    CHECK( 0 == count );
 	    CHECK( true == bRet );
@@ -33,23 +33,23 @@ TEST_CASE( "stack_lockfree_total_simple", "[stack]" ) {
 	}
     }    
 
-    SECTION( "pop empty" ) {
+    SECTION( "get empty" ) {
 	int retrieve;
 	size_t count;
-	bool bRet = stack.pop( retrieve );
+	bool bRet = stack.get( retrieve );
 	count = stack.size();
 	CHECK( 0 == count );
 	CHECK( false == bRet );
     }
 
-    SECTION( "multi-thread push" ) {
+    SECTION( "multi-thread put" ) {
 	size_t count;
 	unsigned int num_threads = 10;
 	vector<thread> threads( num_threads );
 	for( int i = 0; i < num_threads; ++i ){
 	    threads[i] = std::thread( [ &stack, i ](){
 		    int num = i;
-		    stack.push( num );
+		    stack.put( num );
 		} );
 	}
 	for( auto & i : threads ){
@@ -58,16 +58,16 @@ TEST_CASE( "stack_lockfree_total_simple", "[stack]" ) {
 	count = stack.size();
 	CHECK( num_threads == count );
 
-	SECTION( "multi-thread pop" ) {
+	SECTION( "multi-thread get" ) {
 	    set<int> vals_retrieve;
 	    mutex mtx;
 	    for( auto & i : threads ){
 		i = std::thread( [&](){
-			int pop_val;
-			bool bRet = stack.pop( pop_val );
+			int get_val;
+			bool bRet = stack.get( get_val );
 			mtx.lock();
 			if( bRet ){
-			    vals_retrieve.insert( pop_val );
+			    vals_retrieve.insert( get_val );
 			}
 			mtx.unlock();
 		    } );

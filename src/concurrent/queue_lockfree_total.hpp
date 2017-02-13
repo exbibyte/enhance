@@ -5,7 +5,7 @@
 
 #include <cstring>
 #include <atomic>
-#include "IQueue.hpp"
+#include "IPool.hpp"
 
 //A value of type T that a node holds is assumed to be default constructable
 template< class T >
@@ -21,7 +21,7 @@ public:
                      _t_node _next;
                       _t_val _val;
                              Node(): _next( nullptr ) {}
-                             Node( _t_val & val ): _val(val), _next( nullptr ) {}
+                             Node( _t_val const & val ): _val(val), _next( nullptr ) {}
 	      };
 
                queue_lockfree_total_impl();
@@ -29,10 +29,10 @@ public:
           bool clear();
           bool empty();
        _t_size size();                                                 //approximate count of the container size
-          bool enqueue( _t_val & val ){ return push_back( val ); }
-          bool dequeue( _t_val & val ){ return pop_front( val ); }
+          bool put( _t_val const & val ){ return push_back( val ); }
+          bool get( _t_val & val ){ return pop_front( val ); }
 private:
-          bool push_back( _t_val & val );
+          bool push_back( _t_val const & val );
           bool pop_front( _t_val & val );
        _t_node _head;
        _t_node _tail;
@@ -41,6 +41,9 @@ private:
 #include "queue_lockfree_total.tpp"
 
 template< class T >
-using queue_lockfree_total = IQueue< T, queue_lockfree_total_impl >;
+using queue_lockfree_total = IPool< T, queue_lockfree_total_impl,
+				    trait_pool_size::unbounded,
+				    trait_pool_method::total,
+				    trait_pool_fairness::fifo>;
 
 #endif

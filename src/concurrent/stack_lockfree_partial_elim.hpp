@@ -3,7 +3,7 @@
 #ifndef STACK_LF_PARTIAL_ELIM_H
 #define STACK_LF_PARTIAL_ELIM_H
 
-#include "IStack.hpp"
+#include "IPool.hpp"
 #include <atomic>
 
 template< class T >
@@ -26,15 +26,20 @@ public:
          bool clear();
          bool empty() const;
     _t_size_t size() const; //not guaranteed to be consistent when threads are accesing stack
+         bool put( T & val ){ return push( val ); }
+         bool get( T & val ){ return pop( val ); }
+private:
          bool push( T & val );
          bool pop( T & val );
-private:
       _t_node _head;
 };
 
 #include "stack_lockfree_partial_elim.tpp"
 
 template< class T >
-using stack_lockfree_partial_elim = IQueue< T, stack_lockfree_partial_elim_impl >;
+using stack_lockfree_partial_elim = IPool< T, stack_lockfree_partial_elim_impl,
+					   trait_pool_size::unbounded,
+					   trait_pool_method::partial,
+					   trait_pool_fairness::lifo >;
 
 #endif

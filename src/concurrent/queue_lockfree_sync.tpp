@@ -22,7 +22,7 @@ queue_lockfree_sync_impl<T>::~queue_lockfree_sync_impl(){
     }
 }
 template< typename T >
-bool queue_lockfree_sync_impl<T>::push_back( T & val ){ //push an item to the tail
+bool queue_lockfree_sync_impl<T>::push_back( T const & val ){ //push an item to the tail
     Node * new_node = new Node( val ); //type is ITEM if value argument is present
     while( true ){
         Node * tail = _tail.load( std::memory_order_acquire );

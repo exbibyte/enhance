@@ -4,7 +4,7 @@
 #define QUEUE_LF_SYNC_H
 
 #include <atomic>
-#include "IQueue.hpp"
+#include "IPool.hpp"
 
 //A value of type T that a node holds is assumed to be default constructable
 template< class T >
@@ -32,7 +32,7 @@ public:
 		             Node(): _next( nullptr ) {
 				 _type.store( NodeType::RESERVATION );
                              }
-                             Node( _t_val & val ): _val( val ), _next( nullptr ){
+                             Node( _t_val const & val ): _val( val ), _next( nullptr ){
 				 _type.store( NodeType::ITEM );
                              }
               };
@@ -42,10 +42,10 @@ public:
           bool clear();
           bool empty();
        _t_size size();                                                 //approximate count of the container size
-          bool enqueue( _t_val & val ){ return push_back( val ); }
-          bool dequeue( _t_val & val ){ return pop_front( val ); }
+          bool put( _t_val const & val ){ return push_back( val ); }
+          bool get( _t_val & val ){ return pop_front( val ); }
 private:
-          bool push_back( _t_val & val );
+          bool push_back( _t_val const & val );
           bool pop_front( _t_val & val );
        _t_node _head;
        _t_node _tail;
@@ -54,7 +54,10 @@ private:
 #include "queue_lockfree_sync.tpp"
 
 template< class T >
-using queue_lockfree_sync = IQueue< T, queue_lockfree_sync_impl >;
+using queue_lockfree_sync = IPool< T, queue_lockfree_sync_impl,
+				   trait_pool_size::unbounded,
+				   trait_pool_method::synchronous,
+				   trait_pool_fairness::fifo>;
 
 #endif
 

@@ -16,53 +16,41 @@ TEST_CASE( "stack_lockfree_split_reference", "[stack split reference]" ) {
 
     stack_lockfree_split_reference<int> stack;
 
-    SECTION( "push" ) {
+    SECTION( "put" ) {
 	size_t count = stack.size();
 	CHECK( 0 == count );
-	stack.push(5);
-	stack.push(10);
+	stack.put(5);
+	stack.put(10);
 	count = stack.size();
 	CHECK( 2 == count );
 
-	SECTION( "pop" ) {
+	SECTION( "get" ) {
 	    int retrieve;
-	    bool bRet = stack.pop( retrieve );
+	    bool bRet = stack.get( retrieve );
 	    count = stack.size();
 	    CHECK( 1 == count );
 	    CHECK( true == bRet );
 	    CHECK( 10 == retrieve );
 	}
-
-	// SECTION( "top" ) {
-	//     int retrieve;
-	//     count = stack.size();
-	//     CHECK( 1 == count );
-	//     bool bRet = stack.top( retrieve );
-	//     count = stack.size();
-	//     CHECK( 1 == count );
-	//     CHECK( true == bRet );
-	//     CHECK( 5 == retrieve );
-	// }
     }    
 
-    SECTION( "pop empty" ) {
+    SECTION( "get empty" ) {
     	int retrieve;
     	size_t count;
-    	bool bRet = stack.pop( retrieve );
+    	bool bRet = stack.get( retrieve );
     	count = stack.size();
     	CHECK( 0 == count );
     	CHECK( false == bRet );
     }
 
-    SECTION( "multi-thread push" ) {
+    SECTION( "multi-thread put" ) {
     	size_t count;
     	unsigned int num_threads = 10;
     	vector<thread> threads( num_threads );
     	for( int i = 0; i < num_threads; ++i ){
     	    threads[i] = std::thread( [ &stack, i ](){
-    		    stack.push( i );
+    		    stack.put( i );
     		} );
-	    // std::this_thread::sleep_for (std::chrono::milliseconds(20));
     	}
     	for( auto & i : threads ){
     	    i.join();
@@ -70,16 +58,16 @@ TEST_CASE( "stack_lockfree_split_reference", "[stack split reference]" ) {
     	count = stack.size();
     	CHECK( num_threads == count );
 
-    	SECTION( "multi-thread pop" ) {
+    	SECTION( "multi-thread get" ) {
     	    set<int> vals_retrieve;
     	    mutex mtx;
     	    for( auto & i : threads ){
     		i = std::thread( [&](){
-    			int pop_val;
-    			bool bRet = stack.pop( pop_val );
+    			int get_val;
+    			bool bRet = stack.get( get_val );
     			mtx.lock();
     			if( bRet ){
-    			    vals_retrieve.insert( pop_val );
+    			    vals_retrieve.insert( get_val );
     			}
     			mtx.unlock();
     		    } );
@@ -98,11 +86,11 @@ TEST_CASE( "stack_lockfree_split_reference", "[stack split reference]" ) {
 
 	    for( auto & i : threads ){
     		i = std::thread( [&](){
-    			int pop_val;
-    			bool bRet = stack.pop( pop_val );
+    			int get_val;
+    			bool bRet = stack.get( get_val );
     			mtx.lock();
     			if( bRet ){
-    			    vals_retrieve.insert( pop_val );
+    			    vals_retrieve.insert( get_val );
     			}
     			mtx.unlock();
     		    } );

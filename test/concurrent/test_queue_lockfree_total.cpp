@@ -20,13 +20,13 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
         size_t count = queue.size();
         CHECK( 0 == count );
         int val = 5;
-        queue.enqueue(val);
+        queue.put(val);
         count = queue.size();
         CHECK( 1 == count );
 
         SECTION( "pop" ) {
             int retrieve;
-            bool bRet = queue.dequeue( retrieve );
+            bool bRet = queue.get( retrieve );
             count = queue.size();
             CHECK( 0 == count );
             CHECK( true == bRet );
@@ -40,7 +40,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
         
         int retrieve;
         size_t count;
-        bool bRet = queue.dequeue( retrieve );
+        bool bRet = queue.get( retrieve );
         count = queue.size();
         CHECK( 0 == count );
         CHECK( false == bRet );
@@ -58,7 +58,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
             for( int i = 0; i < num_threads; ++i ){
                 threads[i] = std::thread( [ &, i ](){
                         int val = i;
-                        queue.enqueue( val );
+                        queue.put( val );
                     } );
             }
             count = queue.size();
@@ -69,7 +69,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
             for( int i = 0; i < num_threads * 0.1; ++i ){
                 threads2[i] = std::thread( [&](){
                         int pop_val;
-                        bool bRet = queue.dequeue( pop_val );
+                        bool bRet = queue.get( pop_val );
                         if( bRet ){
                             std::cout << pop_val << std::endl;
                         }
@@ -87,7 +87,7 @@ TEST_CASE( "queue_lockfree_total", "[queue]" ) {
             for( int i = 0; i < num_threads * 0.9; ++i ){
                 threads2[i] = std::thread( [&](){
                         int pop_val;
-                        bool bRet = queue.dequeue( pop_val );
+                        bool bRet = queue.get( pop_val );
                         if( bRet ){
                             std::cout << pop_val << std::endl;
                         }

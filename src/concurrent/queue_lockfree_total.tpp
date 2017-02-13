@@ -19,7 +19,7 @@ queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
     }
 }
 template< typename T >
-bool queue_lockfree_total_impl<T>::push_back( T & val ){ //push item to the tail
+bool queue_lockfree_total_impl<T>::push_back( T const & val ){ //push item to the tail
     Node * new_node = new Node( val );
     while( true ){
 	Node * tail = _tail.load( std::memory_order_relaxed );
