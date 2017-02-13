@@ -22,7 +22,7 @@ TEST_CASE( "exchanger_lockfree", "[exchanger]" ) {
 	*b = ex.exchange( *a, timeout_us );
     };
 
-    int n= 10;
+    int n= 1000;
     vector<int> vals(n);
     int count = 0;
     for( auto & i : vals ){
@@ -60,4 +60,35 @@ TEST_CASE( "exchanger_lockfree", "[exchanger]" ) {
     CHECK( vals_unique );
 
     delete [] rets;
+}
+TEST_CASE( "exchanger_lockfree timeout", "[exchanger]" ) { 
+    exchanger_lockfree<int> ex;
+    long timeout_us = 3'000'000;
+
+    function<void(bool*,int*)> f = [&](bool* b, int * a){
+	*b = ex.exchange( *a, timeout_us );
+    };
+
+    int n= 1;
+    vector<int> vals(n);
+    int count = 0;
+    for( auto & i : vals ){
+    	i = count;
+    	++count;
+    }
+    bool * rets = new bool[n];
+    vector<thread> ts(n);
+    for(size_t i = 0; i < n; ++i ){
+	bool * b = &rets[i];
+        int * a = &vals[i];
+    	ts[i] = std::thread( f, b, a );
+    }
+
+    for(size_t i = 0; i < n; ++i ){
+    	ts[i].join();
+    }
+    CHECK( false == rets[0] );
+    exchanger_status stat = ex._status.load();
+    CHECK( exchanger_status::EMPTY == stat );
+    std::cout << "threads joined." << std::endl;
 }

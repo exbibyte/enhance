@@ -14,7 +14,7 @@ stack_lockfree_partial_elim_impl<T>::~stack_lockfree_partial_elim_impl(){
     }
 }
 template< class T >
-bool stack_lockfree_partial_elim_impl<T>::push( T & val ){
+bool stack_lockfree_partial_elim_impl<T>::push( T const & val ){
     Node * new_node = new Node( val );
     Node * head = _head.load( std::memory_order_relaxed );
     new_node->_next = head;

@@ -19,17 +19,17 @@ public:
                           T _val;
                      Node * _next;
                             Node(): _next( nullptr ) {}
-                            Node( T val ) : _val( val ), _next( nullptr ) {}
+                            Node( T const & val ) : _val( val ), _next( nullptr ) {}
               };
               stack_lockfree_partial_elim_impl();
               ~stack_lockfree_partial_elim_impl();
          bool clear();
          bool empty() const;
     _t_size_t size() const; //not guaranteed to be consistent when threads are accesing stack
-         bool put( T & val ){ return push( val ); }
+         bool put( T const & val ){ return push( val ); }
          bool get( T & val ){ return pop( val ); }
 private:
-         bool push( T & val );
+         bool push( T const & val );
          bool pop( T & val );
       _t_node _head;
 };
