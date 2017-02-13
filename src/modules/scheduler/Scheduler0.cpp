@@ -12,10 +12,10 @@ Scheduler0::~Scheduler0(){
     _thread.setaction( IThread::Action::END );
 }
 bool Scheduler0::add( Funwrap3 & f){
-    return _queue.enqueue( f ); //enqueue into top half
+    return _queue.put( f ); //enqueue into top half
 }
 bool Scheduler0::get( Funwrap3 & f ){
-    return _queue_sched.dequeue( f ); //deque from bottom half
+    return _queue_sched.get( f ); //deque from bottom half
 }
 bool Scheduler0::run(){
     return _thread.setaction( IThread::Action::START );
@@ -29,8 +29,8 @@ void Scheduler0::flush(){
 void Scheduler0::task(){
     //push enqueued tasks from the top half into the bottom half queue
     Funwrap3 f;
-    if( _queue.dequeue( f ) ){
-	_queue_sched.enqueue( f );
+    if( _queue.get( f ) ){
+	_queue_sched.put( f );
     }else{
 	std::this_thread::yield();
     }
