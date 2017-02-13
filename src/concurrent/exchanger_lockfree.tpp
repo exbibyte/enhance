@@ -4,21 +4,10 @@
 
 template< class T >
 exchanger_lockfree<T>::exchanger_lockfree(){
-    _node.store( nullptr, std::memory_order_release );
+    _status.store(status::EMPTY);
 }
 template< class T >
 exchanger_lockfree<T>::~exchanger_lockfree(){
-    while(true){
-	Node * n = _node.load( std::memory_order_acquire );
-	Node * replace = nullptr;
-	//claim node and then release node if necessary
-	if( _node.compare_exchange_weak( n, replace, std::memory_order_acq_rel ) ){
-	    if( nullptr != n ){
-		delete n;
-	    }
-	    break;
-	}
-    }
 }
 template< class T >
 bool exchanger_lockfree<T>::exchange( T & item, long timeout_us ){
@@ -30,15 +19,21 @@ bool exchanger_lockfree<T>::exchange( T & item, long timeout_us ){
 	auto diff = time_now - time_enter;
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(diff).count();
 	if( duration > timeout_us ){
+#ifdef DEBUG_VERBOSE
 	    std::cout << "entering: timeout segment 1." << std::endl;
+#endif
 	    return false;
 	}
 
-	switch( _status.load( std::memory_order_relaxed ) ){
+	switch( _status.load( std::memory_order_acquire ) ){
 	case status::EMPTY:
 	{
 	    status expected_empty = status::EMPTY;
-	    if( _status.compare_exchange_weak( expected_empty, status::WAITING, std::memory_order_acq_rel ) ){
+	    if( _status.compare_exchange_weak( expected_empty, status::EMPTY_2, std::memory_order_acq_rel ) ){
+		//at this point, current active thread is depositing value to be exchanged with 2nd arriving thread
+		_val = item;
+		_status.store( status::WAITING, std::memory_order_release );
+		//wait for 2nd thread to arrive
 		while(true){
 		    time_now = std::chrono::high_resolution_clock::now();
 		    diff = time_now - time_enter;
@@ -47,58 +42,57 @@ bool exchanger_lockfree<T>::exchange( T & item, long timeout_us ){
 			break;
 		    }
 		    //wait for partner thread to exchange
-		    std::cout << "entering: wait for partner to exchange." << std::endl;
 		    status expected_exchanging_2 = status::EXCHANGING_2;
 		    if( _status.compare_exchange_weak( expected_exchanging_2, status::EXCHANGING_3, std::memory_order_acq_rel ) ){
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			//active thread received deposit from 2nd thread
 			item = _val;
 			_status.store( status::EMPTY, std::memory_order_release );
+#ifdef DEBUG_VERBOSE
 			std::cout << "entering: exchanged with partner segment 1." << std::endl;
+#endif
 			return true;
 		    }
 		}
-		status expected_waiting = status::WAITING;
-		if( _status.compare_exchange_weak( expected_waiting, status::EMPTY, std::memory_order_acq_rel ) ){
-		    //timeout
-		    std::cout << "entering: timeout segment 2." << std::endl;
-		    return false;
+		status expected_exchanging_complete = status::EXCHANGING_2;
+		if( _status.compare_exchange_weak( expected_exchanging_complete, status::EXCHANGING_3, std::memory_order_acq_rel ) ){
+		    //active thread received deposit from 2nd thread
+		    item = _val;
+		    _status.store( status::EMPTY, std::memory_order_release );
+#ifdef DEBUG_VERBOSE
+		    std::cout << "entering: exchanged with partner segment 1." << std::endl;
+#endif
+		    return true;
 		}else{
-		    //exchange is in progress
-		    while(true){
-			std::cout << "entering: in progress." << std::endl;
-			status expected_exchanging_2 = status::EXCHANGING_2;
-			if( _status.compare_exchange_weak( expected_exchanging_2, status::EXCHANGING_3, std::memory_order_acq_rel ) ){
-			    item = _val;
-			    _status.store( status::EMPTY, std::memory_order_release );
-			    std::cout << "entering: in progress end." << std::endl;
-			    return true;
-			}
-		    }
+		    //active thread times out and gives up resource
+#ifdef DEBUG_VERBOSE
+		    std::cout << "entering: timeout segment 2." << std::endl;
+#endif
+		    _status.store( status::EMPTY, std::memory_order_release );
+		    return false;
 		}
 	    }
 	}
-	    break;
+	break;
 	case status::WAITING:
 	{
 	    status expected = status::WAITING;
 	    if( _status.compare_exchange_weak( expected, status::EXCHANGING, std::memory_order_acq_rel ) ){
-		//found waiting object, exchange with it
+		//at this point, this is the 2nd thread arriving, exchanging with an active thread
 		T val_exchanged = _val;
 		_val = item;
 		item = val_exchanged;
 		_status.store( status::EXCHANGING_2, std::memory_order_release ); //signal exchange partner that object has been exchanged
+#ifdef DEBUG_VERBOSE
 		std::cout << "entering: exchanged with partner segment 2." << std::endl;
+#endif
 		return true;
 	    }
 	}
-	    break;
-	case status::EXCHANGING:
-            //retry
-	    break;
+	break;
 	default:
-	    assert( 0 && "Invalid status." );
+	    //retry
 	    break;
 	}
     }    
-    return false; //shoudn't come here
+    return false;
 }

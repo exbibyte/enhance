@@ -7,6 +7,7 @@
 #include <set>
 #include "catch.hpp"
 #include "exchanger_lockfree.hpp"
+#include <functional>
 
 #include <chrono>
 #include <thread>
@@ -15,26 +16,48 @@ using namespace std;
 
 TEST_CASE( "exchanger_lockfree", "[exchanger]" ) { 
     exchanger_lockfree<int> ex;
-    long timeout_us = 10000000;
+    long timeout_us = 3'000'000;
 
-    int val1 = 10;
-    int val2 = 20;
-    bool ret1 = false;
-    bool ret2 = false;
+    function<void(bool*,int*)> f = [&](bool* b, int * a){
+	*b = ex.exchange( *a, timeout_us );
+    };
 
-    thread t1 = std::thread( [&](){
-	    ret1 = ex.exchange( val1, timeout_us );
-	} );
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    thread t2 = std::thread( [&](){
-	    ret2 = ex.exchange( val2, timeout_us );
-	} );
+    int n= 10;
+    vector<int> vals(n);
+    int count = 0;
+    for( auto & i : vals ){
+    	i = count;
+    	++count;
+    }
+    bool * rets = new bool[n];
+    vector<thread> ts(n);
+    for(size_t i = 0; i < n; ++i ){
+	bool * b = &rets[i];
+        int * a = &vals[i];
+    	ts[i] = std::thread( f, b, a );
+    }
 
-    t1.join();
-    t2.join();
+    for(size_t i = 0; i < n; ++i ){
+    	ts[i].join();
+    }
+
     std::cout << "threads joined." << std::endl;
-    CHECK( true == ret1 );
-    CHECK( true == ret2 );
-    CHECK( 20 == val1 );
-    CHECK( 10 == val2 );
+
+    vector<int> expected_vals(n);
+    count = 0;
+    for( auto & i : expected_vals ){
+    	i = count;
+    	++count;
+    }
+    //check each value has changed
+    for( size_t i = 0; i < n; ++i ){
+    	CHECK( rets[i] == true );
+    	CHECK( vals[i] != expected_vals[i] );
+    }
+    //check appearance of each unique value
+    sort(vals.begin(), vals.end());
+    bool vals_unique = expected_vals == vals;
+    CHECK( vals_unique );
+
+    delete [] rets;
 }
