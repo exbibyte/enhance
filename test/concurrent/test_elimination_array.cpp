@@ -24,7 +24,7 @@ TEST_CASE( "elimination_array size 1", "[elimination_array]" ) {
 	*b = elim.visit( *a, elim_size-1 );
     };
 
-    int n= 10;
+    int n= 100;
     vector<int> vals(n);
     int count = 0;
     for( auto & i : vals ){

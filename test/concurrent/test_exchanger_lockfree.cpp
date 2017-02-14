@@ -16,13 +16,13 @@ using namespace std;
 
 TEST_CASE( "exchanger_lockfree", "[exchanger]" ) { 
     exchanger_lockfree<int> ex;
-    long timeout_us = 3'000'000;
+    long timeout_us = 100000;
 
     function<void(bool*,int*)> f = [&](bool* b, int * a){
 	*b = ex.exchange( *a, timeout_us );
     };
 
-    int n= 1000;
+    int n= 200;
     vector<int> vals(n);
     int count = 0;
     for( auto & i : vals ){
@@ -31,6 +31,9 @@ TEST_CASE( "exchanger_lockfree", "[exchanger]" ) {
     }
     bool * rets = new bool[n];
     vector<thread> ts(n);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    
     for(size_t i = 0; i < n; ++i ){
 	bool * b = &rets[i];
         int * a = &vals[i];
@@ -41,7 +44,10 @@ TEST_CASE( "exchanger_lockfree", "[exchanger]" ) {
     	ts[i].join();
     }
 
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count();    
     std::cout << "threads joined." << std::endl;
+    std::cout << "duration(ms): " << duration << std::endl;
 
     vector<int> expected_vals(n);
     count = 0;
@@ -88,7 +94,7 @@ TEST_CASE( "exchanger_lockfree timeout", "[exchanger]" ) {
     	ts[i].join();
     }
     CHECK( false == rets[0] );
-    exchanger_status stat = ex._status.load();
-    CHECK( exchanger_status::EMPTY == stat );
+    auto stat = ex._status.load();
+    CHECK( exchanger_status::ABORT == stat );
     std::cout << "threads joined." << std::endl;
 }

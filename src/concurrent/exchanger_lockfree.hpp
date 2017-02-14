@@ -11,6 +11,8 @@ enum class exchanger_status { //expected to be monotically increasing in terms o
     EXCHANGING, //2nd thread has detected a presence of an active thread
     EXCHANGING_2, //2nd thread has claimed resource and is in process of exchanging its value
     EXCHANGING_3, //2nd thread has exchanged and deposited its value and the active thread will be exchanging its value with the 2nd thread's deposited value
+    COMPLETE,
+    ABORT,
 };
 
 template< class T >
