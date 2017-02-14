@@ -2,6 +2,7 @@
 #define IPOOL_H
 
 #include <utility>
+#include <functional>
 
 class trait_pool_size {
 public:
@@ -45,6 +46,11 @@ public:
     size_type size(){ return ContainerType<T>::size(); }
     bool put( value_type const & item ){ return ContainerType<T>::put( item ); }
     bool get( value_type & item ){ return ContainerType<T>::get( item ); }
+    void get_fun( std::function<void(bool,reference)> f ){
+        value_type val;
+	bool ret = get( val );
+	f( ret, val );
+    }
 };
 
 #endif
