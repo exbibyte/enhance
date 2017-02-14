@@ -48,6 +48,10 @@ TEST_CASE( "queue_lockfree_sync bulk operations", "[bulk]" ) {
 		int val;
 		bool ret;
 		ret = queue.get( val );
+		if( ret ){
+		    *ret_val_ptr = 1;
+		    *item_ptr = val;
+		}
 	    } );
     }
 
