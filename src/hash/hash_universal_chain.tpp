@@ -1,5 +1,7 @@
 template< class K, class V >
 hash_universal_chain< K, V >::hash_universal_chain(){
+    size_t table_size = 199;
+    resize( table_size );
     set_default_hash_funcs();
     select_random_hash_func();
 }
@@ -90,7 +92,7 @@ bool hash_universal_chain< K, V >::compute_hash( K const key, size_t & hashed_va
 }
 template< class K, class V >
 bool hash_universal_chain< K, V >::select_random_hash_func(){
-    if( 1 > _funcs_hash.size() ){
+    if( _funcs_hash.empty() ){
 	return false;
     }
     std::random_device rd;
@@ -102,39 +104,31 @@ bool hash_universal_chain< K, V >::select_random_hash_func(){
 }
 template< class K, class V >
 bool hash_universal_chain< K, V >::set_default_hash_funcs(){
+    size_t table_size = get_table_size();
+    if( 0 >= table_size )
+	return false;
+
     _funcs_hash.clear();
-    size_t table_size = 199;
-    resize( table_size );
-    auto hash_1 = std::function< size_t( K ) >( [=]( K key ) -> size_t {
-	    return key % table_size;
-	});
-    auto hash_2 = std::function< size_t( K ) >( [=]( K key ) -> size_t {
-	    //source: https://gist.github.com/badboy/6267743
-	    //hash32shiftmult
-	    size_t c2 = 0x27d4eb2d; // a prime or an odd constant
-	    size_t key2 = key;
-	    key2 = (key2 ^ 61) ^ (key2 >> 16);
-	    key2 = key2 + (key2 << 3);
-	    key2 = key2 ^ (key2 >> 4);
-	    key2 = key2 * c2;
-	    key2 = key2 ^ (key2 >> 15);
-	    return key2 % table_size;
-	});
-    auto hash_3 = std::function< size_t( K )>( [=]( K key ) -> size_t {
-	    //source: https://gist.github.com/badboy/6267743
-	    //Robert Jenkins' 32 bit
-	    size_t a = key;
-	    a = (a+0x7ed55d16) + (a<<12);
-	    a = (a^0xc761c23c) ^ (a>>19);
-	    a = (a+0x165667b1) + (a<<5);
-	    a = (a+0xd3a2646c) ^ (a<<9);
-	    a = (a+0xfd7046c5) + (a<<3);
-	    a = (a^0xb55a4f09) ^ (a>>16);
-	    return a % table_size;
-	});
-    add_hash_func( hash_1 ); //add hash function into the univeral set
-    add_hash_func( hash_2 ); //add hash function into the univeral set
-    add_hash_func( hash_3 );  //add hash function into the univeral set
+
+    constexpr size_t p = 2147483647; //2^31-1 prime number
+
+    //select coefficients for hash function ( ( a * hashed_key + b ) mod p ) mod table_size
+    std::random_device rd;
+    std::mt19937 engine(rd());
+    std::uniform_int_distribution<size_t> distr_a( 1, p-1 ); //a from Zp* = [1,p-1]
+    std::uniform_int_distribution<size_t> distr_b( 0, p-1 ); //b from Zp = [0,p-1]
+
+    //create different instances from this set of hash functions Zp* and Zp
+    for( size_t i = 0; i < 10; ++i ){
+	size_t a = distr_a( engine );
+	size_t b = distr_b( engine );
+	auto hash_func = std::function< size_t( size_t ) >( [=]( size_t hashed_key ) -> size_t {
+		return ( ( a * hashed_key + b ) % p ) % table_size;
+	    });
+	_funcs_hash.push_back( hash_func );
+    }
+
+    return true;
 }
 template< class K, class V >
 bool hash_universal_chain< K, V >::prepend_hashnode( hashnode * & node, size_t hashed_key, V val ){
@@ -153,6 +147,7 @@ bool hash_universal_chain< K, V >::prepend_hashnode( hashnode * & node, size_t h
 	    node = new_node; //head
 	}
     }
+    return true;
 }
 template< class K, class V >
 bool hash_universal_chain< K, V >::remove_hashnode( hashnode * & node ){

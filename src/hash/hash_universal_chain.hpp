@@ -18,8 +18,8 @@ public:
              bool insert( K const, V const & );
              bool find( K const , V & );
              bool erase( K const );
-             bool add_hash_func( std::function<size_t(size_t)> ); //add hash function into the univeral set
-             bool get_hash_func_current( std::function<size_t(size_t)> & ); //add hash function into the univeral set
+             bool add_hash_func( std::function< size_t( size_t ) > ); //add hash function into the univeral set
+             bool get_hash_func_current( std::function< size_t( size_t ) > & ); //add hash function into the univeral set
              bool resize( size_t size );
            size_t get_table_size();
            size_t get_load_factor();
