@@ -1,5 +1,7 @@
 #include <list>
 
+#include "hash_universal.hpp"
+
 template< class K, class V >
 hashtable_universal_chain_impl< K, V >::hashtable_universal_chain_impl( size_t table_size ){
     _count_items = 0;
@@ -137,30 +139,7 @@ bool hashtable_universal_chain_impl< K, V >::select_random_hash_func(){
 }
 template< class K, class V >
 bool hashtable_universal_chain_impl< K, V >::set_default_hash_funcs( size_t const table_size ){
-    if( 0 >= table_size )
-	return false;
-
-    _funcs_hash.clear();
-
-    constexpr size_t p = 2147483647; //2^31-1 prime number
-
-    //select coefficients for hash function ( ( a * hashed_key + b ) mod p ) mod table_size
-    std::random_device rd;
-    std::mt19937 engine(rd());
-    std::uniform_int_distribution<size_t> distr_a( 1, p-1 ); //a from Zp* = [1,p-1]
-    std::uniform_int_distribution<size_t> distr_b( 0, p-1 ); //b from Zp = [0,p-1]
-
-    //create different instances from this set of hash functions Zp* and Zp
-    for( size_t i = 0; i < 10; ++i ){
-	size_t a = distr_a( engine );
-	size_t b = distr_b( engine );
-	auto hash_func = std::function< size_t( size_t ) >( [=]( size_t hashed_key ) -> size_t {
-		return ( ( a * hashed_key + b ) % p ) % table_size;
-	    });
-	_funcs_hash.push_back( hash_func );
-    }
-
-    return true;
+    return hash_universal< K >::generate( table_size, _funcs_hash );
 }
 template< class K, class V >
 bool hashtable_universal_chain_impl< K, V >::prepend_hashnode( hashnode * & node, K const key, V const & val ){
