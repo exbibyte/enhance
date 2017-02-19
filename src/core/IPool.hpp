@@ -39,7 +39,7 @@ public:
 
     template< class... Args >
     IPool( Args... args ) : ContainerType<T>( std::forward<Args>(args)... ) {}
-    ~IPool(){ this->~ContainerType<T>(); }
+    ~IPool(){}
     
     bool clear(){ return ContainerType<T>::clear(); }
     bool empty(){ return ContainerType<T>::empty(); }
