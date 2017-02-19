@@ -9,7 +9,37 @@
 #include <cmath>
 #include <iostream>
 
-template< class K, class V, template<class,class> class Impl >
+class trait_hashtable_hashing_method {
+public:
+    class division{};
+    class multiplication{};
+    class universal{};
+    class other{};
+};
+
+class trait_hashtable_method {
+public:
+    class closed{};
+    class open{};
+};
+
+class trait_hashtable_concurrency {
+public:
+    class none{};
+    class global{};
+    class granular{};
+    class lockless{};
+    class waitfree{};
+};
+
+class trait_hashtable_lock_load_factor {
+public:
+    class constant{};
+    class linear{};
+    class not_applicable{};
+};
+
+template< class K, class V, template<class,class> class Impl, class HtConcurrency, class HtMethod, class HtLockLoadFactor, class HashingMethod >
 class IHashtable final : public Impl< K, V > {
 public:
          using key_type =               K;

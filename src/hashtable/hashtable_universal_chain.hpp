@@ -54,6 +54,11 @@ private:
 #include "hashtable_universal_chain.tpp"
 
 template< class K, class V >
-using hashtable_universal_chain = IHashtable< K, V, hashtable_universal_chain_impl >;
+using hashtable_universal_chain = IHashtable< K, V, hashtable_universal_chain_impl,
+					      trait_hashtable_concurrency::none,
+					      trait_hashtable_method::closed,
+					      trait_hashtable_lock_load_factor::constant,
+					      trait_hashtable_hashing_method::universal
+					      >;
 
 #endif
