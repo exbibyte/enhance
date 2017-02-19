@@ -39,6 +39,7 @@ private:
 template< class T >
 using stack_lockfree_partial_elim = IPool< T, stack_lockfree_partial_elim_impl,
 					   trait_pool_size::unbounded,
+					   trait_pool_concurrency::lockfree,
 					   trait_pool_method::partial,
 					   trait_pool_fairness::lifo >;
 

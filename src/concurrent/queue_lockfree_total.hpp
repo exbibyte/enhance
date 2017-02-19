@@ -43,6 +43,7 @@ private:
 template< class T >
 using queue_lockfree_total = IPool< T, queue_lockfree_total_impl,
 				    trait_pool_size::unbounded,
+				    trait_pool_concurrency::lockfree,
 				    trait_pool_method::total,
 				    trait_pool_fairness::fifo>;
 

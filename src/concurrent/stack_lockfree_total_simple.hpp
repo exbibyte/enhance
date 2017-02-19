@@ -38,6 +38,7 @@ private:
 template< class T >
 using stack_lockfree_total_simple = IPool< T, stack_lockfree_total_simple_impl,
 					   trait_pool_size::unbounded,
+					   trait_pool_concurrency::lockfree,
 					   trait_pool_method::total,
 					   trait_pool_fairness::lifo >;
 #endif

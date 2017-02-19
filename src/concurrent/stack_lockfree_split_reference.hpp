@@ -44,6 +44,7 @@ private:
 template< class T >
 using stack_lockfree_split_reference = IPool< T, stack_lockfree_split_reference_impl,
 					      trait_pool_size::unbounded,
+					      trait_pool_concurrency::lockfree,
 					      trait_pool_method::partial,
 					      trait_pool_fairness::lifo >;
 
