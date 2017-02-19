@@ -27,6 +27,7 @@ public:
 };
 
 class trait_pool_fairness {
+public:
     class fifo{};
     class lifo{};
 };
@@ -35,17 +36,17 @@ template< class T, template< class > class ContainerType, class PoolSize, class 
 class IPool final : public ContainerType<T> {
 public:
         //container and value traits
-        using container_type = ContainerType<T>;
-	using value_type = T;
-	using reference = T &;
-	using const_reference = T const &;
-	using size_type = typename ContainerType<T>::_t_size;
+        using container_type =     ContainerType<T>;
+	using value_type =         T;
+	using reference =          T &;
+	using const_reference =    T const &;
+	using size_type =          typename ContainerType<T>::_t_size;
 
         //pool traits
-        using pool_size = PoolSize;
-	using pool_concurrency = PoolConcurrency;
-	using pool_method = PoolMethod;
-        using pool_fairness = PoolFairness;
+        using pool_size =          PoolSize;
+	using pool_concurrency =   PoolConcurrency;
+	using pool_method =        PoolMethod;
+        using pool_fairness =      PoolFairness;
 
               template< class... Args >
               IPool( Args... args ) : ContainerType<T>( std::forward<Args>(args)... ) {}
