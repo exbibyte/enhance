@@ -31,16 +31,16 @@ public:
 	        threads2[i] = std::thread( [&vec_count_found, &hashtable, i ](){
 			int val_query;
 			bool bRet = hashtable.find( i, val_query );
-			if( val_query == i ){
+			if( bRet && (val_query == i) ){
 			    vec_count_found[i] = 1;
 			}
 		    } );
 	    }
+	    for( auto & i : threads2 )
+		i.join();
 	    int count_found = 0;
 	    for( auto i : vec_count_found )
 		count_found += i;
-	    for( auto & i : threads2 )
-		i.join();
 	    auto t2 = std::chrono::high_resolution_clock::now();
 	    for( int i = 0; i < num_threads; ++i ){
 	        threads3[i] = std::thread( [ &, i ](){
@@ -55,7 +55,7 @@ public:
 	    for( int i = 0; i < num_threads; ++i ){
 		int val_query;
 		bool bRet = hashtable.find( i, val_query );
-		if( val_query == i ){
+		if( !bRet ){
 		    ++count_del;
 		}
 	    }
