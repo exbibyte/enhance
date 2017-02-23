@@ -6,7 +6,6 @@ template< class K, class V >
 hashtable_lock_striped_impl< K, V >::hashtable_lock_striped_impl( size_t table_size, double lock_factor ){
     _is_resizing.store( true, std::memory_order_release );
     _id_resize = std::this_thread::get_id();
-    _is_resizing.store( false, std::memory_order_release );
     _count_items.store( 0, std::memory_order_release );
     _table.clear();
     _func_hash_selected = nullptr;
@@ -18,14 +17,37 @@ hashtable_lock_striped_impl< K, V >::hashtable_lock_striped_impl( size_t table_s
 	lock_factor = 1;
     }
     _lock_factor = lock_factor;
-
+    _is_resizing.store( false, std::memory_order_release );
     if( !resize( table_size ) ){
 	assert( 0 && "initialization failed." );
     }
 }
 template< class K, class V >
 hashtable_lock_striped_impl< K, V >::~hashtable_lock_striped_impl(){
-    
+    while(true){
+	bool resize = false;
+	if( _is_resizing.compare_exchange_weak( resize, true, std::memory_order_acq_rel ) ){
+	    _id_resize = std::this_thread::get_id();
+		for( auto & i : _locks ){
+		    i.lock();
+		}
+		//enter critical region
+		for( size_t i = 0; i < _table.size(); ++i ){
+		    hashnode * n = _table[i];
+		    while( n ){
+			hashnode * n_next = n->_next;
+			delete n;
+			n = n_next;
+		    }
+		}
+		for( auto & i : _locks ){
+		    i.unlock();
+		}
+		// _table.clear();
+		// _locks.clear();
+		break;
+	}
+    }
 }
 template< class K, class V >
 bool hashtable_lock_striped_impl< K, V >::insert( K const key, V const & value ){
@@ -40,11 +62,11 @@ bool hashtable_lock_striped_impl< K, V >::insert( K const key, V const & value )
 	    break;
 	}
     }
-
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].lock();
+    size_t count_lock = _lock_count.load( std::memory_order_acquire );
+    _locks[ hashed_key % count_lock ].lock();
     //entered critical region
 
-    hashnode * & head = _table[ hashed_key ];
+    hashnode * head = _table[ hashed_key ];
     hashnode * find = find_hashnode( head, key );
     if( find ){
 	find->_val = value;
@@ -52,9 +74,8 @@ bool hashtable_lock_striped_impl< K, V >::insert( K const key, V const & value )
 	prepend_hashnode( head, key, value );
 	_count_items.fetch_add(1);
     }
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].unlock();
+    _locks[ hashed_key % count_lock ].unlock();
     //exited critical region
-
     return true;
 }
 template< class K, class V >
@@ -70,18 +91,20 @@ bool hashtable_lock_striped_impl< K, V >::find( K const key, V & value ){
 	    break;
 	}
     }
-	
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].lock();
+    size_t count_lock = _lock_count.load( std::memory_order_acquire );
+    _locks[ hashed_key % count_lock ].lock();
     //entered critical region
 
     hashnode * head = _table[ hashed_key ];
     hashnode * find = find_hashnode( head, key );
     if( find ){
 	value = find->_val;
+	_locks[ hashed_key % count_lock ].unlock();
+	//exited critical region
 	return true;
     }
     
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].unlock();
+    _locks[ hashed_key % count_lock ].unlock();
     //exited critical region
 
     return false;
@@ -99,26 +122,28 @@ bool hashtable_lock_striped_impl< K, V >::erase( K const key ){
 	    break;
 	}
     }
-
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].lock();
+    size_t count_lock = _lock_count.load( std::memory_order_acquire );
+    _locks[ hashed_key % count_lock ].lock();
     //entered critical region
 	
-    hashnode * & head = _table[ hashed_key ];
+    hashnode * head = _table[ hashed_key ];
     hashnode * find = find_hashnode( head, key );
     if( find ){
 	if( find == head ){
+	    hashnode * n = head->_next;
 	    remove_hashnode( head );
+	    _table[ hashed_key ] = n;
 	}else{
 	    remove_hashnode( find );
 	}
 	_count_items.fetch_sub(1);
 
-	_locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].unlock();
+	_locks[ hashed_key % count_lock ].unlock();
 	//exited critical region
 	return true;
     }
 
-    _locks[ hashed_key % _lock_count.load( std::memory_order_acquire ) ].unlock();
+    _locks[ hashed_key % count_lock ].unlock();
     //exited critical region
 	
     return false;
@@ -279,8 +304,6 @@ bool hashtable_lock_striped_impl< K, V >::remove_hashnode( hashnode * & node ){
     }
     if( node_prev ){
 	node_prev->_next = node_next;
-    }else{
-	node = node_next;
     }
     return true;
 }
