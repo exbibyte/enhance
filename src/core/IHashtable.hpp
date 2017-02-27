@@ -28,6 +28,7 @@ public:
     class none{};
     class global{};
     class granular{};
+    class disjoint_access_parallelism{};
     class lockless{};
     class waitfree{};
 };
@@ -39,7 +40,7 @@ public:
     class not_applicable{};
 };
 
-template< class K, class V, template<class,class> class Impl, class HtConcurrency, class HtMethod, class HtLockLoadFactor, class HashingMethod >
+template< class K, class V, template<class,class> class Impl, class HtConcurrency, class HtMethod, class HtLockLoadFactor, class HashMethod >
 class IHashtable final : public Impl< K, V > {
 public:
          using key_type =               K;
@@ -48,6 +49,12 @@ public:
          using val_reference =          V &;
          using val_const_reference =    V const &;
 
+	 //hashtable traits
+	 using hashtable_concurrency = HtConcurrency;
+	 using hashtable_method = HtMethod;
+	 using hashtable_lock_load_factor = HtLockLoadFactor;
+	 using hashtable_hash_method = HashMethod;
+	 
                template< class... Args >
                IHashtable( Args... args ) : Impl< K, V >( std::forward<Args>( args )... ) {}
                ~IHashtable(){}

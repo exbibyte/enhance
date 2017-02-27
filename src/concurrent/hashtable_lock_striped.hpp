@@ -69,7 +69,7 @@ std::atomic<std::thread::id> _id_resize;
 
 template< class K, class V >
 using hashtable_lock_striped = IHashtable< K, V, hashtable_lock_striped_impl,
-					      trait_hashtable_concurrency::granular,
+   					      trait_hashtable_concurrency::disjoint_access_parallelism,
 					      trait_hashtable_method::closed,
 					      trait_hashtable_lock_load_factor::constant,
 					      trait_hashtable_hashing_method::universal
