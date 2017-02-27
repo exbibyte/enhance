@@ -12,7 +12,7 @@ public:
     static void stress_put_get_int( unsigned int num_threads, Hashtable & hashtable ){
 	int count_loop = 5;
 	while( --count_loop >=0 ){
-	    std::cout << "insertion starts." << std::endl;
+	    // std::cout << "insertion starts." << std::endl;
 	    std::vector<std::thread> threads3( num_threads );
 	    std::vector<std::thread> threads2( num_threads );
 	    std::vector<std::thread> threads( num_threads );
@@ -25,8 +25,8 @@ public:
 	    for( auto & i : threads )
 	    	i.join();
 	    auto t1 = std::chrono::high_resolution_clock::now();
-	    std::cout << "insertion ends." << std::endl;
-	    std::cout << "find starts." << std::endl;
+	    // std::cout << "insertion ends." << std::endl;
+	    // std::cout << "find starts." << std::endl;
 	    std::vector<int> vec_count_found( num_threads, 0 );
 	    for( int i = 0; i < num_threads; ++i ){
 	        threads2[i] = std::thread( [&vec_count_found, &hashtable, i ](){
@@ -43,8 +43,8 @@ public:
 	    int count_found = 0;
 	    for( auto i : vec_count_found )
 		count_found += i;
-	    std::cout << "find ends." << std::endl;
-	    std::cout << "erase starts." << std::endl;
+	    // std::cout << "find ends." << std::endl;
+	    // std::cout << "erase starts." << std::endl;
 	    for( int i = 0; i < num_threads; ++i ){
 	        threads3[i] = std::thread( [ &hashtable, i ](){
 	    		bool bret = hashtable.erase( i );
@@ -57,7 +57,7 @@ public:
 	    for( auto & i : threads3 )
 	    	i.join();
 	    auto t3 = std::chrono::high_resolution_clock::now();
-	    std::cout << "erase ends." << std::endl;
+	    // std::cout << "erase ends." << std::endl;
 	    int count_del = 0;
 	    for( int i = 0; i < num_threads; ++i ){
 	    	int val_query;

@@ -14,7 +14,7 @@ using namespace std;
 int main(){
 
     hashtable_lock_striped< int, int > hashtable( 200, 0.33 ); //200 buckets, 0.33 lock factor
-    unsigned int num_threads = 300;
+    unsigned int num_threads = 1000;
     
     stress_hashtable::stress_put_get_int( num_threads, hashtable );
 
