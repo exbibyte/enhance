@@ -16,7 +16,7 @@ Service Module and Infrastructure - Partial
 Memory Management  - In Progress  
 Script management  - To Do
 
-Current work is focused on lighting, rendering pipeline calculations, and  model file format refinement for animation.
+Current work is focused on concurrent data structures, lighting, rendering pipeline, and asset model file format.
 
 ## Dependencies:
 
