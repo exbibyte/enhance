@@ -55,8 +55,8 @@ public:
          bool clear(){ return ContainerType<T>::clear(); }
          bool empty(){ return ContainerType<T>::empty(); }
     size_type size(){ return ContainerType<T>::size(); }
-         bool put( value_type const & item ){ return ContainerType<T>::put( item ); }
-         bool get( value_type & item ){ return ContainerType<T>::get( item ); }
+         bool put( const_reference item ){ return ContainerType<T>::put( item ); }
+         bool get( reference item ){ return ContainerType<T>::get( item ); }
          void get_fun( std::function<void(bool,reference)> f ){
 	     value_type val;
 	     bool ret = get( val );
