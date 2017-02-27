@@ -1,16 +1,16 @@
-#ifndef LOCK_RECURSIVE_HPP
-#define LOCK_RECURSIVE_HPP
+#ifndef LOCK_RECURSIVE_BLOCK_HPP
+#define LOCK_RECURSIVE_BLOCK_HPP
 
 #include <thread>
 #include <atomic>
 
-class lock_recursive {
+class lock_recursive_block {
 public:
-    lock_recursive(){
+    lock_recursive_block(){
 	_count = 0;
 	_access.store( true, std::memory_order_release );
     }
-    lock_recursive(lock_recursive const & ){
+    lock_recursive_block(lock_recursive_block const & ){
 	_count = 0;
 	_access.store( true, std::memory_order_release );			  
     }
@@ -54,7 +54,10 @@ public:
 	    }
 	}
     }
-    size_t is_free() const{
+    bool is_free() const{
+	return _count == 0;
+    }
+    size_t count() const{
 	return _count;
     }
 private:

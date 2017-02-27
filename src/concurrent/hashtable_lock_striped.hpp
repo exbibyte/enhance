@@ -13,7 +13,7 @@
 #include <atomic>
 
 #include "IHashtable.hpp"
-#include "lock_recursive.hpp"
+#include "lock_recursive_total.hpp"
 
 template< class K, class V >
 class hashtable_lock_striped_impl {
@@ -36,22 +36,23 @@ private:
 		      hashnode * _next = nullptr;
 		      hashnode * _prev = nullptr;
 		      V          _val;
+		      hashnode() : _next( nullptr ), _prev( nullptr ) {}
 		  };
 
             using vec_hash_func =    std::vector< std::function< size_t( size_t )> >;
             using vec_hashnode =     std::vector< hashnode * >;
             using hash_func =        std::function< size_t( size_t ) >;
-            using vec_lock =         std::vector< lock_recursive >;
+            using vec_lock =         std::vector< lock_recursive_total >;
 
              bool compute_hash( K const key, size_t & hashed_val );
              bool select_random_hash_func();
              bool set_default_hash_funcs( size_t const table_size );
 
              bool quiesce();
-             bool prepend_hashnode( hashnode * & node, K const key, V const & val );
+       hashnode * prepend_hashnode( hashnode * node, K const key, V const & val );
              bool remove_hashnode( hashnode * & node );
        hashnode * find_hashnode( hashnode * const node, K const key );
-
+public:
          vec_lock _locks;
      vec_hashnode _table;
     vec_hash_func _funcs_hash;
@@ -59,9 +60,9 @@ private:
 std::atomic<size_t> _count_items;
            double _lock_factor;
 std::atomic<size_t> _lock_count;
-
 std::atomic<bool> _is_resizing;
-  std::thread::id _id_resize;
+std::atomic<bool> _is_destructing;
+std::atomic<std::thread::id> _id_resize;
 };
 
 #include "hashtable_lock_striped.tpp"

@@ -8,11 +8,11 @@
 #include <chrono>
 
 #include "catch.hpp"
-#include "lock_recursive.hpp"
+#include "lock_recursive_block.hpp"
 
 using namespace std;
 
-void increase( int & val, lock_recursive & l, int recurse_lock ){
+void increase( int & val, lock_recursive_block & l, int recurse_lock ){
     for( int i = 0; i < recurse_lock; ++i ){
 	l.lock();
 	++val;
@@ -24,8 +24,8 @@ void increase( int & val, lock_recursive & l, int recurse_lock ){
 
 TEST_CASE( "queue_lockfree_total", "[queue]" ) {
     int increment = 0;
-    lock_recursive lock;
-    int n = 500;
+    lock_recursive_block lock;
+    int n = 1000;
     vector<std::thread> t(n);
 
     int recurse_lock = 20;
