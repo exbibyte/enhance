@@ -25,7 +25,7 @@ void increase( int & val, lock_recursive_block & l, int recurse_lock ){
 TEST_CASE( "queue_lockfree_total", "[queue]" ) {
     int increment = 0;
     lock_recursive_block lock;
-    int n = 1000;
+    int n = 300;
     vector<std::thread> t(n);
 
     int recurse_lock = 20;

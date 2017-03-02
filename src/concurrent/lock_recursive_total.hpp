@@ -4,13 +4,15 @@
 #include <thread>
 #include <atomic>
 
-class lock_recursive_total {
+#include <ILock.hpp>
+
+class lock_recursive_total_impl {
 public:
-    lock_recursive_total(){
+    lock_recursive_total_impl(){
 	_count = 0;
 	_access.store( true, std::memory_order_release );
     }
-    lock_recursive_total(lock_recursive_total const & ){
+    lock_recursive_total_impl(lock_recursive_total_impl const & ){
 	_count = 0;
 	_access.store( true, std::memory_order_release );			  
     }
@@ -63,5 +65,7 @@ private:
     size_t _count;
     std::atomic<bool> _access;
 };
+
+using lock_recursive_total = ILock< lock_recursive_total_impl, trait_lock_method::total >;
 
 #endif
