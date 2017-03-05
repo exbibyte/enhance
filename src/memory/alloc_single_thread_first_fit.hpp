@@ -13,7 +13,7 @@ public:
     alloc_single_thread_first_fit_impl( size_t block_size ); //self initialize block from system
     alloc_single_thread_first_fit_impl( void * p, size_t size ); //inherit a block from elsewhere
     ~alloc_single_thread_first_fit_impl();
-    bool allocating( void ** p, size_t size );
+    bool allocating( void ** p, size_t size, bool zeroed = false );
     bool freeing( void * p );
     size_t stat_free_size_total();
     size_t stat_free_size_largest();

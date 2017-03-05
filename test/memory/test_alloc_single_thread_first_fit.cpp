@@ -4,15 +4,20 @@
 
 int main(){
 
-    size_t block_size = 100'000'000;
+    size_t block_size = 200'000'000;
     alloc_single_thread_first_fit alc( block_size );
     void * p;
-    size_t p_size = 10'000'000;
-    bool bret = alc.allocating( &p, p_size );
+    size_t p_size = 100'000'000;
+    bool zeroed = true;
+    bool bret = alc.allocating( &p, p_size, zeroed );
     assert( bret );
 
     size_t free_size_total = alc.stat_free_size_total();
     assert( block_size - p_size == free_size_total );
+
+    for( int i = 0; i < p_size; ++i ){
+	((char*)p)[i] = 3;
+    }
 
     bret = alc.freeing( p );
     assert( bret );

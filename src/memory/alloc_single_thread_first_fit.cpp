@@ -19,7 +19,7 @@ alloc_single_thread_first_fit_impl::alloc_single_thread_first_fit_impl( void * p
 alloc_single_thread_first_fit_impl::~alloc_single_thread_first_fit_impl(){
     clear_internal();
 }
-bool alloc_single_thread_first_fit_impl::allocating( void ** p, size_t size ){
+bool alloc_single_thread_first_fit_impl::allocating( void ** p, size_t size, bool zeroed ){
     if( size > _size ){
 	assert( 0 && "allocating size too big" );
 	return false;
@@ -31,6 +31,8 @@ bool alloc_single_thread_first_fit_impl::allocating( void ** p, size_t size ){
 	    i.first += size;
 	    i.second -= size;
 	    *p = (void*)((char*)_p + i.first);
+	    if( zeroed )
+		memset( *p, 0, size );
 	    return true;
 	}
     }
