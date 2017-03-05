@@ -4,22 +4,22 @@
 #include <list>
 #include <cassert>
 
-#include "alloc_single_thread_first_fit.hpp"
+#include "alloc_sthread_first_fit_part_none.hpp"
 
-alloc_single_thread_first_fit_impl::alloc_single_thread_first_fit_impl( size_t block_size ){
+alloc_sthread_first_fit_part_none_impl::alloc_sthread_first_fit_part_none_impl( size_t block_size ){
     _p = malloc( block_size );
     _size = block_size;
     _alloc_info.push_back( std::pair<size_t,size_t>(0,_size) );
 }
 
-alloc_single_thread_first_fit_impl::alloc_single_thread_first_fit_impl( void * p, size_t size ){
+alloc_sthread_first_fit_part_none_impl::alloc_sthread_first_fit_part_none_impl( void * p, size_t size ){
     _p = p;
     _size = size;
 }
-alloc_single_thread_first_fit_impl::~alloc_single_thread_first_fit_impl(){
+alloc_sthread_first_fit_part_none_impl::~alloc_sthread_first_fit_part_none_impl(){
     clear_internal();
 }
-bool alloc_single_thread_first_fit_impl::allocating( void ** p, size_t size, bool zeroed ){
+bool alloc_sthread_first_fit_part_none_impl::allocating( void ** p, size_t size, bool zeroed ){
     if( size > _size ){
 	assert( 0 && "allocating size too big" );
 	return false;
@@ -39,7 +39,7 @@ bool alloc_single_thread_first_fit_impl::allocating( void ** p, size_t size, boo
     //no suitable free block found
     return false;
 }
-bool alloc_single_thread_first_fit_impl::freeing( void * p ){
+bool alloc_sthread_first_fit_part_none_impl::freeing( void * p ){
     if( (char*)p < (char*)_p || (char*)p >= ((char*)_p + _size) ){
 	assert( 0 && "reclaiming pointer is invalid" );
 	return false;
@@ -70,14 +70,14 @@ bool alloc_single_thread_first_fit_impl::freeing( void * p ){
     }
     return false;
 }
-size_t alloc_single_thread_first_fit_impl::stat_free_size_total(){
+size_t alloc_sthread_first_fit_part_none_impl::stat_free_size_total(){
     size_t total = 0;
     for( auto it = _alloc_info.begin(), it_e = _alloc_info.end(); it!=it_e; ++it ){
 	total += it->second;
     }
     return total;
 }
-size_t alloc_single_thread_first_fit_impl::stat_free_size_largest(){
+size_t alloc_sthread_first_fit_part_none_impl::stat_free_size_largest(){
     size_t largest = 0;
     for( auto it_2 = _alloc_info.begin(), it_2_e = _alloc_info.end(); it_2!=it_2_e; ++it_2 ){
 	if( largest < it_2->second ){
@@ -86,39 +86,39 @@ size_t alloc_single_thread_first_fit_impl::stat_free_size_largest(){
     }
     return largest;
 }
-double alloc_single_thread_first_fit_impl::stat_free_size_mean(){
+double alloc_sthread_first_fit_part_none_impl::stat_free_size_mean(){
     size_t n = stat_free_count_blocks();
     if( n == 0 )
 	return 0;
     return (double) stat_free_size_total() / stat_free_count_blocks();
 }
-size_t alloc_single_thread_first_fit_impl::stat_free_count_blocks(){
+size_t alloc_sthread_first_fit_part_none_impl::stat_free_count_blocks(){
     size_t s = _alloc_info.size();
     return s;
 }
-double alloc_single_thread_first_fit_impl::stat_free_fraction(){
+double alloc_sthread_first_fit_part_none_impl::stat_free_fraction(){
     if( _size == 0 )
 	return 1.0;
     return (double) stat_free_size_total() / _size;
 }
-size_t alloc_single_thread_first_fit_impl::stat_lent_size_total(){
+size_t alloc_sthread_first_fit_part_none_impl::stat_lent_size_total(){
     size_t total = 0;
     for( auto it = _lent_info.begin(), it_e = _lent_info.end(); it!=it_e; ++it ){
 	total += it->second;
     }
     return total;
 }
-size_t alloc_single_thread_first_fit_impl::stat_lent_count_blocks(){
+size_t alloc_sthread_first_fit_part_none_impl::stat_lent_count_blocks(){
     return _lent_info.size();
 }
-double alloc_single_thread_first_fit_impl::stat_lent_size_mean(){
+double alloc_sthread_first_fit_part_none_impl::stat_lent_size_mean(){
     size_t n = _lent_info.size();
     if( n == 0 ){
 	return 0;
     }
     return (double) stat_lent_size_total() / n;
 }
-bool alloc_single_thread_first_fit_impl::resize_internal( void * p, size_t size, bool zeroed ){
+bool alloc_sthread_first_fit_part_none_impl::resize_internal( void * p, size_t size, bool zeroed ){
     if( size < _size ){
 	assert( 0 && "resize target block too small." );
 	return false;
@@ -150,7 +150,7 @@ bool alloc_single_thread_first_fit_impl::resize_internal( void * p, size_t size,
     }
     return true;
 }
-bool alloc_single_thread_first_fit_impl::resize_internal( size_t size ){
+bool alloc_sthread_first_fit_part_none_impl::resize_internal( size_t size ){
     if( size < _size ){
 	assert( 0 && "resize target block too small." );
     }
@@ -167,7 +167,7 @@ bool alloc_single_thread_first_fit_impl::resize_internal( size_t size ){
     }
     return true;
 }
-bool alloc_single_thread_first_fit_impl::clear_internal(){
+bool alloc_sthread_first_fit_part_none_impl::clear_internal(){
     if( _lent_info.size() > 0 ){
 	//some block(s) still lent out
 	return false;
