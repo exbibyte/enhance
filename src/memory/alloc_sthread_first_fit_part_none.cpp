@@ -21,8 +21,10 @@ alloc_sthread_first_fit_part_none_impl::~alloc_sthread_first_fit_part_none_impl(
 }
 bool alloc_sthread_first_fit_part_none_impl::allocating( void ** p, size_t size, bool zeroed ){
     if( size > _size ){
-	assert( 0 && "allocating size too big" );
-	return false;
+	// assert( 0 && "allocating size too big" );
+	std::bad_alloc bad_alloc;
+	throw bad_alloc;
+	// return false;
     }
     for( auto & i : _alloc_info ){
 	size_t remain_size = i.second;
@@ -41,7 +43,7 @@ bool alloc_sthread_first_fit_part_none_impl::allocating( void ** p, size_t size,
 }
 bool alloc_sthread_first_fit_part_none_impl::freeing( void * p ){
     if( (char*)p < (char*)_p || (char*)p >= ((char*)_p + _size) ){
-	assert( 0 && "reclaiming pointer is invalid" );
+	// assert( 0 && "reclaiming pointer is invalid" );
 	return false;
     }
     size_t offset = (char*)p - (char*)_p;    

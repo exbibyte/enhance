@@ -34,15 +34,20 @@ public:
     using alloc_partition = AllocPartition;
 
     template< class... Args >
-    IAlloc( Args... args ) : Impl( std::forward<Args>(args)... ) {}
+    IAlloc( Args&&... args ) : Impl( std::forward<Args>(args)... ) {}
     ~IAlloc(){}
     //lend out a free block to user
     template< class... Args >
-    bool allocating( Args... args ){ return Impl::allocating( std::forward<Args>(args)... ); }
+    bool allocating( Args&&... args ){ return Impl::allocating( std::forward<Args>(args)... ); }
     //reclaim a block
     template< class... Args >
-    bool freeing( Args... args ){ return Impl::freeing( std::forward<Args>(args)... ); }
-
+    bool freeing( Args&&... args ){ return Impl::freeing( std::forward<Args>(args)... ); }
+    //allocate and initializes T if p is nullptr, else initialize T using existing placement p
+    template< class T, class... Args >
+    T * newing( void * p, Args&&... args ){ return Impl::template newing<T,Args...>( p, std::forward<Args>(args)... ); }
+    template< class T >
+    bool deleting( T * p ){ return Impl::deleting( p ); }
+	 
     size_t stat_free_size_total(){ return Impl::stat_free_size_total(); }
     size_t stat_free_size_largest(){ return Impl::stat_free_size_largest(); }
     double stat_free_size_mean(){ return Impl::stat_free_size_mean(); }

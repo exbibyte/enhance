@@ -16,6 +16,10 @@ public:
     
          bool allocating( void ** p, size_t size, bool zeroed = false );
          bool freeing( void * p );
+         template< class T, class... Args >
+         T * newing( void * p, Args&&... args );
+         template< class T >
+	 bool deleting( T * p );
 
               //stat query
        size_t stat_free_size_total();
@@ -42,6 +46,8 @@ private:
        t_list _alloc_info;
        t_list _lent_info;
 };
+
+#include "alloc_sthread_first_fit_part_none.tpp"
 
 using alloc_sthread_first_fit_part_none = IAlloc< alloc_sthread_first_fit_part_none_impl,
 						  trait_alloc_concurrency::none,
