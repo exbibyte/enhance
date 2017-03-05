@@ -24,8 +24,11 @@ targets := $(patsubst %.cpp, %, $(wildcard *.cpp))
 %: %.cpp
 	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $^ $(object_files) $(include_flags)
 
+build_memory:
+	$(MAKE) -C ./../../src/memory all
+
 .PHONY: all
-all: $(targets)
+all: build_memory $(targets)
 
 .PHONY: clean
 clean:
