@@ -21,6 +21,7 @@ class ILock final : public Impl {
 public:
         //lock traits
 	using lock_method =        LockMethod;
+	using lock_impl =          Impl;
 
               template< class... Args >
               ILock( Args... args ) : Impl( std::forward<Args>(args)... ) {}

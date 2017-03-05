@@ -50,6 +50,7 @@ public:
          using val_const_reference =    V const &;
 
 	 //hashtable traits
+	 using hashtable_impl = Impl< K, V >;
 	 using hashtable_concurrency = HtConcurrency;
 	 using hashtable_method = HtMethod;
 	 using hashtable_lock_load_factor = HtLockLoadFactor;
