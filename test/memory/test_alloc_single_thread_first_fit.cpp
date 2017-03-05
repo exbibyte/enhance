@@ -15,6 +15,16 @@ int main(){
     size_t free_size_total = alc.stat_free_size_total();
     assert( block_size - p_size == free_size_total );
 
+    assert( block_size - p_size == alc.stat_free_size_largest() );
+
+    assert( block_size - p_size == alc.stat_free_size_mean() );
+    
+    assert( 1 == alc.stat_free_count_blocks() );
+
+    double err = 0.001;
+    assert( (double)0.5 - err <= alc.stat_free_fraction() );
+    assert( (double)0.5 + err >= alc.stat_free_fraction() );
+    
     for( int i = 0; i < p_size; ++i ){
 	((char*)p)[i] = 3;
     }

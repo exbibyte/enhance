@@ -19,8 +19,9 @@ public:
     size_t stat_free_size_largest();
     double stat_free_size_mean();
     size_t stat_free_count_blocks();
-    //copy curernt buffer to an already empty target buffer
-    bool resize_internal( void * p, size_t size );
+    double stat_free_fraction();
+    //copy current buffer to an already empty target buffer
+    bool resize_internal( void * p, size_t size, bool zeroed = false );
     //copy current buffer to a new empty buffer initialized from system
     bool resize_internal( size_t size );
     bool clear_internal();
@@ -28,7 +29,7 @@ private:
     //starting pointer and total size
     void * _p;
     size_t _size;
-    //remaining free block offset from start and size
+    //free blocks and lent blocks
     std::list<std::pair<size_t, size_t> > _alloc_info;
     std::list<std::pair<size_t, size_t> > _lent_info;
 };

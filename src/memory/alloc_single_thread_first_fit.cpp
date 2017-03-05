@@ -84,7 +84,12 @@ size_t alloc_single_thread_first_fit_impl::stat_free_count_blocks(){
     assert( s > 0 && "free list size invalid." );
     return s;
 }
-bool alloc_single_thread_first_fit_impl::resize_internal( void * p, size_t size ){
+double alloc_single_thread_first_fit_impl::stat_free_fraction(){
+    if( _size == 0 )
+	return 1.0;
+    return (double) stat_free_size_total() / _size;
+}
+bool alloc_single_thread_first_fit_impl::resize_internal( void * p, size_t size, bool zeroed ){
     if( size < _size ){
 	assert( 0 && "resize target block too small." );
 	return false;
@@ -93,16 +98,22 @@ bool alloc_single_thread_first_fit_impl::resize_internal( void * p, size_t size 
 	assert( 0 && "target pointer invalid." );
 	return false;
     }
+    if( _lent_info.size() > 0 ){
+	//some block(s) still lent out
+	return false;
+    }
     char * p_char = (char*)p;
     char * _p_char = (char*)_p;
     try{
 	for( size_t i = 0; i < _size; ++i ){
 	    *p_char++ = *_p_char++;
 	}
-	for( size_t i = 0, remain = size - _size; i < remain; ++i ){
-	    *p_char++ = 0;
+	if( zeroed ){
+	    for( size_t i = 0, remain = size - _size; i < remain; ++i )
+		*p_char++ = 0;
 	}
 	free( _p );
+	_p = p;
 	_size = size;
     }catch(...){
 	assert( 0 && "resize_internal failed." );

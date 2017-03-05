@@ -47,6 +47,7 @@ public:
     size_t stat_free_size_largest(){ return Impl::stat_free_size_largest(); }
     double stat_free_size_mean(){ return Impl::stat_free_size_mean(); }
     size_t stat_free_count_blocks(){ return Impl::stat_free_count_blocks(); }
+    double stat_free_fraction(){ return Impl::stat_free_fraction(); }
     
     //internal helpers
     //remove currently owned block(s) and repoint to a free block elsewhere
