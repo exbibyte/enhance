@@ -20,6 +20,11 @@ public:
     double stat_free_size_mean();
     size_t stat_free_count_blocks();
     double stat_free_fraction();
+
+    size_t stat_lent_size_total();
+    double stat_lent_size_mean();
+    size_t stat_lent_count_blocks();
+
     //copy current buffer to an already empty target buffer
     bool resize_internal( void * p, size_t size, bool zeroed = false );
     //copy current buffer to a new empty buffer initialized from system

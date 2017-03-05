@@ -48,6 +48,10 @@ public:
     double stat_free_size_mean(){ return Impl::stat_free_size_mean(); }
     size_t stat_free_count_blocks(){ return Impl::stat_free_count_blocks(); }
     double stat_free_fraction(){ return Impl::stat_free_fraction(); }
+
+    size_t stat_lent_size_total(){ return Impl::stat_lent_size_total(); }
+    double stat_lent_size_mean(){ return Impl::stat_lent_size_mean(); }
+    size_t stat_lent_count_blocks(){ return Impl::stat_lent_count_blocks(); }
     
     //internal helpers
     //remove currently owned block(s) and repoint to a free block elsewhere
