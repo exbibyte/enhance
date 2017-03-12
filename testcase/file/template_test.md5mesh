@@ -1,0 +1,25 @@
+MD5Version 10
+commandline somecommandline
+
+numJoints 20
+numMeshes 30
+
+joints {
+"joint_name" -1 ( 0.1 0.2 .3 ) ( 1.0 -1.1 2. ) //some comment 
+"joint_1" -1 ( 0.1 0.2 .3 ) ( 1.0 -1.1 2. ) 
+}
+
+mesh {
+shader texture
+
+numverts 1
+vert 0 ( 5.5 5.6 ) 10 3
+
+numtris 2
+tri 0 0 1 2
+tri 1 0 1 2
+
+numweights 1
+weight 0 -1 5.0 ( 33.0 34.0 35.5 )
+
+}
