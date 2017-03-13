@@ -1,41 +1,32 @@
 MD5Version 10
 commandline somecommandline
 
-numJoints 2
-numMeshes 2
+numJoints 3
+numMeshes 1
 
 joints {
+
 "joint_name" -1 ( 0.1 0.2 .3 ) ( 1.0 -1.1 2. ) //some comment 
-"joint_1" 0 ( 5.1 5.2 5.3 ) ( 1.0 -1.1 2. ) 
+"joint_1" 0 ( 5.1 5.2 5.3 ) ( 1.0 -1.1 2. )
+"joint_2" 0 ( 5.1 5.2 5.3 ) ( 1.0 -1.1 2. )
+
 }
 
 mesh {
+
 shader "texture_0"
 
-numverts 1
-vert 0 ( 0.5 0.4 ) 10 3
-
-numtris 2
-tri 0 0 1 2
-tri 1 0 1 2
-
-numweights 1
-weight 0 -1 0.5 ( 33.0 34.0 35.5 )
-
-}
-mesh {
-shader "texture_1"
-
-numverts 2
-vert 0 ( 0.3 0.4 ) 10 3
-vert 1 ( 0.0 0.1 ) 10 3
+numverts 3
+vert 0 ( 0.5 0.4 ) 0 1
+vert 1 ( 0.5 0.4 ) 1 1
+vert 2 ( 0.5 0.4 ) 0 2
 
 numtris 2
 tri 0 0 1 2
 tri 1 0 1 2
 
 numweights 2
-weight 0 -1 0.5 ( 33.0 34.0 35.5 )
-weight 1 0 0.75 ( 3.0 4.0 5.5 )
+weight 0 0 0.5 ( 33.0 34.0 35.5 )
+weight 1 1 0.75 ( 3.0 4.0 5.5 )
 
 }

@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <unordered_map>
 #include <map>
+#include <set>
 
 std::unordered_map< std::string, file_md5_mesh::process_type > file_md5_mesh::_keyword_map = \
 { { "MD5Version", file_md5_mesh::process_type::md5version }, \
@@ -40,7 +41,7 @@ std::map< file_md5_mesh::process_type, bool(*)(std::fstream &, void *) > file_md
   { file_md5_mesh::process_type::numweights, &file_md5_mesh::process_numweights }, \
   { file_md5_mesh::process_type::weight, &file_md5_mesh::process_weight } };
 
-file_md5_mesh::data_mesh file_md5_mesh::process( std::string file_path ){
+std::pair<bool, file_md5_mesh::data_mesh> file_md5_mesh::process( std::string file_path ){
     data_mesh d {};
     std::fstream f( file_path, std::fstream::in );
     std::pair<token, std::string> t = get_token( f );
@@ -52,14 +53,9 @@ file_md5_mesh::data_mesh file_md5_mesh::process( std::string file_path ){
 	process_token( t, f, (void*)&d );
 	t = get_token( f );
     }
-    //check count of joints and meshes for collected data
-    if( d._numjoints != d._joints.size() ){
-	assert( 0 && "joint number inconsistent" );
-    }
-    if( d._nummeshes != d._meshes.size() ){
-	assert( 0 && "mesh number inconsistent" );
-    }
-    return d;
+
+    bool ret = check_consistency( d );
+    return std::pair<bool, data_mesh>( ret, std::move(d) );
 }
 bool file_md5_mesh::skip_white_space( std::fstream & f ){
     while( f.good() ){
@@ -83,9 +79,9 @@ std::pair< file_md5_mesh::token, std::string > file_md5_mesh::get_token( std::fs
 	return std::pair<token,std::string>( token::END, "" );
     std::string s {};
     char sink;
-    bool negative = false;
-    if( '-' == c ){
-	negative = true;
+    bool is_signed = false;
+    if( '-' == c || '+' == c ){
+        is_signed = true;
 	s += c;
 	f.get(sink);
 	c = f.peek();
@@ -133,7 +129,7 @@ std::pair< file_md5_mesh::token, std::string > file_md5_mesh::get_token( std::fs
 	    return std::pair<token,std::string>( token::INT, s );
 	}
     }
-    if( negative ){
+    if( is_signed ){
 	return std::pair<token,std::string>( token::INVALID, s );
     }
     if( '"' == c ){
@@ -233,49 +229,13 @@ void file_md5_mesh::process_token( std::pair<file_md5_mesh::token, std::string> 
 	    bool ret = (*func)( f, d );
 	}
 	break;
-	//the process types below are expected to be processed within process_mesh
-	// case process_type::shader:
-	// case process_type::numverts:
-	// case process_type::numtris:
-	// case process_type::numweights:
-	// case process_type::vert:
-	// case process_type::tri:
-	// case process_type::weight:
-	// {
-	//     //d is assumed to be mesh*
-	//     bool ret = (*func)( f, d );
-	// }
-	// break;
 	default:
 	    assert( 0 && "unknown process_token" );
 	}
     }
-    if( token::INT == t.first ){
-	std::cout << "found int: " << t.second << std::endl;
-    }
-    if( token::FLOAT == t.first ){
-	std::cout << "found float: " << t.second << std::endl;
-    }
-    if( token::STR == t.first ){
-	std::cout << "found str: " << t.second << std::endl;
-    }
-    if( token::COMMENT == t.first ){
-	std::cout << "found comment: " << t.second << std::endl;
-    }
-    if( token::BRACEL == t.first ){
-	std::cout << "found {" << std::endl;
-    }
-    if( token::BRACER == t.first ){
-	std::cout << "found }" << std::endl;
-    }
-    if( token::PARENL == t.first ){
-	std::cout << "found (" << std::endl;
-    }
-    if( token::PARENR == t.first ){
-	std::cout << "found )" << std::endl;
-    }
-    if( token::INVALID == t.first ){
-	std::cout << "found invalid: " << t.second << std::endl;
+    else{
+	std::cout << "found token: " << t.second << std::endl;
+	assert( 0 && "unexpected token" );
     }
 }
 bool file_md5_mesh::process_md5version( std::fstream & f, void * d ){
@@ -519,13 +479,6 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 	}
 	}
     }
-    //check retrived data
-    if( m._numverts != m._verts.size() ||
-	m._numtris != m._tris.size() ||
-	m._numweights != m._weights.size() ){
-	assert( 0 && "inconsistent mesh data" );
-	return false;
-    }
     ((data_mesh*)d)->_meshes.push_back( m );
     return true;
 }
@@ -754,7 +707,117 @@ bool file_md5_mesh::aux_process_float( std::fstream & f, void * d )
     *((float*)d)= num;
     return true;
 }
-bool file_md5_mesh::check_consistency( data_mesh & ){
+bool file_md5_mesh::check_consistency( data_mesh & d ){
+    //joints
+    if( d._numjoints != d._joints.size() ){
+	assert( 0 && "joint number inconsistent" );
+	return false;
+    }
+    {
+	bool root_index_set = false;
+	std::set<std::string> unique;
+	for( auto & i : d._joints ){
+	    if( unique.end() != unique.find( i._name ) ){
+		assert( 0 && "joint name is not unique" );
+		return false;
+	    }
+	    unique.insert( i._name );
 
+	    if( !root_index_set && (-1 == i._parent_index) ){
+		root_index_set = true;
+	    }else if( -1 == i._parent_index ){
+		assert( 0 && "multiple root joint found" );
+		return false;
+	    }else if( i._parent_index < -1 || i._parent_index >= d._numjoints ){
+		assert( 0 && "joint parent index out of range" );
+		return false;
+	    }
+	}
+	if( !root_index_set ){
+	    assert( 0 && "no root joint found" );
+	    return false;
+	}
+    }
+    //mesh
+    if( d._nummeshes != d._meshes.size() ){
+	assert( 0 && "mesh number inconsistent" );
+	return false;
+    }
+    for( auto & i : d._meshes ){
+	{//vert
+	    if( i._numverts != i._verts.size() ){
+		assert( 0 && "mesh vert count not consistent" );
+		return false;
+	    }
+	    std::set<int> unique;
+	    for( auto & j : i._verts ){
+		if( unique.end() != unique.find( j._index ) ){
+		    assert( 0 && "vert index is not unique" );
+		    return false;
+		}
+		unique.insert( j._index );
+
+		if( j._tex_coords[0] < 0 || j._tex_coords[0] > 1 ||
+		    j._tex_coords[1] < 0 || j._tex_coords[1] > 1 ){
+		    assert( 0 && "vert texture coordinate out of range" );
+		    return false;
+		}
+
+		if( j._weight_start < 0 || j._weight_start >= i._numweights ||
+		    (j._weight_start + j._weight_count > i._numweights) ){
+		    assert( 0 && "vert weight index out of range" );
+		    return false;
+		}
+		if( j._weight_count <= 0 ){
+		    assert( 0 && "vert weight count invalid" );
+		    return false;
+		}
+	    }
+	}
+	{//tri
+	    if( i._numtris != i._tris.size() ){
+		assert( 0 && "mesh tri count not consistent" );
+		return false;
+	    }
+	    std::set<int> unique;
+	    for( auto & j : i._tris ){
+		if( unique.end() != unique.find( j._index ) ){
+		    assert( 0 && "tri index is not unique" );
+		    return false;
+		}
+		unique.insert( j._index );
+
+	        for( auto & k : j._vert_indices ){
+		    if( k < 0 || k >= i._numverts ){
+			assert( 0 && "tri vert index out of range" );
+			return false;
+		    }
+		}
+	    }
+	}
+	{//weight
+	    if( i._numweights != i._weights.size() ){
+		assert( 0 && "mesh weight count not consistent" );
+		return false;
+	    }
+	    std::set<int> unique;
+	    for( auto & j : i._weights ){
+		if( unique.end() != unique.find( j._index ) ){
+		    assert( 0 && "weight index is not unique" );
+		    return false;
+		}
+		unique.insert( j._index );
+
+		if( j._joint_index < 0 || j._joint_index >= d._numjoints ){
+		    assert( 0 && "weight joint index out of range" );
+		    return false;
+		}
+		if( j._weight_bias < 0 || j._weight_bias > 1 ){
+		    assert( 0 && "weight bias out of range" );
+		    return false;
+		}
+	    }
+	}
+    }
     return true;
 }

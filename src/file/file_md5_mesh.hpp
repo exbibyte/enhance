@@ -63,7 +63,6 @@ public:
 	INVALID,
         END,
     };
-
     enum class process_type {
 	md5version,
 	commandline,
@@ -80,8 +79,7 @@ public:
 	numweights,
 	weight,
     };
-    
-    static data_mesh process( std::string file_path );
+    static std::pair<bool, data_mesh> process( std::string file_path );
 
 private:
 

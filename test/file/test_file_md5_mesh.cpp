@@ -1,10 +1,13 @@
 #include "file_md5_mesh.hpp"
 #include <string>
+#include <cassert>
 
 int main( int argc, char** argv ){
 
     std::string path = argv[1];
-    file_md5_mesh::data_mesh d = file_md5_mesh::process( path );
+    std::pair<bool, file_md5_mesh::data_mesh> ret = file_md5_mesh::process( path );
+    assert( ret.first );
+    file_md5_mesh::data_mesh d = std::move( ret.second );
     std::cout << "data_mesh: md5version: " << d._md5version << std::endl;
     std::cout << "data_mesh: commandline: " << d._commandline << std::endl;
     std::cout << "data_mesh: numjoints: " << d._numjoints << std::endl;
