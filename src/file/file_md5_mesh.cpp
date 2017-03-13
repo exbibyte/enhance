@@ -53,7 +53,6 @@ std::pair<bool, file_md5_mesh::data_mesh> file_md5_mesh::process( std::string fi
 	process_token( t, f, (void*)&d );
 	t = get_token( f );
     }
-
     bool ret = check_consistency( d );
     return std::pair<bool, data_mesh>( ret, std::move(d) );
 }
