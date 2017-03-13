@@ -17,6 +17,7 @@ Memory Management  - In Progress
 Script management  - To Do
 
 Current work is focused on concurrent data structures, lighting, rendering pipeline, and asset model file format.
+3D model format is being revised to support md5mesh and md5anim formats.
 
 ## Dependencies:
 
