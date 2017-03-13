@@ -82,6 +82,11 @@ public:
     };
     
     static data_mesh process( std::string file_path );
+
+private:
+
+    static bool check_consistency( data_mesh & );
+    
     static bool skip_white_space( std::fstream & f );
     static std::pair<token, std::string> get_token( std::fstream & f, bool ignore_comments = true );
     static void process_token( std::pair<token, std::string> t, std::fstream & f, void * );
@@ -107,7 +112,6 @@ public:
     static bool aux_process_vec_float( std::fstream &, int count, void *, int & retrieved );
     static bool aux_process_int( std::fstream &, void * );
     static bool aux_process_float( std::fstream &, void * );
-
     static std::unordered_map<std::string, file_md5_mesh::process_type > _keyword_map;
     static std::map<file_md5_mesh::process_type, bool(*)(std::fstream &, void *) > _process_map;
 

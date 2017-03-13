@@ -61,7 +61,6 @@ file_md5_mesh::data_mesh file_md5_mesh::process( std::string file_path ){
     }
     return d;
 }
-
 bool file_md5_mesh::skip_white_space( std::fstream & f ){
     while( f.good() ){
 	int c = f.peek();
@@ -76,8 +75,6 @@ bool file_md5_mesh::skip_white_space( std::fstream & f ){
     }
     return false;
 }
-
-
 std::pair< file_md5_mesh::token, std::string > file_md5_mesh::get_token( std::fstream & f, bool ignore_comments ){
     if( !skip_white_space( f ) )
 	return std::pair<token,std::string>( token::INVALID, "" );
@@ -214,7 +211,6 @@ std::pair< file_md5_mesh::token, std::string > file_md5_mesh::get_token( std::fs
     c = f.peek();
     return std::pair<token,std::string>( token::INVALID, s );
 }
-
 void file_md5_mesh::process_token( std::pair<file_md5_mesh::token, std::string> t, std::fstream & f, void * d ){
     if( token::KEYWORD == t.first ){
 	// std::cout << "found keyword: " << t.second << std::endl;
@@ -282,24 +278,14 @@ void file_md5_mesh::process_token( std::pair<file_md5_mesh::token, std::string> 
 	std::cout << "found invalid: " << t.second << std::endl;
     }
 }
-
 bool file_md5_mesh::process_md5version( std::fstream & f, void * d ){
     //d is assumed to be data_mesh*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::INT != t.first ){
+    if( !aux_process_int( f, &((data_mesh*)d)->_md5version ) ){
+	assert( 0 && "expected md5version number" );
 	return false;
-    }else{
-	int i;
-	int n = sscanf( t.second.c_str(), "%d", &i );
-	if( 1 != n ){
-	    return false;
-	}else{
-	    ((data_mesh*)d)->_md5version = i;
-	    return true;
-	}
     }
+    return true;
 }
-
 bool file_md5_mesh::process_commandline( std::fstream & f, void * d ){
     //d is assumed to be data_mesh*
     std::pair< token, std::string > t = get_token( f );
@@ -310,41 +296,22 @@ bool file_md5_mesh::process_commandline( std::fstream & f, void * d ){
 	return true;
     }
 }
-
 bool file_md5_mesh::process_numjoints( std::fstream & f, void * d ){
     //d is assumed to be data_mesh*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::INT != t.first ){
+    if( !aux_process_int( f, &((data_mesh*)d)->_numjoints ) ){
+	assert( 0 && "expected numjoints" );
 	return false;
-    }else{
-	int i;
-	int n = sscanf( t.second.c_str(), "%d", &i );
-	if( 1 != n ){
-	    return false;
-	}else{
-	    ((data_mesh*)d)->_numjoints = i;
-	    return true;
-	}
     }
+    return true;
 }
-
 bool file_md5_mesh::process_nummeshes( std::fstream & f, void * d ){
     //d is assumed to be data_mesh*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::INT != t.first ){
+    if( !aux_process_int( f, &((data_mesh*)d)->_nummeshes ) ){
+	assert( 0 && "expected nummeshes" );
 	return false;
-    }else{
-	int i;
-	int n = sscanf( t.second.c_str(), "%d", &i );
-	if( 1 != n ){
-	    return false;
-	}else{
-	    ((data_mesh*)d)->_nummeshes = i;
-	    return true;
-	}
     }
+    return true;
 }
-
 bool file_md5_mesh::process_joints( std::fstream & f, void * d ){
     //d is assumed to be data_mesh*
     {
@@ -384,18 +351,10 @@ bool file_md5_mesh::process_joint( std::fstream & f, void * d ){
 	((joint*)d)->_name = t.second;
     }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::INT != t.first ){
-	    // assert( 0 && "expected joint parent index" );
+	if( !aux_process_int( f, &((joint*)d)->_parent_index ) ){
+	    assert( 0 && "expected joint parent index" );
 	    return false;
 	}
-	int i;
-	int n = sscanf( t.second.c_str(), "%d", &i );
-	if( 1 != n ){
-	    // assert( 0 && "expected joint parent index" );
-	    return false;
-	}
-	((joint*)d)->_parent_index = i;
     }
     {
 	std::pair< token, std::string > t = get_token( f );
@@ -742,7 +701,6 @@ bool file_md5_mesh::aux_process_vec_int( std::fstream & f, int count, void * d, 
     }
     return true;
 }
-
 bool file_md5_mesh::aux_process_vec_float( std::fstream & f, int count, void * d, int & retrieved )
 {
     //d is assume to be float*
@@ -765,7 +723,6 @@ bool file_md5_mesh::aux_process_vec_float( std::fstream & f, int count, void * d
     }
     return true;
 }
-
 bool file_md5_mesh::aux_process_int( std::fstream & f, void * d )
 {
     //d is assumed to be int*
@@ -795,5 +752,9 @@ bool file_md5_mesh::aux_process_float( std::fstream & f, void * d )
 	return false;
     }
     *((float*)d)= num;
+    return true;
+}
+bool file_md5_mesh::check_consistency( data_mesh & ){
+
     return true;
 }
