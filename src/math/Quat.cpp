@@ -21,6 +21,17 @@ Quat::Quat( float x, float y, float z, float w ){
     _quat[3] = w;
 }
 
+Quat::Quat( float x, float y, float z ){
+    _quat[0] = x;
+    _quat[1] = y;
+    _quat[2] = z;
+    float t = 1.0 - ( x*x - y*y - z*z );
+    if( t < 0 )
+	_quat[3] = 0;	
+    else
+	_quat[3] = -sqrt(t);
+}
+
 Quat::Quat( Vec v, float w ){
     _quat[0] = v._vec[0];
     _quat[1] = v._vec[1];
@@ -294,6 +305,28 @@ void Quat::ToAxisAngle( Vec & axis, float & angle ){
 
 Quat Quat::Negate() const {
     return Quat( -_quat[0], -_quat[1], -_quat[2], -_quat[3] );
+}
+
+void Quat::RotatePoint( float in [], float out[] ) const {
+    Quat temp, inverse, final;
+    inverse = *this;
+    inverse._quat[0] *= -1;
+    inverse._quat[1] *= -1;
+    inverse._quat[2] *= -1;
+    inverse.NormalizeQuatCurrent();
+    temp = this->MultVec( in );
+    final = temp * inverse;
+    out[0] = final._quat[0];
+    out[1] = final._quat[1];
+    out[2] = final._quat[2];
+}
+Quat Quat::MultVec( float in [] ) const {
+    Quat q;
+    q._quat[3] = - (_quat[0]*in[0]) - (_quat[1]*in[1]) - (_quat[2]*in[2]);
+    q._quat[0] = (_quat[3]*in[0]) + (_quat[1]*in[2]) + (_quat[2]*in[1]);
+    q._quat[1] = (_quat[3]*in[1]) + (_quat[2]*in[0]) + (_quat[0]*in[2]);
+    q._quat[2] = (_quat[3]*in[2]) + (_quat[0]*in[1]) + (_quat[1]*in[0]);
+    return q;
 }
 
 Quat InterpolateBasic( const Quat q1, const Quat q2, float r ){

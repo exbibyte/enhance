@@ -26,7 +26,7 @@ public:
     };
     struct frame {
 	int _index;
-	std::vector<float> _data;
+	std::vector<float> _data; //size of num animated components
     };
     struct data_anim {
 	int _md5version;
@@ -35,10 +35,10 @@ public:
 	int _numjoints;
 	int _framerate;
 	int _num_animated_components;
-	std::list<hierarchy> _hierarchies;
-	std::list<bound> _bounds;
-	std::list<baseframe> _baseframes;
-	std::list<frame> _frames;
+	std::list<hierarchy> _hierarchies; //expected size = _numjoints
+	std::list<bound> _bounds; //expected size = number of _frames = _numframes
+	std::list<baseframe> _baseframes; //expected size = _numjoints
+	std::list<frame> _frames; //expected number of data per frame = _num_animated_components. expected size = _numframes
     };
     enum class token {
 	COMMENT,
@@ -69,6 +69,8 @@ public:
 
 private:
 
+    static bool check_consistency( data_anim & );
+    
     static bool skip_white_space( std::fstream & f );
     static std::pair<token, std::string> get_token( std::fstream & f, bool ignore_comments = true );
     static void process_token( std::pair<file_md5_anim::token, std::string> t, std::fstream & f, void * d );

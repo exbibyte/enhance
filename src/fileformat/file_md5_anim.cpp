@@ -6,6 +6,7 @@
 #include <map>
 #include <fstream>
 #include <cassert>
+#include <set>
 
 #include "file_md5_anim.hpp"
 
@@ -47,8 +48,8 @@ std::pair<bool, file_md5_anim::data_anim> file_md5_anim::process( std::string fi
 	process_token( t, f, (void*)&d );
 	t = get_token( f );
     }
-    // bool ret = check_consistency( d );
-    return std::pair<bool, data_anim>( true, std::move(d) );
+    bool ret = check_consistency( d );
+    return std::pair<bool, data_anim>( ret, std::move(d) );
 }
 void file_md5_anim::process_token( std::pair<file_md5_anim::token, std::string> t, std::fstream & f, void * d ){
     if( token::KEYWORD == t.first ){
@@ -590,3 +591,53 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
     ((data_anim*)d)->_frames.push_back( fr );
     return true;
 } 
+bool file_md5_anim::check_consistency( data_anim & d ){
+    if( d._numjoints != d._hierarchies.size() ){
+	assert( d._numjoints == d._hierarchies.size() );
+	return false;
+    }
+    if( d._numjoints != d._baseframes.size() ){
+	assert( d._numjoints == d._baseframes.size() );
+	return false;
+    }
+    std::set<int> frame_indices;
+    for( auto & i : d._frames ){
+	if( frame_indices.find(i._index) != frame_indices.end() ){
+	    assert( false && "frame index not unique" );
+	    return false;
+	}else{
+	    frame_indices.insert(i._index);
+	}
+    }
+
+    std::set<int> parent_index;
+    for( auto & i : d._hierarchies ){
+	if( i._parent == -1 ){
+	    if( parent_index.end() != parent_index.find(-1) ){
+		assert( false && "multiple root joints found" );
+		return false;
+	    }
+	    parent_index.insert(-1);
+	}else{
+	    parent_index.insert(i._parent);
+	}
+    }
+
+    if( !parent_index.empty() ){
+	int min_index = *parent_index.begin();
+	int max_index = *parent_index.rbegin();
+	if( min_index != -1 ){
+	    assert( false && "expect 1 root joint having parent index of -1" );
+	    return false;
+	}
+	if( max_index >= d._hierarchies.size() ){
+	    assert( false && "hierarchy joint parent index out of range" );
+	    return false;
+	}
+    }else{
+	assert( false && "empty heierachy parent index");
+	return false;
+    }
+
+    return true;
+}

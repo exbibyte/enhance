@@ -15,6 +15,7 @@ class Quat{
   float             _quat[4];
                     Quat();
                     Quat( float x, float y, float z, float w );
+                    Quat( float x, float y, float z ); //w computed from x, y, z
 		    Quat( Vec a, float w ); //a = {x,y,z}
 		    Quat( const Quat & q );
 
@@ -42,6 +43,8 @@ class Quat{
   void              ToAxisAngle( Vec & axis, float & angle );
   inline Quat       Conjugate() const { return Quat(-_quat[0], -_quat[1], -_quat[2], _quat[3]); }
   Quat              Negate() const; //negative version
+  void              RotatePoint( float in [], float out[] ) const;
+  Quat              MultVec( float in [] ) const;
 };
 
 Quat                Scale( float s, const Quat q); // s*q

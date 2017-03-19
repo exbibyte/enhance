@@ -3,7 +3,7 @@
 #include <cassert>
 
 int main( int argc, char** argv ){
-
+    assert( argc >= 2 );
     std::string path = argv[1];
     std::pair<bool, file_md5_mesh::data_mesh> ret = file_md5_mesh::process( path );
     assert( ret.first );
