@@ -8,6 +8,8 @@
 #include <iostream>
 #include <map>
 
+#include "Quat.hpp"
+
 class file_md5_mesh {
 public:
     struct joint {
@@ -15,12 +17,15 @@ public:
 	int _parent_index;
 	float _pos[3];
 	float _orient[3];
+	Quat _rot; //computed for bind pose
     };
     struct vert {
 	int _index;
 	float _tex_coords[2];
 	int _weight_start;
 	int _weight_count;
+	float _normal[3]; //computed for bind pose
+	float _pos[3]; //computed for bind pose
     };
     struct tri {
 	int _index;
@@ -47,7 +52,7 @@ public:
 	std::string _commandline;
 	int _numjoints;
 	int _nummeshes;
-	std::list<joint> _joints;
+	std::vector<joint> _joints;
 	std::list<mesh> _meshes;
     };
     enum class token {
@@ -84,6 +89,8 @@ public:
 private:
 
     static bool check_consistency( data_mesh & );
+    static bool calc_bind_pose_positions( data_mesh & );
+    static bool calc_bind_pose_normals( data_mesh & );
     
     static bool skip_white_space( std::fstream & f );
     static std::pair<token, std::string> get_token( std::fstream & f, bool ignore_comments = true );

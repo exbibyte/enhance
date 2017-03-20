@@ -8,6 +8,7 @@ class file_md5_calc_mesh_frame {
 public:
     struct vert_final {
 	float _pos[3];
+	float _normal[3];
     };
     struct mesh_frame_final {
 	std::vector<vert_final> _verts;

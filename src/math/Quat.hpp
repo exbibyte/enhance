@@ -45,6 +45,7 @@ class Quat{
   Quat              Negate() const; //negative version
   void              RotatePoint( float in [], float out[] ) const;
   Quat              MultVec( float in [] ) const;
+  Quat              Inverse() const;
 };
 
 Quat                Scale( float s, const Quat q); // s*q

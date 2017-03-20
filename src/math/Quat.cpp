@@ -1,6 +1,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -327,6 +328,19 @@ Quat Quat::MultVec( float in [] ) const {
     q._quat[1] = (_quat[3]*in[1]) + (_quat[2]*in[0]) + (_quat[0]*in[2]);
     q._quat[2] = (_quat[3]*in[2]) + (_quat[0]*in[1]) + (_quat[1]*in[0]);
     return q;
+}
+
+Quat Quat::Inverse() const {
+    Quat conj = this->Conjugate();
+    float dot = 0;
+    for( int i = 0; i < 4; ++i ){
+	dot += conj._quat[i] * conj._quat[i];
+    }
+    assert( dot != 0 );
+    for( int i = 0; i < 4; ++i ){
+	conj._quat[i] /= dot;
+    }
+    return conj;
 }
 
 Quat InterpolateBasic( const Quat q1, const Quat q2, float r ){
