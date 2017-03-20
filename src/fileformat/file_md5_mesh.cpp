@@ -419,6 +419,12 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing numverts failed" );
 		    return false;
 		}
+		if( m._numverts < 0 )
+		{
+		    assert( 0 && "numverts out of range" );
+		    return false;
+		}
+		m._verts.resize( m._numverts );
 	    }
 	    break;
 	    case process_type::numtris:
@@ -427,6 +433,12 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing numtris failed" );
 		    return false;
 		}
+		if( m._numtris < 0 )
+		{
+		    assert( 0 && "numtris out of range" );
+		    return false;
+		}
+		m._tris.resize( m._numtris );
 	    }
 	    break;
 	    case process_type::numweights:
@@ -435,6 +447,12 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing numweights failed" );
 		    return false;
 		}
+		if( m._numweights < 0 )
+		{
+		    assert( 0 && "numweights out of range" );
+		    return false;
+		}
+		m._weights.resize( m._numweights );
 	    }
 	    break;
 	    case process_type::vert:
@@ -444,7 +462,7 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing vert failed" );
 		    return false;
 		}
-		m._verts.push_back( a );
+		m._verts[ a._index ] = a;
 	    }
 	    break;
 	    case process_type::tri:
@@ -454,7 +472,7 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing tri failed" );
 		    return false;
 		}
-		m._tris.push_back( a );
+		m._tris[ a._index ] = a;
 	    }
 	    break;
 	    case process_type::weight:
@@ -464,7 +482,7 @@ bool file_md5_mesh::process_mesh( std::fstream & f, void * d ){
 		    assert( 0 && "processing weight failed" );
 		    return false;
 		}
-		m._weights.push_back( a );
+		m._weights[ a._index ] = a;
 	    }
 	    break;
 	    default:

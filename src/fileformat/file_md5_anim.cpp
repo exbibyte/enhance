@@ -597,7 +597,6 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
 	    return false;
 	}
     }
-    // ((data_anim*)d)->_frames.push_back( fr );
     return true;
 } 
 bool file_md5_anim::check_consistency( data_anim & d ){

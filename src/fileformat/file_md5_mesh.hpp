@@ -43,7 +43,7 @@ public:
 	int _numtris;
 	int _numweights;
 	std::vector<vert> _verts;
-	std::list<tri> _tris;
+	std::vector<tri> _tris;
 	std::vector<weight> _weights;
 	mesh() : _shader(""), _numverts(0), _numtris(0), _numweights(0) {}
     };
