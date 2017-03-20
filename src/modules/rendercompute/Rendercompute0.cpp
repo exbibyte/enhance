@@ -19,7 +19,7 @@ RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > 
     RenderData renderdata;
 
     //light ----------------------------------------------------------------------
-    vector<double> light_position     { 0, 0, 20 };
+    vector<double> light_position     { 0, 0, 80 };
     vector<double> light_lookat       { 0, 0, 0 };
     vector<double> light_up           { 0, 1, 0 };
     vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
@@ -28,7 +28,7 @@ RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > 
     vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
 
     //camera ---------------------------------------------------------------------
-    vector<double> camera_position    { -15, -15, 10.0 };
+    vector<double> camera_position    { 70, 70, 70.0 };
     vector<double> camera_lookat      { 0, 0, 0 };
     vector<double> camera_up          { 0, 1, 0 };
     vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };

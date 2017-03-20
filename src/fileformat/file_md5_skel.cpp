@@ -39,7 +39,6 @@ std::pair<bool,file_md5_skel::skel_frame> file_md5_skel::process_skel_frame( fil
     auto it_base = base.begin();
     while( it_hier != hier.end() ){
 	int frame_data_start_index = it_hier->_start_index;
-	int offset = 0;
 	int flag = it_hier->_flags;
 	//obtain rotation and position from base frame
 	float sf_pos[3];
@@ -48,20 +47,20 @@ std::pair<bool,file_md5_skel::skel_frame> file_md5_skel::process_skel_frame( fil
 	    sf_pos[i] = it_base->_pos[i];
 	    sf_rot[i] = it_base->_orient[i];
 	}
-
+	int offset = 0;
 	//update rotation and position from frame data if neccessary
-	if( flag & 1 ) //pos x
-	    sf_pos[0] = f._data[ frame_data_start_index + offset++ ];
-	if( flag & 2 ) //pos y
-	    sf_pos[1] = f._data[ frame_data_start_index + offset++ ];
-	if( flag & 4 ) //pos z
-	    sf_pos[2] = f._data[ frame_data_start_index + offset++ ];
-	if( flag & 8 ) //rot x
-	    sf_rot[0] = f._data[ frame_data_start_index + offset++ ];
-	if( flag & 16 ) //rot y
-	    sf_rot[1] = f._data[ frame_data_start_index + offset++ ];
-	if( flag & 32 ) //rot z
-	    sf_rot[2] = f._data[ frame_data_start_index + offset++ ];
+	for( int i = 0; i < 3; ++i ){
+	    if( flag & (1<<i) ){
+		sf_pos[i] = f._data[ frame_data_start_index + offset ];
+		++offset;
+	    }
+	}
+	for( int i = 0; i < 3; ++i ){
+	    if( flag & (8<<i) ){
+		sf_rot[i] = f._data[ frame_data_start_index + offset ];
+		++offset;
+	    }
+	}
 	
 	//compute rotation quaternion
 	Quat sf_orient( sf_rot[0], sf_rot[1], sf_rot[2] );

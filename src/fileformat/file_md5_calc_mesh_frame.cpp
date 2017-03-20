@@ -7,7 +7,7 @@
 #include "file_md5_mesh.hpp"
 #include "file_md5_skel.hpp"
 
-std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_frame::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_frame & sf ){
+std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_frame::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_frame & sf ){    
     data_mesh_frame dmf;
     for( auto & ele : m._meshes ){
 	mesh_frame_final mff;
@@ -37,10 +37,32 @@ std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_fr
 		    // vf._pos[i] += (jf._pos[i] + weight_pos_transform[i]) * w._weight_bias;
 		    vf._pos[i] += (jf._pos[i] + pos_xform[i]) * w._weight_bias;
 		    // vf._normal[i] += vertex_normal_transform[i] * w._weight_bias;
-		    vf._normal[i] += dir_norm._quat[i] * w._weight_bias;
+		    // vf._normal[i] += dir_norm._quat[i] * w._weight_bias;
 		}
 	    }
 	    mff._verts.push_back( std::move( vf ) );
+	}
+	//calculate vertex normal
+	for( auto & t : ele._tris ){
+	    int v0_index = t._vert_indices[ 0 ];
+	    int v1_index = t._vert_indices[ 1 ];
+	    int v2_index = t._vert_indices[ 2 ];
+	    assert( v0_index >= 0 && v0_index < mff._verts.size() );
+	    assert( v1_index >= 0 && v1_index < mff._verts.size() );
+	    assert( v2_index >= 0 && v2_index < mff._verts.size() );
+	    Vec v0, v1, v2;
+	    v0.SetFromArray( 3, mff._verts[ v0_index ]._pos );
+	    v1.SetFromArray( 3, mff._verts[ v1_index ]._pos );
+	    v2.SetFromArray( 3, mff._verts[ v2_index ]._pos );
+	    Vec v01 = v1 - v0;
+	    Vec v02 = v2 - v0;
+	    Vec n = v02.Cross(v01);
+	    n.NormalizeCurrent();
+	    for( int i = 0; i < 3; ++i ){
+		mff._verts[ v0_index ]._normal[i] = n._vec[i];
+		mff._verts[ v1_index ]._normal[i] = n._vec[i];
+		mff._verts[ v2_index ]._normal[i] = n._vec[i];
+	    }
 	}
 	mff._tris.insert(mff._tris.end(), ele._tris.begin(), ele._tris.end() );
 	dmf._mesh_frames.push_back( std::move( mff ) );

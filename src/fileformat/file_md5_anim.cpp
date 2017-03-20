@@ -331,10 +331,13 @@ bool file_md5_anim::process_commandline( std::fstream & f, void * d ){
 }
 bool file_md5_anim::process_numframes( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    if( !aux_process_int( f, &((data_anim*)d)->_numframes ) ){
+    int n;
+    if( !aux_process_int( f, &n ) ){
 	assert( 0 && "expected numframes" );
 	return false;
     }
+    ((data_anim*)d)->_numframes = n;
+    ((data_anim*)d)->_frames.resize(n);
     return true;
 }
 bool file_md5_anim::process_numjoints( std::fstream & f, void * d ){
@@ -560,11 +563,17 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
     // frame_index:int {
     //  v0:float v1:float ... -> # of floats = numAnimatedComponents
     // }
-    frame fr {};
-    if( !aux_process_int( f, &fr._index ) ){
+    int frame_index;
+    if( !aux_process_int( f, &frame_index ) ){
 	assert( 0 && "expected frame index" );
 	return false;
     }
+    if( frame_index < 0 || frame_index >= ((data_anim*)d)->_frames.size() ){
+	assert( 0 && "frame index out of range" );
+	return false;
+    }
+    frame & fr = ((data_anim*)d)->_frames[frame_index];
+    fr._index = frame_index;
     {
 	std::pair< token, std::string > t = get_token( f );
 	if( token::BRACEL != t.first ){
@@ -588,7 +597,7 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
 	    return false;
 	}
     }
-    ((data_anim*)d)->_frames.push_back( fr );
+    // ((data_anim*)d)->_frames.push_back( fr );
     return true;
 } 
 bool file_md5_anim::check_consistency( data_anim & d ){
@@ -601,13 +610,19 @@ bool file_md5_anim::check_consistency( data_anim & d ){
 	return false;
     }
     std::set<int> frame_indices;
+    int current_frame = 0;
     for( auto & i : d._frames ){
 	if( frame_indices.find(i._index) != frame_indices.end() ){
 	    assert( false && "frame index not unique" );
 	    return false;
 	}else{
+	    if( current_frame != i._index ){
+		assert( false && "frame index not match expected" );
+		return false;
+	    }
 	    frame_indices.insert(i._index);
 	}
+	++current_frame;
     }
 
     std::set<int> parent_index;
