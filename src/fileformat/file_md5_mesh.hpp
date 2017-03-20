@@ -37,9 +37,9 @@ public:
 	int _numverts;
 	int _numtris;
 	int _numweights;
-	std::list<vert> _verts;
+	std::vector<vert> _verts;
 	std::list<tri> _tris;
-	std::list<weight> _weights;
+	std::vector<weight> _weights;
 	mesh() : _shader(""), _numverts(0), _numtris(0), _numweights(0) {}
     };
     struct data_mesh {

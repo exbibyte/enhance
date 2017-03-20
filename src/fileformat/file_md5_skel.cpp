@@ -1,4 +1,5 @@
 #include <list>
+#include <vector>
 #include <utility>
 #include <cassert>
 
@@ -7,7 +8,6 @@
 
 std::pair<bool, file_md5_skel::skel_collection> file_md5_skel::process( file_md5_anim::data_anim const & d ){
     skel_collection sc;
-
     if( d._frames.size() != d._bounds.size() ){
 	assert( false && "number of frames and number of bounding box not equal" );
 	return { false, {} };
@@ -19,12 +19,13 @@ std::pair<bool, file_md5_skel::skel_collection> file_md5_skel::process( file_md5
 	std::pair<bool,skel_frame> ret = process_skel_frame( *it_frames, *it_bounds, d._hierarchies, d._baseframes );
 	if( false == ret.first ){
 	    assert( false && "process_skel_frame failed." );
-	    return std::pair<bool,skel_collection>(false,{});
+	    return { false,{} };
 	}
 	sc._skels.push_back( std::move(ret.second) );
 	++it_frames;
 	++it_bounds;
     }
+    sc._framerate = d._framerate;
     return std::pair<bool,skel_collection>(true,std::move(sc));
 }
 

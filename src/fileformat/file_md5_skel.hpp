@@ -22,7 +22,8 @@ public:
 	std::vector<joint_frame> _joints;
     };
     struct skel_collection { //a collection of skeleton frames
-	std::list<skel_frame> _skels;
+	std::vector<skel_frame> _skels;
+	int _framerate;
     };
     static std::pair<bool, skel_collection> process( file_md5_anim::data_anim const & );
 
