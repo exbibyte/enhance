@@ -147,9 +147,11 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	//parserpolymesh0
 	vector<enComponentMeta*> parserpolymeshes;
 	engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
-	assert( parserpolymeshes.size() == 1 );
+	assert( parserpolymeshes.size() == 2 );
 	COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
+	COMPONENT_INSTANCE( parsermd5, enComponentParserMd5, parserpolymeshes[1] );
     }
 
     engine_kernel.deinit();
 }
+

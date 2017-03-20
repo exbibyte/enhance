@@ -25,10 +25,11 @@ objects_math := $(wildcard ../../src/math/intermediate/*.o)
 objects_file := $(wildcard ../../src/file/intermediate/*.o)
 objects_datatransform := $(wildcard ../../src/datatransform/intermediate/*.o)
 objects_ui := $(wildcard ../../src/ui/intermediate/*.o)
+objects_fileformat := $(wildcard ../../src/fileformat/intermediate/*.o)
 
 targets := test_enEngineKernel0 test_render
 
-object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_datatransform) $(objects_ui)
+object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_datatransform) $(objects_ui) $(objects_fileformat)
 
 dir_build := ./build
 

@@ -81,18 +81,18 @@ std::pair<bool,file_md5_skel::skel_frame> file_md5_skel::process_skel_frame( fil
 	    //chain transformation from parent joint
 
 	    //update positions
-	    float pos_rotated[3];
-	    parent_joint_frame._orient.RotatePoint( sf_pos, pos_rotated );
+	    Quat qpos( sf_pos[0], sf_pos[1], sf_pos[2], 0.0 );
+	    Quat res = parent_joint_frame._orient * qpos * parent_joint_frame._orient.Conjugate();
 	    for( int i = 0; i < 3; ++i ){
-		jf._pos[i] = parent_joint_frame._pos[i] + pos_rotated[i];
+		jf._pos[i] = parent_joint_frame._pos[i] + res._quat[i];
 	    }
 
 	    //update orientation
-	    jf._orient = parent_joint_frame._orient * jf._orient;
+	    jf._orient = parent_joint_frame._orient * sf_orient;
 	    jf._orient.NormalizeQuatCurrent();
 	}
 	else{
-	    //no parent
+	    //no parent, root joint
 	    for( int i = 0; i < 3; ++i ){
 		jf._pos[i] = sf_pos[i];
 	    }

@@ -845,11 +845,14 @@ bool file_md5_mesh::calc_bind_pose_positions( data_mesh & d ){
 		j._rot = Quat( j._orient[0], j._orient[1], j._orient[2] );
 		j._rot.NormalizeQuatCurrent();
 		//transform weight position using bind pose joint orientation
-		float weight_pos_transform[3];
-		j._rot.RotatePoint( w._pos, weight_pos_transform );
+		// float weight_pos_transform[3];
+		// j._rot.RotatePoint( w._pos, weight_pos_transform );
+		Quat qpos( w._pos[0], w._pos[1], w._pos[2], 0.0 );
+		Quat pos_xform = j._rot * qpos * j._rot.Conjugate();
 		//sum contribution of transformed weight positions to bind pose vertex position
 		for( int i = 0; i < 3; ++i ){
-		    v._pos[i] += ( j._pos[i] + weight_pos_transform[i] ) * w._weight_bias;
+		    // v._pos[i] += ( j._pos[i] + weight_pos_transform[i] ) * w._weight_bias;
+		    v._pos[i] += ( j._pos[i] + pos_xform._quat[i] ) * w._weight_bias;
 		}
 	    }
 	    //todo: prepare texture mapping positions
@@ -899,11 +902,14 @@ bool file_md5_mesh::calc_bind_pose_normals( data_mesh & d ){
 		weight & w = m._weights[ weight_index ];
 		int joint_index = w._joint_index;
 		joint & j = d._joints[ joint_index ];
-		float normal_transform[3];
+		// float normal_transform[3];
 		Quat joint_orient_inverse = j._rot.Inverse();
-		joint_orient_inverse.RotatePoint( n._vec, normal_transform );
+		// joint_orient_inverse.RotatePoint( n._vec, normal_transform );
+		Quat qnorm( n._vec[0], n._vec[1], n._vec[2], 0.0 );
+		Quat norm_dir_xform = joint_orient_inverse * qnorm * joint_orient_inverse.Conjugate();
 		for( int i = 0; i < 3; ++i ){
-		    v._normal[i] += normal_transform[i] * w._weight_bias;
+		    // v._normal[i] += normal_transform[i] * w._weight_bias;
+		    v._normal[i] += norm_dir_xform._quat[i] * w._weight_bias;
 		}
 	    }
 	}

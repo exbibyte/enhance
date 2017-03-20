@@ -35,15 +35,31 @@
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 
+#include "file_md5_anim.hpp"
+#include "file_md5_mesh.hpp"
+#include "file_md5_skel.hpp"
+#include "file_md5_calc_mesh.hpp"
+
 using namespace std;
 
 int main( int argc, char ** argv ){
 
-    string path_poly;
-    if( argc > 1 )
-        path_poly = argv[1];
-    else
-	path_poly = "../../testcase/file/arrow.pmesh";
+    string path_mesh;
+    vector<string> paths_anim;
+    if( argc >= 3 ){
+	path_mesh = argv[1];
+	for( int i = 2; i < argc; ++i ){
+	    paths_anim.push_back( argv[i] );
+	}
+    }else{
+	path_mesh = "../../testcase/fileformat/md5/qshambler.md5mesh";
+	paths_anim.push_back( "../../testcase/fileformat/md5/qshamblerattack01.md5anim" );
+    }
+    // if( argc > 1 )
+    //     path_poly = argv[1];
+    // else
+    // 	path_poly = "../../testcase/file/arrow.pmesh";
+    
     
     enEngineKernel0 engine_kernel;
     assert( engine_kernel.get_num_components() == 0 );
@@ -106,20 +122,73 @@ int main( int argc, char ** argv ){
     //parserpolymesh0
     vector<enComponentMeta*> parserpolymeshes;
     engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
-    assert( parserpolymeshes.size() == 1 );
-    COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
+    assert( parserpolymeshes.size() >= 1 );
+    // COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
+    ParserMd5 * parsermd5 = nullptr;
+    for( auto & i : parserpolymeshes ){
+	COMPONENT_INSTANCE( parser_model, enComponentParserMd5, i );
+	if( nullptr != parser_model ){
+	    parsermd5 = (ParserMd5 *)parser_model;
+	    break;
+	}
+    }
+    assert( nullptr != parsermd5 );
+    if( nullptr == parsermd5 )
+	return -1;
 
     //parse polymesh files and obtain asset information
     map< string, GLBufferInfo * > map_buffer_info; //unused for now
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
     vector<double> vert_pos;
     vector<double> vert_norm;
-    ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
-
-    vector<double> vert_pos_2 = vert_pos; //duplicate position data and offset it
-    for( auto & i : vert_pos_2 ){
-	i += 4;
+    
+    // ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
+    auto retparse = parsermd5->parse( path_mesh, paths_anim );
+    assert( retparse.first );
+    if( !retparse.first )
+	return 0;
+    auto model_mesh = std::move(retparse.second.first);
+    auto model_skels = std::move(retparse.second.second);
+    assert( !model_skels.empty() );
+    auto & sc = model_skels.back();
+    assert( !sc._skels.empty() );
+    //select the first frame of the current skeleton for rendering
+    size_t count_tris = 0;
+    int index_frame = 0;
+    {
+	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc, index_frame );
+	assert( retcalc.first );
+	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
+	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
+	std::cout << "number of model meshes: " << dmf._mesh_frames.size() << std::endl;
+	auto it_dmesh_mesh = model_mesh._meshes.begin();
+	for( auto & m : dmf._mesh_frames ){
+	    assert( m._tris.size() == it_dmesh_mesh->_tris.size() );
+	    assert( m._verts.size() == it_dmesh_mesh->_verts.size() );
+	    //add vertex and normals for rendering
+	    for( auto & t : m._tris ){
+		for( int i = 0; i < 3; ++i ){
+		    int vert_index = t._vert_indices[i];
+		    auto & v = m._verts[ vert_index ];
+		    vert_pos.push_back(v._pos[0]);
+		    vert_pos.push_back(v._pos[1]);
+		    vert_pos.push_back(v._pos[2]);
+		    vert_norm.push_back(v._normal[0]);
+		    vert_norm.push_back(v._normal[1]);
+		    vert_norm.push_back(v._normal[2]);
+		}
+	    }
+	    count_tris += m._tris.size();
+	    ++it_dmesh_mesh;
+	}
     }
+    ++index_frame;
+    std::cout << "number of model verts: " << vert_pos.size() << std::endl;
+    std::cout << "number of model tris: " << count_tris << std::endl;
+    // vector<double> vert_pos_2 = vert_pos; //duplicate position data and offset it
+    // for( auto & i : vert_pos_2 ){
+    // 	i += 4;
+    // }
     
     cout << "End of Init Phase" << endl;
 
@@ -147,7 +216,7 @@ int main( int argc, char ** argv ){
     orient_axis[0] = 1;
     orient_angle = 0.000;
 
-    double auto_rotate = 0.4;
+    double auto_rotate = 0.0;
     
     bool bQuit = false;
     while(true){
@@ -250,7 +319,40 @@ int main( int argc, char ** argv ){
 	}
 
 	orient_angle += auto_rotate;
-	
+
+	//update animation starts
+	//select the first frame of the current skeleton for rendering
+	if( index_frame >= sc._skels.size() ){
+	    index_frame = 0;
+	}
+	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc, index_frame );
+	assert( retcalc.first );
+	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
+	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
+	auto it_dmesh_mesh = model_mesh._meshes.begin();
+	vert_pos.clear();
+	vert_norm.clear();
+	for( auto & m : dmf._mesh_frames ){
+	    assert( m._tris.size() == it_dmesh_mesh->_tris.size() );
+	    assert( m._verts.size() == it_dmesh_mesh->_verts.size() );
+	    //add vertex and normals for rendering
+	    for( auto & t : m._tris ){
+		for( int i = 0; i < 3; ++i ){
+		    int vert_index = t._vert_indices[i];
+		    auto & v = m._verts[ vert_index ];
+		    vert_pos.push_back(v._pos[0]);
+		    vert_pos.push_back(v._pos[1]);
+		    vert_pos.push_back(v._pos[2]);
+		    vert_norm.push_back(v._normal[0]);
+		    vert_norm.push_back(v._normal[1]);
+		    vert_norm.push_back(v._normal[2]);
+		}
+	    }
+	    ++it_dmesh_mesh;
+	}
+	++index_frame;
+	//update animation ends
+    
 	//compute render information
 	IRendercompute::RenderDataPack render_data_0;
 	render_data_0.vert_coord = vert_pos;
@@ -258,13 +360,14 @@ int main( int argc, char ** argv ){
 	render_data_0.orient_axis = orient_axis;
 	render_data_0.orient_angle = orient_angle;
 
-	IRendercompute::RenderDataPack render_data_1;
-	render_data_1.vert_coord = vert_pos_2;
-	render_data_1.vert_normal = vert_norm;
-	render_data_1.orient_axis = orient_axis;
-	render_data_1.orient_angle = orient_angle;
+	// IRendercompute::RenderDataPack render_data_1;
+	// render_data_1.vert_coord = vert_pos_2;
+	// render_data_1.vert_normal = vert_norm;
+	// render_data_1.orient_axis = orient_axis;
+	// render_data_1.orient_angle = orient_angle;
 
-	RenderData renderdata = rendercompute0->compute( { render_data_0, render_data_1 } );
+	// RenderData renderdata = rendercompute0->compute( { render_data_0, render_data_1 } );
+	RenderData renderdata = rendercompute0->compute( { render_data_0 } );
 	renderdata._glslprogram = glslprogram.get();
 	
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
@@ -291,21 +394,22 @@ int main( int argc, char ** argv ){
 	}
 	ImGui::Render();
 
-	glfwSwapBuffers( windowinfo._window );
-
-	// std::cout << "post renderdraw0." << std::endl;
-
 	//wait for clock tick
 	while( !ticked ){
 	    clock0->tick();
 	    std::this_thread::sleep_for(std::chrono::milliseconds(3));
 	}
 	ticked = false;
-	
+ 
 	if( glfwWindowShouldClose( windowinfo._window ) )
 	{
 	    break;
 	}
+
+	glfwSwapBuffers( windowinfo._window );
+
+	// std::cout << "post renderdraw0." << std::endl;
+		
 	glfwPollEvents();
     }
 

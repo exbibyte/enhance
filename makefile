@@ -16,13 +16,16 @@ build_math:
 build_file:
 	$(MAKE) -C ./src/file all
 
+build_fileformat:
+	$(MAKE) -C ./src/fileformat all
+
 build_datatransform: build_file
 	$(MAKE) -C ./src/datatransform all
 
 build_ui:
 	$(MAKE) -C ./src/ui all
 
-build_kernel_modules: build_render build_math build_datatransform build_gl build_ui
+build_kernel_modules: build_render build_math build_datatransform build_gl build_ui build_fileformat
 	$(MAKE) -C $(kernel_modules) all
 
 build_kernel: build_kernel_modules
