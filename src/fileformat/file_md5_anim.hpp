@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <memory>
 
 class file_md5_anim {
 public:
@@ -38,7 +39,7 @@ public:
 	std::list<hierarchy> _hierarchies; //expected size = _numjoints
 	std::list<bound> _bounds; //expected size = number of _frames = _numframes
 	std::list<baseframe> _baseframes; //expected size = _numjoints
-	std::vector<frame> _frames; //expected number of data per frame = _num_animated_components. expected size = _numframes
+	std::vector< std::shared_ptr<frame> > _frames; //expected number of data per frame = _num_animated_components. expected size = _numframes
     };
     enum class token {
 	COMMENT,

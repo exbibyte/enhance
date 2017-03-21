@@ -2,6 +2,7 @@
 #include <vector>
 #include <utility>
 #include <cassert>
+#include <memory>
 
 #include "file_md5_skel.hpp"
 #include "Quat.hpp"
@@ -16,12 +17,12 @@ std::pair<bool, file_md5_skel::skel_collection> file_md5_skel::process( file_md5
     auto it_bounds = d._bounds.begin();
     
     while( it_frames != d._frames.end() ){
-	std::pair<bool,skel_frame> ret = process_skel_frame( *it_frames, *it_bounds, d._hierarchies, d._baseframes );
+	std::pair<bool,std::shared_ptr<skel_frame> > ret = process_skel_frame( **it_frames, *it_bounds, d._hierarchies, d._baseframes );
 	if( false == ret.first ){
 	    assert( false && "process_skel_frame failed." );
 	    return { false,{} };
 	}
-	sc._skels.push_back( std::move(ret.second) );
+	sc._skels.push_back( ret.second );
 	++it_frames;
 	++it_bounds;
     }
@@ -29,12 +30,12 @@ std::pair<bool, file_md5_skel::skel_collection> file_md5_skel::process( file_md5
     return std::pair<bool,skel_collection>(true,std::move(sc));
 }
 
-std::pair<bool,file_md5_skel::skel_frame> file_md5_skel::process_skel_frame( file_md5_anim::frame const & f, file_md5_anim::bound const & bbox, std::list<file_md5_anim::hierarchy> const & hier, std::list<file_md5_anim::baseframe> const & base ){
+std::pair<bool, std::shared_ptr<file_md5_skel::skel_frame> > file_md5_skel::process_skel_frame( file_md5_anim::frame const & f, file_md5_anim::bound const & bbox, std::list<file_md5_anim::hierarchy> const & hier, std::list<file_md5_anim::baseframe> const & base ){
     if( hier.size() != base.size() ){
 	assert( false && "hierarchy and baseframe size not equal" );
 	return { false, {} };
     }
-    skel_frame sf;
+    std::shared_ptr<skel_frame> sf( new skel_frame );
     auto it_hier = hier.begin();
     auto it_base = base.begin();
     while( it_hier != hier.end() ){
@@ -64,43 +65,46 @@ std::pair<bool,file_md5_skel::skel_frame> file_md5_skel::process_skel_frame( fil
 	
 	//compute rotation quaternion
 	Quat sf_orient( sf_rot[0], sf_rot[1], sf_rot[2] );
+	sf_orient.NormalizeQuatCurrent();
 
 	int parent_joint_index = it_hier->_parent;
 
-	joint_frame jf;
-	jf._parent = parent_joint_index;
-	jf._name = it_hier->_name;
+	std::shared_ptr<joint_frame> jf( new joint_frame );
+	jf->_parent = parent_joint_index;
+	jf->_name = it_hier->_name;
 
 	if( parent_joint_index >= 0 ){
-	    if( parent_joint_index >= sf._joints.size() ){
+	    if( parent_joint_index >= sf->_joints.size() ){
 		assert( false && "parent joint index out of range." );
 		return { false, {} };
 	    }
-	    joint_frame & parent_joint_frame = sf._joints[ parent_joint_index ];
+	    std::shared_ptr<joint_frame> parent_joint_frame = sf->_joints[ parent_joint_index ];
 	    //chain transformation from parent joint
 
 	    //update positions
-	    Quat qpos( sf_pos[0], sf_pos[1], sf_pos[2], 0.0 );
-	    Quat res = parent_joint_frame._orient * qpos * parent_joint_frame._orient.Conjugate();
+	    Quat qpos( sf_pos[0], sf_pos[1], sf_pos[2], 0.0f );
+	    Quat orient_inv = parent_joint_frame->_orient.Inverse();
+	    orient_inv.NormalizeQuatCurrent();
+	    Quat res = parent_joint_frame->_orient * qpos * orient_inv;
 	    for( int i = 0; i < 3; ++i ){
-		jf._pos[i] = parent_joint_frame._pos[i] + res._quat[i];
+		jf->_pos[i] = parent_joint_frame->_pos[i] + res._quat[i];
 	    }
 
 	    //update orientation
-	    jf._orient = parent_joint_frame._orient * sf_orient;
-	    jf._orient.NormalizeQuatCurrent();
+	    jf->_orient = parent_joint_frame->_orient * sf_orient;
+	    jf->_orient.NormalizeQuatCurrent();
 	}
 	else{
 	    //no parent, root joint
 	    for( int i = 0; i < 3; ++i ){
-		jf._pos[i] = sf_pos[i];
+		jf->_pos[i] = sf_pos[i];
 	    }
-	    jf._orient = sf_orient;
-	    jf._orient.NormalizeQuatCurrent();
+	    jf->_orient = sf_orient;
+	    jf->_orient.NormalizeQuatCurrent();
 	}
-	sf._joints.push_back( std::move(jf) );
+	sf->_joints.push_back( jf );
 	++it_hier;
 	++it_base;
     }
-    return { true, std::move(sf) };
+    return { true, sf };
 }

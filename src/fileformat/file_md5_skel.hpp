@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <memory>
 
 #include "file_md5_anim.hpp"
 #include "Quat.hpp"
@@ -19,16 +20,16 @@ public:
 	Quat _orient;
     };
     struct skel_frame { //a collection of a skeleton's joints per frame
-	std::vector<joint_frame> _joints;
+	std::vector<std::shared_ptr<joint_frame> > _joints;
     };
     struct skel_collection { //a collection of skeleton frames
-	std::vector<skel_frame> _skels;
+	std::vector< std::shared_ptr<skel_frame> > _skels;
 	int _framerate;
     };
     static std::pair<bool, skel_collection> process( file_md5_anim::data_anim const & );
 
 private:
-    static std::pair<bool, skel_frame> process_skel_frame( file_md5_anim::frame const & f, file_md5_anim::bound const & bbox, std::list<file_md5_anim::hierarchy> const & hier, std::list<file_md5_anim::baseframe> const & base );
+    static std::pair<bool, std::shared_ptr<skel_frame> > process_skel_frame( file_md5_anim::frame const & f, file_md5_anim::bound const & bbox, std::list<file_md5_anim::hierarchy> const & hier, std::list<file_md5_anim::baseframe> const & base );
 };
 
 #endif

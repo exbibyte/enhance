@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cassert>
 #include <set>
+#include <memory>
 
 #include "file_md5_anim.hpp"
 
@@ -572,8 +573,8 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
 	assert( 0 && "frame index out of range" );
 	return false;
     }
-    frame & fr = ((data_anim*)d)->_frames[frame_index];
-    fr._index = frame_index;
+    std::shared_ptr<frame> fr( new frame );
+    fr->_index = frame_index;
     {
 	std::pair< token, std::string > t = get_token( f );
 	if( token::BRACEL != t.first ){
@@ -582,10 +583,10 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
 	}
     }
     int num_animated_components = ((data_anim*)d)->_num_animated_components;
-    fr._data.resize( num_animated_components );
+    fr->_data.resize( num_animated_components );
     {
 	int retrieved;
-	if( !aux_process_vec_float( f, num_animated_components, &fr._data[0], retrieved ) ){
+	if( !aux_process_vec_float( f, num_animated_components, &fr->_data[0], retrieved ) ){
 	    assert( 0 && "expected frame data: vec(num_animated_compoenents)float" );
 	    return false;
 	}
@@ -597,6 +598,7 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
 	    return false;
 	}
     }
+    ((data_anim*)d)->_frames[frame_index] = fr;
     return true;
 } 
 bool file_md5_anim::check_consistency( data_anim & d ){
@@ -611,15 +613,19 @@ bool file_md5_anim::check_consistency( data_anim & d ){
     std::set<int> frame_indices;
     int current_frame = 0;
     for( auto & i : d._frames ){
-	if( frame_indices.find(i._index) != frame_indices.end() ){
+	assert( nullptr != i );
+	if( nullptr == i ){
+	    return false;
+	}
+	if( frame_indices.find(i->_index) != frame_indices.end() ){
 	    assert( false && "frame index not unique" );
 	    return false;
 	}else{
-	    if( current_frame != i._index ){
+	    if( current_frame != i->_index ){
 		assert( false && "frame index not match expected" );
 		return false;
 	    }
-	    frame_indices.insert(i._index);
+	    frame_indices.insert(i->_index);
 	}
 	++current_frame;
     }

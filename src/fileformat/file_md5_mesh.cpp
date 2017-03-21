@@ -785,8 +785,8 @@ bool file_md5_mesh::check_consistency( data_mesh & d ){
 
 		if( j._tex_coords[0] < 0 || j._tex_coords[0] > 1 ||
 		    j._tex_coords[1] < 0 || j._tex_coords[1] > 1 ){
-		    assert( 0 && "vert texture coordinate out of range" );
-		    return false;
+		    // assert( 0 && "vert texture coordinate out of range" );
+		    // return false;
 		}
 
 		if( j._weight_start < 0 || j._weight_start >= i._numweights ||
@@ -849,88 +849,88 @@ bool file_md5_mesh::check_consistency( data_mesh & d ){
 }
 
 bool file_md5_mesh::calc_bind_pose_positions( data_mesh & d ){
-    for( auto & m : d._meshes ){
-	for( auto & v : m._verts ){
-	    for( int i = 0; i < 3; ++i ){
-		v._pos[i] = 0;
-		v._normal[i] = 0;
-	    }
-	    for( int wc = 0; wc < v._weight_count; ++wc ){
-		int weight_index = v._weight_start + wc;
-		weight & w = m._weights[ weight_index ];
-		int joint_index = w._joint_index;
-		joint & j = d._joints[ joint_index ];
-		j._rot = Quat( j._orient[0], j._orient[1], j._orient[2] );
-		j._rot.NormalizeQuatCurrent();
-		//transform weight position using bind pose joint orientation
-		// float weight_pos_transform[3];
-		// j._rot.RotatePoint( w._pos, weight_pos_transform );
-		Quat qpos( w._pos[0], w._pos[1], w._pos[2], 0.0 );
-		Quat pos_xform = j._rot * qpos * j._rot.Conjugate();
-		//sum contribution of transformed weight positions to bind pose vertex position
-		for( int i = 0; i < 3; ++i ){
-		    // v._pos[i] += ( j._pos[i] + weight_pos_transform[i] ) * w._weight_bias;
-		    v._pos[i] += ( j._pos[i] + pos_xform._quat[i] ) * w._weight_bias;
-		}
-	    }
-	    //todo: prepare texture mapping positions
-	}
-    }
+    // for( auto & m : d._meshes ){
+    // 	for( auto & v : m._verts ){
+    // 	    for( int i = 0; i < 3; ++i ){
+    // 		v._pos[i] = 0;
+    // 		v._normal[i] = 0;
+    // 	    }
+    // 	    for( int wc = 0; wc < v._weight_count; ++wc ){
+    // 		int weight_index = v._weight_start + wc;
+    // 		weight & w = m._weights[ weight_index ];
+    // 		int joint_index = w._joint_index;
+    // 		joint & j = d._joints[ joint_index ];
+    // 		j._rot = Quat( j._orient[0], j._orient[1], j._orient[2] );
+    // 		j._rot.NormalizeQuatCurrent();
+    // 		//transform weight position using bind pose joint orientation
+    // 		// float weight_pos_transform[3];
+    // 		// j._rot.RotatePoint( w._pos, weight_pos_transform );
+    // 		Quat qpos( w._pos[0], w._pos[1], w._pos[2], 0.0 );
+    // 		Quat pos_xform = j._rot * qpos * j._rot.Conjugate();
+    // 		//sum contribution of transformed weight positions to bind pose vertex position
+    // 		for( int i = 0; i < 3; ++i ){
+    // 		    // v._pos[i] += ( j._pos[i] + weight_pos_transform[i] ) * w._weight_bias;
+    // 		    v._pos[i] += ( j._pos[i] + pos_xform._quat[i] ) * w._weight_bias;
+    // 		}
+    // 	    }
+    // 	    //todo: prepare texture mapping positions
+    // 	}
+    // }
     return true;
 }
 
 bool file_md5_mesh::calc_bind_pose_normals( data_mesh & d ){
-    //compute vertex normals for bind pose joint orientation
-    //vertex positions are assumed to be already computed in local joint orientation of bind pose
-    for( auto & m : d._meshes ){
-	//compute vertex normal in object space with bind pose
-	for( auto & t : m._tris ){
-	    int v0_index = t._vert_indices[ 0 ];
-	    int v1_index = t._vert_indices[ 1 ];
-	    int v2_index = t._vert_indices[ 2 ];
-	    assert( v0_index >= 0 && v0_index < m._verts.size() );
-	    assert( v1_index >= 0 && v1_index < m._verts.size() );
-	    assert( v2_index >= 0 && v2_index < m._verts.size() );
-	    Vec v0, v1, v2;
-	    v0.SetFromArray( 3, m._verts[ v0_index ]._pos );
-	    v1.SetFromArray( 3, m._verts[ v1_index ]._pos );
-	    v2.SetFromArray( 3, m._verts[ v2_index ]._pos );
-	    Vec v01 = v1 - v0;
-	    Vec v02 = v2 - v0;
-	    Vec n = v02.Cross(v01);
-	    size_t actual_count;
-	    for( int i = 0; i < 3; ++i ){
-		m._verts[ v0_index ]._normal[i] += n._vec[i];
-		m._verts[ v1_index ]._normal[i] += n._vec[i];
-		m._verts[ v2_index ]._normal[i] += n._vec[i];
-	    }
-	}
-	//normalize and transform to 
-	for( auto & v : m._verts ){
-	    Vec n;
-	    n.SetFromArray( 3, v._normal );
-	    n.NormalizeCurrent();
-	    //reset vertex normal for precompute for animation frames
-	    for( int i = 0; i < 3; ++i ){
-		v._normal[i] = 0;
-	    }
-	    //precompute vertex normal to be later used in animation frames by rotating with bind pose local joint inverse orientation
-	    for( int wc = 0; wc < v._weight_count; ++wc ){
-		int weight_index = v._weight_start + wc;
-		weight & w = m._weights[ weight_index ];
-		int joint_index = w._joint_index;
-		joint & j = d._joints[ joint_index ];
-		// float normal_transform[3];
-		Quat joint_orient_inverse = j._rot.Inverse();
-		// joint_orient_inverse.RotatePoint( n._vec, normal_transform );
-		Quat qnorm( n._vec[0], n._vec[1], n._vec[2], 0.0 );
-		Quat norm_dir_xform = joint_orient_inverse * qnorm * joint_orient_inverse.Conjugate();
-		for( int i = 0; i < 3; ++i ){
-		    // v._normal[i] += normal_transform[i] * w._weight_bias;
-		    v._normal[i] += norm_dir_xform._quat[i] * w._weight_bias;
-		}
-	    }
-	}
-    }
+    // //compute vertex normals for bind pose joint orientation
+    // //vertex positions are assumed to be already computed in local joint orientation of bind pose
+    // for( auto & m : d._meshes ){
+    // 	//compute vertex normal in object space with bind pose
+    // 	for( auto & t : m._tris ){
+    // 	    int v0_index = t._vert_indices[ 0 ];
+    // 	    int v1_index = t._vert_indices[ 1 ];
+    // 	    int v2_index = t._vert_indices[ 2 ];
+    // 	    assert( v0_index >= 0 && v0_index < m._verts.size() );
+    // 	    assert( v1_index >= 0 && v1_index < m._verts.size() );
+    // 	    assert( v2_index >= 0 && v2_index < m._verts.size() );
+    // 	    Vec v0, v1, v2;
+    // 	    v0.SetFromArray( 3, m._verts[ v0_index ]._pos );
+    // 	    v1.SetFromArray( 3, m._verts[ v1_index ]._pos );
+    // 	    v2.SetFromArray( 3, m._verts[ v2_index ]._pos );
+    // 	    Vec v01 = v1 - v0;
+    // 	    Vec v02 = v2 - v0;
+    // 	    Vec n = v02.Cross(v01);
+    // 	    size_t actual_count;
+    // 	    for( int i = 0; i < 3; ++i ){
+    // 		m._verts[ v0_index ]._normal[i] += n._vec[i];
+    // 		m._verts[ v1_index ]._normal[i] += n._vec[i];
+    // 		m._verts[ v2_index ]._normal[i] += n._vec[i];
+    // 	    }
+    // 	}
+    // 	//normalize and transform to 
+    // 	for( auto & v : m._verts ){
+    // 	    Vec n;
+    // 	    n.SetFromArray( 3, v._normal );
+    // 	    n.NormalizeCurrent();
+    // 	    //reset vertex normal for precompute for animation frames
+    // 	    for( int i = 0; i < 3; ++i ){
+    // 		v._normal[i] = 0;
+    // 	    }
+    // 	    //precompute vertex normal to be later used in animation frames by rotating with bind pose local joint inverse orientation
+    // 	    for( int wc = 0; wc < v._weight_count; ++wc ){
+    // 		int weight_index = v._weight_start + wc;
+    // 		weight & w = m._weights[ weight_index ];
+    // 		int joint_index = w._joint_index;
+    // 		joint & j = d._joints[ joint_index ];
+    // 		// float normal_transform[3];
+    // 		Quat joint_orient_inverse = j._rot.Inverse();
+    // 		// joint_orient_inverse.RotatePoint( n._vec, normal_transform );
+    // 		Quat qnorm( n._vec[0], n._vec[1], n._vec[2], 0.0 );
+    // 		Quat norm_dir_xform = joint_orient_inverse * qnorm * joint_orient_inverse.Conjugate();
+    // 		for( int i = 0; i < 3; ++i ){
+    // 		    // v._normal[i] += normal_transform[i] * w._weight_bias;
+    // 		    v._normal[i] += norm_dir_xform._quat[i] * w._weight_bias;
+    // 		}
+    // 	    }
+    // 	}
+    // }
     return true;
 }

@@ -171,10 +171,12 @@ void Quat::NormalizeQuatCurrent(){
     if( len == 0 )
 	throw("Quat::Normalize(): can't divide by length 0");
 
-    _quat[0] /= len;
-    _quat[1] /= len;
-    _quat[2] /= len;
-    _quat[3] /= len;
+    if( len > 0.0f ){
+	_quat[0] /= len;
+	_quat[1] /= len;
+	_quat[2] /= len;
+	_quat[3] /= len;
+    }
 }
 
 Quat Quat::NormalizeQuat() const{
@@ -310,10 +312,7 @@ Quat Quat::Negate() const {
 
 void Quat::RotatePoint( float in [], float out[] ) const {
     Quat temp, inverse, final;
-    inverse = *this;
-    inverse._quat[0] *= -1;
-    inverse._quat[1] *= -1;
-    inverse._quat[2] *= -1;
+    inverse = this->Inverse();
     inverse.NormalizeQuatCurrent();
     temp = this->MultVec( in );
     final = temp * inverse;
@@ -332,15 +331,12 @@ Quat Quat::MultVec( float in [] ) const {
 
 Quat Quat::Inverse() const {
     Quat conj = this->Conjugate();
-    float dot = 0;
-    for( int i = 0; i < 4; ++i ){
-	dot += conj._quat[i] * conj._quat[i];
-    }
-    assert( dot != 0 );
-    for( int i = 0; i < 4; ++i ){
-	conj._quat[i] /= dot;
-    }
-    return conj;
+    float norm = conj.LengthSquared();
+    if( norm == 0.0f )
+	throw("Quat::Inverse(): can't divide by length 0");
+
+    Quat inv = Scale( 1.0/norm, conj );
+    return inv;
 }
 
 Quat InterpolateBasic( const Quat q1, const Quat q2, float r ){
