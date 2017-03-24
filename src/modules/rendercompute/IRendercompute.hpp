@@ -30,6 +30,14 @@ public:
     vector<double> _camera_specular    { 0.45f, 0.45f, 0.45f };
 };
 
+class material {
+public:
+    vector<double> _ambient   { 1.0, 1.0, 1.0 };
+    vector<double> _diffuse   { 1, 1, 1 };
+    vector<double> _specular  { 1, 1, 1 };
+    vector<double> _shininess { 2 };
+};
+
 class IRendercompute {
 public:
     class RenderDataPack {
@@ -39,6 +47,7 @@ public:
 	Vec orient_axis;
 	double orient_angle;
 	Vec translate;
+	material _material;
     };
     virtual ~IRendercompute(){}
     virtual RenderData compute( light l, camera c, std::list< IRendercompute::RenderDataPack > render_data ) = 0;

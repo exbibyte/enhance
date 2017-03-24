@@ -206,7 +206,6 @@ int main( int argc, char ** argv ){
     clock0->run();
 
     camera c;
-    c._camera_position = { 15, 15, 15 };
     light l;
     l._light_position = { 0, 0, 80 };
     Vec orient_axis;
@@ -365,7 +364,10 @@ int main( int argc, char ** argv ){
 	c._camera_lookat.resize(3);
 	for( int i = 0; i < 3; ++i ){
 	    c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
+	    c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
 	}
+	material m;
+	render_data_0._material = m;
 	RenderData renderdata = rendercompute0->compute( l, c, { render_data_0 } );
 	renderdata._glslprogram = glslprogram.get();
 	

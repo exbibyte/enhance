@@ -19,36 +19,10 @@ RenderData Rendercompute0::compute( light l, camera c, std::list< IRendercompute
 
     RenderData renderdata;
 
-    // //light ----------------------------------------------------------------------
-    // vector<double> light_position     { 0, 0, 80 };
-    // vector<double> light_lookat       { 0, 0, 0 };
-    // vector<double> light_up           { 0, 1, 0 };
-    // vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
-    // vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
-    // vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
-    // vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
-
-    // //camera ---------------------------------------------------------------------
-    // assert( 3 == render_data._camera_pos.GetDim() );
-    // assert( 3 == render_data._camera_focus_pos.GetDim() );
-    // vector<double> camera_position    {  render_data._camera_pos[0], render_data._camera_pos[1], render_data._camera_pos[2] };
-    // vector<double> camera_lookat      {  render_data._camera_focus_pos[0], render_data._camera_focus_pos[1], render_data._camera_focus_pos[2] };
-    // vector<double> camera_up          { 0, 1, 0 };
-    // vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
-    // vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
-    // vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
-    // vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
-
     //context --------------------------------------------------------------------
     vector<int> context_windowsize { 500, 500 };
     vector<int> context_texturesize_shadowmap { 2500, 2500 };
     string context_title = "renderer";
-
-    //set material data, TODO: per entity attribute
-    vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
-    vector<double> entity_material_diffuse   { 1, 1, 1 };
-    vector<double> entity_material_specular  { 1, 1, 1 };
-    vector<double> entity_material_shininess { 2 };
 
     //apply settings -------------------------------------------------------------
     std::shared_ptr<RenderLight> light = std::make_shared< RenderLight >();
@@ -83,7 +57,6 @@ RenderData Rendercompute0::compute( light l, camera c, std::list< IRendercompute
     {
 	//orientation	
 	vector<double> entity_translate    { i.translate._vec[0], i.translate._vec[1], i.translate._vec[2] };
-
 	vector<double> entity_rotate_axis  { i.orient_axis._vec[0], i.orient_axis._vec[1], i.orient_axis._vec[2] };
 	vector<double> entity_rotate_angle { i.orient_angle };
     
@@ -97,10 +70,11 @@ RenderData Rendercompute0::compute( light l, camera c, std::list< IRendercompute
 	entity_01->AddDataSingle( RenderPolyData::RotationAxis(),  entity_rotate_axis );
 	entity_01->AddDataSingle( RenderPolyData::RotationAngle(), entity_rotate_angle );
 
-	entity_01->AddDataSingle( RenderMaterialData::Ambient(),   entity_material_ambient );
-	entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   entity_material_diffuse );
-	entity_01->AddDataSingle( RenderMaterialData::Specular(),  entity_material_specular );
-	entity_01->AddDataSingle( RenderMaterialData::Shininess(), entity_material_shininess );
+	entity_01->AddDataSingle( RenderMaterialData::Ambient(),   i._material._ambient );
+	entity_01->AddDataSingle( RenderMaterialData::Diffuse(),   i._material._diffuse );
+	entity_01->AddDataSingle( RenderMaterialData::Specular(),  i._material._specular );
+	entity_01->AddDataSingle( RenderMaterialData::Shininess(), i._material._shininess );
+
 	entity_01->AddDataSingle( RenderVertexData::Normals(),  entity_normals );
 	entity_01->AddDataSingle( RenderVertexData::Vertices(), entity_vertices );
 	
