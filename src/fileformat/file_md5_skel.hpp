@@ -21,6 +21,8 @@ public:
     };
     struct skel_frame { //a collection of a skeleton's joints per frame
 	std::vector<std::shared_ptr<joint_frame> > _joints;
+	float _bbox_lower[3];
+	float _bbox_upper[3];
     };
     struct skel_collection { //a collection of skeleton frames
 	std::vector< std::shared_ptr<skel_frame> > _skels;

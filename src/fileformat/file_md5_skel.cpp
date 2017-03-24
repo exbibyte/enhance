@@ -36,8 +36,11 @@ std::pair<bool, std::shared_ptr<file_md5_skel::skel_frame> > file_md5_skel::proc
 	return { false, {} };
     }
     std::shared_ptr<skel_frame> sf( new skel_frame );
+    sf->_joints.resize( hier.size() );
+    
     auto it_hier = hier.begin();
     auto it_base = base.begin();
+    int index_current_joint = 0;
     while( it_hier != hier.end() ){
 	int frame_data_start_index = it_hier->_start_index;
 	int flag = it_hier->_flags;
@@ -93,8 +96,7 @@ std::pair<bool, std::shared_ptr<file_md5_skel::skel_frame> > file_md5_skel::proc
 	    //update orientation
 	    jf->_orient = parent_joint_frame->_orient * sf_orient;
 	    jf->_orient.NormalizeQuatCurrent();
-	}
-	else{
+	}else{
 	    //no parent, root joint
 	    for( int i = 0; i < 3; ++i ){
 		jf->_pos[i] = sf_pos[i];
@@ -102,9 +104,15 @@ std::pair<bool, std::shared_ptr<file_md5_skel::skel_frame> > file_md5_skel::proc
 	    jf->_orient = sf_orient;
 	    jf->_orient.NormalizeQuatCurrent();
 	}
-	sf->_joints.push_back( jf );
+	// sf->_joints.push_back( jf );
+	sf->_joints[ index_current_joint ] = jf;
 	++it_hier;
 	++it_base;
+	++index_current_joint;
+    }
+    for( int i = 0; i < 3; ++i ){
+	sf->_bbox_lower[i] = bbox._min[i];
+	sf->_bbox_upper[i] = bbox._max[i];
     }
     return { true, sf };
 }

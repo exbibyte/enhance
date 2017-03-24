@@ -13,34 +13,36 @@
 #include <iostream>
 #include <memory>
 #include <list>
+#include <cassert>
 
-RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > render_data ){
+RenderData Rendercompute0::compute( light l, camera c, std::list< IRendercompute::RenderDataPack > render_data ){
 
     RenderData renderdata;
 
-    //light ----------------------------------------------------------------------
-    vector<double> light_position     { 0, 0, 80 };
-    vector<double> light_lookat       { 0, 0, 0 };
-    vector<double> light_up           { 0, 1, 0 };
-    vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
-    vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
-    vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
-    vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
+    // //light ----------------------------------------------------------------------
+    // vector<double> light_position     { 0, 0, 80 };
+    // vector<double> light_lookat       { 0, 0, 0 };
+    // vector<double> light_up           { 0, 1, 0 };
+    // vector<double> light_perspective  { 60.0f, 1.0f, 0.1f, 1000.0f };
+    // vector<double> light_ambient      { 0.05f, 0.05f, 0.05f };
+    // vector<double> light_diffuse      { 0.5f, 0.5f, 0.5f };
+    // vector<double> light_specular     { 0.45f, 0.45f, 0.45f };
 
-    //camera ---------------------------------------------------------------------
-    // vector<double> camera_position    { 70, 70, 70.0 };
-    vector<double> camera_position    { 5, 5, 5.0 };
-    vector<double> camera_lookat      { 0, 0, 0 };
-    vector<double> camera_up          { 0, 1, 0 };
-    vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
-    vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
-    vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
-    vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
+    // //camera ---------------------------------------------------------------------
+    // assert( 3 == render_data._camera_pos.GetDim() );
+    // assert( 3 == render_data._camera_focus_pos.GetDim() );
+    // vector<double> camera_position    {  render_data._camera_pos[0], render_data._camera_pos[1], render_data._camera_pos[2] };
+    // vector<double> camera_lookat      {  render_data._camera_focus_pos[0], render_data._camera_focus_pos[1], render_data._camera_focus_pos[2] };
+    // vector<double> camera_up          { 0, 1, 0 };
+    // vector<double> camera_perspective { 90.0f, 1.0f, 0.1f, 500.0f };
+    // vector<double> camera_ambient     { 0.05f, 0.05f, 0.05f };
+    // vector<double> camera_diffuse     { 0.5f, 0.5f, 0.5f };
+    // vector<double> camera_specular    { 0.45f, 0.45f, 0.45f };
 
     //context --------------------------------------------------------------------
     vector<int> context_windowsize { 500, 500 };
     vector<int> context_texturesize_shadowmap { 2500, 2500 };
-    string context_title = "engine0";
+    string context_title = "renderer";
 
     //set material data, TODO: per entity attribute
     vector<double> entity_material_ambient   { 1.0, 1.0, 1.0 };
@@ -50,22 +52,22 @@ RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > 
 
     //apply settings -------------------------------------------------------------
     std::shared_ptr<RenderLight> light = std::make_shared< RenderLight >();
-    light->AddDataSingle( RenderLightData::Coordinate(),  light_position    );
-    light->AddDataSingle( RenderLightData::Lookat(),      light_lookat      );
-    light->AddDataSingle( RenderLightData::Up(),          light_up          );
-    light->AddDataSingle( RenderLightData::Perspective(), light_perspective );
-    light->AddDataSingle( RenderLightData::Ambient(),     light_ambient     );
-    light->AddDataSingle( RenderLightData::Diffuse(),     light_diffuse     );
-    light->AddDataSingle( RenderLightData::Specular(),    light_specular    );
+    light->AddDataSingle( RenderLightData::Coordinate(),  l._light_position    );
+    light->AddDataSingle( RenderLightData::Lookat(),      l._light_lookat      );
+    light->AddDataSingle( RenderLightData::Up(),          l._light_up          );
+    light->AddDataSingle( RenderLightData::Perspective(), l._light_perspective );
+    light->AddDataSingle( RenderLightData::Ambient(),     l._light_ambient     );
+    light->AddDataSingle( RenderLightData::Diffuse(),     l._light_diffuse     );
+    light->AddDataSingle( RenderLightData::Specular(),    l._light_specular    );
 	    
     std::shared_ptr<RenderCamera> camera = std::make_shared< RenderCamera >();
-    camera->AddDataSingle( RenderCameraData::Coordinate(),  camera_position    );
-    camera->AddDataSingle( RenderCameraData::Lookat(),      camera_lookat      );
-    camera->AddDataSingle( RenderCameraData::Up(),          camera_up          );
-    camera->AddDataSingle( RenderCameraData::Perspective(), camera_perspective );
-    camera->AddDataSingle( RenderCameraData::Ambient(),     camera_ambient     );
-    camera->AddDataSingle( RenderCameraData::Diffuse(),     camera_diffuse     );
-    camera->AddDataSingle( RenderCameraData::Specular(),    camera_specular    );
+    camera->AddDataSingle( RenderCameraData::Coordinate(),  c._camera_position    );
+    camera->AddDataSingle( RenderCameraData::Lookat(),      c._camera_lookat      );
+    camera->AddDataSingle( RenderCameraData::Up(),          c._camera_up          );
+    camera->AddDataSingle( RenderCameraData::Perspective(), c._camera_perspective );
+    camera->AddDataSingle( RenderCameraData::Ambient(),     c._camera_ambient     );
+    camera->AddDataSingle( RenderCameraData::Diffuse(),     c._camera_diffuse     );
+    camera->AddDataSingle( RenderCameraData::Specular(),    c._camera_specular    );
 
     std::shared_ptr<RenderContext> context = std::make_shared< RenderContext >();
     context->AddDataSingle( RenderContextData::WindowSize(),           context_windowsize );
@@ -80,7 +82,7 @@ RenderData Rendercompute0::compute( std::list< IRendercompute::RenderDataPack > 
     for( auto & i : render_data )
     {
 	//orientation	
-	vector<double> entity_translate    { 0, 0, 0 };
+	vector<double> entity_translate    { i.translate._vec[0], i.translate._vec[1], i.translate._vec[2] };
 
 	vector<double> entity_rotate_axis  { i.orient_axis._vec[0], i.orient_axis._vec[1], i.orient_axis._vec[2] };
 	vector<double> entity_rotate_angle { i.orient_angle };

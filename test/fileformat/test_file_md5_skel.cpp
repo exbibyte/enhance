@@ -3,6 +3,7 @@
 #include <string>
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 int main( int argc, char** argv ){
     assert(argc >= 2 );
@@ -23,16 +24,16 @@ int main( int argc, char** argv ){
     assert( sc._skels.size() == d._numframes );
     int index_frame = 0;
     for( auto & i : sc._skels ){
-	assert( d._numjoints == i._joints.size() );
+	assert( d._numjoints == i->_joints.size() );
 	std::cout << "frame: " << index_frame << std::endl;
-	for( auto & j : i._joints ){
-	    std::cout << "joint: " << j._name << ", parent: " << j._parent << ", pos: [ ";
-	    for( auto p : j._pos ){
+	for( auto & j : i->_joints ){
+	    std::cout << "joint: " << j->_name << ", parent: " << j->_parent << ", pos: [ ";
+	    for( auto p : j->_pos ){
 		std::cout << p << " ]";
 	    }
 	    std::cout << ", orient: [ ";
 	    for( int k = 0; k < 4; ++k ){
-		std::cout << j._orient[k] << " ";
+		std::cout << j->_orient[k] << " ";
 	    }
 	    std::cout << " ]" << std::endl;
 	}

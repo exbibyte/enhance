@@ -12,7 +12,7 @@
 class Rendercompute0 : public IRendercompute {
 public:
     char const * get_id(){ return "rendercompute0"; }
-    RenderData compute( std::list< IRendercompute::RenderDataPack > render_data );
+    RenderData compute( light l, camera c, std::list< IRendercompute::RenderDataPack > render_data );
 };
 
 #endif

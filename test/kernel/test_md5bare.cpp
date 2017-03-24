@@ -1,4 +1,4 @@
-#include "enEngineKernel0.hpp"
+#include "enEngineKernel1.hpp"
 #include "enComponentType.hpp"
 #include "enComponentMeta.hpp"
 #include "enComponentClock.hpp"
@@ -52,8 +52,8 @@ int main( int argc, char ** argv ){
 	    paths_anim.push_back( argv[i] );
 	}
     }else{
-	path_mesh = "../../testcase/fileformat/md5/qshambler.md5mesh";
-	paths_anim.push_back( "../../testcase/fileformat/md5/qshamblerattack01.md5anim" );
+	path_mesh = "../../testcase/fileformat/md5/bob_lamp_update/bob_lamp_update_export.md5mesh";
+	paths_anim.push_back( "../../testcase/fileformat/md5/bob_lamp_update/bob_lamp_update_export.md5anim" );
     }
     // if( argc > 1 )
     //     path_poly = argv[1];
@@ -61,7 +61,7 @@ int main( int argc, char ** argv ){
     // 	path_poly = "../../testcase/file/arrow.pmesh";
     
     
-    enEngineKernel0 engine_kernel;
+    enEngineKernel1 engine_kernel;
     assert( engine_kernel.get_num_components() == 0 );
 
     engine_kernel.init();
@@ -83,19 +83,19 @@ int main( int argc, char ** argv ){
 
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-    //renderdraw0
+    //renderdraw1
     vector<enComponentMeta*> renderdraws;
     engine_kernel.get_components_by_type( enComponentType::RENDERDRAW, renderdraws );
     assert( renderdraws.size() == 1 );
-    COMPONENT_INSTANCE( renderdraw0, enComponentRenderdraw0, renderdraws.front() );
+    COMPONENT_INSTANCE( renderdraw1, enComponentRenderdraw1, renderdraws.front() );
 
-    //renderserver0
+    //renderserver1
     vector<enComponentMeta*> renderservers;
     engine_kernel.get_components_by_type( enComponentType::RENDERSERVER, renderservers );
     assert( renderservers.size() == 1 );
-    COMPONENT_INSTANCE( renderserver0, enComponentRenderserver0, renderservers.front() );
-    renderserver0->init();
-    std::shared_ptr<GLSLProgram> glslprogram = ((Renderserver0*)renderserver0)->_glslprogram;
+    COMPONENT_INSTANCE( renderserver1, enComponentRenderserver1, renderservers.front() );
+    renderserver1->init();
+    std::shared_ptr<GLSLProgram> glslprogram = ((Renderserver1*)renderserver1)->_glslprogram;
     assert( glslprogram.get() && "resource(glslprogram*) invalid" );
 
     //filterdrag0
@@ -209,6 +209,10 @@ int main( int argc, char ** argv ){
     c._camera_position = { 15, 15, 15 };
     light l;
     l._light_position = { 0, 0, 80 };
+    Vec cam_pos(3);
+    cam_pos[0] = 15;
+    cam_pos[1] = 15;
+    cam_pos[2] = 15;
     Vec orient_axis;
     float orient_angle;
     orient_axis[0] = 1;
@@ -372,7 +376,7 @@ int main( int argc, char ** argv ){
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
 
 	//render call ----------------------------------------------------------------
-	renderdraw0->render( renderdata );
+	renderdraw1->render( renderdata );
 
 	ImVec4 clear_color = ImColor(60, 60, 90);
 
@@ -406,8 +410,6 @@ int main( int argc, char ** argv ){
 	}
 
 	glfwSwapBuffers( windowinfo._window );
-
-	// std::cout << "post renderdraw0." << std::endl;
 		
 	glfwPollEvents();
     }

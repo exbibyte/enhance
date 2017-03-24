@@ -73,6 +73,10 @@ std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_fr
 	}
 	mff._tris.insert(mff._tris.end(), ele._tris.begin(), ele._tris.end() );
 	dmf._mesh_frames.push_back( mff );
+	for( int i = 0; i < 3; ++i ){
+	    dmf._bbox_lower[i] = sf._bbox_lower[i];
+	    dmf._bbox_upper[i] = sf._bbox_upper[i];
+	}	
     }
     return { true, dmf };
 }
