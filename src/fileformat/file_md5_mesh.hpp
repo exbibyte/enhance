@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 
+#include "file_md5_common.hpp"
 #include "Quat.hpp"
 
 class file_md5_mesh {
@@ -55,19 +56,6 @@ public:
 	std::vector<joint> _joints;
 	std::list<mesh> _meshes;
     };
-    enum class token {
-	COMMENT,
-	KEYWORD,
-	STR,
-	INT,
-	FLOAT,
-	BRACEL,
-	BRACER,
-	PARENL,
-	PARENR,
-	INVALID,
-        END,
-    };
     enum class process_type {
 	md5version,
 	commandline,
@@ -84,17 +72,18 @@ public:
 	numweights,
 	weight,
     };
-    static std::pair<bool, data_mesh> process( std::string file_path );
 
+    file_md5_mesh();
+	    
+    static std::pair<bool, data_mesh> process( std::string file_path );
+    
 private:
 
     static bool check_consistency( data_mesh & );
     static bool calc_bind_pose_positions( data_mesh & );
     static bool calc_bind_pose_normals( data_mesh & );
-    
-    static bool skip_white_space( std::fstream & f );
-    static std::pair<token, std::string> get_token( std::fstream & f, bool ignore_comments = true );
-    static void process_token( std::pair<token, std::string> t, std::fstream & f, void * );
+
+    static bool process_token( std::pair<file_md5_common::token, std::string> t, std::fstream & f, void * );
 
     //keyword processing
     static bool process_md5version( std::fstream &, void * );
@@ -113,13 +102,8 @@ private:
     static bool process_weight( std::fstream &, void * );
 
     //helpers
-    static bool aux_process_vec_int( std::fstream &, int count, void *, int & retrieved );
-    static bool aux_process_vec_float( std::fstream &, int count, void *, int & retrieved );
-    static bool aux_process_int( std::fstream &, void * );
-    static bool aux_process_float( std::fstream &, void * );
     static std::unordered_map<std::string, file_md5_mesh::process_type > _keyword_map;
     static std::map<file_md5_mesh::process_type, bool(*)(std::fstream &, void *) > _process_map;
-
 };
 
 #endif

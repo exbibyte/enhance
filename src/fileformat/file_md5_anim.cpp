@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "file_md5_anim.hpp"
+#include "file_md5_common.hpp"
 
 std::unordered_map< std::string, file_md5_anim::process_type > file_md5_anim::_keyword_map = \
 { { "MD5Version", file_md5_anim::process_type::md5version }, \
@@ -40,25 +41,29 @@ std::map< file_md5_anim::process_type, bool(*)(std::fstream &, void *) > file_md
 std::pair<bool, file_md5_anim::data_anim> file_md5_anim::process( std::string file_path ){
     data_anim d {};
     std::fstream f( file_path, std::fstream::in );
-    std::pair<token, std::string> t = get_token( f );
-    while( token::END != t.first ){
-	if( token::INVALID == t.first ){
+    std::pair< file_md5_common::token, std::string> t = file_md5_common::get_token( _keyword_map, f );
+    while( file_md5_common::token::END != t.first ){
+	if( file_md5_common::token::INVALID == t.first ){
 	    assert( 0 && "invalid token encountered" );
 	    break;
 	}
-	process_token( t, f, (void*)&d );
-	t = get_token( f );
+	if( !process_token( t, f, (void*)&d ) ){
+	    return { false, {} };
+	}
+	t = file_md5_common::get_token( _keyword_map, f );
     }
-    bool ret = check_consistency( d );
-    return std::pair<bool, data_anim>( ret, std::move(d) );
+    if( !check_consistency( d ) ){
+	return { false, {} };
+    }
+    return std::pair<bool, data_anim>( true, std::move(d) );
 }
-void file_md5_anim::process_token( std::pair<file_md5_anim::token, std::string> t, std::fstream & f, void * d ){
-    if( token::KEYWORD == t.first ){
+bool file_md5_anim::process_token( std::pair<file_md5_common::token, std::string> t, std::fstream & f, void * d ){
+    if( file_md5_common::token::KEYWORD == t.first ){
 	process_type pt = _keyword_map[t.second];
 	auto p = _process_map.find(pt);
 	if( p == _process_map.end() ){
 	    assert( 0 && "unknown function" );
-	    return;
+	    return false;
 	}
 	auto func = p->second;
 	switch( p->first ){
@@ -79,242 +84,22 @@ void file_md5_anim::process_token( std::pair<file_md5_anim::token, std::string> 
 	}
 	break;
 	default:
+	{
 	    assert( 0 && "unknown process_token" );
+	    return false;
+	}
 	}
     }
     else{
 	std::cout << "found token: " << t.second << std::endl;
 	assert( 0 && "unexpected token" );
-    }
-}
-bool file_md5_anim::skip_white_space( std::fstream & f ){
-    while( f.good() ){
-	int c = f.peek();
-	if( EOF == c )
-	    return true;
-	else if( ' ' == c || '\n' == c || '\t' == c || '\r' == c ){
-	    int a = f.get();
-	    continue;
-	}
-	else
-	    return true;
-    }
-    return false;
-}
-std::pair< file_md5_anim::token, std::string > file_md5_anim::get_token( std::fstream & f, bool ignore_comments ){
-    if( !skip_white_space( f ) )
-	return std::pair<token,std::string>( token::INVALID, "" );
-    int c = f.peek();
-    if( EOF == c )
-	return std::pair<token,std::string>( token::END, "" );
-    std::string s {};
-    char sink;
-    bool is_signed = false;
-    if( '-' == c || '+' == c ){
-        is_signed = true;
-	s += c;
-	f.get(sink);
-	c = f.peek();
-	if( EOF == c ){
-	    return std::pair<token,std::string>( token::INVALID, s );
-	}
-    }
-    if( '.' == c ){
-	//float
-	s += c;
-	f.get(sink);
-	c = f.peek();
-	while( EOF != c && isdigit(c) )
-	{
-	    s += c;
-	    f.get(sink);
-	    c = f.peek();
-	}
-	return std::pair<token,std::string>( token::FLOAT, s );
-    }
-    if( isdigit(c) ){
-	s += c;
-	f.get(sink);
-	c = f.peek();
-	while( EOF != c && isdigit(c) )
-	{
-	    s += c;
-	    f.get(sink);
-	    c = f.peek();
-	}
-	if( '.' == c ){
-	    //float
-	    s += '.';
-	    f.get(sink);
-	    c = f.peek();
-	    while( EOF != c && isdigit(c) )
-	    {
-		s += c;
-		f.get(sink);
-		c = f.peek();
-	    }
-	    return std::pair<token,std::string>( token::FLOAT, s );
-	}else{
-	    //int
-	    return std::pair<token,std::string>( token::INT, s );
-	}
-    }
-    if( is_signed ){
-	return std::pair<token,std::string>( token::INVALID, s );
-    }
-    if( '"' == c ){
-	f.get(sink);
-	c = f.peek();
-	while( EOF != c && '"' != c ){
-	    s += c;
-	    f.get(sink);
-	    c = f.peek();
-	}
-	if( '"' == c ){
-	    f.get(sink);
-	    return std::pair<token,std::string>( token::STR, s );
-	}else{
-	    return std::pair<token,std::string>( token::INVALID, s );
-	}
-    }
-    if( '{' == c ){
-	f.get(sink);
-	return std::pair<token,std::string>( token::BRACEL, "" );
-    }
-    if( '}' == c ){
-	f.get(sink);
-	return std::pair<token,std::string>( token::BRACER, "" );
-    }
-    if( '(' == c ){
-	f.get(sink);
-	return std::pair<token,std::string>( token::PARENL, "" );
-    }
-    if( ')' == c ){
-	f.get(sink);
-	return std::pair<token,std::string>( token::PARENR, "" );
-    }
-    if( isalpha(c) ){
-	s += c;
-	f.get(sink);
-	c = f.peek();
-	while( EOF != c && (isalpha(c) || isdigit(c) || ('_' == c)) ){
-	    s += c;
-	    f.get(sink);
-	    c = f.peek();
-	}
-	auto it = _keyword_map.find( s );
-	if( it != _keyword_map.end() )
-	    return std::pair<token,std::string>( token::KEYWORD, s );
-	else
-	    return std::pair<token,std::string>( token::STR, s );
-    }
-    if( '/' == c ){
-	s += c;
-	f.get(sink);
-	c = f.peek();
-	if( '/' == c ){
-	    s += c;
-	    f.get(sink);
-	    c = f.peek();
-	    while( EOF != c && '\n' != c ){
-		s += c;
-		f.get(sink);
-		c = f.peek();
-	    }
-	    if( '\n' == c )
-		f.get(sink);
-	    if( ignore_comments ){
-		return get_token( f, ignore_comments );
-	    }else{
-		return std::pair<token,std::string>( token::COMMENT, s );
-	    }
-	}
-	return std::pair<token,std::string>( token::INVALID, s );
-    }
-    //skip unrecognized character
-    s += c;
-    f.get(sink);
-    c = f.peek();
-    return std::pair<token,std::string>( token::INVALID, s );
-}
-bool file_md5_anim::aux_process_vec_int( std::fstream & f, int count, void * d, int & retrieved )
-{
-    //d is assume to be int*
-    retrieved = 0;
-    int * d_int = ( int * )d;
-    for( int i = 0; i < count; ++i ){
-	std::pair< token, std::string > t = get_token( f );
-	if( token::INT != t.first ){
-	    assert( 0 && "expected int" );
-	    return false;
-	}
-	int num;
-	int n = sscanf( t.second.c_str(), "%d", &num );
-	if( 1 != n ){
-	    assert( 0 && "expected int" );
-	    return false;
-	}
-	*(d_int++) = num;
-	++retrieved;
-    }
-    return true;
-}
-bool file_md5_anim::aux_process_vec_float( std::fstream & f, int count, void * d, int & retrieved )
-{
-    //d is assume to be float*
-    retrieved = 0;
-    float * d_float = ( float * )d;
-    for( int i = 0; i < count; ++i ){
-	std::pair< token, std::string > t = get_token( f );
-	if( token::FLOAT != t.first && token::INT != t.first ){
-	    assert( 0 && "expected float or int" );
-	    return false;	    
-	}
-	float num;
-	int n = sscanf( t.second.c_str(), "%f", &num );
-	if( 1 != n ){
-	    assert( 0 && "expected float or int" );
-	    return false;
-	}
-	*(d_float++) = num;
-	++retrieved;
-    }
-    return true;
-}
-bool file_md5_anim::aux_process_int( std::fstream & f, void * d )
-{
-    //d is assumed to be int*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::INT != t.first ){
-	return false;
-    }else{
-	int num;
-	int n = sscanf( t.second.c_str(), "%d", &num );
-	if( 1 != n ){
-	    return false;   
-	}
-	*((int*)d) = num;
-	return true;
-    }
-}
-bool file_md5_anim::aux_process_float( std::fstream & f, void * d )
-{
-    //d is assumed to be float*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::FLOAT != t.first && token::INT != t.first ){
-	return false;	    
-    }
-    float num;
-    int n = sscanf( t.second.c_str(), "%f", &num );
-    if( 1 != n ){
 	return false;
     }
-    *((float*)d)= num;
     return true;
 }
 bool file_md5_anim::process_md5version( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    if( !aux_process_int( f, &((data_anim*)d)->_md5version ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &((data_anim*)d)->_md5version ) ){
 	assert( 0 && "expected md5version number" );
 	return false;
     }
@@ -322,8 +107,8 @@ bool file_md5_anim::process_md5version( std::fstream & f, void * d ){
 }
 bool file_md5_anim::process_commandline( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    std::pair< token, std::string > t = get_token( f );
-    if( token::STR != t.first ){
+    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+    if( file_md5_common::token::STR != t.first ){
 	return false;
     }else{
 	((data_anim*)d)->_commandline = t.second;
@@ -333,7 +118,7 @@ bool file_md5_anim::process_commandline( std::fstream & f, void * d ){
 bool file_md5_anim::process_numframes( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
     int n;
-    if( !aux_process_int( f, &n ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &n ) ){
 	assert( 0 && "expected numframes" );
 	return false;
     }
@@ -343,7 +128,7 @@ bool file_md5_anim::process_numframes( std::fstream & f, void * d ){
 }
 bool file_md5_anim::process_numjoints( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    if( !aux_process_int( f, &((data_anim*)d)->_numjoints ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &((data_anim*)d)->_numjoints ) ){
 	assert( 0 && "expected numjoints" );
 	return false;
     }
@@ -351,7 +136,7 @@ bool file_md5_anim::process_numjoints( std::fstream & f, void * d ){
 } 
 bool file_md5_anim::process_framerate( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    if( !aux_process_int( f, &((data_anim*)d)->_framerate ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &((data_anim*)d)->_framerate ) ){
 	assert( 0 && "expected framerate" );
 	return false;
     }
@@ -359,7 +144,7 @@ bool file_md5_anim::process_framerate( std::fstream & f, void * d ){
 } 
 bool file_md5_anim::process_numanimatedcomponents( std::fstream & f, void * d ){
     //d is assumed to be data_anim*
-    if( !aux_process_int( f, &((data_anim*)d)->_num_animated_components ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &((data_anim*)d)->_num_animated_components ) ){
 	assert( 0 && "expected num animated components" );
 	return false;
     }
@@ -373,39 +158,39 @@ bool file_md5_anim::process_hierarchy( std::fstream & f, void * d ){
     // ...
     //}
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACEL != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACEL != t.first ){
 	    assert( 0 && "expected {" );
 	    return false;
 	}
     }
     for( int i = 0; i < ((data_anim*)d)->_numjoints; ++i ){
 	hierarchy h {};
-	std::pair< token, std::string > t = get_token( f );
-	if( token::STR != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::STR != t.first ){
 	    assert( 0 && "expected hierarchy name" );
 	    return false;
 	}else{
 	    h._name = t.second;
 	}
 
-	if( !aux_process_int( f, &h._parent ) ){
+	if( !file_md5_common::aux_process_int( _keyword_map, f, &h._parent ) ){
 	    assert( 0 && "expected hierarchy parent" );
 	    return false;
 	}
-	if( !aux_process_int( f, &h._flags ) ){
+	if( !file_md5_common::aux_process_int( _keyword_map, f, &h._flags ) ){
 	    assert( 0 && "expected hierarchy flags" );
 	    return false;
 	}
-	if( !aux_process_int( f, &h._start_index ) ){
+	if( !file_md5_common::aux_process_int( _keyword_map, f, &h._start_index ) ){
 	    assert( 0 && "expected hierarchy start index" );
 	    return false;
 	}
 	((data_anim*)d)->_hierarchies.push_back( h );
     }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACER != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACER != t.first ){
 	    assert( 0 && "expected }" );
 	    return false;
 	}
@@ -420,8 +205,8 @@ bool file_md5_anim::process_bounds( std::fstream & f, void * d ){
     // ...
     //}
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACEL != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACEL != t.first ){
 	    assert( 0 && "expected bounds {" );
 	    return false;
 	}
@@ -430,8 +215,8 @@ bool file_md5_anim::process_bounds( std::fstream & f, void * d ){
 	bound b {};
 	//bound min
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENL != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENL != t.first ){
 		assert( 0 && "expected bounds (" );
 		return false;
 	    }
@@ -439,22 +224,22 @@ bool file_md5_anim::process_bounds( std::fstream & f, void * d ){
 	{
 	    int count = 3;
 	    int retrieved;
-	    if( !aux_process_vec_float( f, count, b._min, retrieved ) ){
+	    if( !file_md5_common::aux_process_vec_float( _keyword_map, f, count, b._min, retrieved ) ){
 		assert( 0 && "expected bound min: vec3float" );
 		return false;
 	    }
 	}
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENR != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENR != t.first ){
 		assert( 0 && "expected bounds )" );
 		return false;
 	    }
 	}
 	//bound max
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENL != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENL != t.first ){
 		assert( 0 && "expected bounds (" );
 		return false;
 	    }
@@ -462,14 +247,14 @@ bool file_md5_anim::process_bounds( std::fstream & f, void * d ){
 	{
 	    int count = 3;
 	    int retrieved;
-	    if( !aux_process_vec_float( f, count, b._max, retrieved ) ){
+	    if( !file_md5_common::aux_process_vec_float( _keyword_map, f, count, b._max, retrieved ) ){
 		assert( 0 && "expected bound max: vec3float" );
 		return false;
 	    }
 	}
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENR != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENR != t.first ){
 		assert( 0 && "expected bounds )" );
 		return false;
 	    }
@@ -477,8 +262,8 @@ bool file_md5_anim::process_bounds( std::fstream & f, void * d ){
 	((data_anim*)d)->_bounds.push_back( b );
     }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACER != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACER != t.first ){
 	    assert( 0 && "expected bounds }" );
 	    return false;
 	}
@@ -493,8 +278,8 @@ bool file_md5_anim::process_baseframe( std::fstream & f, void * d ){
     //  ... -> number of lines = number of joints
     // }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACEL != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACEL != t.first ){
 	    assert( 0 && "expected baseframe {" );
 	    return false;
 	}
@@ -503,8 +288,8 @@ bool file_md5_anim::process_baseframe( std::fstream & f, void * d ){
 	baseframe bf {};
 	//pos
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENL != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENL != t.first ){
 		assert( 0 && "expected baseframe (" );
 		return false;
 	    }
@@ -512,22 +297,22 @@ bool file_md5_anim::process_baseframe( std::fstream & f, void * d ){
 	{
 	    int count = 3;
 	    int retrieved;
-	    if( !aux_process_vec_float( f, count, bf._pos, retrieved ) ){
+	    if( !file_md5_common::aux_process_vec_float( _keyword_map, f, count, bf._pos, retrieved ) ){
 		assert( 0 && "expected baseframe pos: vec3float" );
 		return false;
 	    }
 	}
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENR != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENR != t.first ){
 		assert( 0 && "expected baseframe )" );
 		return false;
 	    }
 	}
 	//orient
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENL != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENL != t.first ){
 		assert( 0 && "expected baseframe (" );
 		return false;
 	    }
@@ -535,14 +320,14 @@ bool file_md5_anim::process_baseframe( std::fstream & f, void * d ){
 	{
 	    int count = 3;
 	    int retrieved;
-	    if( !aux_process_vec_float( f, count, bf._orient, retrieved ) ){
+	    if( !file_md5_common::aux_process_vec_float( _keyword_map, f, count, bf._orient, retrieved ) ){
 		assert( 0 && "expected baseframe orient: vec3float" );
 		return false;
 	    }
 	}
 	{
-	    std::pair< token, std::string > t = get_token( f );
-	    if( token::PARENR != t.first ){
+	    std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	    if( file_md5_common::token::PARENR != t.first ){
 		assert( 0 && "expected baseframe )" );
 		return false;
 	    }
@@ -550,8 +335,8 @@ bool file_md5_anim::process_baseframe( std::fstream & f, void * d ){
 	((data_anim*)d)->_baseframes.push_back( bf );
     }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACER != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACER != t.first ){
 	    assert( 0 && "expected baseframe }" );
 	    return false;
 	}
@@ -565,7 +350,7 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
     //  v0:float v1:float ... -> # of floats = numAnimatedComponents
     // }
     int frame_index;
-    if( !aux_process_int( f, &frame_index ) ){
+    if( !file_md5_common::aux_process_int( _keyword_map, f, &frame_index ) ){
 	assert( 0 && "expected frame index" );
 	return false;
     }
@@ -576,8 +361,8 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
     std::shared_ptr<frame> fr( new frame );
     fr->_index = frame_index;
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACEL != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACEL != t.first ){
 	    assert( 0 && "expected frame {" );
 	    return false;
 	}
@@ -586,14 +371,14 @@ bool file_md5_anim::process_frame( std::fstream & f, void * d ){
     fr->_data.resize( num_animated_components );
     {
 	int retrieved;
-	if( !aux_process_vec_float( f, num_animated_components, &fr->_data[0], retrieved ) ){
+	if( !file_md5_common::aux_process_vec_float( _keyword_map, f, num_animated_components, &fr->_data[0], retrieved ) ){
 	    assert( 0 && "expected frame data: vec(num_animated_compoenents)float" );
 	    return false;
 	}
     }
     {
-	std::pair< token, std::string > t = get_token( f );
-	if( token::BRACER != t.first ){
+	std::pair< file_md5_common::token, std::string > t = file_md5_common::get_token( _keyword_map, f );
+	if( file_md5_common::token::BRACER != t.first ){
 	    assert( 0 && "expected frame }" );
 	    return false;
 	}
