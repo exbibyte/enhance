@@ -16,8 +16,7 @@ Service Module and Infrastructure - Working
 Memory Management  - Work in progress 
 Script management  - To Do
 
-Current work is focused on concurrent data structures, lighting, rendering pipeline, and asset model file format.
-3D model format is being revised to support md5mesh and md5anim formats.
+Current work is focused on concurrent data structures, rendering pipeline, and memory management.
 
 ## Dependencies:
 
