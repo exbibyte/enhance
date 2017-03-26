@@ -55,12 +55,20 @@ std::pair<bool, std::shared_ptr<file_md5_skel::skel_frame> > file_md5_skel::proc
 	//update rotation and position from frame data if neccessary
 	for( int i = 0; i < 3; ++i ){
 	    if( flag & (1<<i) ){
+		if( frame_data_start_index + offset >= f._data.size() ){
+		    assert( false && "index access out of range" );
+		    return { false, {} };
+		}
 		sf_pos[i] = f._data[ frame_data_start_index + offset ];
 		++offset;
 	    }
 	}
 	for( int i = 0; i < 3; ++i ){
 	    if( flag & (8<<i) ){
+		if( frame_data_start_index + offset >= f._data.size() ){
+		    assert( false && "index access out of range" );
+		    return { false, {} };
+		}
 		sf_rot[i] = f._data[ frame_data_start_index + offset ];
 		++offset;
 	    }

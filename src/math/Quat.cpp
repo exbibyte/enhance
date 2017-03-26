@@ -26,11 +26,11 @@ Quat::Quat( float x, float y, float z ){
     _quat[0] = x;
     _quat[1] = y;
     _quat[2] = z;
-    float t = 1.0 - ( x*x - y*y - z*z );
+    float t = 1.0 - x*x - y*y - z*z;
     if( t < 0 )
 	_quat[3] = 0;	
     else
-	_quat[3] = -sqrt(t);
+	_quat[3] = (float)-sqrt((double)t);
 }
 
 Quat::Quat( Vec v, float w ){
