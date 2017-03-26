@@ -9,11 +9,11 @@ Experimental 3D rendering and engine tools for interactive application developme
 
 ## Brief Status:
 
-Math Utilites  - Working, work in progress
-UI Handling  - In Progress  
-Graphics Utilities  - Partial, work in progress  
-Service Module and Infrastructure - Partial  
-Memory Management  - In Progress  
+Math Utilites  - Working
+UI Handling  - Work in progress  
+Graphics Pipeline  - Work in progress  
+Service Module and Infrastructure - Working
+Memory Management  - Work in progress 
 Script management  - To Do
 
 Current work is focused on concurrent data structures, lighting, rendering pipeline, and asset model file format.
@@ -37,6 +37,9 @@ Mac/Windows (not yet supported)
 
 ## Progress:
 
+Addition of md5mesh and md5anim file import
+https://youtu.be/pxU5Jtvp9Z4
+
 Addition of UI eventing and stream filtering modules. Testing of initial version of trackball functionality on top of these:
 https://youtu.be/hnAWd_QL_XY
 
@@ -45,6 +48,23 @@ https://youtu.be/x8cADzdhJhs
 
 Addition of Imgui UI toolkit:
 https://youtu.be/Je6lmugDkJc
+
+--------------------------------------------
+
+## Model Asset Support:
+
+md5mesh, md5anim file format
+custom simple file format for static meshes convertable from .obj file
+texture map (todo)
+normal map (todo)
+surface light model map (todo)
+
+## Rendering Support:
+
+no shadow
+shadow mapping
+shadow volume (todo)
+physically based light transport(todo)
 
 --------------------------------------------
 
