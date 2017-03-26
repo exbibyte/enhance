@@ -19,14 +19,22 @@ public:
 	float _pos[3];
 	Quat _orient;
     };
-    struct skel_frame { //a collection of a skeleton's joints per frame
+    class skel_frame { //a collection of a skeleton's joints per frame
+    public:
 	std::vector<std::shared_ptr<joint_frame> > _joints;
 	float _bbox_lower[3];
 	float _bbox_upper[3];
+	~skel_frame(){
+	    _joints.clear();
+	}
     };
-    struct skel_collection { //a collection of skeleton frames
+    class skel_collection { //a collection of skeleton frames
+    public:
 	std::vector< std::shared_ptr<skel_frame> > _skels;
 	int _framerate;
+	~skel_collection(){
+	    _skels.clear();
+	}
     };
     static std::pair<bool, skel_collection> process( file_md5_anim::data_anim const & );
 

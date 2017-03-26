@@ -31,7 +31,8 @@ public:
 	int _index;
 	std::vector<float> _data; //size of num animated components
     };
-    struct data_anim {
+    class data_anim {
+    public:
 	int _md5version;
 	std::string _commandline;
 	int _numframes;
@@ -42,6 +43,9 @@ public:
 	std::list<bound> _bounds; //expected size = number of _frames = _numframes
 	std::list<baseframe> _baseframes; //expected size = _numjoints
 	std::vector< std::shared_ptr<frame> > _frames; //expected number of data per frame = _num_animated_components. expected size = _numframes
+	~data_anim(){
+	    _frames.clear();
+	}
     };
     enum class process_type {
 	md5version,
