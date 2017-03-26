@@ -207,7 +207,7 @@ int main( int argc, char ** argv ){
 
     camera c;
     light l;
-    l._light_position = { 0, 0, 80 };
+    l._light_position = { 50.0, 50.0, 50.0 };
     Vec orient_axis;
     float orient_angle;
     orient_axis[0] = 1;
