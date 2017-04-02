@@ -17,6 +17,8 @@ public:
     bool deinit() override;
     bool register_resource_to_monitor( handle_resource ) override; //resource handle is assumed to be GLFwindow *
     bool deregister_resource_to_monitor( handle_resource ) override; //resource handle is assumed to be GLFwindow *
+    bool clear_characters();
+    bool _debug;
 private:
     static void process_mouse_move( GLFWwindow * window, double xpos, double ypos );
     static void process_mouse_button( GLFWwindow * window, int button, int action, int mods );

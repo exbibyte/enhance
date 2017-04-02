@@ -19,6 +19,7 @@ bool Ui0::get_characters( std::list<character> & characters ){
     return true;
 }
 bool Ui0::init(){
+    _debug = true;
     return true;
 }
 bool Ui0::deinit(){
@@ -34,6 +35,8 @@ void Ui0::process_mouse_move( GLFWwindow * window, double xpos, double ypos ){
 	c._handle_resource = window;
 	c._input_type = input_type::MOUSE_COORD;
         c._coordinate = { xpos, ypos, 0 };
+	if(instance->_debug)
+	    std::cout << "mouse coordinate: ( " << xpos << ", " << ypos << " )" << std::endl;
 	instance->_chars.push_back( std::move(c) );
 	++it;
     }
@@ -48,23 +51,54 @@ void Ui0::process_mouse_button( GLFWwindow * window, int button, int action, int
         state mouse_state;
 	switch( button ){
 	case GLFW_MOUSE_BUTTON_LEFT:
+	{
 	    mouse_char = mouse_character::LEFT;
-	    break;
+	    if(instance->_debug)
+		std::cout << "mouse L ";
+	}
+	break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
+	{
 	    mouse_char = mouse_character::RIGHT;
-	    break;
+	    if(instance->_debug)
+		std::cout << "mouse R ";
+	}
+	break;
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+	{
+	    mouse_char = mouse_character::MID;
+	    if(instance->_debug)
+		std::cout << "mouse M ";
+	}
+	break;
 	default:
+	{
 	    mouse_char = mouse_character::OTHER;
+	    if(instance->_debug)
+		std::cout << "mouse other ";
+	}
 	}
 	switch( action ){
 	case GLFW_PRESS:
+	{
 	    mouse_state = state::DOWN;
-	    break;
+	    if(instance->_debug)
+		std::cout << "mouse down" << std::endl;
+	}
+	break;
 	case GLFW_RELEASE:
+	{
 	    mouse_state = state::UP;
-	    break;
+	    if(instance->_debug)
+		std::cout << "mouse up" << std::endl;
+	}
+	break;
 	default:
+	{
 	    mouse_state = state::OTHER;
+	    if(instance->_debug)
+		std::cout << "mouse other" << std::endl;
+	}
 	}
 	character c;
 	c._handle_resource = window;
@@ -82,19 +116,37 @@ void Ui0::process_key_input( GLFWwindow * window, int key, int scancode, int act
     while( it != it_range.second ){
 	Ui0 * instance = it->second;
         key_character key_char = key;
+	if(instance->_debug)
+	    std::cout << "key " << key;
         state key_state;
 	switch( action ){
 	case GLFW_PRESS:
+	{
 	    key_state = state::DOWN;
-	    break;
+	    if(instance->_debug)
+		std::cout << "down" << std::endl;
+	}
+	break;
 	case GLFW_RELEASE:
+	{
 	    key_state = state::UP;
-	    break;
+	    if(instance->_debug)
+		std::cout << "up" << std::endl;
+	}
+	break;
 	case GLFW_REPEAT:
+	{
 	    key_state = state::REPEAT;
-	    break;
+	    if(instance->_debug)
+		std::cout << "repeat" << std::endl;
+	}
+	break;
 	default:
+	{
 	    key_state = state::OTHER;
+	    if(instance->_debug)
+		std::cout << "other" << std::endl;
+	}
 	}
 	character c;
 	c._handle_resource = window;
@@ -126,4 +178,7 @@ bool Ui0::deregister_resource_to_monitor( handle_resource resource ){
     glfwSetKeyCallback( (GLFWwindow *)resource, 0 );
     _map_resource_to_instance.erase( resource );
     return true;
+}
+bool Ui0::clear_characters(){
+    _chars.clear();
 }

@@ -155,34 +155,9 @@ int main( int argc, char ** argv ){
     assert( !sc.second._skels.empty() );
     //select the first frame of the current skeleton for rendering
     size_t count_tris = 0;
-    int index_frame = 0;
-    {
-	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc.second, index_frame );
-	assert( retcalc.first );
-	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
-	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
-	std::cout << "number of model meshes: " << dmf._mesh_frames.size() << std::endl;
-	auto it_dmesh_mesh = model_mesh._meshes.begin();
-	for( auto & m : dmf._mesh_frames ){
-	    assert( m._tris.size() == it_dmesh_mesh->_tris.size() );
-	    assert( m._verts.size() == it_dmesh_mesh->_verts.size() );
-	    //add vertex and normals for rendering
-	    for( auto & t : m._tris ){
-		for( int i = 0; i < 3; ++i ){
-		    int vert_index = t._vert_indices[i];
-		    auto & v = m._verts[ vert_index ];
-		    for( int j = 0; j < 3; ++j ){
-			vert_pos.push_back(v._pos[j]);
-			vert_norm.push_back(v._normal[j]);
-		    }
-		}
-	    }
-	    count_tris += m._tris.size();
-	    ++it_dmesh_mesh;
-	}
+    for( auto & i : model_mesh._meshes ){
+	count_tris += i._tris.size();
     }
-    ++index_frame;
-    std::cout << "number of model verts: " << vert_pos.size() << std::endl;
     std::cout << "number of model tris: " << count_tris << std::endl;
     
     cout << "End of Init Phase" << endl;
@@ -194,6 +169,7 @@ int main( int argc, char ** argv ){
     ImGui_ImplGlfwGL3_Init( windowinfo._window, bInstallCallback );
 
     //register window resource for UI event handler
+    ui0->init();
     ui0->register_resource_to_monitor( windowinfo._window );
 
     //setup clock tick callback
@@ -218,14 +194,12 @@ int main( int argc, char ** argv ){
     
     bool bQuit = false;
     while(true){
+	if( bQuit ) { break; }
+
 	std::uint64_t time_since_start_ms;
 	std::uint64_t ticks_since_start;
 	clock0->get_time( time_since_start_ms, ticks_since_start );
-	// if( time_since_start_ms > 5000 ){
-	//     cout << "End rendering..." << endl;
-	//     bQuit = true;
-	//     break;
-	// }
+
 	vector<enComponentMeta*> rendercomputes;
 	engine_kernel.get_components_by_type( enComponentType::RENDERCOMPUTE, rendercomputes );
 	assert( rendercomputes.size() == 1 );
@@ -235,42 +209,13 @@ int main( int argc, char ** argv ){
 	std::list<IUi::character> characters{};
 	ui0->get_characters( characters );
 	for( auto & i : characters ){
-	    if( IUi::input_type::MOUSE == i._input_type ){
-		if( IUi::mouse_character::LEFT == i._mouse_character ){
-		    std::cout << "mouse L ";
-		}
-		else if( IUi::mouse_character::RIGHT == i._mouse_character ){
-		    std::cout << "mouse R ";
-		}
-		else if( IUi::mouse_character::MID == i._mouse_character ){
-		    std::cout << "mouse M ";
-		}
-
+	    if( IUi::input_type::KEY == i._input_type ){
 		if( IUi::state::DOWN == i._state ){
-		    std::cout << "down" << std::endl;
-		}
-		else if( IUi::state::UP == i._state ){
-		    std::cout << "up" << std::endl;
-		}
-	    }
-	    else if( IUi::input_type::KEY == i._input_type ){
-		std::cout << "key " << i._key_character << " ";
-
-		if( IUi::state::DOWN == i._state ){
-		    std::cout << "down" << std::endl;
 		    if( 'Q' == i._key_character ){
-			std::cout << "exit" << std::endl;
-			return 0;
+			std::cout << "exiting.." << std::endl;
+			bQuit = true;
 		    }
 		}
-		else if( IUi::state::UP == i._state ){
-		    std::cout << "up" << std::endl;
-		}
-		else if( IUi::state::REPEAT == i._state ){
-		    std::cout << "repeat" << std::endl;
-		}
-	    }else{ //MOUSE_COORD
-		// std::cout << "x: " << i._coordinate._a << ", y: " << i._coordinate._b << std::endl;
 	    }
 	}
 
