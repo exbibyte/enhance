@@ -26,13 +26,13 @@ public:
 	float _bbox_lower [3];
 	float _bbox_upper [3];
     };
-    static std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> process( file_md5_mesh::data_mesh &, file_md5_skel::skel_frame & );
+    static std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> process( file_md5_mesh::data_mesh &, file_md5_skel::skel_frame &, file_md5_skel::skel_frame &, float interp );
 };
 
 class file_md5_calc_mesh {
 public:
     static std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> process( file_md5_mesh::data_mesh &, file_md5_skel::skel_collection &, double time );
-    static std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> process( file_md5_mesh::data_mesh &, file_md5_skel::skel_collection &, int frame_index );
+    static std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> process( file_md5_mesh::data_mesh &, file_md5_skel::skel_collection &, int frame_index, int frame_index2, float interp );
 };
 
 #endif

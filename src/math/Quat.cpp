@@ -374,6 +374,15 @@ Quat InterpolateSlerp( const Quat & q1, const Quat & q2, float t ){
 	cosOmega = -cosOmega;
     }
 
+    assert( t >= 0 && t <=1 );
+    
+    if( t < 0 ){
+	t = 0;
+    }
+    else if( t > 1 ){
+	t = 1;
+    }
+
     float k0, k1;
     if ( cosOmega > 0.99999f ) {
 	k0 = 1.0f - t;

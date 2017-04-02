@@ -14,7 +14,7 @@
 
 using namespace std;
 
-std::pair<bool, std::pair<file_md5_mesh::data_mesh, std::list<file_md5_skel::skel_collection> > > ParserMd5::parse( std::string path_mesh, std::vector<std::string> paths_anim ){
+std::pair<bool, ParserMd5::md5_data > ParserMd5::parse( std::string path_mesh, std::vector<std::string> paths_anim ){
     std::pair<bool, file_md5_mesh::data_mesh> retmesh = file_md5_mesh::process( path_mesh );
     assert( retmesh.first );
     if( false == retmesh.first )
@@ -22,7 +22,7 @@ std::pair<bool, std::pair<file_md5_mesh::data_mesh, std::list<file_md5_skel::ske
 	
     file_md5_mesh::data_mesh dmesh = std::move( retmesh.second );
     
-    std::list<file_md5_skel::skel_collection> scs {};
+    std::list< std::pair< md5_anim_info, file_md5_skel::skel_collection > > scs {};
 
     for( auto p : paths_anim ){
 	
@@ -51,7 +51,13 @@ std::pair<bool, std::pair<file_md5_mesh::data_mesh, std::list<file_md5_skel::ske
 	    assert( sc._skels.size() == danim._numframes );
 	    return { false, {} };
 	}
-	scs.push_back( std::move(sc) );
+	md5_anim_info anim_info;
+	anim_info._numframes = danim._numframes;
+	anim_info._framerate = danim._framerate;
+	scs.push_back( { anim_info, std::move(sc) } );
     }
-    return { true, { std::move(dmesh), std::move(scs) } };
+    md5_data ret;
+    ret._dm = std::move(dmesh);
+    ret._scs = std::move(scs);
+    return { true, ret };
 }

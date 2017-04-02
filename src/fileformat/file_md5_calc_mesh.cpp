@@ -9,20 +9,27 @@ std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh::p
     double frame_period = 1.0/sc._framerate;
     double numframes = time / frame_period;
     int frame_index = numframes;
-    if( frame_index >= sc._skels.size() ) //clamp frame index if greater than number of total frames
+    double interp = numframes - frame_index;
+    int frame_index2 = numframes + 1;
+    if( frame_index >= sc._skels.size() ){ //clamp frame index if greater than number of total frames
 	frame_index = sc._skels.size() - 1;
-    return process( m, sc, frame_index );
+    }
+    if( frame_index2 >= sc._skels.size() ){
+	frame_index2 = sc._skels.size() - 1;
+    }
+    return process( m, sc, frame_index, frame_index2, interp );
 }
-std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_collection & sc, int frame_index ){
+std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_collection & sc, int frame_index, int frame_index2, float interp ){
     if( frame_index < 0 || frame_index >= sc._skels.size() ){
 	assert( false && "frame_index out of range" );
 	return { false, {} };
     }
     std::shared_ptr<file_md5_skel::skel_frame> sf = sc._skels[frame_index];
-    return file_md5_calc_mesh_frame::process( m, *sf );
+    std::shared_ptr<file_md5_skel::skel_frame> sf2 = sc._skels[frame_index2];
+    return file_md5_calc_mesh_frame::process( m, *sf, *sf2, interp );
 }
 
-std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_frame::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_frame & sf ){
+std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_frame::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_frame & sf,  file_md5_skel::skel_frame & sf2, float interp ){
     data_mesh_frame dmf;
     for( auto & ele : m._meshes ){
 	mesh_frame_final mff;
@@ -40,11 +47,18 @@ std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh_fr
 		    assert( false && "joint index out of range" );
 		    return { false, {} };
 		}
+		if( joint_index < 0 || joint_index >= sf2._joints.size() ){
+		    assert( false && "joint index out of range" );
+		    return { false, {} };
+		}		
 		std::shared_ptr<file_md5_skel::joint_frame> jf = sf._joints[ joint_index ];
+		std::shared_ptr<file_md5_skel::joint_frame> jf2 = sf2._joints[ joint_index ];
 		//get position of the weight after transformation with joint orientation
 		Quat qpos( w._pos[0], w._pos[1], w._pos[2], 0.0f );
-		Quat orient_inv = jf->_orient.Inverse();
+		Quat orient_interp = InterpolateSlerp( jf->_orient, jf2->_orient, interp );
+		Quat orient_inv = orient_interp.Inverse();
 		orient_inv.NormalizeQuatCurrent();
+		
 		Quat pos_xform = jf->_orient * qpos * orient_inv;
 		//get vertex normal after transformation with joint orientation. vertex normal is accumed to be previously computed for bind pose
 		// Quat qnorm( v._normal[0], v._normal[1], v._normal[2], 0 );

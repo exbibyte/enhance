@@ -31,6 +31,7 @@
 #include "PassConvertPolyMeshDataStructToArray.h"
 #include "DataTransformDriver.h"
 #include "PolyMesh_Data_Arrays.h"
+#include "ParserMd5.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
@@ -143,20 +144,20 @@ int main( int argc, char ** argv ){
     vector<double> vert_norm;
     
     // ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
-    auto retparse = parsermd5->parse( path_mesh, paths_anim );
+    std::pair<bool, ParserMd5::md5_data > retparse = parsermd5->parse( path_mesh, paths_anim );
     assert( retparse.first );
     if( !retparse.first )
 	return 0;
-    auto model_mesh = std::move(retparse.second.first);
-    auto model_skels = std::move(retparse.second.second);
+    auto model_mesh = std::move(retparse.second._dm);
+    auto model_skels = std::move(retparse.second._scs);
     assert( !model_skels.empty() );
-    auto & sc = model_skels.back();
-    assert( !sc._skels.empty() );
+    std::pair< ParserMd5::md5_anim_info, file_md5_skel::skel_collection > & sc = model_skels.back();
+    assert( !sc.second._skels.empty() );
     //select the first frame of the current skeleton for rendering
     size_t count_tris = 0;
     int index_frame = 0;
     {
-	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc, index_frame );
+	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc.second, index_frame );
 	assert( retcalc.first );
 	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
 	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
@@ -225,7 +226,6 @@ int main( int argc, char ** argv ){
 	//     bQuit = true;
 	//     break;
 	// }
-
 	vector<enComponentMeta*> rendercomputes;
 	engine_kernel.get_components_by_type( enComponentType::RENDERCOMPUTE, rendercomputes );
 	assert( rendercomputes.size() == 1 );
@@ -316,13 +316,10 @@ int main( int argc, char ** argv ){
 	}
 	
 	orient_angle += auto_rotate;
-
 	//update animation starts
 	//select the first frame of the current skeleton for rendering
-	if( index_frame >= sc._skels.size() ){
-	    index_frame = 0;
-	}
-	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc, index_frame );
+	double animation_time = fmod( time_since_start_ms/1000.0, (double)sc.first._numframes / sc.first._framerate );
+	std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> retcalc = file_md5_calc_mesh::process( model_mesh, sc.second, animation_time );
 	assert( retcalc.first );
 	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
 	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
@@ -347,7 +344,6 @@ int main( int argc, char ** argv ){
 	    }
 	    ++it_dmesh_mesh;
 	}
-	++index_frame;
 	//update animation ends
     
 	//compute render information
