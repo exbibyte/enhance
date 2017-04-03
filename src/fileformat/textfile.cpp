@@ -1,4 +1,4 @@
-#include "textfile.h"
+#include "textfile.hpp"
 
 char *textFileRead(char const * fn) {
     FILE *fp;

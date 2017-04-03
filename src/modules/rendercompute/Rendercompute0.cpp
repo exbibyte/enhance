@@ -2,10 +2,6 @@
 #include "IRendercompute.hpp"
 
 #include "RenderData.hpp"
-#include "PassParsePolyMesh.h"
-#include "PassConvertPolyMeshDataStructToArray.h"
-#include "DataTransformDriver.h"
-#include "PolyMesh_Data_Arrays.h"
 
 #include "Vec.hpp"
 

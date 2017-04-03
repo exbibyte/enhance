@@ -1,3 +1,11 @@
+#include <vector>
+#include <iostream>
+#include <chrono>
+#include <thread>
+#include <ratio>
+#include <memory>
+#include <assert.h>
+
 #include "enEngineKernel0.hpp"
 #include "enComponentType.hpp"
 #include "enComponentMeta.hpp"
@@ -17,31 +25,17 @@
 
 #include "Funwrap3.hpp"
 
-#include <vector>
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <ratio>
-#include <memory>
-#include <assert.h>
-
-#include "GLIncludes.hpp"
-
-#include "PassParsePolyMesh.h"
-#include "PassConvertPolyMeshDataStructToArray.h"
-#include "DataTransformDriver.h"
-#include "PolyMesh_Data_Arrays.h"
 #include "ParserMd5.hpp"
-
-#include "imgui.h"
-#include "imgui_impl_glfw_gl3.h"
-
 #include "file_md5_anim.hpp"
 #include "file_md5_mesh.hpp"
 #include "file_md5_skel.hpp"
 #include "file_md5_calc_mesh.hpp"
-
 #include "renderable_info.hpp"
+
+#include "GLIncludes.hpp"
+
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
 
 using namespace std;
 
@@ -122,13 +116,12 @@ int main( int argc, char ** argv ){
     //set trackball window size
     orientationmanip0->init( { 500, 500, 250, 250 } );
 
-    //parserpolymesh0
-    vector<enComponentMeta*> parserpolymeshes;
-    engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
-    assert( parserpolymeshes.size() >= 1 );
-    // COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
+    //parsers
+    vector<enComponentMeta*> parsers;
+    engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
+    assert( parsers.size() >= 1 );
     ParserMd5 * parsermd5 = nullptr;
-    for( auto & i : parserpolymeshes ){
+    for( auto & i : parsers ){
 	COMPONENT_INSTANCE( parser_model, enComponentParserMd5, i );
 	if( nullptr != parser_model ){
 	    parsermd5 = (ParserMd5 *)parser_model;
@@ -139,11 +132,10 @@ int main( int argc, char ** argv ){
     if( nullptr == parsermd5 )
 	return -1;
 
-    //parse polymesh files and obtain asset information
+    //parse files and obtain asset information
     map< string, GLBufferInfo * > map_buffer_info; //unused for now
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
-    
-    // ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
+
     std::pair<bool, ParserMd5::md5_data > retparse = parsermd5->parse( path_mesh, paths_anim );
     assert( retparse.first );
     if( !retparse.first )

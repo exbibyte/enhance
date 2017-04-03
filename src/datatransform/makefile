@@ -5,9 +5,10 @@ src_files = $(wildcard *.cpp)
 #source files end---
 
 #include directories start---
-inc_folder_core := ../core ../render ../gl ../file ../asset ../math
 
-include_dirs = $(inc_folder_core)
+inc_folder_basic := $(dir $(wildcard ../../src/*/))
+
+include_dirs = $(inc_folder_basic)
 
 #include directories end---
 
@@ -24,10 +25,11 @@ $(shell mkdir -p $(dir_intermediate))
 
 .PHONY: all
 
-all: $(objects)
+all: $(objects) $(obj2polymesh)
 
 .PHONY: clean
 
 clean:
 	rm -f $(dir_intermediate)/*.o 
+
 

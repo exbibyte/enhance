@@ -26,11 +26,6 @@
 
 #include "GLIncludes.hpp"
 
-#include "PassParsePolyMesh.h"
-#include "PassConvertPolyMeshDataStructToArray.h"
-#include "DataTransformDriver.h"
-#include "PolyMesh_Data_Arrays.h"
-
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 
@@ -143,13 +138,12 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	assert( renderservers.size() == 1 );
 	COMPONENT_INSTANCE( renderserver0, enComponentRenderserver0, renderservers.front() );
     }
-    SECTION( "parserpolymesh0", "parser" ){
-	//parserpolymesh0
-	vector<enComponentMeta*> parserpolymeshes;
-	engine_kernel.get_components_by_type( enComponentType::PARSER, parserpolymeshes );
-	assert( parserpolymeshes.size() == 2 );
-	COMPONENT_INSTANCE( parserpolymesh0, enComponentParserPolymesh0, parserpolymeshes.front() );
-	COMPONENT_INSTANCE( parsermd5, enComponentParserMd5, parserpolymeshes[1] );
+    SECTION( "parsermd5", "parser" ){
+	//parsermd5
+	vector<enComponentMeta*> parsers;
+	engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
+	assert( parsers.size() == 1 );
+	COMPONENT_INSTANCE( parsermd5, enComponentParserMd5, parsers.front() );
     }
 
     engine_kernel.deinit();

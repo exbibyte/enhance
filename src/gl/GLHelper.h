@@ -13,12 +13,9 @@
 /* #else */
 /* #include <GL/glut.h> */
 /* #endif */
-
 	   
 #include <iostream>
 using namespace std;
-
-#include "textfile.h"
 
 namespace GLSLShader {
     enum GLSLShaderType {

@@ -1,6 +1,6 @@
 #source files---
 
-src_files = $(wildcard *.cpp)
+src_files := $(filter-out obj2polymesh.cpp, $(wildcard *.cpp))
 
 #source files end---
 
@@ -14,7 +14,7 @@ include_dirs = $(inc_folder_basic)
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
-objects := $(patsubst %.cpp,%.o,$(src_files))
+objects =  $(patsubst %.cpp,%.o,$(src_files))
 
 dir_intermediate := ./intermediate
 

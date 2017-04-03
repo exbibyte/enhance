@@ -1,8 +1,9 @@
-# kernel related starts
 kernel_modules = ./src/modules
 kernel = ./src/kernel
 test_kernel = ./test/kernel
 test_algo = ./test/algo
+
+sub_dir =  ./src/*
 
 build_gl:
 	$(MAKE) -C ./src/gl all
@@ -39,4 +40,9 @@ build_test_kernel: build_kernel
 
 .PHONY: all
 all: build_test_kernel
-#kernel related ends
+
+.PHONY: clean
+clean:
+	for dir in $(sub_dir); do \
+	  ($(MAKE) -C $$dir clean);\
+	done

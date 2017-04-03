@@ -5,7 +5,7 @@ src_files = $(wildcard *.cpp)
 #source files end---
 
 #include directories start---
-inc_folder_core := ../core ../render ../gl ../file ../asset ../math
+inc_folder_core := ../core ../render ../gl ../fileformat ../asset ../math
 
 include_dirs = $(inc_folder_core)
 

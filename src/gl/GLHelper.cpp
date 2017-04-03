@@ -1,12 +1,11 @@
 #include <cassert>
 
 #include "GLIncludes.hpp"
-
 #include "GLHelper.h"
+#include "textfile.hpp"
 
 // #include <GLFW/glfw3.h>
 // #include <OpenGL/gl3.h>
-
 
 ///////////
 bool GLCompileShaderFromString( GLuint & shader, char const * Source, GLSLShader::GLSLShaderType type ){
