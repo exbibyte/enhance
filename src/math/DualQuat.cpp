@@ -155,7 +155,12 @@ Quat DualQuat::GetReal() const{
 Quat DualQuat::GetDual() const{
   return Quat( _B._quat[0], _B._quat[1], _B._quat[2], _B._quat[3] );
 }
-
+Quat & DualQuat::GetRealRef(){
+    return _A;
+}
+Quat & DualQuat::GetDualRef(){
+    return _B;
+}
 void DualQuat::SetReal( const Quat & q ){
   _A = q;
 }

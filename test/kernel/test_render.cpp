@@ -41,6 +41,8 @@
 #include "file_md5_skel.hpp"
 #include "file_md5_calc_mesh.hpp"
 
+#include "renderable_info.hpp"
+
 using namespace std;
 
 int main( int argc, char ** argv ){
@@ -140,8 +142,6 @@ int main( int argc, char ** argv ){
     //parse polymesh files and obtain asset information
     map< string, GLBufferInfo * > map_buffer_info; //unused for now
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
-    vector<double> vert_pos;
-    vector<double> vert_norm;
     
     // ((ParserPolymesh0*)parserpolymesh0)->parse( path_poly, map_buffer_info, map_buffer_info_sequence, vert_pos, vert_norm );
     std::pair<bool, ParserMd5::md5_data > retparse = parsermd5->parse( path_mesh, paths_anim );
@@ -190,7 +190,7 @@ int main( int argc, char ** argv ){
     orient_axis[0] = 1;
     orient_angle = 0.000;
 
-    double auto_rotate = 0.0;
+    double auto_rotate = 0.07;
     
     bool bQuit = false;
     while(true){
@@ -269,32 +269,14 @@ int main( int argc, char ** argv ){
 	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
 	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
 	auto it_dmesh_mesh = model_mesh._meshes.begin();
-	vert_pos.clear();
-	vert_norm.clear();
-	for( auto & m : dmf._mesh_frames ){
-	    assert( m._tris.size() == it_dmesh_mesh->_tris.size() );
-	    assert( m._verts.size() == it_dmesh_mesh->_verts.size() );
-	    //add vertex and normals for rendering
-	    for( auto & t : m._tris ){
-		for( int i = 0; i < 3; ++i ){
-		    int vert_index = t._vert_indices[i];
-		    auto & v = m._verts[ vert_index ];
-		    vert_pos.push_back(v._pos[0]);
-		    vert_pos.push_back(v._pos[1]);
-		    vert_pos.push_back(v._pos[2]);
-		    vert_norm.push_back(v._normal[0]);
-		    vert_norm.push_back(v._normal[1]);
-		    vert_norm.push_back(v._normal[2]);
-		}
-	    }
-	    ++it_dmesh_mesh;
-	}
+	renderable_info_tris rit = std::move( file_md5_calc_mesh::calc_renderable_info_tris( dmf ) );
+	assert( renderable_check_consistency<renderable_info_tris>::process( rit ) );
 	//update animation ends
-    
+	
 	//compute render information
 	IRendercompute::RenderDataPack render_data_0;
-	render_data_0.vert_coord = vert_pos;
-	render_data_0.vert_normal = vert_norm;
+	render_data_0.vert_coord = std::move( rit._pos );
+	render_data_0.vert_normal = std::move( rit._normal );
 	render_data_0.orient_axis = orient_axis;
 	render_data_0.orient_angle = orient_angle;
 	Vec translate(3);

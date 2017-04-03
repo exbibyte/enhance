@@ -40,6 +40,8 @@ class DualQuat{
 
   Quat              GetReal() const;
   Quat              GetDual() const;
+  Quat &            GetRealRef();
+  Quat &            GetDualRef();
   void              SetReal( const Quat & q );
   void              SetDual( const Quat & q );
   float             GetVal( int index ) const;
