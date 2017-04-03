@@ -7,6 +7,8 @@
 /* #include <GL/glut.h> */
 /* #endif */
 
+#include <list>
+
 #include "GLIncludes.hpp"
 
 #include <algorithm>
@@ -19,24 +21,17 @@ class GLAttribData {
 public:
     GLAttribData(){
         glGenBuffers( 1, &_HandleBuffer );
-	_pData = nullptr;
     }
     ~GLAttribData(){
-        if( _pData ) {
-            delete [] _pData;
-            _pData = 0;
-        }
+	/* _pData.clear(); */
     }
     void SetVertexArrayIndex( GLuint vao, GLuint Index ){
-        IndexVertexAttrib = Index;
+        _indexVertexAttrib = Index;
         _hVAO = vao;
     }
     void SetData( DataType * Data, int VertexSize, int Count ){
-	if( _pData ) {
-            delete [] _pData;
-        }
-	_pData = new DataType[ Count ];
-        std::copy ( Data, Data + Count, _pData );
+	/* _pData.clear(); */
+	/* _pData.insert( _pData.end(), Data, Data + Count ); */
         _VertexSize = VertexSize;
         _Size = Count;
 
@@ -48,7 +43,7 @@ public:
 
         //associate and bind vbo to vao index
         EnableVertexArray();
-        glVertexAttribPointer( IndexVertexAttrib, VertexSize, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
+        glVertexAttribPointer( _indexVertexAttrib, VertexSize, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
 
         UnBindVertexBuf();
 
@@ -56,11 +51,11 @@ public:
     }    
     void EnableVertexArray()
     {
-        glEnableVertexAttribArray( IndexVertexAttrib );
+        glEnableVertexAttribArray( _indexVertexAttrib );
     }
     void DisableVertexArray()
     {
-        glDisableVertexAttribArray( IndexVertexAttrib );
+        glDisableVertexAttribArray( _indexVertexAttrib );
     }
     void BindVertexBuf() {
         glBindBuffer(GL_ARRAY_BUFFER, _HandleBuffer);
@@ -69,20 +64,20 @@ public:
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
     GLuint GetIndexAttrib() const {
-        return IndexVertexAttrib;
+        return _indexVertexAttrib;
     }
-    void GetData( DataType * & Data, int & VertexSize, int & DataCount ) const {
-        Data = _pData;
-        VertexSize = _VertexSize;
-        DataCount = _Size;
-    }
+    /* void GetData( std::list<DataType> & Data, int & VertexSize, int & DataCount ) const { */
+    /*     Data = _pData; */
+    /*     VertexSize = _VertexSize; */
+    /*     DataCount = _Size; */
+    /* } */
 
 private:
     GLuint _HandleBuffer; //vbo size of 1
-    DataType * _pData;
+    /* std::list<DataType> _pData; */
     int _VertexSize;
     int _Size;
-    GLuint IndexVertexAttrib;
+    GLuint _indexVertexAttrib;
     GLuint _hVAO;
 };
 

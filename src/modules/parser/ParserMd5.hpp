@@ -11,6 +11,7 @@
 #include "file_md5_mesh.hpp"
 #include "file_md5_skel.hpp"
 #include "file_md5_calc_mesh.hpp"
+#include "renderable_info.hpp"
 
 class ParserMd5 : public IParser {
 public:

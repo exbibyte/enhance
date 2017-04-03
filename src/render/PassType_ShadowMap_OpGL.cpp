@@ -285,8 +285,6 @@ bool PassType_ShadowMap_OpGL::ProcessPassCommon( PassType pass_type, GLSLProgram
 	bRet = glsl_program->SetUniformMat3( "NormalMatrix", attrib_normal_matrix );
 	bRet = glsl_program->SetUniformMat4( "LightViewMatrix", attrib_light_view_matrix );
 
-	// glsl_program->BindVertexArray();
-
 	//render everything in the buffer for now	
 	GLBufferInfo render_buffer_info;
 	render_buffer_info._Name = "Default_Render_Buffer";

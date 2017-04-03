@@ -44,9 +44,10 @@ public:
     public:
 	std::vector<double> vert_coord;
 	std::vector<double> vert_normal;
-	Vec orient_axis;
-	double orient_angle;
-	Vec translate;
+	Vec orient_axis; //todo-replace with quaternion
+	double orient_angle; //todo-replace with quaternion
+	Vec translate;//todo-replace with quaternion
+	// DuatQuat _orient;
 	material _material;
     };
     virtual ~IRendercompute(){}

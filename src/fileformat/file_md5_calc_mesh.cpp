@@ -4,6 +4,28 @@
 #include "file_md5_calc_mesh.hpp"
 #include "file_md5_mesh.hpp"
 #include "file_md5_skel.hpp"
+#include "renderable_info.hpp"
+
+renderable_info_tris file_md5_calc_mesh::calc_renderable_info_tris( file_md5_calc_mesh_frame::data_mesh_frame & dmf ){
+    renderable_info_tris ret {};
+    for( auto & m : dmf._mesh_frames ){
+	//add vertex and normals for rendering
+	for( auto & t : m._tris ){
+	    for( int i = 0; i < 3; ++i ){
+		int vert_index = t._vert_indices[i];
+		auto & v = m._verts[ vert_index ];
+		ret._pos.push_back(v._pos[0]);
+		ret._pos.push_back(v._pos[1]);
+		ret._pos.push_back(v._pos[2]);
+		ret._normal.push_back(v._normal[0]);
+		ret._normal.push_back(v._normal[1]);
+		ret._normal.push_back(v._normal[2]);
+		//todo: uv
+	    }
+	}
+    }
+    return std::move(ret);
+}
 
 std::pair<bool, file_md5_calc_mesh_frame::data_mesh_frame> file_md5_calc_mesh::process( file_md5_mesh::data_mesh & m, file_md5_skel::skel_collection & sc, double time ){
     double frame_period = 1.0/sc._framerate;

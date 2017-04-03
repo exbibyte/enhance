@@ -4,11 +4,6 @@
 #include "GLIncludes.hpp"
 #include "GLSLProgram.h"
 
-// #include "PassParsePolyMesh.h"
-// #include "PassConvertPolyMeshDataStructToArray.h"
-// #include "DataTransformDriver.h"
-// #include "PolyMesh_Data_Arrays.h"
-
 #include <iostream>
 #include <memory>
 #include <list>

@@ -74,7 +74,7 @@ public:
 	}
 	int size_array = it_find->second.size();
 	size = size_array;
-	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<double[]>() );
+	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<ElementType[]>() );
 	try {   
 	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
 	}catch( ... ){
@@ -123,7 +123,7 @@ public:
 	}
 	int size_array = it_find->second.size();
 	size = size_array;
-	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<int[]>() );
+	data_array = std::shared_ptr< ElementType >( new ElementType[ size_array ], std::default_delete<ElementType[]>() );
 	try {   
 	    std::copy( it_find->second.begin(), it_find->second.end(), data_array.get() );
 	}catch( ... ){

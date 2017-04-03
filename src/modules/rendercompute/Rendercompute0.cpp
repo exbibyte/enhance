@@ -55,7 +55,8 @@ RenderData Rendercompute0::compute( light l, camera c, std::list< IRendercompute
     //entities -------------------------------------------------------------------
     for( auto & i : render_data )
     {
-	//orientation	
+	//orientation
+	
 	vector<double> entity_translate    { i.translate._vec[0], i.translate._vec[1], i.translate._vec[2] };
 	vector<double> entity_rotate_axis  { i.orient_axis._vec[0], i.orient_axis._vec[1], i.orient_axis._vec[2] };
 	vector<double> entity_rotate_angle { i.orient_angle };
