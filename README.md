@@ -20,7 +20,7 @@ Current work is focused on concurrent data structures, rendering pipeline, and m
 
 ## Dependencies:
 
-GLFW, gl3w(http://github.com/skaslev/gl3w), OpenGL 3.3+ hardware support, Flex, Bison, pkg-config
+GLFW, gl3w(http://github.com/skaslev/gl3w), OpenGL 3.3+ hardware support, pkg-config
 These can be obtained via package manager or built with their repositories' source code.
 
 --------------------------------------------
