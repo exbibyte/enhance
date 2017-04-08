@@ -14,7 +14,7 @@ public:
         std::shared_ptr< Node > _right;
         std::shared_ptr< TypeItem > _item;
     };
-    //interfaces
+    //mergeable heap interfaces
     static std::shared_ptr< HeapFibonacci > MakeHeap(){
         std::shared_ptr< HeapFibonacci > heap = std::make_shared< HeapFibonacci >();
         return heap;

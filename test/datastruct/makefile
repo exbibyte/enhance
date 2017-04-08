@@ -13,9 +13,9 @@ src_files = $(wildcard *.cpp)
 
 #src files end---
 
-objects_transition = $(wildcard ../../src/transition/intermediate/*.o)
+objects_graph = $(wildcard ../../src/datastruct/intermediate/*.o)
 
-object_files := $(objects_transition)
+object_files := $(objects_graph)
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
@@ -35,3 +35,9 @@ all: $(targets)
 clean:
 	rm -f -r ./build 
 
+testcase_excludes := $(dir_build)/test_suffix_tree
+
+testcases:
+	@for i in $(filter-out $(testcase_excludes), $(wildcard $(dir_build)/*) ); do \
+		./$$i; \
+	done \

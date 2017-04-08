@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <queue>
+#include <cstring>
 
 class huffman{
 public:

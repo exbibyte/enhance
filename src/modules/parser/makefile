@@ -6,7 +6,9 @@ src_folder_core := ../../core
 
 #source files---
 
-src_files = $(wildcard *.cpp) $(wildcard **/*.cpp) 
+src_exclude := ParserObj.cpp
+
+src_files = $(filter-out $(src_exclude), $(wildcard *.cpp) $(wildcard **/*.cpp) ) 
 
 #source files end---
 

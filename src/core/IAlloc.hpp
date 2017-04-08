@@ -39,12 +39,13 @@ public:
     //lend out a free block to user
     template< class... Args >
     bool allocating( Args&&... args ){ return Impl::allocating( std::forward<Args>(args)... ); }
-    //reclaim a block
+    //reclaim a block. todo: to be relocated to responsibility of specific garbage collector
     template< class... Args >
     bool freeing( Args&&... args ){ return Impl::freeing( std::forward<Args>(args)... ); }
     //allocate and initializes T if p is nullptr, else initialize T using existing placement p
     template< class T, class... Args >
     T * newing( void * p, Args&&... args ){ return Impl::template newing<T,Args...>( p, std::forward<Args>(args)... ); }
+    //todo: to be relocated to responsibility of specific garbbage collector
     template< class T >
     bool deleting( T * p ){ return Impl::deleting( p ); }
 	 

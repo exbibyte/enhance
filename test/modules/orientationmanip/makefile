@@ -23,14 +23,14 @@ objects_gl := $(wildcard ../../../src/gl/intermediate/*.o)
 objects_render := $(wildcard ../../../src/render/intermediate/*.o)
 objects_math := $(wildcard ../../../src/math/intermediate/*.o)
 objects_file := $(wildcard ../../../src/file/intermediate/*.o)
-objects_datatransform := $(wildcard ../../../src/DataTransform/intermediate/*.o)
+objects_fileformat := $(wildcard ../../../src/fileformat/intermediate/*.o)
 objects_ui := $(wildcard ../../../src/ui/intermediate/*.o)
 objects_filter := $(wildcard ../../../src/filter/intermediate/*.o)
 objects_orientationmanip := $(wildcard ../../../src/orientationmanip/intermediate/*.o)
 
 targets = test_orientationmanip0
 
-object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_datatransform) $(objects_ui) $(objects_filter) $(objects_orientationmanip)
+object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_render) $(objects_math) $(objects_file) $(objects_fileformat) $(objects_datatransform) $(objects_ui) $(objects_filter) $(objects_orientationmanip)
 
 libs =  -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
 

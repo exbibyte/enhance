@@ -31,3 +31,9 @@ all: $(targets)
 clean:
 	rm -f -r ./build 
 
+testcase_excludes := $(dir_build)/
+
+testcases:
+	@for i in $(filter-out $(testcase_excludes), $(wildcard $(dir_build)/*) ); do \
+		./$$i; \
+	done \
