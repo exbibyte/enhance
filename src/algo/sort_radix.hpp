@@ -10,8 +10,8 @@
 
 class sort_radix {
 public:
-    using t_stable_sort = std::function<bool(std::vector<std::pair<unsigned int, unsigned int> > const &, std::vector< std::pair<unsigned int, unsigned int> > & )>;
-    static bool sort( t_stable_sort stable_sort, std::vector<std::pair<std::vector<unsigned int>, unsigned int> > const & input, std::vector< std::pair<std::vector<unsigned int>, unsigned int> > & output ){
+    using t_stable_sort = std::function<bool(std::vector<std::pair<unsigned int/*key*/, unsigned int/*id*/> > const &, std::vector< std::pair<unsigned int, unsigned int> > & )>;
+    static bool sort( t_stable_sort stable_sort, std::vector<std::pair<std::vector<unsigned int>/*keys to sort*/, unsigned int/*id*/> > const & input, std::vector< std::pair<std::vector<unsigned int>, unsigned int> > & output ){
 	if( input.empty() )
 	    return true;
 
