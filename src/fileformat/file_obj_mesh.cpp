@@ -51,7 +51,7 @@ std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string fi
     std::vector<file_obj_mesh::norm> normals {};
     std::vector<file_obj_mesh::texturecoord> textures {};
     while (getline(input, current)) 
-    {    
+    {
         // object name
         std::regex reg_obj_name("^o (\\w+)");
         std::smatch match_obj_name;

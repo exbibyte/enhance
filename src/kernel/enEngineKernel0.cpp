@@ -26,6 +26,7 @@ void enEngineKernel0::init(){
     register_component( new enComponentRendercompute0( new Rendercompute0 ) );
     register_component( new enComponentRenderserver0( new Renderserver0 ) );
     register_component( new enComponentParserMd5( new ParserMd5 ) );
+    register_component( new enComponentParserObj( new ParserObj ) );
     register_component( new enComponentUi0( new Ui0 ) );
     register_component( new enComponentFilterUiDrag( new FilterUiDrag ) );
     register_component( new enComponentOrientationmanip0( new Orientationmanip0 ) );

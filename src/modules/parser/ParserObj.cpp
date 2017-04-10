@@ -11,7 +11,7 @@
 
 using namespace std;
 
-std::pair<bool, ParserObj::obj_data > ParserObj::parse( std::string path_mesh ){
+std::pair<bool, file_obj_mesh::data_mesh > ParserObj::parse( std::string path_mesh ){
     std::pair<bool, file_obj_mesh::data_mesh> ret = std::move( file_obj_mesh::process( path_mesh ) );
     assert( ret.first );
     if( false == ret.first )

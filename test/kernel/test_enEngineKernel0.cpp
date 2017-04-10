@@ -142,8 +142,15 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	//parsermd5
 	vector<enComponentMeta*> parsers;
 	engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
-	assert( parsers.size() == 1 );
+	assert( parsers.size() == 2 );
 	COMPONENT_INSTANCE( parsermd5, enComponentParserMd5, parsers.front() );
+    }
+    SECTION( "parserobj", "parser" ){
+	//parserobj
+	vector<enComponentMeta*> parsers;
+	engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
+	assert( parsers.size() == 2 );
+	COMPONENT_INSTANCE( parserobj, enComponentParserObj, parsers[1] );
     }
 
     engine_kernel.deinit();

@@ -30,6 +30,10 @@
 #include "file_md5_mesh.hpp"
 #include "file_md5_skel.hpp"
 #include "file_md5_calc_mesh.hpp"
+
+#include "ParserObj.hpp"
+#include "file_obj_mesh.hpp"
+
 #include "renderable_info.hpp"
 
 #include "GLIncludes.hpp"
@@ -56,7 +60,8 @@ int main( int argc, char ** argv ){
     //     path_poly = argv[1];
     // else
     // 	path_poly = "../../testcase/file/arrow.pmesh";
-    
+
+    string path_mesh_obj = "../../testcase/file/samplemodel.txt";
     
     enEngineKernel0 engine_kernel;
     assert( engine_kernel.get_num_components() == 0 );
@@ -132,6 +137,18 @@ int main( int argc, char ** argv ){
     if( nullptr == parsermd5 )
 	return -1;
 
+    ParserObj * parserobj = nullptr;
+    for( auto & i : parsers ){
+	COMPONENT_INSTANCE( parser_model, enComponentParserObj, i );
+	if( nullptr != parser_model ){
+	    parserobj = (ParserObj *)parser_model;
+	    break;
+	}
+    }
+    assert( nullptr != parserobj );
+    if( nullptr == parserobj )
+	return -1;
+
     //parse files and obtain asset information
     map< string, GLBufferInfo * > map_buffer_info; //unused for now
     map< string, GLBufferInfoSequence * > map_buffer_info_sequence; //unused for now
@@ -151,6 +168,15 @@ int main( int argc, char ** argv ){
 	count_tris += i._tris.size();
     }
     std::cout << "number of model tris: " << count_tris << std::endl;
+
+
+    //obj model
+    std::pair< bool, file_obj_mesh::data_mesh > retparse_obj = parserobj->parse( path_mesh_obj );
+    assert( retparse_obj.first );
+    if( !retparse_obj.first )
+	return 0;
+    auto dm_obj = std::move( retparse_obj.second );
+    std::cout << "number of obj model tris: " << dm_obj._numtris << std::endl;
     
     cout << "End of Init Phase" << endl;
 
@@ -261,7 +287,9 @@ int main( int argc, char ** argv ){
 	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
 	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
 	auto it_dmesh_mesh = model_mesh._meshes.begin();
-	renderable_info_tris rit = std::move( file_md5_calc_mesh::calc_renderable_info_tris( dmf ) );
+	// renderable_info_tris rit = std::move( file_md5_calc_mesh::calc_renderable_info_tris( dmf ) );
+	renderable_info_tris rit = file_obj_mesh::calc_renderable_info_tris( dm_obj );	
+	
 	assert( renderable_check_consistency<renderable_info_tris>::process( rit ) );
 	//update animation ends
 	
@@ -278,8 +306,10 @@ int main( int argc, char ** argv ){
 	render_data_0.translate = translate;
 	c._camera_lookat.resize(3);
 	for( int i = 0; i < 3; ++i ){
-	    c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
-	    c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
+	    // c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
+	    // c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
+	    c._camera_lookat[i] = 0;
+	    c._camera_position[i] = 5;
 	}
 	material m;
 	render_data_0._material = m;
