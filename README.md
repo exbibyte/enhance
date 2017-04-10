@@ -53,10 +53,9 @@ https://youtu.be/Je6lmugDkJc
 ## Model Asset Support:
 
 md5mesh, md5anim file format
-custom simple file format for static meshes convertable from .obj file
+.obj format
 texture map (todo)
 normal map (todo)
-surface light model map (todo)
 
 ## Rendering Support:
 
