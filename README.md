@@ -53,15 +53,21 @@ https://youtu.be/Je6lmugDkJc
 ## Model Asset Support:
 
 md5mesh, md5anim file format
+
 .obj format
+
 texture map (todo)
+
 normal map (todo)
 
 ## Rendering Support:
 
 no shadow
+
 shadow mapping
+
 shadow volume (todo)
+
 physically based light transport(todo)
 
 --------------------------------------------
