@@ -57,7 +57,7 @@ std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string fi
         std::smatch match_obj_name;
         if (std::regex_search( current, match_obj_name, reg_obj_name ) && match_obj_name.size() > 1 ) {
             result_obj_name = match_obj_name.str(1);
-	    std::cout << "Object Name: " << result_obj_name << std::endl;
+	    // std::cout << "Object Name: " << result_obj_name << std::endl;
 	    continue;
         }
 
@@ -70,7 +70,7 @@ std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string fi
 	    v._index = count_verts++;
 	    for( int i = 0; i < 3; ++i )
 		v._pos[i] = stod( match_vert_coord.str( i + 1 ) );
-	    std::cout << "Vertice Coord: " << v._pos[0] << ", " << v._pos[1] <<", " << v._pos[2] << std::endl;
+	    // std::cout << "Vertice Coord: " << v._pos[0] << ", " << v._pos[1] <<", " << v._pos[2] << std::endl;
 	    dm._verts.push_back(v);
 	    continue;
         }
@@ -84,7 +84,7 @@ std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string fi
 	    n._index = count_normals++;
 	    for( int i = 0; i < 3; ++i )
 		n._normal[i] = stod( match_vert_norm.str( i + 1 ) );
-	    std::cout << "Vertice Normal: " << n._normal[0] << ", " << n._normal[1] <<", " << n._normal[2] << std::endl;
+	    // std::cout << "Vertice Normal: " << n._normal[0] << ", " << n._normal[1] <<", " << n._normal[2] << std::endl;
 	    normals.push_back( n );
 	    continue;
         }
@@ -98,7 +98,7 @@ std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string fi
 	    tc._index = count_tc++;
 	    for( int i = 0; i < 2; ++i )
 		tc._tc[i] = stod( match_tc.str( i + 1 ) );
-	    std::cout << "Texture Coord: " << tc._tc[0] << ", " << tc._tc[1] << std::endl;
+	    // std::cout << "Texture Coord: " << tc._tc[0] << ", " << tc._tc[1] << std::endl;
 	    textures.push_back( tc );
 	    continue;
         }

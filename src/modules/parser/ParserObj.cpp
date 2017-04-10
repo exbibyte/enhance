@@ -1,6 +1,6 @@
 #include "IParser.hpp"
 #include "ParserObj.hpp"
-#include "file_obj.hpp"
+#include "file_obj_mesh.hpp"
 
 #include <vector>
 #include <list>
@@ -12,12 +12,10 @@
 using namespace std;
 
 std::pair<bool, ParserObj::obj_data > ParserObj::parse( std::string path_mesh ){
-    std::pair<bool, file_obj::data_mesh> retmesh = file_obj_mesh::process( path_mesh );
-    assert( retmesh.first );
-    if( false == retmesh.first )
+    std::pair<bool, file_obj_mesh::data_mesh> ret = std::move( file_obj_mesh::process( path_mesh ) );
+    assert( ret.first );
+    if( false == ret.first )
 	return { false, {} };
 
-    obj_data ret;
-    ret._dm = std::move(dmesh);
-    return { true, ret };
+    return { true, std::move( ret.second ) };
 }

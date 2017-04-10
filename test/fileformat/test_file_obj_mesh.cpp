@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "file_obj_mesh.hpp"
-#include "render_info.hpp"
+#include "renderable_info.hpp"
 
 int main( int argc, char** argv ){
     assert( argc >= 2 );
@@ -27,9 +27,9 @@ int main( int argc, char** argv ){
 
 
     renderable_info_tris rit = file_obj_mesh::calc_renderable_info_tris( dm );
-    assert( rit._pos.size() == dm._numtris * 3 );
+    assert( rit._pos.size() == dm._numtris * 9 );
     assert( rit._pos.size() == rit._normal.size() );
-    assert( rit._uv.size() == dm._numtris * 2 );
+    assert( rit._uv.size() == dm._numtris * 6 );
     
     return 0;
 }
