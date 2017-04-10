@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "renderable_info.hpp"
+
 class file_obj_mesh {
 public:
     struct vert {
@@ -23,6 +25,7 @@ public:
 	std::vector<vert> _verts;
 	std::vector<tri> _tris;
     };
+    static renderable_info_tris calc_renderable_info_tris( file_obj_mesh::data_mesh & dm );
     static std::pair<bool, data_mesh> process( std::string file_path );
 private:
     struct norm { //combined into vert structure

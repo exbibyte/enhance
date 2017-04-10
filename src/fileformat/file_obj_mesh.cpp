@@ -10,6 +10,28 @@
 
 #include "file_obj_mesh.hpp"
 
+#include "renderable_info.hpp"
+
+renderable_info_tris file_obj_mesh::calc_renderable_info_tris( file_obj_mesh::data_mesh & dm ){
+    renderable_info_tris ret {};
+    //add vertex and normals for rendering
+    for( auto & t : dm._tris ){
+	for( int i = 0; i < 3; ++i ){
+	    int vert_index = t._vert_indices[ i ];
+	    auto & v = dm._verts[ vert_index ];
+	    ret._pos.push_back( v._pos[0] );
+	    ret._pos.push_back( v._pos[1] );
+	    ret._pos.push_back( v._pos[2] );
+	    ret._normal.push_back( v._normal[0] );
+	    ret._normal.push_back( v._normal[1] );
+	    ret._normal.push_back( v._normal[2] );
+	    ret._uv.push_back( v._tex_coords[0] );
+	    ret._uv.push_back( v._tex_coords[1] );
+	}
+    }
+    return std::move(ret);
+}
+
 std::pair<bool, file_obj_mesh::data_mesh> file_obj_mesh::process( std::string file_path ){
     std::fstream input;
     input.open( file_path, std::fstream::in );
