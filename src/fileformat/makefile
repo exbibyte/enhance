@@ -6,7 +6,7 @@ src_files := $(filter-out obj2polymesh.cpp, $(wildcard *.cpp))
 
 #include directories start---
 
-inc_folder_basic := $(dir $(wildcard ../../src/*/))
+inc_folder_basic := $(dir $(wildcard ../*/))
 
 include_dirs = $(inc_folder_basic)
 
