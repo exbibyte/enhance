@@ -13,6 +13,7 @@ enum class enComponentType {
     UI,
     FILTER,
     ORIENTATIONMANIP,
+    CAM,
     LOGIC,
     SCHEDULER,
     WORKERPOOL,

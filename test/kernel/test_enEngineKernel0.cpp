@@ -14,6 +14,7 @@
 #include "enComponentRendercompute.hpp"
 #include "enComponentRenderserver.hpp"
 #include "enComponentParser.hpp"
+#include "enComponentCam.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -151,6 +152,13 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
 	assert( parsers.size() == 2 );
 	COMPONENT_INSTANCE( parserobj, enComponentParserObj, parsers[1] );
+    }
+    SECTION( "cam0", "cam" ){
+	//camera with ui
+	vector<enComponentMeta*> cams;
+	engine_kernel.get_components_by_type( enComponentType::CAM, cams );
+	assert( cams.size() == 1 );
+	COMPONENT_INSTANCE( cam, enComponentCam0, cams.front() );
     }
 
     engine_kernel.deinit();

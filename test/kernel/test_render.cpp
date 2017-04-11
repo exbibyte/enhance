@@ -22,6 +22,7 @@
 #include "enComponentUi.hpp"
 #include "enComponentFilter.hpp"
 #include "enComponentOrientationmanip.hpp"
+#include "enComponentCam.hpp"
 
 #include "Funwrap3.hpp"
 
@@ -118,9 +119,20 @@ int main( int argc, char ** argv ){
     assert( orientationmanips.size() == 1 );
     COMPONENT_INSTANCE( orientationmanip0, enComponentOrientationmanip0, orientationmanips.front() );
 
+    //camera manipulation
+    vector<enComponentMeta*> cams;
+    engine_kernel.get_components_by_type( enComponentType::CAM, cams );
+    assert( cams.size() == 1 );
+    COMPONENT_INSTANCE( cam, enComponentCam0, cams.front() );
+    cam0 * camera_manip = static_cast<cam0*>( cam );
     //set trackball window size
     orientationmanip0->init( { 500, 500, 250, 250 } );
 
+    camera_manip->process( ICam::e_pparam::register_ui, (void*) ui0 );
+    camera_manip->process( ICam::e_pparam::register_orientationmanip, (void*) orientationmanip0 );
+    camera_manip->process( ICam::e_pparam::register_filter, (void*) filterdrag0 );
+    camera_manip->process( ICam::e_pparam::enable, (void*) 0 );
+    
     //parsers
     vector<enComponentMeta*> parsers;
     engine_kernel.get_components_by_type( enComponentType::PARSER, parsers );
@@ -204,9 +216,11 @@ int main( int argc, char ** argv ){
     light l;
     l._light_position = { 50.0, 50.0, 50.0 };
     Vec orient_axis;
+    float init_orient[] = { 0,0,1 };
+    orient_axis.SetFromArray( 3, init_orient );
     float orient_angle;
     orient_axis[0] = 1;
-    orient_angle = 0.000;
+    orient_angle = 1.000;
 
     double auto_rotate = 0.07;
     
@@ -223,62 +237,74 @@ int main( int argc, char ** argv ){
 	assert( rendercomputes.size() == 1 );
 	COMPONENT_INSTANCE( rendercompute0, enComponentRendercompute0, rendercomputes.front() );
 
-	//process UI events
-	std::list<IUi::character> characters{};
-	ui0->get_characters( characters );
-	for( auto & i : characters ){
-	    if( IUi::input_type::KEY == i._input_type ){
-		if( IUi::state::DOWN == i._state ){
-		    if( 'Q' == i._key_character ){
-			std::cout << "exiting.." << std::endl;
-			bQuit = true;
-		    }
-		}
-	    }
-	}
+	// delegate ui to camera
+	// //process UI events
+	// std::list<IUi::character> characters{};
+	// ui0->get_characters( characters );
+	// for( auto & i : characters ){
+	//     if( IUi::input_type::KEY == i._input_type ){
+	// 	if( IUi::state::DOWN == i._state ){
+	// 	    if( 'Q' == i._key_character ){
+	// 		std::cout << "exiting.." << std::endl;
+	// 		bQuit = true;
+	// 	    }
+	// 	}
+	//     }
+	// }
 
-	//drag filter
-	std::list<drag_coordinate> drag{};
-        filterdrag0->process( drag, characters );
-	for( auto & i : drag ){
-	    if( IUi::mouse_character::LEFT == i._mouse_character ){
-		std::cout << "drag: left, ";
-	    }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
-		std::cout << "drag: right, ";
-	    }else if( IUi::mouse_character::MID == i._mouse_character ){
-		std::cout << "drag: mid, ";
-	    }else {
-		continue;
-		// std::cout << "drag: other, ";
-	    }
-	    std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
-	}
-	
-	//orientation manipulation
-	std::list<Quat> orientation;
-        orientationmanip0->process( orientation, drag );
-	for( auto & i : orientation ){
-	    Vec axis{};
-	    float angle;
-	    i.ToAxisAngle( axis, angle );
-	    std::cout << "axis: ";
-	    std::cout << axis._vec[0] << ", ";
-	    std::cout << axis._vec[1] << ", ";
-	    std::cout << axis._vec[2];
-	    std::cout << ", angle: " << angle << std::endl;
+	// //drag filter
+	// std::list<drag_coordinate> drag{};
+        // filterdrag0->process( drag, characters );
+	// for( auto & i : drag ){
+	//     if( IUi::mouse_character::LEFT == i._mouse_character ){
+	// 	std::cout << "drag: left, ";
+	//     }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
+	// 	std::cout << "drag: right, ";
+	//     }else if( IUi::mouse_character::MID == i._mouse_character ){
+	// 	std::cout << "drag: mid, ";
+	//     }else {
+	// 	continue;
+	// 	// std::cout << "drag: other, ";
+	//     }
+	//     std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
+	// }
+	    
+	// //orientation manipulation
+	// std::list<Quat> orientation;
+        // orientationmanip0->process( orientation, drag );
+	// for( auto & i : orientation ){
+	//     Vec axis{};
+	//     float angle;
+	//     i.ToAxisAngle( axis, angle );
+	//     std::cout << "axis: ";
+	//     std::cout << axis._vec[0] << ", ";
+	//     std::cout << axis._vec[1] << ", ";
+	//     std::cout << axis._vec[2];
+	//     std::cout << ", angle: " << angle << std::endl;
 
-	    Vec orient_axis_temp;
-	    i.ToAxisAngle( orient_axis_temp, orient_angle );
-	    if( orient_angle == 0 ){
-		continue;
-	    }else{
-		orient_axis = orient_axis_temp;
-		orient_angle = orient_angle / 3.14 * 180;
-		break;
-	    }
+	//     Vec orient_axis_temp;
+	//     i.ToAxisAngle( orient_axis_temp, orient_angle );
+	//     if( orient_angle == 0 ){
+	// 	continue;
+	//     }else{
+	// 	orient_axis = orient_axis_temp;
+	// 	orient_angle = orient_angle / 3.14 * 180;
+	// 	break;
+	//     }
+	// }
+
+	ICam::operation_mode movement_filter = ICam::operation_mode::latest_discard_all_after;
+	camera_manip->process( ICam::e_pparam::operation, (void*) &movement_filter );
+	Vec orient_axis_temp;
+	camera_manip->_orientation.ToAxisAngle( orient_axis_temp, orient_angle );
+	if( orient_angle != 0 ){
+	    orient_axis = orient_axis_temp;
+	    orient_angle = orient_angle / 3.14 * 180;
 	}
+	bQuit = camera_manip->_exit;
 	
-	orient_angle += auto_rotate;
+	// orient_angle += auto_rotate;
+
 	//update animation starts
 	//select the first frame of the current skeleton for rendering
 	double animation_time = fmod( time_since_start_ms/1000.0, (double)sc.first._numframes / sc.first._framerate );
@@ -309,18 +335,25 @@ int main( int argc, char ** argv ){
 	    // c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
 	    // c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
 	    c._camera_lookat[i] = 0;
-	    c._camera_position[i] = 5;
+	    // c._camera_position[i] = 5;
+	    c._camera_position[i] = camera_manip->_pos[i] + 5;
 	}
+
 	material m;
 	render_data_0._material = m;
+	try{
 	RenderData renderdata = rendercompute0->compute( l, c, { render_data_0 } );
 	renderdata._glslprogram = glslprogram.get();
-	
+
 	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
 
 	//render call ----------------------------------------------------------------
 	renderdraw0->render( renderdata );
 
+	}catch(...){
+	    assert( 0 && "caught" );
+
+	}
 	ImVec4 clear_color = ImColor(60, 60, 90);
 
 	//Imgui renderig starts
