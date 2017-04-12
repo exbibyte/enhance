@@ -85,25 +85,25 @@ bool cam0::process_operation( ICam::operation_mode * m ){
 	std::list<drag_coordinate> drag{};
         if( !_filterdrag_register->process( drag, ui_inputs ) )
 	    return false;
-	for( auto & i : drag ){
-	    if( IUi::mouse_character::LEFT == i._mouse_character ){
-		std::cout << "drag: left, ";
-	    }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
-		std::cout << "drag: right, ";
-	    }else if( IUi::mouse_character::MID == i._mouse_character ){
-		std::cout << "drag: mid, ";
-	    }else {
-		continue;
-		// std::cout << "drag: other, ";
-	    }
-	    std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
-	}
+	// for( auto & i : drag ){
+	//     if( IUi::mouse_character::LEFT == i._mouse_character ){
+	// 	std::cout << "drag: left, ";
+	//     }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
+	// 	std::cout << "drag: right, ";
+	//     }else if( IUi::mouse_character::MID == i._mouse_character ){
+	// 	std::cout << "drag: mid, ";
+	//     }else {
+	// 	continue;
+	// 	// std::cout << "drag: other, ";
+	//     }
+	//     std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
+	// }
 	std::list<Quat> orients;
 	if( !_orientationmanip_register->process( orients, drag ) )
 	    return false;
 
 	for( auto & j : orients ){
-	    _orientation = _orientation * j;
+	    _orientation = j;
 	    _orientation.NormalizeCurrent();
 	}
 

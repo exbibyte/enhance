@@ -27,10 +27,11 @@ bool FilterUiDrag::process( std::list<drag_coordinate> & out, std::list<IUi::cha
 	        auto & map_mouse_char_to_coordinate = it_mouse_char->second;
 		auto it_coord_cache = map_mouse_char_to_coordinate.find( static_cast<int>(i._mouse_character) );
 		if( it_coord_cache == map_mouse_char_to_coordinate.end() ){
-		    map_mouse_char_to_coordinate[ static_cast<int>(i._mouse_character) ] = { { 0,0,0 }, true };
+		    map_mouse_char_to_coordinate[ static_cast<int>(i._mouse_character) ] = { i._coordinate, true };
 		    // std::cout << "init coord cache" << std::endl;
 		}else{
 		    // std::cout << "cached coordinate" << std::endl;
+		    // it_coord_cache->second._coordinate = i._coordinate;
 		    it_coord_cache->second._active = true;
 		}
 	    }else if( IUi::state::UP == i._state ){
@@ -46,7 +47,7 @@ bool FilterUiDrag::process( std::list<drag_coordinate> & out, std::list<IUi::cha
 		}
 	    }
 	    //output no drag value
-	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
+	    // out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	}
 	else if( IUi::input_type::MOUSE_COORD == i._input_type ){
 	    auto key = i._handle_resource;
@@ -73,17 +74,17 @@ bool FilterUiDrag::process( std::list<drag_coordinate> & out, std::list<IUi::cha
 			//save coordinate
 			it_coord_cache->second._coordinate = i._coordinate;
 			//output no drag value
-			out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
+			// out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 		    }
 		    ++it_coord_cache;
 		}
 	    }else{
 		//output no drag value
-		out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
+		// out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	    }
 	}else{
 	    //output no drag value
-	    out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
+	    // out.push_back( { IUi::mouse_character::OTHER, { 0,0,0 }, { 0,0,0 } } );
 	}
     }
     return true;

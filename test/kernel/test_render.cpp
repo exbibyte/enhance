@@ -216,11 +216,11 @@ int main( int argc, char ** argv ){
     light l;
     l._light_position = { 50.0, 50.0, 50.0 };
     Vec orient_axis;
-    float init_orient[] = { 0,0,1 };
-    orient_axis.SetFromArray( 3, init_orient );
+    // float init_orient[] = { 0,0,1 };
+    // orient_axis.SetFromArray( 3, init_orient );
     float orient_angle;
     orient_axis[0] = 1;
-    orient_angle = 1.000;
+    orient_angle = 0;
 
     double auto_rotate = 0.07;
     

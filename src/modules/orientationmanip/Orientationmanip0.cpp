@@ -43,6 +43,8 @@ bool Orientationmanip0::process( std::list<Quat> & out, std::list<drag_coordinat
     trackball tb;
 
     for( auto & i : in ){
+	// if( i._mouse_character != IUi::mouse_character::OTHER )
+	//     continue;
 	if( i._coordinate_delta._a == 0 && i._coordinate_delta._b == 0 ){
 	    continue;
 	}

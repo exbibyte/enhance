@@ -35,8 +35,8 @@ void Ui0::process_mouse_move( GLFWwindow * window, double xpos, double ypos ){
 	c._handle_resource = window;
 	c._input_type = input_type::MOUSE_COORD;
         c._coordinate = { xpos, ypos, 0 };
-	if(instance->_debug)
-	    std::cout << "mouse coordinate: ( " << xpos << ", " << ypos << " )" << std::endl;
+	// if(instance->_debug)
+	//     std::cout << "mouse coordinate: ( " << xpos << ", " << ypos << " )" << std::endl;
 	instance->_chars.push_back( std::move(c) );
 	++it;
     }
