@@ -313,8 +313,8 @@ int main( int argc, char ** argv ){
 	file_md5_calc_mesh_frame::data_mesh_frame dmf = std::move( retcalc.second );
 	assert( dmf._mesh_frames.size() == model_mesh._meshes.size() );
 	auto it_dmesh_mesh = model_mesh._meshes.begin();
-	// renderable_info_tris rit = std::move( file_md5_calc_mesh::calc_renderable_info_tris( dmf ) );
-	renderable_info_tris rit = file_obj_mesh::calc_renderable_info_tris( dm_obj );	
+	renderable_info_tris rit = std::move( file_md5_calc_mesh::calc_renderable_info_tris( dmf ) );
+	// renderable_info_tris rit = file_obj_mesh::calc_renderable_info_tris( dm_obj );	
 	
 	assert( renderable_check_consistency<renderable_info_tris>::process( rit ) );
 	//update animation ends
