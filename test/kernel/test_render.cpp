@@ -332,9 +332,9 @@ int main( int argc, char ** argv ){
 	render_data_0.translate = translate;
 	c._camera_lookat.resize(3);
 	for( int i = 0; i < 3; ++i ){
-	    // c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
+	    c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
 	    // c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
-	    c._camera_lookat[i] = 0;
+	    // c._camera_lookat[i] = 0;
 	    // c._camera_position[i] = 5;
 	    c._camera_position[i] = camera_manip->_pos[i] + 5;
 	}
@@ -342,13 +342,13 @@ int main( int argc, char ** argv ){
 	material m;
 	render_data_0._material = m;
 	try{
-	RenderData renderdata = rendercompute0->compute( l, c, { render_data_0 } );
-	renderdata._glslprogram = glslprogram.get();
+	    RenderData renderdata = rendercompute0->compute( l, c, { render_data_0 } );
+	    renderdata._glslprogram = glslprogram.get();
 
-	glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
+	    glfwMakeContextCurrent( windowinfo._window ); // this is need when calling rendering APIs on separate thread
 
-	//render call ----------------------------------------------------------------
-	renderdraw0->render( renderdata );
+	    //render call ----------------------------------------------------------------
+	    renderdraw0->render( renderdata );
 
 	}catch(...){
 	    assert( 0 && "caught" );
