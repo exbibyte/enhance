@@ -10,10 +10,15 @@ Experimental 3D rendering and engine tools for interactive application developme
 ## Brief Status:
 
 Math Utilites  - Working
-UI Handling  - Work in progress  
-Graphics Pipeline  - Work in progress  
+
+UI Handling  - Work in progress
+
+Graphics Pipeline  - Work in progress
+
 Service Module and Infrastructure - Working
-Memory Management  - Work in progress 
+
+Memory Management  - Work in progress
+
 Script management  - To Do
 
 Current work is focused on concurrent data structures, rendering pipeline, and memory management.
