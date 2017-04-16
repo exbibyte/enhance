@@ -21,7 +21,7 @@ Memory Management  - Work in progress
 
 Script management  - To Do
 
-Current work is focused on concurrent data structures, rendering pipeline, and memory management.
+Current work is focused on schedulers, concurrent data structure, statistics collection, rendering pipeline, memory optimization.
 
 ## Dependencies:
 
