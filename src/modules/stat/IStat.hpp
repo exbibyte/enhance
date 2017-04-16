@@ -6,17 +6,20 @@
 class IStat {
 public:
     enum class e_param {
-	register_func,
-	deregister_func,
+	register_context,
+	deregister_context,
 	enable,
 	disable,
         query,
         reset,
-	operation,
-	set_count_window,
+        context_enter,
+	context_exit,
+	set_sample_window,
+	set_sample_period,
+	sample,
     };
     virtual ~IStat(){}
-    virtual bool process( e_param, void * in, double & ret ){ return false; }
+    virtual std::pair< bool, uint64_t > process( e_param, uint64_t in ){ return { false, 0 }; }
 };
 
 #endif

@@ -117,8 +117,6 @@ TEST_CASE( "EnEngineKernel0", "[EnEngineKernel0]" ) {
 	engine_kernel.get_components_by_type( enComponentType::STAT, stats );
 	REQUIRE( stats.size() == 1 );
 	COMPONENT_INSTANCE( stat0, enComponentStat0, stats.front() );
-	// CHECK( 0 < stat0->getstat().size() );
-	// std::cout << stat0->getstat() << std::endl;
     }
     SECTION( "initGL/renderdraw0/renderserver0, init renderdraw renderserver" ) {
 	//initGL
