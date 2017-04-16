@@ -104,7 +104,7 @@ bool cam0::process_operation( ICam::operation_mode * m ){
 
 	for( auto & j : orients ){
 	    _orientation = j;
-	    _orientation.NormalizeCurrent();
+	    _orientation.NormalizeQuatCurrent();
 	}
 
 	ui_inputs.clear();

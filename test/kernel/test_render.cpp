@@ -216,8 +216,6 @@ int main( int argc, char ** argv ){
     light l;
     l._light_position = { 50.0, 50.0, 50.0 };
     Vec orient_axis;
-    // float init_orient[] = { 0,0,1 };
-    // orient_axis.SetFromArray( 3, init_orient );
     float orient_angle;
     orient_axis[0] = 1;
     orient_angle = 0;
@@ -237,62 +235,6 @@ int main( int argc, char ** argv ){
 	assert( rendercomputes.size() == 1 );
 	COMPONENT_INSTANCE( rendercompute0, enComponentRendercompute0, rendercomputes.front() );
 
-	// delegate ui to camera
-	// //process UI events
-	// std::list<IUi::character> characters{};
-	// ui0->get_characters( characters );
-	// for( auto & i : characters ){
-	//     if( IUi::input_type::KEY == i._input_type ){
-	// 	if( IUi::state::DOWN == i._state ){
-	// 	    if( 'Q' == i._key_character ){
-	// 		std::cout << "exiting.." << std::endl;
-	// 		bQuit = true;
-	// 	    }
-	// 	}
-	//     }
-	// }
-
-	// //drag filter
-	// std::list<drag_coordinate> drag{};
-        // filterdrag0->process( drag, characters );
-	// for( auto & i : drag ){
-	//     if( IUi::mouse_character::LEFT == i._mouse_character ){
-	// 	std::cout << "drag: left, ";
-	//     }else if( IUi::mouse_character::RIGHT == i._mouse_character ){
-	// 	std::cout << "drag: right, ";
-	//     }else if( IUi::mouse_character::MID == i._mouse_character ){
-	// 	std::cout << "drag: mid, ";
-	//     }else {
-	// 	continue;
-	// 	// std::cout << "drag: other, ";
-	//     }
-	//     std::cout << "x: " << i._coordinate_delta._a << ", y: " << i._coordinate_delta._b << std::endl;
-	// }
-	    
-	// //orientation manipulation
-	// std::list<Quat> orientation;
-        // orientationmanip0->process( orientation, drag );
-	// for( auto & i : orientation ){
-	//     Vec axis{};
-	//     float angle;
-	//     i.ToAxisAngle( axis, angle );
-	//     std::cout << "axis: ";
-	//     std::cout << axis._vec[0] << ", ";
-	//     std::cout << axis._vec[1] << ", ";
-	//     std::cout << axis._vec[2];
-	//     std::cout << ", angle: " << angle << std::endl;
-
-	//     Vec orient_axis_temp;
-	//     i.ToAxisAngle( orient_axis_temp, orient_angle );
-	//     if( orient_angle == 0 ){
-	// 	continue;
-	//     }else{
-	// 	orient_axis = orient_axis_temp;
-	// 	orient_angle = orient_angle / 3.14 * 180;
-	// 	break;
-	//     }
-	// }
-
 	ICam::operation_mode movement_filter = ICam::operation_mode::latest_discard_all_after;
 	camera_manip->process( ICam::e_pparam::operation, (void*) &movement_filter );
 	Vec orient_axis_temp;
@@ -302,8 +244,6 @@ int main( int argc, char ** argv ){
 	    orient_angle = orient_angle / 3.14 * 180;
 	}
 	bQuit = camera_manip->_exit;
-	
-	// orient_angle += auto_rotate;
 
 	//update animation starts
 	//select the first frame of the current skeleton for rendering
@@ -335,8 +275,7 @@ int main( int argc, char ** argv ){
 	    c._camera_lookat[i] = (dmf._bbox_lower[i] + dmf._bbox_upper[i])/2.0;
 	    // c._camera_position[i] = c._camera_lookat[i] + (dmf._bbox_upper[i] - dmf._bbox_lower[i]);
 	    // c._camera_lookat[i] = 0;
-	    // c._camera_position[i] = 5;
-	    c._camera_position[i] = camera_manip->_pos[i] + 5;
+	    c._camera_position[i] = camera_manip->_pos[i] + 10;
 	}
 
 	material m;
@@ -386,8 +325,6 @@ int main( int argc, char ** argv ){
 	}
 
 	glfwSwapBuffers( windowinfo._window );
-
-	// std::cout << "post renderdraw0." << std::endl;
 		
 	glfwPollEvents();
     }

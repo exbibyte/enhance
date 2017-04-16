@@ -18,7 +18,7 @@ public:
     virtual ~IThread(){}
     virtual bool setaction( IThread::Action ) = 0;
     virtual IThread::State getstate() const = 0;
-    virtual void settask( std::function<void(void)> ) = 0;
+    virtual void settask( std::function<void(int)> ) = 0;
 };
 
 #endif

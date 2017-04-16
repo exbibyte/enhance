@@ -4,6 +4,7 @@
 #include <atomic>
 #include <thread>
 #include <functional>
+#include <cassert>
 
 Thread0::~Thread0(){
     if( _thread.joinable() ){
@@ -62,10 +63,16 @@ TAG_CLEANUP:
 }
 
 void Thread0::runtask(){
-    if( nullptr != _task )
-	_task();
+    if( nullptr != _task ){
+	assert( _pool_index < _pools_available.size() );
+	size_t pool_selected = _pools_available[ _pool_index ];
+	_task( pool_selected ); //dispatch task from selected pool
+	++_pool_index;
+	if( _pool_index >= _pools_available.size() )
+	    _pool_index = 0;
+    }
 }
 
-void Thread0::settask( std::function<void(void)>  task ){
+void Thread0::settask( std::function<void(int)> task ){
     _task = task;
 }

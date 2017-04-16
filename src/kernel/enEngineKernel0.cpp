@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "enEngineKernel0.hpp"
 
 #include "enComponentClock.hpp"
@@ -19,7 +21,21 @@ void enEngineKernel0::init(){
     //TODO: consider bulk memory allocation
     register_component( new enComponentClock0( new Clock0 ) );
     register_component( new enComponentLoggerStdout( new LoggerStdout ) );
-    register_component( new enComponentScheduler0( new Scheduler0 ) );
+
+    //create and run scheduler
+    Scheduler0 * sch = new Scheduler0;
+    //3 pools for different priorities
+    std::list<e_scheduler_priority> p { e_scheduler_priority::low, e_scheduler_priority::medium, e_scheduler_priority::high };
+    std::pair<bool,void*> r = sch->set_pools( p );
+    assert( true == r.first );
+    //3 threads
+    std::list<e_scheduler_priority> t { e_scheduler_priority::low, e_scheduler_priority::medium, e_scheduler_priority::high };
+    r = sch->set_threads( t );
+    assert( true == r.first );
+    register_component( new enComponentScheduler0( sch ) );
+    auto ret = sch->run();
+    assert( ret.first );
+	
     register_component( new enComponentStat0( new Stat0 ) );
     register_component( new enComponentThread0( new Thread0 ) );
     register_component( new enComponentInitGL( new InitGL ) );

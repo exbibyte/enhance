@@ -14,89 +14,46 @@ using namespace std;
 
 TEST_CASE( "scheduler0", "[scheduler0]" ) { 
 
-    SECTION( "multithreaded add/get" ) {
+    SECTION( "task scheduling" ) {
 	Scheduler0 sch;
+
+	//3 pools for different priorities
+	std::list<e_scheduler_priority> p { e_scheduler_priority::low, e_scheduler_priority::medium, e_scheduler_priority::high };
+	std::pair<bool,void*> r = sch.set_pools( p );
+	CHECK( ( true == r.first ) );
+
+	//3 threads
+	std::list<e_scheduler_priority> t { e_scheduler_priority::low, e_scheduler_priority::medium, e_scheduler_priority::high };
+	r = sch.set_threads( t );
+	CHECK( ( true == r.first ) );
+
         sch.run();
-	vector<thread> t(50);
+
 	vector<int> arr(50,0);
-	auto func_thread = []( int i, vector<int> & dest )->void{ cout << i << " "; dest[i] = 0; };
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i] = std::thread( [&arr,&sch,i,func_thread](){
-		    Funwrap3 f;
-		    f.set( FunCallType::ASYNC, func_thread, i, std::ref(arr) );
-		    sch.add(f);
-		    arr[i] = 1;
-		} );
-	}
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i].join();
+	auto func_thread = []( int i, vector<int> & dest )->void{ dest[i] = 1; };
+	for( int i = 0; i < arr.size(); ++i ){
+	    Funwrap3 f;
+	    f.set( FunCallType::ASYNC, func_thread, i, std::ref(arr) );
+	    if( i % 3 == 0 )
+		sch.add_task( e_scheduler_priority::low, f );
+	    else if( i % 2 == 0 )
+		sch.add_task( e_scheduler_priority::medium, f );
+	    else
+		sch.add_task( e_scheduler_priority::high, f );
+	    arr[i] = 1;
 	}
 
-	vector<int> arr_expected_middle( 50, 1 );
-	CHECK( ( arr_expected_middle == arr ) );
-	
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i] = std::thread( [&sch](){
-		    Funwrap3 g;
-		    if( sch.get( g ) ){
-			g.apply();
-		    }
-		} );
+	//todo: implement alternative task compleltion notification mechanism
+	size_t task_todo = sch.get_num_tasks();
+	while( task_todo != 0 ){
+	    task_todo = sch.get_num_tasks();
 	}
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i].join();
-	}	
-	sch.stop();
 
-	vector<int> arr_expected_end( 50, 0 );
-	CHECK( ( arr_expected_end == arr ) );
-
-	CHECK( sch.size_scheduled() == 0 );
-    }
-
-    SECTION( "multithreaded add/get mixed" ) {
-	Scheduler0 sch;
-        sch.run();
-	int num_add = 100;
-	int num_get = 50;
-	vector<thread> t( num_add );
-	vector<thread> t2( num_get );
-	vector<int> arr( std::max( num_add, num_get ), 0 );
-	auto func_thread = []( int i, vector<int> & dest )->void{ cout << i << " "; dest[i] = 0; };
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i] = std::thread( [&arr,&sch,i,func_thread](){
-		    Funwrap3 f;
-		    f.set( FunCallType::ASYNC, func_thread, i, std::ref(arr) );
-		    sch.add(f);
-		    arr[i] = 1;
-		} );
-	}
-	for( int i = 0; i < t2.size(); ++i ){
-	    t2[i] = std::thread( [&sch](){
-		    Funwrap3 g;
-		    if( sch.get( g ) ){
-			g.apply();
-		    }
-		} );
-	}
-	for( int i = 0; i < t.size(); ++i ){
-	    t[i].join();
-	}
-	for( int i = 0; i < t2.size(); ++i ){
-	    t2[i].join();
+	vector<int> arr_expected( 50, 1 );
+	for( int i = 0; i < arr_expected.size(); ++i ){
+	    CHECK( arr_expected[i] == arr[i] );
 	}
 
 	sch.stop();
-
-	int num_diff = num_add - num_get;
-	CHECK( sch.size_scheduled() == num_diff );
-		
-	//check number of values set to 0
-	int count = 0;
-	for( auto & i : arr ){
-	    if( i == 0 )
-		++count;
-	}
-	CHECK( count == num_get );
     }
 }
