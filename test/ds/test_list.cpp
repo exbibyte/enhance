@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "list.h"
-#include "memory.h"
+#include "list.hpp"
+#include "memory.hpp"
 
 int main(){
 
@@ -22,7 +22,7 @@ int main(){
 	assert( 0 == s );
     }
     
-    for( int i = 0; i < 10; ++i ){
+    for( uint64_t i = 0; i < 10; ++i ){
 	list_push_back( l, (uint64_t)( i ) );
     }
     
@@ -31,7 +31,7 @@ int main(){
 	assert( 10 == s );
     }
 
-    for( int i = 10; i < 20; ++i ){
+    for( uint64_t i = 10; i < 20; ++i ){
 	list_push_front( l, (uint64_t)( i ) );
     }    
 
@@ -54,7 +54,7 @@ int main(){
 	++count;
     }
 
-    for( int i = 0; i < 10; ++i ){
+    for( uint64_t i = 0; i < 10; ++i ){
 	list_pop_front( l );
     }
     
@@ -65,12 +65,11 @@ int main(){
     }
     
 
-    for( int i = 0; i < 10; ++i ){
+    for( uint64_t i = 0; i < 10; ++i ){
         uint64_t v;
 	bool ret = list_front( l, &v );
 	assert( ret );
-	int v_int = (int)( v );
-	assert( i == v_int );
+	assert( i == v );
 	ret = list_pop_front( l );
 	assert( ret );
     }
@@ -82,12 +81,12 @@ int main(){
     }
 
 
-    for( int i = 0; i < 10; ++i ){
+    for( uint64_t i = 0; i < 10; ++i ){
 	list_push_back( l, (uint64_t)( i ) );
     }
     {
 	list_node * it = list_iterator_begin( l );
-	for( int i = 0; i < 5; ++i ){
+	for( uint64_t i = 0; i < 5; ++i ){
 	    it = list_next( l, it );
 	}
 	it = list_erase( l, it );
@@ -109,10 +108,10 @@ int main(){
 
     //splice entire
     {
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l, (uint64_t)( i ) );
 	}
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l2, (uint64_t)( 2*i ) );
 	}
 
@@ -128,11 +127,11 @@ int main(){
 	assert( 20 == list_update_size( l2 ) );
 
 	list_node * n = list_iterator_begin( l2 );
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    assert( i == n->_val );
 	    n = list_next( l2, n );
 	}
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    assert( 2*i == n->_val );
 	    n = list_next( l2, n );
 	}
@@ -145,10 +144,10 @@ int main(){
 
     //splice single
     {
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l, (uint64_t)( i ) );
 	}
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l2, (uint64_t)( 2*i ) );
 	}
 	assert( 10 == list_size( l ) );
@@ -197,22 +196,22 @@ int main(){
 
     //splice range partial
     {
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l, (uint64_t)( i ) );
 	}
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l2, (uint64_t)( 2*i ) );
 	}
 	assert( 10 == list_size( l ) );
 	assert( 10 == list_size( l2 ) );
 
 	list_node * n = list_iterator_begin( l );
-	for( int i = 0; i < 5; ++i ){
+	for( uint64_t i = 0; i < 5; ++i ){
 	    n = list_next( l, n );
 	}
 
 	list_node * n2 = list_iterator_begin( l2 );
-	for( int i = 0; i < 5; ++i ){
+	for( uint64_t i = 0; i < 5; ++i ){
 	    n2 = list_next( l2, n2 );
 	}
 
@@ -227,15 +226,15 @@ int main(){
 	assert( 6 == list_update_size( l2 ) );
 	
 	list_node * check = list_begin( l );
-	for( int i = 0; i <= 4; ++i ){
+	for( uint64_t i = 0; i <= 4; ++i ){
 	    check = list_next( l, check );
 	    assert( i == check->_val );
 	}
-	for( int i = 5; i < 9; ++i ){
+	for( uint64_t i = 5; i < 9; ++i ){
 	    check = list_next( l, check );
 	    assert( 2*i == check->_val );
 	}
-	for( int i = 5; i < 10; ++i ){
+	for( uint64_t i = 5; i < 10; ++i ){
 	    check = list_next( l, check );
 	    assert( i == check->_val );
 	}
@@ -248,10 +247,10 @@ int main(){
 
     //splice range all
     {
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l, (uint64_t)( i ) );
 	}
-	for( int i = 0; i < 10; ++i ){
+	for( uint64_t i = 0; i < 10; ++i ){
 	    list_push_back( l2, (uint64_t)( 2*i ) );
 	}
 	assert( 10 == list_size( l ) );

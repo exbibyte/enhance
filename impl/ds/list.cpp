@@ -1,8 +1,8 @@
-#include <assert.h>
-#include <stdbool.h>
+#include <cassert>
+#include <cstdbool>
 
-#include "list.h"
-#include "memory.h"
+#include "list.hpp"
+#include "memory.hpp"
 
 void list_node_init( list_node * n ){
     /* mem_deassign( (void**) n->_prev ); */

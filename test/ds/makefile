@@ -1,20 +1,12 @@
-#include directories start---
-
-inc_folder_basic := $(dir $(wildcard ../../src/*/))
+inc_folder_basic := $(dir $(wildcard ../../impl/*/))
 inc_folder_test := ../
 
 include_dirs = $(inc_folder_basic) $(inc_folder_test)
 
-#include directories end---
+src_files = $(wildcard *.cpp)
 
-#src files start---
-
-src_files = $(wildcard *.c)
-
-#src files end---
-
-objects_memory = $(wildcard ../../src/memory/intermediate/*.o)
-objects_ds = $(wildcard ../../src/ds/intermediate/*.o)
+objects_memory = $(wildcard ../../impl/memory/intermediate/*.o)
+objects_ds = $(wildcard ../../impl/ds/intermediate/*.o)
 
 object_files := $(objects_memory) $(objects_ds)
 
@@ -24,10 +16,10 @@ dir_build = build
 
 $(shell mkdir -p $(dir_build))
 
-targets := $(patsubst %.c,%,$(src_files))
+targets := $(patsubst %.cpp,%,$(src_files))
 
-% : %.c
-	clang -g -Wall -o $(dir_build)/$@ $< $(object_files) $(include_flags)
+% : %.cpp
+	$(CXX) -std=c++11 -g -Wall -o $(dir_build)/$@ $< $(object_files) $(include_flags)
 
 .PHONY: all
 all: $(targets)

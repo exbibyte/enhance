@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "memory.h"
+#include "memory.hpp"
 
 void mem_alloc( void** v, size_t n ){
     assert( v );
