@@ -51,7 +51,9 @@ public:
               template< class... Args >
               i_pool( Args... args ) : ContainerType<T>( std::forward<Args>(args)... ) {}
               ~i_pool(){}
-    
+	      i_pool( i_pool const & ) = delete;
+     i_pool & operator=( i_pool const & ) = delete;
+
          bool clear(){ return ContainerType<T>::clear(); }
          bool empty(){ return ContainerType<T>::empty(); }
     size_type size(){ return ContainerType<T>::size(); }

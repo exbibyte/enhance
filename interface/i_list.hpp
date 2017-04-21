@@ -1,56 +1,44 @@
-#ifndef I_LIST_H
-#define I_LIST_H
+#ifndef I_LIST_HPP
+#define I_LIST_HPP
 
-#include <utility>
-#include <functional>
+namespace i_list {
+    template< class ContainerType >
+               bool i_list_clear( ContainerType * c ){ return false; }
 
-class trait_list_concurrency {
-public:
-    class none{};
-    class global{};
-    class granular{};
-    class lockfree{};
-    class waitfree{};
-};
+    template< class ContainerType >
+             size_t i_list_size( ContainerType * c ){ return 0; }
 
-class trait_list_size {
-public:
-    class bounded{};
-    class unbounded{};
-};
+    template< class ContainerType >
+             size_t i_list_update_size( ContainerType * c ){ return 0; }
 
-class trait_list_method {
-public:
-    class total{};
-    class partial{};
-    class synchronous{};
-};
+    template< class ContainerType, class ValType >
+               bool i_list_push_back( ContainerType * c, ValType const * item ){ return false; }
 
-template< class T, template< class > class ContainerType, class ListSize, class ListConcurrency, class ListMethod >
-class i_list final : public ContainerType<T> {
-public:
-        //container and value traits
-        using container_type =     ContainerType<T>;
-	using value_type =         T;
-	using reference =          T &;
-	using const_reference =    T const &;
-	using size_type =          typename ContainerType<T>::_t_size;
+    template< class ContainerType, class ValType >
+               bool i_list_push_front( ContainerType * c, ValType const * item ){ return false; }
 
-        //list traits
-        using list_size =          ListSize;
-	using list_concurrency =   ListConcurrency;
-	using list_method =        ListMethod;
+    template< class ContainerType, class ValType >
+               bool i_list_pop_back( ContainerType * c, ValType * item ){ return false; }
 
-              template< class... Args >
-              i_list( Args... args ) : ContainerType<T>( std::forward<Args>(args)... ) {}
-              ~i_list(){}
+    template< class ContainerType, class ValType >
+               bool i_list_pop_front( ContainerType * c, ValType * item ){ return false; }
+
+    template< class ContainerType, class ValType >
+               bool i_list_front( ContainerType * c, ValType * item ){ return false; }
+
+    template< class ContainerType, class ValType >
+               bool i_list_back( ContainerType * c, ValType * item ){ return false; }
+}
+
+namespace i_spliceable {
+    template< class ContainerType, class IterableType >
+    bool i_list_splice_entire( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list );
     
-         bool clear(){ return ContainerType<T>::clear(); }
-         bool empty(){ return ContainerType<T>::empty(); }
-    size_type size(){ return ContainerType<T>::size(); }
-         bool add( const_reference item, size_t key ){ return ContainerType<T>::add( item, key ); }
-         bool remove( value_type & item, size_t key ){ return ContainerType<T>::remove( item, key ); }
-         bool contains( const_reference item, size_t key ){ return ContainerType<T>::contains( item, key ); }
-};
+    template< class ContainerType, class IterableType >
+    bool i_list_splice_single( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list, IterableType * insert_from );
+    
+    template< class ContainerType, class IterableType >
+    bool i_list_splice_range( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list, IterableType * insert_from_iter_begin, IterableType * insert_from_iter_end );
+}
 
 #endif

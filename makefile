@@ -6,7 +6,6 @@ build_test_ds:
 build_src_ds:
 	$(MAKE) -C $(src_dir)/ds all
 
-
 build_src_memory:
 	$(MAKE) -C $(src_dir)/memory all
 

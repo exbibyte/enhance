@@ -4,7 +4,8 @@
 
 #include <cstring>
 #include <atomic>
-#include "i_list.hpp"
+#include <utility>
+#include "i_list_concurrent.hpp"
 
 template< class T >
 class list_lockfree_total_impl {
@@ -42,7 +43,7 @@ private:
 #include "list_lockfree_total.tpp"
 
 template< class T >
-using list_lockfree_total = i_list < T, list_lockfree_total_impl,
+using list_lockfree_total = IList < T, list_lockfree_total_impl,
 				   trait_list_size::unbounded,
 				   trait_list_concurrency::lockfree,
 				   trait_list_method::total

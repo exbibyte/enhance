@@ -1,28 +1,78 @@
 #include <cassert>
 #include <cstdbool>
 
-#include "list.hpp"
+#include "list_st.hpp"
 #include "memory.hpp"
 
-void list_node_init( list_node * n ){
+#include "i_list.hpp"
+#include "i_basic.hpp"
+#include "i_iterable.hpp"
+
+//implemented functions for list_st
+namespace i_list {
+    template<> bool i_list_clear( list_st::list * l ){ return list_st::list_clear( l ); }
+    template<> size_t i_list_size( list_st::list * l ){ return list_st::list_size( l ); }
+    template<> size_t i_list_update_size( list_st::list * l ){ return list_st::list_update_size( l ); }
+    template<> bool i_list_push_back( list_st::list * l, uint64_t const * v ){ return list_st::list_push_back( l, v ); }
+    template<> bool i_list_push_front( list_st::list * l, uint64_t const * v ){ return list_st::list_push_front( l, v ); }
+    template<> bool i_list_pop_back( list_st::list * l, uint64_t * v ){ return list_st::list_pop_back( l, v ); }
+    template<> bool i_list_pop_front( list_st::list * l, uint64_t * v ){ return list_st::list_pop_front( l, v ); }
+    template<> bool i_list_front( list_st::list * l, uint64_t * v ){ return list_st::list_front( l, v ); }
+    template<> bool i_list_back( list_st::list * l, uint64_t * v ){ return list_st::list_back( l, v ); }
+}
+
+namespace i_iterable {
+    template<> list_st::list_node * i_begin( list_st::list * l, list_st::list_node * tag ){ return list_st::list_begin( l ); } 
+    template<> list_st::list_node * i_iterator_begin( list_st::list * l, list_st::list_node * tag ){ return list_st::list_iterator_begin( l ); } 
+    template<> list_st::list_node * i_end( list_st::list * l, list_st::list_node * tag ){ return list_st::list_end( l ); } 
+    template<> list_st::list_node * i_iterator_end( list_st::list * l, list_st::list_node * tag ){ return list_st::list_iterator_end( l ); } 
+    template<> list_st::list_node * i_next( list_st::list * l, list_st::list_node * current ){ return list_st::list_next( l, current ); } 
+    template<> list_st::list_node * i_prev( list_st::list * l, list_st::list_node * current ){ return list_st::list_prev( l, current ); } 
+    template<> list_st::list_node * i_erase( list_st::list * l , list_st::list_node * n ){ return list_st::list_erase( l, n ); } 
+}
+
+namespace i_spliceable {
+    template<> bool i_list_splice_entire( list_st::list * l_ins_at, list_st::list_node * n_ins_at, list_st::list * l_ins_frm ){
+	return list_st::list_splice_entire( l_ins_at, n_ins_at, l_ins_frm );
+    } 
+    template<> bool i_list_splice_single( list_st::list * l_ins_at, list_st::list_node * n_ins_at, list_st::list * l_ins_frm, list_st::list_node * n_ins_frm ){
+	return list_st::list_splice_single( l_ins_at, n_ins_at, l_ins_frm, n_ins_frm );
+    } 
+    template<> bool i_list_splice_range( list_st::list * l_ins_at, list_st::list_node * n_ins_at, list_st::list * l_ins_frm, list_st::list_node * n_ins_frm_begin, list_st::list_node * n_ins_frm_end ){
+	return list_st::list_splice_range( l_ins_at, n_ins_at, l_ins_frm, n_ins_frm_begin, n_ins_frm_end );
+    }
+}
+
+namespace i_startup {
+    template<> bool i_init( list_st::list * l ){ return list_st::list_init( l ); }
+    template<> bool i_deinit( list_st::list * l ){ return list_st::list_deinit( l ); }
+}
+
+namespace list_st {
+
+bool list_node_init( list_node * n ){
     /* mem_deassign( (void**) n->_prev ); */
     /* mem_deassign( (void**) n->_next ); */
+    return true;
 }
 
-void list_node_deinit( list_node * n ){
+bool list_node_deinit( list_node * n ){
     /* mem_deassign( (void**) &n->_prev ); */
     /* mem_deassign( (void**) &n->_next ); */
+    return true;
 }
 
-void list_node_set_prev( list_node * n, list_node * prev ){
+bool list_node_set_prev( list_node * n, list_node * prev ){
     mem_assign( (void**)&(n->_prev), (void**)&(prev) );
+    return true;
 }
 
-void list_node_set_next( list_node * n, list_node * next ){
+bool list_node_set_next( list_node * n, list_node * next ){
     mem_assign( (void**)&(n->_next), (void**)&(next) );
+    return true;
 }
 
-void list_init( list * l ){
+bool list_init( list * l ){
 
     mem_alloc( (void**)&l->_head, sizeof( list_node ) );
     mem_alloc( (void**)&l->_tail, sizeof( list_node ) );
@@ -36,9 +86,11 @@ void list_init( list * l ){
     list_node_set_prev( l->_tail, l->_head );
     list_node_set_next( l->_head, l->_tail );
     l->_size = 0;
+
+    return true;
 }
 
-void list_deinit( list * l ){
+bool list_deinit( list * l ){
     list_node * n = list_iterator_begin( l );
     while( list_end( l ) != n ){
 	list_node * next = list_next( l, n );
@@ -50,9 +102,11 @@ void list_deinit( list * l ){
     /* list_node_deinit( l->_tail ); */
     mem_free( (void*)l->_head );
     mem_free( (void*)l->_tail );
+
+    return true;
 }
 
-void list_clear( list * l ){
+bool list_clear( list * l ){
     list_node * n = list_iterator_begin( l );
     while( list_end( l ) != n ){
 	list_node * next = list_next( l, n );
@@ -63,9 +117,11 @@ void list_clear( list * l ){
     list_node_set_prev( l->_tail, l->_head );
     list_node_set_next( l->_head, l->_tail );
     l->_size = 0;
+
+    return true;
 }
 
-void list_push_back( list * l, uint64_t v ){
+bool list_push_back( list * l, uint64_t const * v ){
     list_node * n;
     mem_alloc( (void**)&n, sizeof( list_node ) );
     assert( n );
@@ -73,14 +129,16 @@ void list_push_back( list * l, uint64_t v ){
 
     list_node_set_prev( n, l->_tail->_prev );
     list_node_set_next( n, l->_tail );
-    n->_val = v;
+    n->_val = *v;
 
     list_node_set_next( l->_tail->_prev, n );
     list_node_set_prev( l->_tail, n );
     ++l->_size;
+
+    return true;
 }
 
-void list_push_front( list * l, uint64_t v ){
+bool list_push_front( list * l, uint64_t const * v ){
     list_node * n;
     mem_alloc( (void**)&n, sizeof( list_node ) );
     assert( n );
@@ -88,14 +146,16 @@ void list_push_front( list * l, uint64_t v ){
 
     list_node_set_next( n, l->_head->_next );
     list_node_set_prev( n, l->_head );
-    n->_val = v;
+    n->_val = *v;
 
     list_node_set_prev( l->_head->_next, n );
     list_node_set_next( l->_head, n );
     ++l->_size;
+
+    return true;
 }
 
-bool list_pop_back( list * l ){
+bool list_pop_back( list * l, uint64_t * v ){
     if( l->_tail->_prev == l->_head ){
 	return false;
     }else{
@@ -104,12 +164,13 @@ bool list_pop_back( list * l ){
 	list_node_set_prev( l->_tail, update_prev );
 	list_node_set_next( update_prev, l->_tail );
 	/* list_node_deinit( to_free ); */
+	*v = to_free->_val;
 	mem_free( (void*)to_free );
 	--l->_size;
 	return true;
     }
 }
-bool list_pop_front( list * l ){
+bool list_pop_front( list * l, uint64_t * v ){
     if( l->_head->_next == l->_tail ){
 	return false;
     }else{
@@ -118,6 +179,7 @@ bool list_pop_front( list * l ){
 	list_node_set_next( l->_head, update_next );
 	list_node_set_prev( update_next, l->_head );
 	/* list_node_deinit( to_free ); */
+	*v = to_free->_val;
 	mem_free( (void*)to_free );
 	--l->_size;
 	return true;
@@ -211,12 +273,12 @@ size_t list_update_size( list * l ){
     return ret;
 }
 
-void list_splice_entire( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm ){
+bool list_splice_entire( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm ){
     if( l_ins_at->_head == n_ins_at ){ //adjust node to avoid changing sentinel node
 	n_ins_at = list_next( l_ins_at, n_ins_at );
     }
     if( 0 == list_size( l_ins_frm ) )
-	return;
+	return true;
 	
     list_node * old_prev = n_ins_at->_prev;
 
@@ -233,13 +295,15 @@ void list_splice_entire( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm
     list_node_set_prev( l_ins_frm->_tail, l_ins_frm->_head );
     list_node_set_next( l_ins_frm->_head, l_ins_frm->_tail );
     l_ins_frm->_size = 0;
+
+    return true;
 }
-void list_splice_single( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm ){
+bool list_splice_single( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm ){
     if( l_ins_at->_head == n_ins_at ){ //adjust node to avoid changing sentinel node
 	n_ins_at = list_next( l_ins_at, n_ins_at );
     }
     if( 0 == list_size( l_ins_frm ) )
-	return;
+	return true;
 
     if( l_ins_frm->_head == n_ins_frm ){ //adjust node to avoid changing sentinel node
 	n_ins_frm = list_next( l_ins_frm, n_ins_frm );
@@ -265,8 +329,10 @@ void list_splice_single( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm
     list_node_set_prev( frm_old_next, frm_old_prev );
     list_node_set_next( frm_old_prev, frm_old_next );
     --l_ins_frm->_size;
+
+    return true;
 }
-void list_splice_range( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm_begin, list_node * n_ins_frm_end ){
+bool list_splice_range( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm_begin, list_node * n_ins_frm_end ){
     //inserts from [ begin, end ) into before n_ins_at
     if( l_ins_at->_head == n_ins_at ){ //adjust node to avoid changing sentinel node
 	n_ins_at = list_next( l_ins_at, n_ins_at );
@@ -285,7 +351,7 @@ void list_splice_range( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm,
 	++count;
     }
     if( count == 0 )
-	return;
+	return false;
 
     list_node * old_prev = n_ins_at->_prev;
 
@@ -310,5 +376,8 @@ void list_splice_range( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm,
     list_node_set_prev( frm_end_old_next, frm_begin_old_prev );
     list_node_set_next( frm_begin_old_prev, frm_end_old_next );
     l_ins_frm->_size -= count;
+
+    return true;
 }
 
+}

@@ -1,4 +1,4 @@
-inc_folder_basic := $(dir $(wildcard ../../impl/*/))
+inc_folder_basic := $(dir $(wildcard ../../impl/*/)) ../../interface/
 inc_folder_test := ../
 
 include_dirs = $(inc_folder_basic) $(inc_folder_test)

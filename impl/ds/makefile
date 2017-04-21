@@ -5,7 +5,7 @@ src_files = $(wildcard *.cpp)
 #source files end---
 
 #include directories start---
-inc_folders := $(dir $(wildcard ../*/) ) ./
+inc_folders := $(dir $(wildcard ../*/) ) ../../interface/ ./
 
 include_dirs = $(inc_folders)
 
