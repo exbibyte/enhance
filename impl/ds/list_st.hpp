@@ -8,49 +8,63 @@
 #include "i_basic.hpp"
 #include "i_iterable.hpp"
 
-namespace list_st { //single thread list
+namespace e2 {
+    namespace ds {
+	template< class ValType >
+	class list_st {
+//single thread list
+	public:
+	    class list_node {
+	    public:
+		list_node * _prev;
+		list_node * _next;
+	        ValType _val;
+	    };
+	    static bool list_node_set_prev( list_node * n, list_node * prev );
+	    static bool list_node_set_next( list_node * n, list_node * next );
+	    static bool list_node_init( list_node * n );
+	    static bool list_node_deinit( list_node * n );
+	    
+	    list_st();
+	    ~list_st();
+	    bool clear();
+	    bool push_back( ValType const * v );
+	    bool push_front( ValType const * v );
+	    bool pop_back( ValType * v );
+	    bool pop_front( ValType * v );
+	    bool front( ValType * v );
+	    bool back( ValType * v );
+	    list_node * begin();
+	    list_node * iterator_begin();
+	    list_node * end();
+	    list_node * iterator_end();
+	    list_node * next( list_node * current );
+	    list_node * prev( list_node * current );
+	    list_node * erase( list_node * n );
+	    size_t size();
+	    size_t update_size();    
+	    bool splice_entire( list_node * n_ins_at, list_st * l_ins_frm );
+	    bool splice_single( list_node * n_ins_at, list_st * l_ins_frm, list_node * n_ins_frm );
+	    bool splice_range( list_node * n_ins_at, list_st * l_ins_frm, list_node * n_ins_frm_begin, list_node * n_ins_frm_end );
 
-    struct list_node {
-	struct list_node * _prev;
-	struct list_node * _next;
-	uint64_t _val;
-    };
-    typedef struct list_node list_node;
+	private:
+	    list_node * _head;
+	    list_node * _tail;
+	    size_t _size;
+	};
+    }
+}
 
-    bool list_node_init( list_node * n );
-    bool list_node_deinit( list_node * n );
-    bool list_node_set_prev( list_node * n, list_node * prev );
-    bool list_node_set_next( list_node * n, list_node * next );
+#include "list_st.tpp"
 
-    struct list {
-	struct list_node * _head;
-	struct list_node * _tail;
-	size_t _size;
-    };
-    typedef struct list list;
-
-    bool list_init( list * l );
-    bool list_deinit( list * l );
-    bool list_clear( list * l );
-    bool list_push_back( list * l, uint64_t const * v );
-    bool list_push_front( list * l, uint64_t const * v );
-    bool list_pop_back( list * l, uint64_t * v );
-    bool list_pop_front( list * l, uint64_t * v );
-    bool list_front( list * l, uint64_t * v );
-    bool list_back( list * l, uint64_t * v );
-    list_node * list_begin( list * l );
-    list_node * list_iterator_begin( list * l );
-    list_node * list_end( list * l );
-    list_node * list_iterator_end( list * l );
-    list_node * list_next( list * l, list_node * current );
-    list_node * list_prev( list * l, list_node * current );
-    list_node * list_erase( list * l , list_node * n );
-    size_t list_size( list * l );
-    size_t list_update_size( list * l );    
-    bool list_splice_entire( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm );
-    bool list_splice_single( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm );
-    bool list_splice_range( list * l_ins_at, list_node * n_ins_at, list * l_ins_frm, list_node * n_ins_frm_begin, list_node * n_ins_frm_end );
-
+//specializations
+namespace e2 {
+    namespace ds {
+	class list_st_uint64_t : public list_st<uint64_t> {};
+	class list_st_int : public list_st<int> {};
+	class list_st_uint : public list_st<unsigned> {};
+	class list_st_voidptr : public list_st<void *> {};
+    }
 }
 
 #endif
