@@ -8,12 +8,17 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include <list>
 
 #include "i_hashtable.hpp"
+#include "hash_universal.hpp"
+
+namespace e2 { namespace ds {
 
 template< class K, class V >
 class hashtable_universal_chain_impl {
 public:
+                  hashtable_universal_chain_impl(){}
                   hashtable_universal_chain_impl( size_t table_size );
                   ~hashtable_universal_chain_impl();
 
@@ -54,11 +59,21 @@ private:
 #include "hashtable_universal_chain.tpp"
 
 template< class K, class V >
-using hashtable_universal_chain = i_hashtable < K, V, hashtable_universal_chain_impl,
-					      trait_hashtable_concurrency::none,
-					      trait_hashtable_method::closed,
-					      trait_hashtable_lock_load_factor::constant,
-					      trait_hashtable_hashing_method::universal
-					      >;
+class hashtable_universal_chain final : public ::e2::interface::i_hashtable < K, V, hashtable_universal_chain_impl > {
+public:
+    hashtable_universal_chain( size_t table_size ) : hashtable_universal_chain_impl < K, V > ( table_size ), ::e2::interface::i_hashtable < K, V, hashtable_universal_chain_impl >( table_size ) {
+	using type_parent = ::e2::interface::i_hashtable < K, V, hashtable_universal_chain_impl >;
+
+	type_parent::_trait_hashtable._hash_method = ::e2::trait::hashtable::e_hash_method::universal;
+	type_parent::_trait_hashtable._table_method = ::e2::trait::hashtable::e_table_method::closed;
+	type_parent::_trait_hashtable._lock_load_factor = ::e2::trait::hashtable::e_lock_load_factor::constant;
+	type_parent::_trait_concurrency._bound_size = ::e2::trait::concurrency::e_bound_size::unbounded;
+	type_parent::_trait_concurrency._method = ::e2::trait::concurrency::e_method::none;
+	type_parent::_trait_concurrency._granularity = ::e2::trait::concurrency::e_granularity::none;
+	type_parent::_trait_concurrency._fairness = ::e2::trait::concurrency::e_fairness::not_applicable;
+    }
+};
+
+} }
 
 #endif

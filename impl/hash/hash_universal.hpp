@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include <cstring>
+#include <random>
 
 #include "i_hash.hpp"
 

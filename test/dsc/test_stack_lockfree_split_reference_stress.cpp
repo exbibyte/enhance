@@ -15,7 +15,7 @@ using namespace std;
 
 TEST_CASE( "stack_lockfree_split_reference stress", "[stress]" ) { 
 
-    stack_lockfree_split_reference<int> p;
+    e2::dsc::stack_lockfree_split_reference<int> p;
     unsigned int num_threads = 10000;
     stress_pool::stress_put_get_int( num_threads, p );
 }

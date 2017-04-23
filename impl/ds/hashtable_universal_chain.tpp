@@ -1,7 +1,3 @@
-#include <list>
-
-#include "hash_universal.hpp"
-
 template< class K, class V >
 hashtable_universal_chain_impl< K, V >::hashtable_universal_chain_impl( size_t table_size ){
     _count_items = 0;

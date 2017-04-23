@@ -10,6 +10,7 @@
 #include "hashtable_universal_chain.hpp"
 
 using namespace std;
+using namespace e2::ds;
 
 TEST_CASE( "hashtable_universal_chain", "[hashtable_universal_chain]" ) { 
     SECTION( "add" ) {

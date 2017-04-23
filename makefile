@@ -9,10 +9,10 @@ build_src_ds:
 build_src_memory:
 	$(MAKE) -C $(src_dir)/memory all
 
-build_test_concurrent:
-	$(MAKE) -C $(test_dir)/concurrent all
-build_src_concurrent:
-	$(MAKE) -C $(src_dir)/concurrent all
+build_test_dsc:
+	$(MAKE) -C $(test_dir)/dsc all
+build_src_dsc:
+	$(MAKE) -C $(src_dir)/dsc all
 
 build_src_math:
 	$(MAKE) -C $(src_dir)/math all
@@ -22,9 +22,9 @@ build_test_hash:
 build_src_hash:
 	$(MAKE) -C $(src_dir)/hash all
 
-builds: build_src_ds build_src_memory build_src_concurrent build_src_math build_src_hash
+builds: build_src_ds build_src_memory build_src_dsc build_src_math build_src_hash
 
-tests: build_test_ds build_test_concurrent build_test_hash
+tests: build_test_ds build_test_dsc build_test_hash
 
 .PHONY: all
 all: builds tests

@@ -1,5 +1,3 @@
-#include <random>
-
 template< class T >
 bool hash_universal_impl< T >::generate_hash_funcs( size_t const table_size, ::std::vector< ::std::function< T ( T ) > > * funcs ){
     if( 0 >= table_size )
