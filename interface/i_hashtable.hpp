@@ -9,55 +9,54 @@
 #include <cmath>
 #include <iostream>
 
-class trait_hashtable_hashing_method {
-public:
-    class division{};
-    class multiplication{};
-    class universal{};
-    class other{};
+#include "i_concurrency.hpp"
+
+namespace e2 { namespace trait { namespace hashtable {
+
+enum class e_hash_method {
+    division,
+    multiplication,
+    universal,
+    other,
 };
 
-class trait_hashtable_method {
-public:
-    class closed{};
-    class open{};
+enum class e_table_method {
+    closed,
+    open,
 };
 
-class trait_hashtable_concurrency {
-public:
-    class none{};
-    class global{};
-    class granular{};
-    class disjoint_access_parallelism{};
-    class lockless{};
-    class waitfree{};
+enum class e_lock_load_factor {
+    constant,
+    linear,
+    not_applicable,
 };
 
-class trait_hashtable_lock_load_factor {
-public:
-    class constant{};
-    class linear{};
-    class not_applicable{};
+struct trait_hashtable {
+    e_hash_method _hash_method;
+    e_table_method _table_method;
+    e_lock_load_factor _lock_load_factor;
 };
 
-template< class K, class V, template<class,class> class Impl, class HtConcurrency, class HtMethod, class HtLockLoadFactor, class HashMethod >
-class i_hashtable final : public Impl< K, V > {
+} } }
+
+namespace e2 { namespace interface {
+	
+template< class K, class V, template<class,class> class Impl >
+class i_hashtable : public virtual Impl< K, V > {
 public:
          using key_type =               K;
          using key_const_type =         K const;
          using value_type =             V;
          using val_reference =          V &;
          using val_const_reference =    V const &;
-
-	 //hashtable traits
 	 using hashtable_impl = Impl< K, V >;
-	 using hashtable_concurrency = HtConcurrency;
-	 using hashtable_method = HtMethod;
-	 using hashtable_lock_load_factor = HtLockLoadFactor;
-	 using hashtable_hash_method = HashMethod;
 	 
+	 //hashtable properties
+	 ::e2::trait::hashtable::trait_hashtable _trait_hashtable;
+	 ::e2::trait::concurrency::trait_concurrency _trait_concurrency;
+
                template< class... Args >
-               i_hashtable( Args... args ) : Impl< K, V >( std::forward<Args>( args )... ) {}
+               i_hashtable( Args ... args ) : Impl< K, V >( args... ) {}
                ~i_hashtable(){}
 
           bool insert( key_const_type k, val_const_reference v ){ return Impl< K, V >::insert( k, v ); }
@@ -70,4 +69,6 @@ public:
         double get_load_factor(){ return Impl< K, V >::get_load_factor(); }
 };
 
+} }
+    
 #endif

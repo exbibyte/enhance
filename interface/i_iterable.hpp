@@ -1,30 +1,16 @@
 #ifndef I_ITERABLE_HPP
 #define I_ITERABLE_HPP
 
-namespace i_iterable {
-    template< class ContainerType, class IterableType >
-    IterableType * i_begin( ContainerType * c, IterableType * tag ){ return nullptr; }
-    
-    template< class ContainerType, class IterableType >
-    IterableType * i_end( ContainerType * c, IterableType * tag ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_iterator_begin( ContainerType * c, IterableType * tag ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_iterator_end( ContainerType * c, IterableType * tag ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_prev( ContainerType * c, IterableType * i ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_next( ContainerType * c, IterableType* i ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_erase( ContainerType * c, IterableType * i ){ return nullptr; }
-
-    template< class ContainerType, class IterableType >
-    IterableType * i_advance( ContainerType * c, IterableType * i, long long n ){ return nullptr; }
-}
+template< class IterableType >
+class i_iterable {
+    IterableType * begin(){ return nullptr; }
+    IterableType * end(){ return nullptr; }
+    IterableType * iterator_begin(){ return nullptr; }
+    IterableType * iterator_end(){ return nullptr; }
+    IterableType * prev( IterableType * i ){ return nullptr; }
+    IterableType * next( IterableType* i ){ return nullptr; }
+    IterableType * erase( IterableType * i ){ return nullptr; }
+    IterableType * advance( IterableType * i, long n ){ return nullptr; }
+};
 
 #endif

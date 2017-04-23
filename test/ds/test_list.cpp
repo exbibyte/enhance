@@ -10,12 +10,7 @@
 
 int main(){
 
-    using namespace i_list;
-    using namespace i_startup;
-    using namespace i_iterable;
-    using namespace i_spliceable;
-
-    using node = e2::ds::list_st_uint64_t::list_node;
+    using node = e2::ds::list_st_uint64_t::iterator;
 	
     e2::ds::list_st_uint64_t * l;
     mem_alloc( (void**)&l, sizeof( e2::ds::list_st_uint64_t ) );

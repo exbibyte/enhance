@@ -1,44 +1,40 @@
 #ifndef I_LIST_HPP
 #define I_LIST_HPP
 
-namespace i_list {
-    template< class ContainerType >
-               bool i_list_clear( ContainerType * c ){ return false; }
+#include <utility>
 
-    template< class ContainerType >
-             size_t i_list_size( ContainerType * c ){ return 0; }
+namespace e2 {
+    namespace interface {
+	
+	template< class ValType, template<class> class ContainerType >
+	class i_list : public virtual ContainerType< ValType > {
+	public:
+	    using container_type =     ContainerType< ValType >;
+	    using value_type =         ValType;
+	    using value_ptr =          ValType *;
+	    using const_value_ptr =    ValType const *;
+	    
+	      bool clear(){ return ContainerType< ValType >::clear(); }
+	    size_t size(){ return ContainerType< ValType >::size(); }
+	    size_t update_size(){ return ContainerType< ValType >::update_size(); }
+	      bool push_back( ValType const * item ){ return ContainerType< ValType >::push_back( item ); }
+	      bool push_front( ValType const * item ){ return ContainerType< ValType >::push_front( item ); }
+	      bool pop_back( ValType * item ){ return ContainerType< ValType >::pop_back( item ); }
+	      bool pop_front( ValType * item ){ return ContainerType< ValType >::pop_front( item ); }
+	      bool front( ValType * item ){ return ContainerType< ValType >::front( item ); }
+	      bool back( ValType * item ){ return ContainerType< ValType >::back( item ); }
+	};
 
-    template< class ContainerType >
-             size_t i_list_update_size( ContainerType * c ){ return 0; }
+	template< class ValType, template<class> class ContainerType, class IterableType >
+	class i_spliceable : public virtual ContainerType< ValType > {
+	public:
+	    using iterator_type = IterableType;
+	    
+	    bool splice_entire( IterableType * insert_at, ContainerType< ValType > * from_list ){ return ContainerType< ValType >::splice_entire( insert_at, from_list ); }
+	    bool splice_single( IterableType * insert_at, ContainerType< ValType > * from_list, IterableType * insert_from ){ return ContainerType< ValType >::splice_single( insert_at, from_list, insert_from ); }
+	    bool splice_range( IterableType * insert_at, ContainerType< ValType > * from_list, IterableType * insert_from_iter_begin, IterableType * insert_from_iter_end ){ return ContainerType< ValType >::splice_range( insert_at, from_list, insert_from_iter_begin, insert_from_iter_end ); }
+	};
 
-    template< class ContainerType, class ValType >
-               bool i_list_push_back( ContainerType * c, ValType const * item ){ return false; }
-
-    template< class ContainerType, class ValType >
-               bool i_list_push_front( ContainerType * c, ValType const * item ){ return false; }
-
-    template< class ContainerType, class ValType >
-               bool i_list_pop_back( ContainerType * c, ValType * item ){ return false; }
-
-    template< class ContainerType, class ValType >
-               bool i_list_pop_front( ContainerType * c, ValType * item ){ return false; }
-
-    template< class ContainerType, class ValType >
-               bool i_list_front( ContainerType * c, ValType * item ){ return false; }
-
-    template< class ContainerType, class ValType >
-               bool i_list_back( ContainerType * c, ValType * item ){ return false; }
+    }
 }
-
-namespace i_spliceable {
-    template< class ContainerType, class IterableType >
-    bool i_list_splice_entire( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list );
-    
-    template< class ContainerType, class IterableType >
-    bool i_list_splice_single( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list, IterableType * insert_from );
-    
-    template< class ContainerType, class IterableType >
-    bool i_list_splice_range( ContainerType * to_list, IterableType * insert_at, ContainerType * from_list, IterableType * insert_from_iter_begin, IterableType * insert_from_iter_end );
-}
-
 #endif

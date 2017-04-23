@@ -5,8 +5,6 @@
 #include <stdint.h>
 
 #include "i_list.hpp"
-#include "i_basic.hpp"
-#include "i_iterable.hpp"
 
 namespace e2 {
     namespace ds {
@@ -20,13 +18,18 @@ namespace e2 {
 		list_node * _next;
 	        ValType _val;
 	    };
+
+	    using iterator = list_node;
+
 	    static bool list_node_set_prev( list_node * n, list_node * prev );
 	    static bool list_node_set_next( list_node * n, list_node * next );
 	    static bool list_node_init( list_node * n );
 	    static bool list_node_deinit( list_node * n );
-	    
+
 	    list_st();
 	    ~list_st();
+	    list_st( list_st const & ) = delete;
+  list_st & operator=( list_st const & ) = delete;
 	    bool clear();
 	    bool push_back( ValType const * v );
 	    bool push_front( ValType const * v );
@@ -60,10 +63,12 @@ namespace e2 {
 //specializations
 namespace e2 {
     namespace ds {
-	class list_st_uint64_t : public list_st<uint64_t> {};
-	class list_st_int : public list_st<int> {};
-	class list_st_uint : public list_st<unsigned> {};
-	class list_st_voidptr : public list_st<void *> {};
+	class list_st_uint64_t final : public ::e2::interface::i_list< uint64_t, list_st >,
+	                               public ::e2::interface::i_spliceable< uint64_t, list_st, list_st<uint64_t>::list_node > {
+	public:
+	    template< class... Args >
+	    list_st_uint64_t( Args && ... args ): list_st< uint64_t >( std::forward( args )... ) {}
+	};
     }
 }
 

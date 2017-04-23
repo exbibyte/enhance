@@ -12,7 +12,7 @@ class hash_universal_impl {
 public:
           hash_universal_impl(){}
           ~hash_universal_impl(){}
-          bool generate_hash_funcs( size_t const table_size, std::vector< std::function< T ( T ) > > * funcs );
+    bool generate_hash_funcs( size_t const table_size, ::std::vector< ::std::function< T ( T ) > > * funcs );
 };
 
 #include "hash_universal.tpp"
