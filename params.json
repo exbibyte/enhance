@@ -1,6 +1,0 @@
-{
-  "name": "Enhance",
-  "tagline": "Enhance: 3D Graphics Engine + Game Engine",
-  "body": "### Welcome to enhance  \r\n(Yet another) experimental 3D engine framework with render and basic support for implementing 3D applications.\r\n\r\n## News  \r\n  + 2016-09-07 - Scheduler implementation is in progress. Additionally, multi-entity rendering support with simple position vector and quaternion rotation orientation is added. Interpolation between different orientation (position & rotation) pairs will also be added. [demo](https://youtu.be/Qppu1-KIrj0)\r\n  + 2016-08-28 - Ongoing changes to rendering and orientation modules. A trackball functionality was implemented on top of existing math utilities as well as UI eventing and event filtering modules. [demo](https://youtu.be/hnAWd_QL_XY)\r\n  + 2016-08-20 - Ongoing refactoring of kernel modules. Several additions of UI and Filter modules enable keyboard and mouse event processing.\r\n  + 2016-07-17 - Rendering code from previous branch was setup to run in the new infrastructure.  \r\nThis serves as the baseline for experimentation and changes.\r\n\r\n## Release Targets:\r\n  + V0_0_0: 2017-Jan.\r\n\r\n### Support or Contact  \r\nCheck out our [wiki](https://github.com/bilbil/enhance/wiki) for more details.\r\n",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
