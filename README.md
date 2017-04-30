@@ -1,6 +1,5 @@
 # Enhance
 
-[![Build Status](https://travis-ci.org/clearlycloudy/enhance.svg?branch=master)](https://travis-ci.org/clearlycloudy/enhance)
 [![License](https://img.shields.io/:license-bsd-blue.svg?style=round-square)](https://github.com/clearlycloudy/enhance/blob/master/LICENSE.txt)
 
 =======
@@ -21,7 +20,7 @@ Memory Management  - Work in progress
 
 Script management  - To Do
 
-Current work is focused on schedulers, concurrent data structure, statistics collection, rendering pipeline, memory optimization.
+Current work is focused on schedulers, concurrent data structure, statistics collection, rendering pipeline, memory optimization. Major revision is being done on e2 branch.
 
 ## Dependencies:
 
