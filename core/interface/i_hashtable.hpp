@@ -67,6 +67,7 @@ public:
           bool resize( size_t size ){ return Impl< K, V >::resize( size ); }
         size_t get_table_size(){ return Impl< K, V >::get_table_size(); }
         double get_load_factor(){ return Impl< K, V >::get_load_factor(); }
+        size_t size(){ return Impl< K, V >::size(); }
 };
 
 } }

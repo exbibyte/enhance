@@ -38,6 +38,7 @@ public:
              bool resize( size_t size );
            size_t get_table_size();
            double get_load_factor();
+           size_t size();
 private:
                   class hashnode {
 		  public:		      
@@ -80,6 +81,19 @@ template< class K, class V >
 class hashtable_lock_striped final : public ::e2::interface::i_hashtable < K, V, hashtable_lock_striped_impl > {
 public:    
     hashtable_lock_striped( size_t table_size, double lock_factor ) : hashtable_lock_striped_impl< K, V > ( table_size, lock_factor ) {
+	using type_parent = ::e2::interface::i_hashtable < K, V, hashtable_lock_striped_impl >;
+
+	type_parent::_trait_hashtable._hash_method = ::e2::trait::hashtable::e_hash_method::universal;
+	type_parent::_trait_hashtable._table_method = ::e2::trait::hashtable::e_table_method::open;
+	type_parent::_trait_hashtable._lock_load_factor = ::e2::trait::hashtable::e_lock_load_factor::constant;
+	type_parent::_trait_concurrency._bound_size = ::e2::trait::concurrency::e_bound_size::unbounded;
+	type_parent::_trait_concurrency._method = ::e2::trait::concurrency::e_method::total;
+	type_parent::_trait_concurrency._granularity = ::e2::trait::concurrency::e_granularity::disjoint_access;
+	type_parent::_trait_concurrency._fairness = ::e2::trait::concurrency::e_fairness::not_applicable;
+    }
+
+
+    hashtable_lock_striped() : hashtable_lock_striped_impl< K, V > ( 100, 0.6 ) {
 	using type_parent = ::e2::interface::i_hashtable < K, V, hashtable_lock_striped_impl >;
 
 	type_parent::_trait_hashtable._hash_method = ::e2::trait::hashtable::e_hash_method::universal;

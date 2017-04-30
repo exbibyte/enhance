@@ -350,3 +350,8 @@ typename hashtable_lock_striped_impl< K, V >::hashnode * hashtable_lock_striped_
     }
     return nullptr;
 }
+template< class K, class V >
+size_t hashtable_lock_striped_impl< K, V >::size(){
+    size_t s = _count_items.load(std::memory_order_relaxed);
+    return s;
+}
