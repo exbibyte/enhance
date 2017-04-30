@@ -139,8 +139,6 @@ public:
 	    	    }
 	    	}
 	    }
-	    // if( false == s->_task_pool.get( &tk ) )
-	    // 	continue;
 	    tk.task_process();
 	}
 	return;
