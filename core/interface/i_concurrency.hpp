@@ -31,6 +31,12 @@ enum class e_fairness {
     lifo,
 };
 
+enum class e_consistency {
+    not_applicable,
+    quiscient,
+    linearizable,
+};
+
 struct trait_concurrency {
     e_bound_size _bound_size;
     e_method _method;

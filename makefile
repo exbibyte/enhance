@@ -12,8 +12,18 @@ builds: build_core build_kernel
 .PHONY: all
 all: builds
 
+
+removetemp0:
+	find -name '*~' | xargs rm -f
+
+removetemp1:
+	find -name '*#' | xargs rm -f
+
+removetemp: removetemp0 removetemp1
+
 .PHONY: clean
-clean:
-	for dir in $(dir ./ ); do \
+clean: removetemp
+	for dir in $(dir ./*/ ); do \
 	  ($(MAKE) -C $$dir clean);\
 	done
+
