@@ -5,8 +5,10 @@
 #include <cstdint>
 #include <utility>
 #include <cstring>
+#include <vector>
 
 #include "i_memory_partition.hpp"
+#include "memory_common.hpp"
 
 namespace e2 { namespace memory {
 
@@ -28,7 +30,7 @@ public:
         double stat_free_fraction();
 
                //reallocation
-          bool internal_resize( size_t len_resize );
+          bool internal_resize( size_t len_resize, std::vector<void*> * lookup_ptr );
 
                //deallocate to system
 	  bool internal_free();
@@ -36,7 +38,7 @@ public:
         void * _mem_start;
         size_t _mem_len;
     
-         using t_list = std::list<std::pair<size_t, size_t> >;
+         using t_list = std::list< memory_block_info >;
         t_list _mem_blocks;
         t_list _mem_lent;
 };

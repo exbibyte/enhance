@@ -2,11 +2,12 @@
 #define E2_MEMORY_TEST_SIMPLE_HPP
 
 #include <cassert>
+#include <vector>
 
 class memory_parition_test_simple {
 public:
     template< class MemoryPartition >
-    static void test_resize( MemoryPartition * mp, size_t len_resize ){
+    static void test_resize( MemoryPartition * mp, size_t len_resize, std::vector< void * > * lookup ){
 	size_t s;
 	double d;
 	bool ret;
@@ -14,11 +15,11 @@ public:
 	size_t s_before = mp->stat_size_total();
 
 	if( s_before > len_resize ){
-	    ret = mp->internal_resize( len_resize );
+	    ret = mp->internal_resize( len_resize, lookup );
 	    assert( false == ret );
 	    return;
 	}else{
-	    ret = mp->internal_resize( len_resize );
+	    ret = mp->internal_resize( len_resize, lookup );
 	    assert( true == ret );
 	}
 

@@ -3,22 +3,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <new>
 
 #include "list_st.hpp"
-#include "memory.hpp"
 
 int main(){
 
     using node = e2::ds::list_st_uint64_t::iterator;
 	
-    e2::ds::list_st_uint64_t * l;
-    mem_alloc( (void**)&l, sizeof( e2::ds::list_st_uint64_t ) );
-    new( (void*)l ) e2::ds::list_st_uint64_t();
+    e2::ds::list_st_uint64_t * l = new e2::ds::list_st_uint64_t;
 
-    e2::ds::list_st_uint64_t * l2;
-    mem_alloc( (void**)&l2, sizeof( e2::ds::list_st_uint64_t ) );
-    new( (void*)l2 ) e2::ds::list_st_uint64_t();
+    e2::ds::list_st_uint64_t * l2 = new e2::ds::list_st_uint64_t;
     
     {
 	size_t s = l->size();
@@ -294,8 +288,8 @@ int main(){
     l->~list_st_uint64_t();
     l2->~list_st_uint64_t();
     
-    mem_free( (void*)l );
-    mem_free( (void*)l2 );
+    delete l;
+    delete l2;
 
     printf( "complete.\n" );
 

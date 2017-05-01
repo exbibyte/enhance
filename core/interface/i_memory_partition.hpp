@@ -35,7 +35,7 @@ public:
 
                //reallocation
                template< class ... Args >
-          bool internal_resize( Args && ... args )     { return Impl::internal_resize( std::forward< Args >( args )... ); }
+	  bool internal_resize( Args && ... args )     { return Impl::internal_resize( std::forward< Args >( args ) ... ); }
 
                //deallocate to system
                template< class ... Args >

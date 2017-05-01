@@ -24,7 +24,7 @@ public:
                i_memory_manager( Args && ... args ) : Impl( std::forward( std::move( args ) )... ) {}
 
                template< class T, class... Args >
-           T * newing( Args ... args ){ return Impl::template newing< T, Args ... >( std::forward< Args >( args )... ); }
+          T ** newing( Args ... args ){ return Impl::template newing< T, Args ... >( std::forward< Args >( args )... ); }
 
                template< class... Args >
 	  bool deleting( Args ... args ){ return Impl::deleting( std::forward< Args >( args )... ); }

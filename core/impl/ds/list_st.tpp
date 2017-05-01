@@ -1,20 +1,18 @@
 #include <cassert>
 #include <cstdbool>
 
-#include "memory.hpp"
-
 namespace e2 {
     namespace ds {
 
 	template< class ValType >
 	bool list_st< ValType >::list_node_set_prev( list_st::list_node * n, list_st::list_node * prev ){
-	    mem_assign( (void**)&(n->_prev), (void**)&(prev) );
+	    n->_prev = prev;
 	    return true;
 	}
 
 	template< class ValType >
 	bool list_st< ValType >::list_node_set_next( list_st::list_node * n, list_st::list_node * next ){
-	    mem_assign( (void**)&(n->_next), (void**)&(next) );
+	    n->_next = next;
 	    return true;
 	}
 
@@ -34,8 +32,8 @@ namespace e2 {
 
 	template< class ValType >
 	list_st< ValType >::list_st(){
-	    mem_alloc( (void**)&_head, sizeof( list_node ) );
-	    mem_alloc( (void**)&_tail, sizeof( list_node ) );
+	    _head = new list_node;
+	    _tail = new list_node;
     
 	    assert( _head );
 	    assert( _tail );
@@ -54,15 +52,15 @@ namespace e2 {
 	    while( end() != n ){
 		list_node * next = this->next( n );
 		/* list_node_deinit( n ); */
-		mem_free( (void*)n );
+		delete n;
 		n = next;
 	    }
 
 	    // list_node_deinit( _head );
 	    // list_node_deinit( _tail );
 	    
-	    mem_free( (void*)_head );
-	    mem_free( (void*)_tail );
+	    delete _head;
+	    delete _tail;
 	}
 
 	template< class ValType >
@@ -71,7 +69,7 @@ namespace e2 {
 	    while( end() != n ){
 		list_node * next = this->next( n );
 		// list_node_deinit( n );
-		mem_free( (void*)n );
+		delete n;
 		n = next;
 	    }
 	    list_node_set_prev( this->_tail, this->_head );
@@ -83,7 +81,7 @@ namespace e2 {
 	template< class ValType >
 	bool list_st< ValType >::push_back( ValType const * v ){
 	    list_node * n;
-	    mem_alloc( (void**)&n, sizeof( list_node ) );
+	    n = new list_node;
 	    assert( n );
 	    list_node_init( n );
 
@@ -101,7 +99,7 @@ namespace e2 {
 	template< class ValType >
 	bool list_st< ValType >::push_front( ValType const * v ){
 	    list_node * n;
-	    mem_alloc( (void**)&n, sizeof( list_node ) );
+	    n = new list_node;
 	    assert( n );
 	    list_node_init( n );
 
@@ -127,7 +125,7 @@ namespace e2 {
 		list_node_set_next( update_prev, _tail );
 		*v = to_free->_val;
 		// list_node_deinit( to_free );
-		mem_free( (void*)to_free );
+		delete to_free;
 		--_size;
 		return true;
 	    }
@@ -144,7 +142,7 @@ namespace e2 {
 		list_node_set_prev( update_next, _head );
 		*v = to_free->_val;
 		// list_node_deinit( to_free );
-		mem_free( (void*)to_free );
+		delete to_free;
 		--_size;
 		return true;
 	    }
@@ -225,7 +223,7 @@ namespace e2 {
 		list_node_set_prev( n->_next, n->_prev );
 		list_node_set_next( n->_prev, n->_next );
 		/* list_node_deinit( n ); */
-		mem_free( (void*) n );
+		delete n;
 		--_size;
 		return next;
 	    }

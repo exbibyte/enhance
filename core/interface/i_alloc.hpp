@@ -24,7 +24,7 @@ public:
 
                //lend out a free block to user
                template< class T, class... Args >
-           T * newing( Args ... args ){ return Impl::template newing< T, Args ... >( std::forward< Args >( args )... ); }
+          T ** newing( Args ... args ){ return Impl::template newing< T, Args ... >( std::forward< Args >( args )... ); }
 
                //internal helper
                template< class ... Args >
