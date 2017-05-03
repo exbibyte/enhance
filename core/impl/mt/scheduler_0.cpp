@@ -54,7 +54,7 @@ bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
         if( nullptr == t )
 	    return false;
 	uint64_t key = reinterpret_cast< uint64_t >( t );
-	return _thread_pool_busy.erase( key ) );
+	return _thread_pool.erase( key ) );
     }
     break;
     case ::e2::interface::e_scheduler_action::ADD_TASK:
