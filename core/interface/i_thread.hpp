@@ -11,9 +11,12 @@ namespace e2 { namespace interface {
 enum class e_thread_state {
     STOPPED,
     BUSY,
+    SIGNAL_STOP,
+    SIGNAL_BUSY,
 };
 
 enum class e_thread_action {
+    SET_TASK,
     START,
     END,
     QUERY_STATE,
@@ -25,8 +28,7 @@ public:
     template< class... Args >
     i_thread( Args && ... args ) : Impl( std::move( args )... ) {}
     template< class... Args >
-    bool thread_process( e_thread_action a, Args && ... args ){ return Impl::thread_process( a, std::move( args )... ); }
-    bool get_thread_state( e_thread_state * s ){ return Impl::get_thread_state( s ); }
+    bool thread_process( e_thread_action a, Args ... args ){ return Impl::thread_process( a, args ... ); }
 };
 
 } }
