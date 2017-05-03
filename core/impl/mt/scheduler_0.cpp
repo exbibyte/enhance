@@ -42,7 +42,10 @@ bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
         if( nullptr == t )
 	    return false;
 	t->thread_process( ::e2::interface::e_thread_action::END ); //wait for thread to end
-	std::function< void( void ) > f = std::bind( thread_loop, t, this );
+	std::function< void( void ) > f = [=]() -> void {
+	    thread_loop( t, this );
+	    return;
+	};
 	t->thread_process( ::e2::interface::e_thread_action::SET_TASK, f );
 	uint64_t key = reinterpret_cast< uint64_t >( t );
 	return _thread_pool.insert( key, t );
