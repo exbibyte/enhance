@@ -2,6 +2,7 @@
 #define SCHEDULER_0_HPP
 
 #include <cassert>
+#include <atomic>
 
 #include "i_scheduler.hpp"
 #include "i_task.hpp"
@@ -22,7 +23,7 @@ public:
 private:
     ::e2::dsc::queue_lockfree_total< ::e2::interface::task > _task_pool;
     ::e2::dsc::hashtable_lock_striped< uint64_t, ::e2::mt::thread_0 * > _thread_pool;
-    bool _shutdown;
+    std::atomic<bool> _shutdown;
 };
 
 class scheduler_0 final : public ::e2::interface::i_scheduler< scheduler_0_impl > {

@@ -19,12 +19,13 @@ void increment( int * v ){
 }
 
 int main(){
+    bool ret;
     scheduler_0 sch;
-    vector< thread_0 * > t;
+    vector< thread_0 * > thread_allocated;
     for( int i = 0; i < 2; ++i ){
     	thread_0 * new_t =  new thread_0;
-    	t.push_back( new_t );
-    	bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_THREAD, new_t );
+    	thread_allocated.push_back( new_t );
+	ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_THREAD, new_t );
         assert( ret );
     }
     
@@ -33,12 +34,12 @@ int main(){
     auto t0 = std::chrono::high_resolution_clock::now();
 
     while(true){
-	for( int i = 0; i < 6; ++i ){
-	    ::e2::interface::task tk;
-	    tk.task_set( increment, &vals[i] );
-	    bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
-	    assert( ret );
-	}
+	// for( int i = 0; i < 6; ++i ){
+	//     ::e2::interface::task tk;
+	//     tk.task_set( increment, &vals[i] );
+	//     bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
+	//     assert( ret );
+	// }
 
 	auto t1 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> dur = t1 - t0;
@@ -48,12 +49,16 @@ int main(){
 	}
     }
 
-    bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::END );
+    ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::END );
     // assert( ret );
     
     for( int i = 0; i < 6; ++i ){
 	// assert( 0 != vals[i] );
 	std::cout << vals[i] << std::endl;
+    }
+
+    for( auto & i : thread_allocated ){
+        ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::REMOVE_THREAD, i );
     }
     
     return 0;
