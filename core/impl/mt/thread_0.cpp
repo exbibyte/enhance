@@ -6,13 +6,13 @@
 
 namespace e2 { namespace mt {
 
-thread_0_impl::thread_0_impl : _thread_state( ::e2::interface::e_thread_state::STOPPED ), _task( nullptr ){
+thread_0_impl::thread_0_impl() : _thread_state( ::e2::interface::e_thread_state::STOPPED ), _task( nullptr ){
 }    
 thread_0_impl::~thread_0_impl(){
     if( _thread.joinable() ){
+        while( ::e2::interface::e_thread_state::STOPPED != _thread_state ){} //blocking wait
         _thread.join();
     }
-    while( ::e2::interface::e_thread_state::STOPPED != _thread_state ){} //blocking wait
 }
 bool thread_0_impl::set_task( std::function< void( void ) > f ){
     if( nullptr == f )
@@ -56,12 +56,29 @@ bool thread_0_impl::thread_start(){
 bool thread_0_impl::thread_end(){
     //non-blocking
     //end thread only if it is busy
-    IThread::State expected_state = ::e2::interface::e_thread_state::BUSY;
+    ::e2::interface::e_thread_state expected_state = ::e2::interface::e_thread_state::BUSY;
     if( atomic_compare_exchange_strong( & _thread_state, & expected_state, ::e2::interface::e_thread_state::SIGNAL_STOP ) ){
         return true;
     }else{
         return false;
     }
 }
-
+bool thread_0_impl::thread_process( ::e2::interface::e_thread_action a ){
+  switch( a ){
+  case ::e2::interface::e_thread_action::START:
+    {
+      return thread_start();
+    }
+    break;
+  case ::e2::interface::e_thread_action::END:
+    {
+      return thread_end();
+    }
+    break;
+  default:
+    return false;
+  }
+  return false;
+}
+    
 } }

@@ -27,8 +27,9 @@ class i_thread : public virtual Impl {
 public:
     template< class... Args >
     i_thread( Args && ... args ) : Impl( std::move( args )... ) {}
-    template< class... Args >
-    bool thread_process( e_thread_action a, Args ... args ){ return Impl::thread_process( a, args ... ); }
+    bool thread_process( e_thread_action a ){ return Impl::thread_process( a ); }
+    bool set_task( std::function< void( void ) > f ){ return Impl::set_task( f ); }
+    bool get_thread_state( ::e2::interface::e_thread_state * s ){ return Impl::get_thread_state( s ); }
 };
 
 } }

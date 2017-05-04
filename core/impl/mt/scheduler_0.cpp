@@ -1,23 +1,25 @@
 #include "scheduler_0.hpp"
 
-scheduler_0_impl() : _shutdown( false ){
+namespace e2 { namespace mt {
+
+scheduler_0_impl::scheduler_0_impl() : _shutdown( false ){
 }
-~scheduler_0_impl(){
+scheduler_0_impl::~scheduler_0_impl(){
     _shutdown = true;
     //blocking wait
     while( 0 < _thread_pool.size() ){}
 }
-::e2::mt::thread_0 * get_thread( ::e2::mt::thread_0 * t ){
+::e2::mt::thread_0 * scheduler_0_impl::get_thread( ::e2::mt::thread_0 * t ){
   if( nullptr == t )
     return nullptr;
   return t;
 }
-::e2::interface::task * get_task( ::e2::interface::task * t ){
+::e2::interface::task * scheduler_0_impl::get_task( ::e2::interface::task * t ){
   if( nullptr == t )
     return nullptr;
   return t;
 }
-bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
+bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
     switch( a ){
     case ::e2::interface::e_scheduler_action::START:
     {
@@ -46,7 +48,7 @@ bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
 	    thread_loop( t, this );
 	    return;
 	};
-	t->thread_process( ::e2::interface::e_thread_action::SET_TASK, f );
+	t->set_task( f );
 	uint64_t key = reinterpret_cast< uint64_t >( t );
 	return _thread_pool.insert( key, t );
     }
@@ -57,7 +59,7 @@ bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
         if( nullptr == t )
 	    return false;
 	uint64_t key = reinterpret_cast< uint64_t >( t );
-	return _thread_pool.erase( key ) );
+	return _thread_pool.erase( key );
     }
     break;
     case ::e2::interface::e_scheduler_action::ADD_TASK:
@@ -74,7 +76,7 @@ bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
   }
   return false;
 }
-static void thread_loop( thread_0 * t, scheduler_0_impl * s ){
+void scheduler_0_impl::thread_loop( thread_0 * t, scheduler_0_impl * s ){
     if( s->_shutdown ){
         t->thread_process( ::e2::interface::e_thread_action::END );
     }
@@ -83,3 +85,5 @@ static void thread_loop( thread_0 * t, scheduler_0_impl * s ){
         tk.task_process();
     }
 }
+
+} }

@@ -7,8 +7,9 @@ include_dirs = $(inc_folder_basic) $(inc_folder_test) $(inc_folder_interface)
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
 objects_concurrent = $(wildcard ../../impl/dsc/intermediate/*.o)
+objects_mt = $(wildcard ../../impl/mt/intermediate/*.o)
 
-object_files = $(objects_concurrent)
+object_files = $(objects_concurrent) $(objects_mt)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))
