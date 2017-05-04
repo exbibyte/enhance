@@ -1,10 +1,12 @@
 #include <iostream>
+#include <thread>
 
 #include "scheduler_0.hpp"
 
 namespace e2 { namespace mt {
 
 scheduler_0_impl::scheduler_0_impl() : _shutdown( false ){
+  _task_pool = new ::e2::dsc::queue_lockfree_total< ::e2::interface::task >;
 }
 scheduler_0_impl::~scheduler_0_impl(){
     _shutdown.store( true );
@@ -12,6 +14,7 @@ scheduler_0_impl::~scheduler_0_impl(){
     while( 0 < _thread_pool.size() ){
         _shutdown.store( true );
     }
+    delete _task_pool;
 }
 ::e2::mt::thread_0 * scheduler_0_impl::get_thread( ::e2::mt::thread_0 * t ){
   if( nullptr == t )
@@ -41,6 +44,7 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
         //non-blocking
         _shutdown.store( true );
 	std::cout << "shutdown is true" << std::endl;
+	return true;
     }
     break;
     case ::e2::interface::e_scheduler_action::ADD_THREAD:
@@ -51,7 +55,6 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
 	t->thread_process( ::e2::interface::e_thread_action::END ); //wait for thread to end
 	std::function< void( void ) > f = [this,t]() -> void {
 	    this->thread_loop( t, this );
-	    return;
 	};
 	t->set_task( f );
 	t->thread_process( ::e2::interface::e_thread_action::START );
@@ -74,7 +77,9 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
         ::e2::interface::task * t = get_task( (::e2::interface::task  *) param );
         if( nullptr == t )
 	    return false;
-	while( false == _task_pool.put( t ) ){}
+	while( false == _task_pool->put( t ) ){
+	    std::this_thread::yield();
+	}
 	return true;
   }
   default:
@@ -88,8 +93,10 @@ void scheduler_0_impl::thread_loop( thread_0 * t, scheduler_0_impl * s ){
         t->thread_process( ::e2::interface::e_thread_action::END );
     }
     ::e2::interface::task tk;
-    if( s->_task_pool.get( &tk ) ){
+    if( s->_task_pool && s->_task_pool->get( &tk ) ){
         tk.task_process();
+    }else{
+        std::this_thread::yield();
     }
 }
 

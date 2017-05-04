@@ -22,7 +22,7 @@ int main(){
     bool ret;
     scheduler_0 sch;
     vector< thread_0 * > thread_allocated;
-    for( int i = 0; i < 2; ++i ){
+    for( int i = 0; i < 4; ++i ){
     	thread_0 * new_t =  new thread_0;
     	thread_allocated.push_back( new_t );
 	ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_THREAD, new_t );
@@ -34,26 +34,28 @@ int main(){
     auto t0 = std::chrono::high_resolution_clock::now();
 
     while(true){
-	// for( int i = 0; i < 6; ++i ){
-	//     ::e2::interface::task tk;
-	//     tk.task_set( increment, &vals[i] );
-	//     bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
-	//     assert( ret );
-	// }
-
+	for( int i = 0; i < 6; ++i ){
+	    ::e2::interface::task tk;
+	    tk.task_set( increment, &vals[i] );
+	    bool ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
+	    assert( ret );
+	}
 	auto t1 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> dur = t1 - t0;
 	auto dur_ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
-	if( dur_ms.count() > 10000 ){
+	if( dur_ms.count() > 7000 ){
 	    break;
 	}
+	// std::this_thread::sleep_for( std::chrono::milliseconds(1) );
     }
 
+    std::this_thread::sleep_for( std::chrono::milliseconds(10000) );
+
     ret = sch.scheduler_process( ::e2::interface::e_scheduler_action::END );
-    // assert( ret );
+    assert( ret );
     
     for( int i = 0; i < 6; ++i ){
-	// assert( 0 != vals[i] );
+	assert( 0 != vals[i] );
 	std::cout << vals[i] << std::endl;
     }
 

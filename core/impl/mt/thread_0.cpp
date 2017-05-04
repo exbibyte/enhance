@@ -39,7 +39,7 @@ void thread_0_impl::runloop(){
 	if( nullptr != _task ){
 	    _task(); //dispatch task
 	}
-	std::cout << "thread running " << std::endl;
+	// std::cout << "thread running " << std::endl;
     }
     std::cout << "thread stopped " << std::endl;
     _thread_state.store( ::e2::interface::e_thread_state::STOPPED );

@@ -21,7 +21,7 @@ public:
     bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param );
     static void thread_loop( thread_0 * t, scheduler_0_impl * s );
 private:
-    ::e2::dsc::queue_lockfree_total< ::e2::interface::task > _task_pool;
+    ::e2::dsc::queue_lockfree_total< ::e2::interface::task > * _task_pool;
     ::e2::dsc::hashtable_lock_striped< uint64_t, ::e2::mt::thread_0 * > _thread_pool;
     std::atomic<bool> _shutdown;
 };
