@@ -28,7 +28,7 @@ int main(){
     bool ret;
     scheduler_0 * sch = new scheduler_0;
     vector< thread_0 * > thread_allocated;
-    int num_threads = 4;
+    int num_threads = 3;
     for( int i = 0; i < num_threads; ++i ){
     	thread_0 * new_t =  new thread_0;
     	thread_allocated.push_back( new_t );

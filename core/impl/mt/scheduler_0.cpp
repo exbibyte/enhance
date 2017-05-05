@@ -95,6 +95,7 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
 void scheduler_0_impl::thread_loop( thread_0 * t ){
     if( true == _shutdown.load() ){
         std::cout << "activating thread end" << std::endl;
+	_task_pool->garbage_clear();
         t->thread_process( ::e2::interface::e_thread_action::END );
 	return;
     }

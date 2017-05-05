@@ -39,14 +39,19 @@ public:
         size_t size(); //approximate count of the container size
           bool put( T const * val ){ return push_back( val ); }
           bool get( T * val ){ return pop_front( val ); }
+          bool garbage_clear();
 private:
           bool push_back( T const * val );
           bool pop_front( T * val );
+          bool hazard_add( Node * );
+          bool hazard_remove( Node * );
+          bool hazard_find( Node * );
        _t_node _head;
        _t_node _tail;
-    static ::e2::mt::lock_rw_sync_impl _hazard_modify;
-    static std::list< queue_lockfree_total_impl * > _common_group;
+    ::e2::mt::lock_rw_sync_impl _hazard_modify;
     static std::list< Node * > _hazards;
+    static thread_local std::list< Node * > _garbage;
+  
 };
 
 #include "queue_lockfree_total.tpp"
