@@ -94,35 +94,24 @@ bool queue_lockfree_total_impl<T>::pop_front( T * val ){ //obtain item from the 
 	//hazard check end
 
 	Node * head_next = head->_next.load( std::memory_order_acquire );
-	if( head == tail ){
-	    if( nullptr == head_next ){ //empty
-		// if( !_hazards.empty() ){
-		//     _hazard_modify.lock( ::e2::interface::lock_access_type::WRITE ); //blocking call
-		//     for( auto & i : _hazards ){
-		// 	if( i )
-		// 	    delete i;
-		//     }
-		//     _hazards.clear();
-		//     _hazard_modify.unlock( ::e2::interface::lock_access_type::WRITE ); //blocking call
-		// }
-		return false;
-	    }else{
+	if( head == _head.load( std::memory_order_acquire ) ){
+	    if( head == tail ){ 
+	        if( nullptr == head_next ){ //empty
+		    return false;
+		}else{
 		// // possible optimization here
 		// _tail.compare_exchange_weak( tail, head_next, std::memory_order_relaxed ); //other thread updated head/tail, so retry
-	    }
-	}else{
-	    if( head_next ){
+	    	}
+	    }else{
+	        *val = head_next->_val; //thread suceeds and returns
 		if( _head.compare_exchange_strong( head, head_next, std::memory_order_acq_rel ) ){ //try unlink an item
 		    //todo: per-thread free list
-		    *val = head_next->_val; //thread suceeds and returns
 		    _hazard_modify.lock( ::e2::interface::lock_access_type::WRITE ); //blocking call
 		    _hazards.push_back( head );
 		    _hazard_modify.unlock( ::e2::interface::lock_access_type::WRITE ); //blocking call 
 
 		    return true;
 		}
-	    }else{
-
 	    }
 	}
     }
