@@ -7,8 +7,12 @@
 #include <atomic>
 
 #include "i_thread.hpp"
+#include "i_probe.hpp"
+#include "i_stat.hpp"
 
 namespace e2 { namespace mt {
+
+class thread_0;
 
 class thread_0_impl {
 public:
@@ -19,16 +23,19 @@ public:
     thread_0_impl & operator=( thread_0_impl const & ) = delete;
     bool set_task( std::function< void( void ) > f );
     bool get_thread_state( ::e2::interface::e_thread_state * s );
-private:
-    std::atomic< ::e2::interface::e_thread_state > _thread_state;
-    std::thread _thread;
-    std::function< void( void ) > _task;
     void runloop();
     bool thread_start();
     bool thread_end();
+    bool probe_process( ::e2::interface::e_probe_action a, void * param );
+    std::atomic< ::e2::interface::e_thread_state > _thread_state;
+    std::thread _thread;
+    std::function< void( void ) > _task;
+    size_t _stat_count_thread_calls;
+    bool _is_idle;
 };
 
-class thread_0 final : public ::e2::interface::i_thread< thread_0_impl > {};
+class thread_0 final : public ::e2::interface::i_thread< thread_0_impl >,
+                       public ::e2::interface::i_probe< thread_0_impl > {};
 	
 } }
 

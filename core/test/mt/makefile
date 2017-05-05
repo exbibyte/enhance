@@ -22,7 +22,7 @@ targets := $(filter-out $(target_excludes), $(patsubst %.cpp, %, $(wildcard *.cp
 libs := -pthread
 
 %: %.cpp
-	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $^ $(object_files) $(include_flags) $(libs)
+	clang++ -g -std=c++14 -o $(dir_build)/$@ $^ $(object_files) $(include_flags) $(libs)
 
 .PHONY: all
 all: $(targets)

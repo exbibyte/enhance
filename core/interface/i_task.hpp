@@ -16,11 +16,19 @@ public:
     // void * ( *_t ) ( void * );
     // void * _param;
     // void * _ret;
+    task( task const & t ){
+	_f = t._f;
+    }
+    task & operator=( task const & t ){
+	_f = t._f;
+	return *this;
+    }
     task(){
 	_f = [](){ return; };
     }
     void task_process(){
-	_f();
+	if( nullptr != _f )
+	    _f();
     }
     template< class Func, class ... Args >
     void task_set( Func f, Args ... args ){
@@ -28,7 +36,7 @@ public:
 	    f( args... );
 	};
     }
-    std::function< void(void) > _f;
+    std::function< void ( void ) > _f;
 };
 
 } }

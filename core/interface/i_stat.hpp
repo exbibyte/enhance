@@ -1,6 +1,8 @@
 #ifndef E2_I_STAT_HPP
 #define E2_I_STAT_HPP
 
+#include <cstring>
+
 namespace e2 { namespace traits {
 
 enum class e_stat_type {
@@ -8,9 +10,16 @@ enum class e_stat_type {
 };
 
 } }
+
 namespace e2 { namespace interface {
 
-template< Impl >
+struct i_stat_threads {
+    size_t _stat_num_thread_busy;
+    size_t _stat_num_thread_idle;
+    size_t _stat_count_thread_calls;
+};
+	
+template< class Impl >
 class i_stat {
 public:
     template< class ... Args >

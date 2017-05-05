@@ -11,7 +11,7 @@ dir_intermediate := ./intermediate
 $(shell mkdir -p $(dir_intermediate))
 
 %.o: %.cpp
-	$(CXX) -g -std=c++11 -c -o $(dir_intermediate)/$@ $< $(include_flags)
+	clang++ -g -std=c++11 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
 .PHONY: all
 

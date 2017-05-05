@@ -14,6 +14,7 @@
 #include <list>
 #include <chrono>
 #include <cassert>
+#include <functional>
 
 #include "i_hashtable.hpp"
 #include "i_concurrency.hpp"
@@ -39,6 +40,7 @@ public:
            size_t get_table_size();
            double get_load_factor();
            size_t size();
+             bool gather_items( std::function< void( V ) > f );
 private:
                   class hashnode {
 		  public:		      

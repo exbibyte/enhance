@@ -12,8 +12,6 @@ public:
         //container and value traits
         using container_type =     ContainerType<T>;
 	using value_type =         T;
-	using value_ptr =          T *;
-	using const_value_ptr =    T const *;
 
               template< class... Args >
               i_pool( Args && ... args ) : ContainerType<T>( std::forward<Args>(args)... ) {}
@@ -21,8 +19,8 @@ public:
          bool clear(){ return ContainerType<T>::clear(); }
          bool empty(){ return ContainerType<T>::empty(); }
        size_t size(){ return ContainerType<T>::size(); }
-         bool put( const_value_ptr item ){ return ContainerType<T>::put( item ); }
-         bool get( value_ptr item ){ return ContainerType<T>::get( item ); }
+         bool put( value_type const * item ){ return ContainerType<T>::put( item ); }
+         bool get( value_type * item ){ return ContainerType<T>::get( item ); }
 };
 
 } }

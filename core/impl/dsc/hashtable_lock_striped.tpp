@@ -68,6 +68,36 @@ hashtable_lock_striped_impl< K, V >::~hashtable_lock_striped_impl(){
 	// std::cout << "destruct_waiting...." << std::endl;
     }
 }
+
+template< class K, class V >
+bool hashtable_lock_striped_impl< K, V >::gather_items( std::function< void( V ) > f ){
+    while(true){
+	// bool resize = false;
+	// if( _is_resizing.compare_exchange_weak( resize, true, std::memory_order_acq_rel ) ){
+	//     _is_destructing.store( true, std::memory_order_release );
+	//     for( auto & i : _locks ){
+	// 	while( !i.lock() ){
+	// 	    // std::cout <<" here destructing!" <<std::endl;
+	// 	}
+	//     }
+	//     //enter critical region
+	    for( size_t i = 0; i < _table.size(); ++i ){
+		hashnode * n = _table[i];
+		while( n ){
+		    f( n->_val ); //apply function
+		    n = n->_next;
+		}
+	    }
+	    // for( auto & i : _locks ){
+	    // 	while( !i.unlock() );
+	    // }
+	    break;
+	// }
+	// std::cout << "destruct_waiting...." << std::endl;
+    }
+    return true;
+}
+
 template< class K, class V >
 bool hashtable_lock_striped_impl< K, V >::insert( K const key, V const & value ){
     K hashed_key;
@@ -161,7 +191,7 @@ bool hashtable_lock_striped_impl< K, V >::erase( K const key ){
 	}
     }
     //entered critical region
-    assert( hashed_key < _table.size() && "hashed_key out of table size limti" );
+    assert( hashed_key < _table.size() && "hashed_key out of table size limit" );
     hashnode * head = _table[ hashed_key % _table.size() ];
     hashnode * find = find_hashnode( head, key );
     if( find ){
