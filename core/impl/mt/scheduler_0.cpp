@@ -115,8 +115,8 @@ void scheduler_0_impl::thread_loop( thread_0 * t ){
     //this function in run on worker threads
     if( true == _shutdown.load() ){
         std::cout << "activating thread end" << std::endl;
-	_task_pool->garbage_clear_force();
-	_task_pool->garbage_stat_thread_local();
+	_task_pool->gc_h_garbage_clear_force();
+	_task_pool->gc_h_stat_recycled();
         t->thread_process( ::e2::interface::e_thread_action::END );
 	return;
     }
@@ -129,8 +129,8 @@ void scheduler_0_impl::thread_loop( thread_0 * t ){
     if( t->_collect_garbage ){
 	t->_collect_garbage = false;
 	// std::cout << "thread publishing garbage..." << std::endl;
-	_task_pool->garbage_publish();
-	_task_pool->hazards_publish();
+	_task_pool->gc_h_garbage_publish();
+	_task_pool->gc_h_hazards_publish();
 	++_count_threads_to_gc;
 	// std::cout << "thread finished publishing garbage." << std::endl;
     }
@@ -159,9 +159,9 @@ void scheduler_0_impl::garbage_collection_loop( thread_0 * t ){
     //this function is only run on gc thread
     if( true == _shutdown.load() ){
         std::cout << "activating gc thread end" << std::endl;
-	_task_pool->garbage_stat_thread_local();
-	_task_pool->garbage_clear();
-	_task_pool->garbage_clear_force();
+	_task_pool->gc_h_garbage_clear();
+	_task_pool->gc_h_stat_recycled();
+	_task_pool->gc_h_garbage_clear_force();
         t->thread_process( ::e2::interface::e_thread_action::END );
 	return;
     }
@@ -201,11 +201,11 @@ void scheduler_0_impl::garbage_collection_loop( thread_0 * t ){
     	if( count_threads_participating > 0 ){
     	    //add global garbage and hazards to gc thread
     	    // std::cout << "gc thread collecting published garbage" << std::endl;
-    	    _task_pool->dump_global_garbage();
-    	    _task_pool->dump_global_hazards();
+    	    _task_pool->gc_h_dump_global_garbage();
+    	    _task_pool->gc_h_dump_global_hazards();
     	    // std::cout << "gc thread preparing for recyling..." << std::endl;
     	    //recycle garbage
-    	    _task_pool->garbage_clear();
+    	    _task_pool->gc_h_garbage_clear();
     	    // std::cout << "gc thread finished recycling" << std::endl;
     	}
     }else{
