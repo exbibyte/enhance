@@ -9,6 +9,8 @@ namespace e2 { namespace mt {
 
 thread_0_impl::thread_0_impl(){
     _is_idle = true;
+    _collect_garbage = false;
+    _collect_hazards = false;
     _stat_count_thread_calls = 0;
     _task = nullptr;
     _thread_state.store( ::e2::interface::e_thread_state::STOPPED );

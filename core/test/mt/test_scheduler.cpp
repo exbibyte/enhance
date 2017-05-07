@@ -6,6 +6,8 @@
 #include <cassert>
 #include <cstring>
 #include <list>
+#include <atomic>
+#include <mutex>
 
 // #include "catch.hpp"
 
@@ -19,9 +21,11 @@ using namespace std;
 using namespace e2::mt;
 using namespace e2::interface;
 
+std::mutex mtx;
+
 void increment( int * v ){
-    if( v )
-    	*v += 1;
+    std::lock_guard<std::mutex> lck( mtx );
+    if( v ) ++(*v);
 }
 
 int main(){
@@ -35,28 +39,31 @@ int main(){
 	ret = sch->scheduler_process( ::e2::interface::e_scheduler_action::ADD_THREAD, new_t );
         assert( ret );
     }
-    vector<int> vals( 100, 0);
+    std::vector< int > vals( 100, 0);
     auto t0 = std::chrono::high_resolution_clock::now();
 
     std::list< ::e2::interface::i_funwrap > tks;
     
-    while(true){
-	for( int i = 0; i < 6; ++i ){
+    // while(true){
+	// for( int i = 0; i < 6; ++i ){
+        for( int i = 0; i < 10000000; ++i ){
 	    ::e2::interface::i_funwrap tk;
-	    tk.set( ::e2::interface::i_funtype::ASYNC, &increment, &vals[i] );
+	    // tk.set( ::e2::interface::i_funtype::ASYNC, &increment, &vals[i] );
+	    tk.set( ::e2::interface::i_funtype::ASYNC, &increment, &vals[i%2] );
 	    tks.push_back( tk );
 	    // bool ret = sch->scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
 	    bool ret = sch->scheduler_add_task( &tks.back() );
 	    std::this_thread::yield();
+	    // std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
-	auto t1 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> dur = t1 - t0;
-	auto dur_ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
-	if( dur_ms.count() > 7000 )
-	    break;
-    }
+	// auto t1 = std::chrono::high_resolution_clock::now();
+	// std::chrono::duration<double> dur = t1 - t0;
+	// auto dur_ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
+	// if( dur_ms.count() > 20000 )
+	//     break;
+    // }
 
-    std::this_thread::sleep_for( std::chrono::milliseconds(15000) );
+    std::this_thread::sleep_for( std::chrono::milliseconds(20000) );
 
     ret = sch->scheduler_process( ::e2::interface::e_scheduler_action::END );
     assert( ret );
@@ -98,13 +105,15 @@ int main(){
     
     std::cout << "terminating scheduler activity." << std::endl;
     
-
-
     for( auto & i : thread_allocated ){
 	if( i )
 	    delete i;
     }
 
     delete sch;
+
+    std::cout << "terminated scheduler." << std::endl;    
+    std::this_thread::sleep_for( std::chrono::milliseconds(20000) );
+
     return 0;
 }

@@ -32,6 +32,9 @@ public:
     std::function< void( void ) > _task;
     size_t _stat_count_thread_calls;
     bool _is_idle;
+    bool _collect_hazards; //flag for indicating to implementation to publish its hazard pointers
+    bool _collect_garbage; //flag for indicating to implementation to publish its garbage
+    void * _data; //implementation storable data
 };
 
 class thread_0 final : public ::e2::interface::i_thread< thread_0_impl >,
