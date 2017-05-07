@@ -11,9 +11,9 @@
 
 // #include "catch.hpp"
 
-#include "i_funwrap.hpp"
 #include "i_stat.hpp"
 #include "i_probe.hpp"
+#include "task_0.hpp"
 #include "scheduler_0.hpp"
 #include "thread_0.hpp"
 
@@ -23,9 +23,10 @@ using namespace e2::interface;
 
 // std::mutex mtx;
 
-void increment( int * v ){
+int increment( int * v ){
     // std::lock_guard<std::mutex> lck( mtx );
     if( v ) ++(*v);
+    return *v;
 }
 
 int main(){
@@ -42,14 +43,14 @@ int main(){
     std::vector< int > vals( 100, 0);
     auto t0 = std::chrono::high_resolution_clock::now();
 
-    std::list< ::e2::interface::i_funwrap > tks;
-    
+    std::list< ::e2::mt::task_0 > tks;
+
+    int ans = 0;
     // while(true){
 	// for( int i = 0; i < 6; ++i ){
         for( int i = 0; i < 10000000; ++i ){
-	    ::e2::interface::i_funwrap tk;
-	    // tk.set( ::e2::interface::i_funtype::ASYNC, &increment, &vals[i] );
-	    tk.set( ::e2::interface::i_funtype::ASYNC, &increment, &vals[i%2] );
+	    ::e2::mt::task_0 tk;
+	    tk.set( &ans, increment, &vals[i%2] );
 	    tks.push_back( tk );
 	    // bool ret = sch->scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
 	    bool ret = sch->scheduler_add_task( &tks.back() );
@@ -72,12 +73,14 @@ int main(){
     std::this_thread::sleep_for( std::chrono::milliseconds(1000) );
     
     size_t expected_count_tasks = 0;
+    std::cout << "vals: " << std::endl;
     for( int i = 0; i < 6; ++i ){
 	// assert( 0 != vals[i] );
 	std::cout << vals[i] << std::endl;
 	expected_count_tasks += vals[i];
     }
-
+    std::cout << "ans: " << ans << std::endl;
+    
     ::e2::interface::i_stat_threads stat;
     ret = sch->probe_process( ::e2::interface::e_probe_action::PROBE_FILTER_SINGLE, &stat );
     assert( ret );

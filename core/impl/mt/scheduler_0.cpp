@@ -3,13 +3,13 @@
 #include <mutex>
 #include "scheduler_0.hpp"
 #include "i_stat.hpp"
-#include "i_funwrap.hpp"
+#include "task_0.hpp"
 
 namespace e2 { namespace mt {
 
 scheduler_0_impl::scheduler_0_impl() : _shutdown( false ){
     std::lock_guard<std::mutex> lock( _mtx );
-    _task_pool = new ::e2::dsc::queue_lockfree_total< ::e2::interface::i_funwrap >;
+    _task_pool = new ::e2::dsc::queue_lockfree_total< ::e2::mt::task_0 >;
     _thread_pool = new ::e2::dsc::hashtable_lock_striped< uint64_t, ::e2::mt::thread_0 * >;
     _thread_gc = new ::e2::mt::thread_0;
     _count_threads_to_gc.store(0);
@@ -45,12 +45,12 @@ scheduler_0_impl::~scheduler_0_impl(){
     return nullptr;
   return t;
 }
-::e2::interface::i_funwrap * scheduler_0_impl::get_task( ::e2::interface::i_funwrap * t ){
+::e2::mt::task_0 * scheduler_0_impl::get_task( ::e2::mt::task_0 * t ){
   if( nullptr == t )
     return nullptr;
   return t;
 }
-bool scheduler_0_impl::scheduler_add_task( ::e2::interface::i_funwrap * task ){
+bool scheduler_0_impl::scheduler_add_task( ::e2::mt::task_0 * task ){
     return _task_pool->put( task );
 }
 bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
@@ -101,7 +101,7 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
     break;
     case ::e2::interface::e_scheduler_action::ADD_TASK:
     {
-        ::e2::interface::i_funwrap * t = get_task( (::e2::interface::i_funwrap  *) param );
+        ::e2::mt::task_0 * t = get_task( (::e2::mt::task_0  *) param );
         if( nullptr == t )
 	    return false;
 	return _task_pool->put( t );
@@ -120,7 +120,7 @@ void scheduler_0_impl::thread_loop( thread_0 * t ){
         t->thread_process( ::e2::interface::e_thread_action::END );
 	return;
     }
-    ::e2::interface::i_funwrap tk;
+    ::e2::mt::task_0 tk;
     if( _task_pool && _task_pool->get( &tk ) ){
         tk.apply();
 	++_count_task_exec;

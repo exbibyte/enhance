@@ -1,42 +1,18 @@
-#ifndef I_TASK_H
-#define I_TASK_H
+#ifndef E2_I_TASK_HPP
+#define E2_I_TASK_HPP
 
+#include <thread>
 #include <functional>
+#include <type_traits>
 
 namespace e2 { namespace interface {
 
-class task {
+template< class Impl >
+class i_task : public Impl {
 public:
-    // task() : _t( nullptr ), _param( nullptr ), _ret( nullptr ) {}
-    // task_process(){
-    // 	if( nullptr == _t )
-    // 	    return;
-    // 	_t( _param, ret );
-    // }
-    // void * ( *_t ) ( void * );
-    // void * _param;
-    // void * _ret;
-    task( task const & t ){
-	_f = t._f;
-    }
-    task & operator=( task const & t ){
-	_f = t._f;
-	return *this;
-    }
-    task(){
-	_f = [](){ return; };
-    }
-    void task_process(){
-	if( nullptr != _f )
-	    _f();
-    }
-    template< class Func, class ... Args >
-    void task_set( Func f, Args ... args ){
-	_f = [=](){
-	    f( args... );
-	};
-    }
-    std::function< void ( void ) > _f;
+    template< class F, class... Args >
+    inline void set( void * ret_addr, F f, Args... args ){ return Impl::set( ret_addr, f, args... ); }
+    inline void apply(){ return Impl::apply(); }
 };
 
 } }
