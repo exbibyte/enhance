@@ -58,7 +58,7 @@ queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
 
     //global garbage
     {
-	std::lock_guard<std::mutex> lock( _mtx );
+	// std::lock_guard<std::mutex> lock( _mtx );
 	// _global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
 	std::cout<<"sch destructor global garbage clear: " << _global_garbage.size() << std::endl;
 	for( auto & i : _global_garbage ){
@@ -143,26 +143,26 @@ bool queue_lockfree_total_impl<T>::pop_front( T * val ){ //obtain item from the 
 }
 template< typename T >
 bool queue_lockfree_total_impl<T>::garbage_publish(){
-    std::lock_guard<std::mutex> lock( _mtx );
+    // std::lock_guard<std::mutex> lock( _mtx );
     //thread publish its local garbage, transfer ownership
-    // _garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
-    // _global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
     _global_garbage.splice( _global_garbage.end(), _garbage );
-    // _global_garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
-    // _garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _global_garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
     return true;
 }
 template< typename T >
 bool queue_lockfree_total_impl<T>::hazards_publish(){
-    std::lock_guard<std::mutex> lock( _mtx );
+    // std::lock_guard<std::mutex> lock( _mtx );
     //thread publish its local hazard pointers, copy items
-    // _hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
-    // _global_hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _global_hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
     for( auto & i : _hazards ){
 	_global_hazards.push_back( i );
     }
-    // _global_hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
-    // _hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _global_hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
     return true;
 }
 template< typename T >
@@ -268,22 +268,22 @@ bool queue_lockfree_total_impl<T>::hazard_find( Node * n ){
 
 template< typename T >
 bool queue_lockfree_total_impl<T>::dump_global_garbage(){
-    std::lock_guard<std::mutex> lock( _mtx );
-    // _garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
-    // _global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    // std::lock_guard<std::mutex> lock( _mtx );
+    _garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
     _garbage.splice( _garbage.end(), _global_garbage );
-    // _global_garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
-    // _garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _global_garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
     return true;
 }
 
 template< typename T >
 bool queue_lockfree_total_impl<T>::dump_global_hazards(){
-    std::lock_guard<std::mutex> lock( _mtx );
-    // _hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
-    // _global_hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    // std::lock_guard<std::mutex> lock( _mtx );
+    _hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
+    _global_hazards_modify.lock( ::e2::interface::lock_access_type::WRITE );
     _hazards.splice( _hazards.end(), _global_hazards );
-    // _global_hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
-    // _hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _global_hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
+    _hazards_modify.unlock( ::e2::interface::lock_access_type::WRITE );
     return true;
 }

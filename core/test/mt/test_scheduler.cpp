@@ -21,10 +21,10 @@ using namespace std;
 using namespace e2::mt;
 using namespace e2::interface;
 
-std::mutex mtx;
+// std::mutex mtx;
 
 void increment( int * v ){
-    std::lock_guard<std::mutex> lck( mtx );
+    // std::lock_guard<std::mutex> lck( mtx );
     if( v ) ++(*v);
 }
 
