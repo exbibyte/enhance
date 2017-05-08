@@ -2,13 +2,13 @@
 
 Minimalist 3D rendering and game engine developed in C++.
 
-Focus of the engine to provide low level control, customizable kernel, loadable game modules, independence from external libraries.
+Focus of the engine to provide tools to create customizable engine kernels and game modules, independence from external libraries, parition of rendering and game logic layers, multithreaded task based progamming model.
 
-Only certain parts of C++ is leveraged such as templates, namespaces. Meanwhile other parts of C++ are avoided: implicit function invokations/copy constructors having expensive operations, minimal dependence on Standard Template Library.
+Certain parts of C++ are leveraged such as templates and namespaces. Meanwhile other parts of C++ are avoided: implicit function invokations and expensive copy constructors.
 
 # Current Progress
 
-The engine is being revised in its implementation of core modules and multithreading facilities. Major parts of modules are being rewritten from the first attempt to provided as simply as possible, which currently reside in branch e2.
+The engine is being revised in core modules and multithreading facilities.
 
 # Dependencies
 
