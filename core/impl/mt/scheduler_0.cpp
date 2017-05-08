@@ -50,9 +50,9 @@ scheduler_0_impl::~scheduler_0_impl(){
     return nullptr;
   return t;
 }
-bool scheduler_0_impl::scheduler_add_task( ::e2::mt::task_0 * task ){
-    return _task_pool->put( task );
-}
+// bool scheduler_0_impl::scheduler_add_task( ::e2::mt::task_0 * task ){
+//     return _task_pool->put( task );
+// }
 bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a, void * param ){
     switch( a ){
     case ::e2::interface::e_scheduler_action::START:
@@ -70,7 +70,7 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
     {
         //non-blocking
         _shutdown.store( true );
-	std::cout << "shutdown is true" << std::endl;
+	// std::cout << "shutdown is true" << std::endl;
 	return true;
     }
     break;
@@ -114,7 +114,7 @@ bool scheduler_0_impl::scheduler_process( ::e2::interface::e_scheduler_action a,
 void scheduler_0_impl::thread_loop( thread_0 * t ){
     //this function in run on worker threads
     if( true == _shutdown.load() ){
-        std::cout << "activating thread end" << std::endl;
+        // std::cout << "activating thread end" << std::endl;
 	_task_pool->gc_h_garbage_clear_force();
 	_task_pool->gc_h_stat_recycled();
         t->thread_process( ::e2::interface::e_thread_action::END );
@@ -158,7 +158,7 @@ bool scheduler_0_impl::probe_process( ::e2::interface::e_probe_action a, void * 
 void scheduler_0_impl::garbage_collection_loop( thread_0 * t ){
     //this function is only run on gc thread
     if( true == _shutdown.load() ){
-        std::cout << "activating gc thread end" << std::endl;
+        // std::cout << "activating gc thread end" << std::endl;
 	_task_pool->gc_h_garbage_clear();
 	_task_pool->gc_h_stat_recycled();
 	_task_pool->gc_h_garbage_clear_force();

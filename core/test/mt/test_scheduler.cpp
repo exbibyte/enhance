@@ -48,7 +48,7 @@ int main(){
     for( int i = 0; i < 10000000; ++i ){
 	::e2::mt::task_0 tk;
 	tk.set( &ans, increment, &vals[ i % num_vals ] );
-	bool ret = sch->scheduler_add_task( &tk );
+	bool ret = sch->scheduler_process( ::e2::interface::e_scheduler_action::ADD_TASK, &tk );
 
 	auto t1 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> dur = t1 - t0;

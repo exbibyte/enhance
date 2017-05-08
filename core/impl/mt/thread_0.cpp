@@ -25,7 +25,7 @@ bool thread_0_impl::set_task( std::function< void(void) > f ){
     if( nullptr == f )
         return false;
     _task = f;
-    std::cout << "thread task set" << std::endl;
+    // std::cout << "thread task set" << std::endl;
     return true;
 }
 bool thread_0_impl::get_thread_state( ::e2::interface::e_thread_state * s ){
@@ -61,10 +61,10 @@ bool thread_0_impl::thread_start(){
 	    _thread.join();
 	}
 	_thread = std::thread( [this]{ this->runloop(); } );
-	std::cout << "thread start success." << std::endl;
+	// std::cout << "thread start success." << std::endl;
 	return true;
     }else{
-        std::cout << "thread start failed." << std::endl;
+        // std::cout << "thread start failed." << std::endl;
         return false;
     }
 }

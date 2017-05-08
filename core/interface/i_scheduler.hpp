@@ -28,8 +28,8 @@ public:
     template< class ... Args >
     i_scheduler( Args && ... args ) : Impl( std::move( args )... ) {}
     bool scheduler_process( ::e2::interface::e_scheduler_action a, void * param = nullptr ){ return Impl::scheduler_process( a, param ); }
-    template< class Arg >
-    bool scheduler_add_task( Arg task ){ return Impl::scheduler_add_task( task ); }
+    // template< class Arg >
+    // bool scheduler_add_task( Arg task ){ return Impl::scheduler_add_task( task ); }
 
 };
 
