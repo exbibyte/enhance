@@ -1,5 +1,5 @@
-#ifndef I_POOL_H
-#define I_POOL_H
+#ifndef E2_I_POOL_HPP
+#define E2_I_POOL_HPP
 
 #include <utility>
 #include <functional>

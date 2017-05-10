@@ -22,7 +22,7 @@ template< class Impl >
 class i_threadpool : public virtual Impl {
 public:
     template< class... Args >
-    i_threadpool( Args && ... args ) : Impl( std::move( args )... ) {}
+    i_threadpool( Args ... args ) : Impl( args... ) {}
     inline bool threadpool_process( e_threadpool_action a, void * v = nullptr ){ return Impl::threadpool_process( a, v ); }
 };
 

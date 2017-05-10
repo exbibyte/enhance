@@ -22,7 +22,7 @@ using namespace e2::interface;
 int main(){
     bool ret;
     {
-	threadpool_0 < thread_0 > tp;
+	threadpool_0 < thread_0 > tp( 4 );
 	size_t n;
 	ret = tp.threadpool_process( ::e2::interface::e_threadpool_action::query_num_total, &n );
 	assert( ret );
