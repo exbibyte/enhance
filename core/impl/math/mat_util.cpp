@@ -1,14 +1,13 @@
-
-#include "MatrixMath.h"
-#include "Vec.hpp"
-#include "Mat.hpp"
-
 #include <iostream>
 #include <cmath>
 
-using namespace std;
+#include "mat_util.hpp"
+#include "vec.hpp"
+#include "mat.hpp"
 
-bool MatrixMath::InvertMatrix( float const m[16], float invOut[16])
+namespace e2 { namespace math {
+
+bool mat_util::invert_matrix( float const m[16], float invout[16])
 {
     double inv[16], det;
     int i;
@@ -132,23 +131,23 @@ bool MatrixMath::InvertMatrix( float const m[16], float invOut[16])
 
     det = 1.0 / det;
 
-    float invOutTemp[16];
+    float invouttemp[16];
     //get the row major matrix result
     for (i = 0; i < 16; i++)
-        invOutTemp[i] = inv[i] * det;
+        invouttemp[i] = inv[i] * det;
 
-    MatrixMath::Mat4x4Transpose(invOutTemp, invOut);
+    mat_util::mat4x4_transpose(invouttemp, invout);
 
     return true;
 }
 
-bool MatrixMath::InvertMatrix3x3( float const m[9], float invOut[9]){
+bool mat_util::invert_matrix3x3( float const m[9], float invout[9]){
     float determinant = m[0]*(m[4]*m[8]-m[5]*m[7]) - m[1]*(m[3]*m[8]-m[5]*m[6]) + m[2]*(m[3]*m[7]-m[4]*m[6]);
     if( ( determinant < 0.000001 ) && ( determinant > -0.000001 ) ){
 	return false;
     }
     float t[9];
-    Mat3x3Transpose( m, t );
+    mat3x3_transpose( m, t );
     float m00 = t[4]*t[8]-t[5]*t[7];
     float m10 = -(t[3]*t[8]-t[5]*t[6]);
     float m20 = t[3]*t[7]-t[4]*t[6];
@@ -158,22 +157,22 @@ bool MatrixMath::InvertMatrix3x3( float const m[9], float invOut[9]){
     float m02 = t[1]*t[5]-t[2]*t[4];
     float m12 = -(t[0]*t[5]-t[2]*t[3]);
     float m22 = t[0]*t[4]-t[1]*t[3];
-    invOut[0] = m00;
-    invOut[1] = m10;
-    invOut[2] = m20;
-    invOut[3] = m01;
-    invOut[4] = m11;
-    invOut[5] = m21;
-    invOut[6] = m02;
-    invOut[7] = m12;
-    invOut[8] = m22;
+    invout[0] = m00;
+    invout[1] = m10;
+    invout[2] = m20;
+    invout[3] = m01;
+    invout[4] = m11;
+    invout[5] = m21;
+    invout[6] = m02;
+    invout[7] = m12;
+    invout[8] = m22;
     for( int i = 0; i < 9; ++i ){
-	invOut[i] /= determinant;
+	invout[i] /= determinant;
     }
     return true;
 }
 
-void MatrixMath::Mat4x4Mult4x1(float FourByOne[], float FourbyFour[], float out[])
+bool mat_util::mat4x4_mult_4x1(float fourbyone[], float fourbyfour[], float out[])
 {
   // for each column
   for(int i = 0; i < 4; i++)
@@ -182,13 +181,14 @@ void MatrixMath::Mat4x4Mult4x1(float FourByOne[], float FourbyFour[], float out[
     // for each row
     for(int j = 0; j < 4; j++)
      {
-      sum += (FourByOne[j] * FourbyFour[i + j*4]);
+      sum += (fourbyone[j] * fourbyfour[i + j*4]);
     }    
     out[i] = sum;
   }
+  return true;
 }
 
-void MatrixMath::Mat1x4Mult4x4(float Onebyfour[], float FourbyFour[], float out[])
+bool mat_util::mat1x4_mult_4x4(float onebyfour[], float fourbyfour[], float out[])
 {
   // for each row
   for(int i = 0; i < 4; i++)
@@ -197,32 +197,34 @@ void MatrixMath::Mat1x4Mult4x4(float Onebyfour[], float FourbyFour[], float out[
     // for each column
     for(int j = 0; j < 4; j++)
      {
-      sum += (Onebyfour[j] * FourbyFour[i*4 + j]);
+      sum += (onebyfour[j] * fourbyfour[i*4 + j]);
     }    
     out[i] = sum;
   }
+  return true;
 }
 
-void MatrixMath::Mat4x4Mult4x4(float Left[], float Right[], float out[])
+bool mat_util::mat4x4_mult_4x4(float left[], float right[], float out[])
 {
-  // for each column in Right
+  // for each column in right
   for(int i = 0; i < 4; i++)
   {
-    // for each row in Left
+    // for each row in left
     for(int j = 0; j < 4; j++)
     {
       float sum = 0;
       // compute dot product of row and column
       for(int k = 0; k < 4; k++)
       {
-	sum += Left[j + k*4] * Right[i*4 + k];
+	sum += left[j + k*4] * right[i*4 + k];
       }
       out[i + j*4] = sum;
     }    
   }
+  return true;
 }
 
-void MatrixMath::Mat4x4Transpose(float const in[], float out[])
+bool mat_util::mat4x4_transpose(float const in[], float out[])
 {
   //for each output column
   for(int i = 0; i < 4; i++)
@@ -233,9 +235,10 @@ void MatrixMath::Mat4x4Transpose(float const in[], float out[])
       out[i*4+j] = in[j*4+i]; 
     }
   }
+  return true;
 }
 
-void MatrixMath::Mat3x3Transpose(float const in[], float out[])
+bool mat_util::mat3x3_transpose(float const in[], float out[])
 {
   //for each output column
   for(int i = 0; i < 3; i++)
@@ -246,9 +249,10 @@ void MatrixMath::Mat3x3Transpose(float const in[], float out[])
       out[i*3+j] = in[j*3+i]; 
     }
   }
+  return true;
 }
 
-void MatrixMath::Mat4x4Normalize(float in[], float out[])
+bool mat_util::mat4x4_normalize(float in[], float out[])
 {
   float factor = in[15];
 
@@ -256,9 +260,10 @@ void MatrixMath::Mat4x4Normalize(float in[], float out[])
   {
     out[i] = in[i]/factor;
   }
+  return true;
 }
 
-void MatrixMath::Mat4x1Normalize(float in[], float out[])
+bool mat_util::mat4x1_normalize(float in[], float out[])
 {
   float factor = in[3];
 
@@ -266,9 +271,10 @@ void MatrixMath::Mat4x1Normalize(float in[], float out[])
   {
     out[i] = in[i]/factor;
   }
+  return true;
 }
 
-void MatrixMath::PrintMat4x4(float in[])
+bool mat_util::print_mat4x4(float in[])
 {
   //for each row
   for(int i = 0; i < 4; i++)
@@ -276,24 +282,28 @@ void MatrixMath::PrintMat4x4(float in[])
     //for each column
     for(int j = 0; j < 4; j++)
     {
-      cout<<in[j + i*4]<<" ";
+      std::cout<<in[j + i*4]<<" ";
     }
-    cout<<endl;
+    std::cout<<std::endl;
   }
-  cout<<endl;
+  std::cout<<std::endl;
+
+  return true;
 }
 
-void MatrixMath::PrintMat4x1(float in[])
+bool mat_util::print_mat4x1(float in[])
 {
   //for each row
   for(int i = 0; i < 4; i++)
   {
-    cout<<in[i]<<", ";
+    std::cout<<in[i]<<", ";
   }
-  cout<<endl;
+  std::cout<<std::endl;
+
+  return true;
 }
 
-void MatrixMath::GetMat4x4Identity(float out[])
+bool mat_util::get_mat4x4_identity(float out[])
 {
   for(int i = 0; i <16; i++)
     out[i] = 0;
@@ -302,9 +312,11 @@ void MatrixMath::GetMat4x4Identity(float out[])
   out[5] = 1;
   out[10] = 1;
   out[15] = 1;
+
+  return true;
 }
 
-void MatrixMath::GetMat4x4Rotation(float in[], float r[])
+bool mat_util::get_mat4x4_rotation(float in[], float r[])
 {
   //normalize scaling
   float sx = sqrt(pow(in[0],2) + pow(in[4],2) + pow(in[8],2));
@@ -329,15 +341,16 @@ void MatrixMath::GetMat4x4Rotation(float in[], float r[])
   }
 
   //rx
-  r[0] = atan2(mat3x3[3][2], mat3x3[3][3])*180/PI;
+  r[0] = atan2(mat3x3[3][2], mat3x3[3][3])*180/pi;
   //ry
-  r[1] = atan2(-mat3x3[3][1], sqrt(pow(mat3x3[3][2],2) + pow(mat3x3[3][3],2)))*180/PI;
+  r[1] = atan2(-mat3x3[3][1], sqrt(pow(mat3x3[3][2],2) + pow(mat3x3[3][3],2)))*180/pi;
   //rz
-  r[2] = atan2(mat3x3[2][1], mat3x3[1][1])*180/PI;
+  r[2] = atan2(mat3x3[2][1], mat3x3[1][1])*180/pi;
 
+  return true;
 }
 
-void MatrixMath::NormalizeScalingMat4x4(float in[], float out[])
+bool mat_util::normalize_scaling_mat4x4(float in[], float out[])
 {
   //normalize scaling
   float sx = sqrt(pow(in[0],2) + pow(in[4],2) + pow(in[8],2));
@@ -361,9 +374,10 @@ void MatrixMath::NormalizeScalingMat4x4(float in[], float out[])
         out[i+j*4] = in[i+j*4]/sz;
     }  
   }
+  return true;
 }
 
-void MatrixMath::InvertTranslateMat4x4(float in[], float out[])
+bool mat_util::invert_translate_mat4x4(float in[], float out[])
 {
   for(int i = 0; i < 12; i++)
   {
@@ -374,9 +388,11 @@ void MatrixMath::InvertTranslateMat4x4(float in[], float out[])
     out[i] = -1*in[i];
   }
   out[15] = in[15];
+
+  return true;
 }
 
-void MatrixMath::InvertTranslateZMat4x4(float in[], float out[])
+bool mat_util::invert_translatez_mat4x4(float in[], float out[])
 {
   for(int i = 0; i < 14; i++)
   {
@@ -384,9 +400,11 @@ void MatrixMath::InvertTranslateZMat4x4(float in[], float out[])
   }
   out[14] = -1*in[14];
   out[15] = in[15];
+
+  return true;
 }
 
-void MatrixMath::InvertRotateMat4x4(float in[], float out[])
+bool mat_util::invert_rotate_mat4x4(float in[], float out[])
 {
   for(int i = 0; i < 16; i++)
     out[i] = in[i];
@@ -398,17 +416,20 @@ void MatrixMath::InvertRotateMat4x4(float in[], float out[])
       out[j+i*4] = in[i+j*4];
     }
   }
+  return true;
 }
 
-void MatrixMath::Trace4x4( float in[], float out[] ){
+bool mat_util::trace_4x4( float in[], float out[] ){
     out[0] = in[0];
     out[1] = in[5];
     out[2] = in[10];
     out[3] = in[15];
+
+    return true;
 }
-void MatrixMath::Perspective( float fov, float aspect, float near, float far, float out[] ){
+bool mat_util::perspective( float fov, float aspect, float near, float far, float out[] ){
     //fov is the full field of view in y-plane, eg: fovy = fov/2
-    float half_tan = tan( fov*PI/360.0 );
+    float half_tan = tan( fov*pi/360.0 );
     for( int i = 0; i < 16; ++i ){
 	out[i] = 0;
     }
@@ -417,28 +438,30 @@ void MatrixMath::Perspective( float fov, float aspect, float near, float far, fl
     out[10] = (-far+near)/(far-near);
     out[11] = -1;
     out[14] = (-2.0*far*near)/(far-near);
+
+    return true;
 }
-void MatrixMath::LookAt( float eye[], float center[], float up[], float out[] ){
+bool mat_util::lookat( float eye[], float center[], float up[], float out[] ){
     //compute viewing plane's normal vector
-    Vec n(3);
+    vec n(3);
     for( int i = 0; i < 3; ++i )
 	n[i] = eye[i] - center[i];
-    n.NormalizeCurrent();
+    n.normalize_current();
 
     //compute 1 orthogonal vector to plane's normal vector
-    Vec up_vec(3);
-    up_vec.SetFromArray(3, up );
-    Vec u = up_vec.Cross( n );
-    u.NormalizeCurrent();
+    vec up_vec(3);
+    up_vec.set_from_array(3, up );
+    vec u = up_vec.cross( n );
+    u.normalize_current();
     
     //compute the other orthogonal vector to plane's normal vector
-    Vec v = n.Cross( u );
-    v.NormalizeCurrent();
+    vec v = n.cross( u );
+    v.normalize_current();
 
-    //Space_original = A_inverse * Space_camera
-    //A is a rotation matrix, which means A_inverse = A_transpose
-    //A is finally augmented with translations on the last column
-    Mat camera_view;
+    //space_original = a_inverse * space_camera
+    //a is a rotation matrix, which means a_inverse = a_transpose
+    //a is finally augmented with translations on the last column
+    mat camera_view;
     camera_view( 0, 0 ) = u[0];
     camera_view( 0, 1 ) = u[1];
     camera_view( 0, 2 ) = u[2];
@@ -458,4 +481,8 @@ void MatrixMath::LookAt( float eye[], float center[], float up[], float out[] ){
 
     for( int i = 0; i < 16; ++i )
 	out[i] = camera_view._mat[i];
+
+    return true;
 }
+
+} }

@@ -1,8 +1,10 @@
-#ifndef PARAMETRICCURVE_H
-#define PARAMETRICCURVE_H
+#ifndef E2_PARAMETRICCURVE_HPP
+#define E2_PARAMETRICCURVE_HPP
+
+namespace e2 { namespace math {
 
 ///provides ability to trace out position of a cubic bezier curve using forward differencing. Taken from pp.365-367 of Chapter 8 of Advanced 3D Game Programming with DirectX 10.0 by Peter Walsh
-class ParametricCurve
+class parametric_curve
 {
  private:
   /// current step
@@ -27,24 +29,26 @@ class ParametricCurve
 
  public:
   
-  ParametricCurve();
+  parametric_curve();
 
   ///sets control points for the curve
-  void SetParameter(int steps, float control1[], float control2[], float control3[], float control4[]);
+  void set_parameter(int steps, float control1[], float control2[], float control3[], float control4[]);
 
   /// go to next step of the curve
-  void Increment();
+  void increment();
 
   /// returns current position
-  void GetCurrent(float*& out); 
+  void get_current(float*& out); 
 
   ///initialize the curve
-  void Start();
+  void start();
 
   ///see if the curve had reached the end
-  bool Done();
+  bool done();
 
-  bool Started();
+  bool started();
 };
+
+} }
 
 #endif

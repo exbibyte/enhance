@@ -1,25 +1,25 @@
-#ifndef INTERPOLATE_H
-#define INTERPOLATE_H
+#ifndef E2_INTERPOLATE_HPP
+#define E2_INTERPOLATE_HPP
 
-#include "ParametricCurve.h"
+#include "parametric_curve.hpp"
 
 #include <vector>
 
-using namespace std;
+namespace e2 { namespace math {
 
-class Interpolate
+class interpolate
 {
  private:
 
-  vector<ParametricCurve*>::iterator                     itCurve;
+  std::vector<parametric_curve*>::iterator                itCurve;
   int CurveIndex;
-  vector<ParametricCurve * >                             vpParametricCurve;   ///stores bezier curves to travel through
+  std::vector<parametric_curve * >                       vp_parametric_curve;   ///stores bezier curves to travel through
   float                                                  Position[3];   /// stores values of current step
   bool                                                   bKeepIncrementing;
   bool                                                   bActivated;
  public:
-                                                         Interpolate();
-							 ~Interpolate();
+                                                         interpolate();
+							 ~interpolate();
   void                                                   AddCurve(int steps, float ctrlpoint1[], float ctrlpoint2[], float ctrlpoint3[], float ctrlpoint4[]);   /// adds a bezier curve to the existing queue of curves
   void                                                   Increment();   /// go to the next step of the curve
   void                                                   PrintPosition();
@@ -30,5 +30,7 @@ class Interpolate
   bool                                                   SetActivated(bool val);
 
 };
+
+} }
 
 #endif
