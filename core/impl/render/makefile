@@ -1,6 +1,6 @@
 src_files = $(wildcard *.cpp)
 
-include_dirs := $(dir $(wildcard ../*/)) $(dir $(wildcard ../../interface/*/))
+include_dirs := $(dir $(wildcard ../*/)) $(dir $(wildcard ../../interface/*/)) gl/
 
 #include directories end---
 

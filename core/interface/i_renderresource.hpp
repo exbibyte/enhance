@@ -6,7 +6,7 @@
 namespace e2 { namespace interface {
 
 enum e_renderresource_type { //list of primitive resources that can be manipulated
-    windowing,
+    windowing = 1,
     camera,
     attrib_vertex,
     attrib_normal,

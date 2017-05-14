@@ -1,8 +1,9 @@
 inc_folder_basic = $(dir $(wildcard ../../impl/*/))
 inc_folder_interface = $(dir $(wildcard ../../interface/*/))
+inc_folder_gl = ../../impl/render/gl/
 inc_folder_test = ../
 
-include_dirs = $(inc_folder_basic) $(inc_folder_test) $(inc_folder_interface)
+include_dirs = $(inc_folder_basic) $(inc_folder_test) $(inc_folder_interface) $(inc_folder_gl)
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
@@ -18,10 +19,12 @@ target_excludes :=
 
 targets := $(filter-out $(target_excludes), $(patsubst %.cpp, %, $(wildcard *.cpp)) )
 
-libs := -pthread
+libs := -pthread -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
+
+pkg_config_flags = `pkg-config --cflags glfw3`
 
 %: %.cpp
-	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $^ $(object_files) $(include_flags) $(libs)
+	$(CXX) -g -std=c++14 $(pkg_config_flags) -o $(dir_build)/$@ $^ $(object_files) $(include_flags) $(libs)
 
 .PHONY: all
 all: $(targets)

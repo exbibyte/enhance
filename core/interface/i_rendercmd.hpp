@@ -4,7 +4,7 @@
 namespace e2 { namespace interface {
 	
 enum e_rendercmd_type {
-    query,
+    query = 1,
     compute,
     store,
     load,

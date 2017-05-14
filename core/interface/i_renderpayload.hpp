@@ -4,7 +4,8 @@
 namespace e2 { namespace interface {
 
 enum e_renderpayload_type { //list of primitive resources that can be manipulated
-    float_1 = 1,
+    na = 1,
+    float_1,
     float_2,
     float_3,
     float_4,
@@ -21,7 +22,7 @@ enum e_renderpayload_type { //list of primitive resources that can be manipulate
     int_4,
     int_n,
     array_int_n,
-    string,
+    text,
 };
 	
 class i_renderpayload {
