@@ -1,0 +1,26 @@
+#ifndef E2_I_RENDERFRONT_HPP
+#define E2_I_RENDERFRONT_HPP
+
+#include <utility>
+#include <functional>
+
+namespace e2 { namespace interface {
+
+enum class e_renderfront_action {
+    sort,
+    gather,
+};
+
+template< class Impl >
+class i_renderfront : public virtual Impl {
+public:
+         using type_renderfront_impl = Impl;
+
+               template< class... Args >
+               i_renderfront( Args && ... args ) : ContainerType<T>( std::forward< Args >( std::move( args ) ) ... ) {}
+          bool renderfront_process( ::e2::interface::e_renderfront_action a, void * v ){ return Impl::renderfront_process( a, v ); }
+};
+
+} }
+
+#endif

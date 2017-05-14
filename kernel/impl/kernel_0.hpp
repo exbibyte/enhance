@@ -8,6 +8,8 @@
 #include "thread_0.hpp"
 #include "threadpool_0.hpp"
 
+#include "memory_manager_p1t_g1_ff.hpp"
+
 namespace e2 { namespace kernel {
 
 class kernel_0_impl {
@@ -23,6 +25,10 @@ private:
     ::e2::mt::threadpool_0< ::e2::mt::thread_0 > _threadpool;
     
     std::list< ::e2::mt::thread_0 * > _threads;
+
+    // ::e2::memory::buffer _memory_buffer;
+
+    ::e2::memory::memory_manager_p1t_g1_ff _mem_manager;
 };
 
 class kernel_0 : public ::e2::interface::i_kernel < kernel_0_impl > {};
