@@ -33,6 +33,7 @@
 *.su
 
 *~*
+target/
 build/
 intermediate/
 TAGS
