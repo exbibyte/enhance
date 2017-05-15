@@ -8,6 +8,10 @@ mod dsc;
 use mt::threadpool::interface::i_threadpool;
 use init::i_init;
 
+fn myfunc()->() {
+    println!("myfunc!");
+}
+
 fn main() {
     
     let var = Arc::new( AtomicUsize::new(0) );
@@ -22,9 +26,14 @@ fn main() {
 
     println!( "{}", a );
 
-    let mut mypool : mt::threadpool::threadpool0::tp0 = Default::default();
+    
+    let mut mypool = mt::threadpool::threadpool0::tp0::new( myfunc );
     assert_eq!( true, mypool.init() );
     let val = mypool.withdraw();
     assert_eq!( true, val.is_some() );
     assert_eq!( 2, val.unwrap() );
+
+    (mypool._f)();
+    
+    println!("end.");
 }

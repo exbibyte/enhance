@@ -1,15 +1,16 @@
 use std::vec;
+// use std::thread;
 
 use init;
+use init::i_init;
 
 #[allow(non_camel_case_types)]
-#[derive(Default)]
-pub struct tp0 {
-    // _t : thread::Thread,
+pub struct tp0< F > where F: Fn()->() {
+    pub _f : F,
     _v : vec::Vec<u64>,
 }
 
-impl super::interface::i_threadpool for tp0 {
+impl<F> super::interface::i_threadpool for tp0<F> where F: Fn()->() {
     fn spawn( & mut self ) -> bool {
         false
     }
@@ -34,7 +35,7 @@ impl super::interface::i_threadpool for tp0 {
     }
 }
 
-impl init::i_init for tp0 {
+impl<F> init::i_init for tp0<F> where F: Fn()->() {
     fn init( & mut self ) -> bool {
         self._v = vec::Vec::new();
         for i in 0..3 {
@@ -43,6 +44,32 @@ impl init::i_init for tp0 {
         true
     }
     fn deinit( & mut self ) -> bool {
-        false
+        println!("threadpoo0 deinit.");
+        self._v.clear();
+        true
     }
 }
+
+impl<F> Drop for tp0<F> where F: Fn()->() {
+    fn drop( & mut self ) {
+        self.deinit();
+    }
+}
+
+impl<F> tp0<F> where F:Fn()->() {
+    pub fn new( f: F ) -> tp0<F> {
+        tp0{ _f: f,
+             _v: vec::Vec::new(),
+        }
+    }
+}
+
+// fn default_func() -> () {
+//     println!("default_func!");
+// }
+
+// impl Default for tp0<F> where F:Fn()->() {
+//     fn default() -> tp0<F> {
+//         tp0<F>::new( default_func )
+//     }
+// }
