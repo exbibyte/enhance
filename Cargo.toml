@@ -1,0 +1,8 @@
+[package]
+name = "e2r"
+version = "0.1.0"
+authors = ["Bill Liu <yuan6liu@gmail.com>"]
+
+[[bin]]
+name = "e2r_bin"
+path = "src/driver.rs"
