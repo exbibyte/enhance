@@ -1,9 +1,14 @@
 #include <list>
 
+#ifdef DEBUG_INFO
+#include <iostream>
+#endif
+
 #include "kernel_0.hpp"
 #include "scheduler_0.hpp"
 #include "task_0.hpp"
 #include "thread_0.hpp"
+#include "buffer.hpp"
 
 bool test_func( int * n ){
     (*n)++;
@@ -15,7 +20,16 @@ namespace e2 { namespace kernel {
 kernel_0_impl::kernel_0_impl () :
     _threadpool( 5 )
 {
-
+    _memory_buffers.resize( 5 );
+    for( auto & i : _memory_buffers ){
+	i.buffer_resize( len_bytes_memory_buffer );
+        size_t v;
+	assert( i.buffer_stat_total_bytes( &v ) );
+	assert( len_bytes_memory_buffer == v );
+#ifdef DEBUG_INFO
+	std::cout << "memory buffer length bytes: " << v << std::endl;
+#endif
+    }
 }
 bool kernel_0_impl::kernel_init()
 {

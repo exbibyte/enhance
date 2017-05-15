@@ -29,13 +29,17 @@ std::list< T * > gc_hazards_0_impl< T >::_global_garbage;
 
 template< typename T >
 bool gc_hazards_0_impl< T >::gc_h_stat_recycled(){
+#ifdef DEBUG_INFO
     std::cout<<"thread local number of garbage recycled: " << _count_garbage << std::endl;
+#endif
     return true;
 }
 template< typename T >
 bool gc_hazards_0_impl< T >::gc_h_garbage_clear(){
     std::list< T * > temp_list {};
-    // std::cout<<"num garbage: " << _garbage.size() << std::endl;
+#ifdef DEBUG_INFO
+    std::cout<<"num garbage: " << _garbage.size() << std::endl;
+#endif
     _garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
     for( auto & i : _garbage ){
 	if( i ){
@@ -58,7 +62,9 @@ bool gc_hazards_0_impl< T >::gc_h_garbage_clear(){
 }
 template< typename T >
 bool gc_hazards_0_impl< T >::gc_h_garbage_clear_force(){
+#ifdef DEBUG_INFO
     std::cout<<"num garbage force clear: " << _garbage.size() << std::endl;
+#endif
     for( auto & i : _garbage ){
 	if( i ){
 	    delete i;

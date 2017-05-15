@@ -1,6 +1,8 @@
 #ifndef E2_I_RENDER_PAYLOAD_HPP
 #define E2_I_RENDER_PAYLOAD_HPP
 
+#include "buffer.hpp"
+
 namespace e2 { namespace interface {
 
 enum e_renderpayload_type { //list of primitive resources that can be manipulated
@@ -27,10 +29,10 @@ enum e_renderpayload_type { //list of primitive resources that can be manipulate
 	
 class i_renderpayload {
 public:
-               size_t _id;
-               size_t _buf_id;
-               size_t _offset;
-               size_t _len;
+                      size_t _id;
+      ::e2::memory::buffer * _buf;
+                      size_t _offset;
+                      size_t _len;
 };
 	
 } }

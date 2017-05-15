@@ -18,14 +18,18 @@ queue_lockfree_total_impl<T>::~queue_lockfree_total_impl(){
 	}
     }
     _gc._garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+#ifdef DEBUG_INFO
     std::cout<<"pool destructor local garbage clear: " << _gc._garbage.size() << std::endl;
+#endif
     for( auto & i : _gc._garbage ){
 	if( i ) delete i;
     }
     _gc._garbage_modify.unlock( ::e2::interface::lock_access_type::WRITE );
 
     _gc._global_garbage_modify.lock( ::e2::interface::lock_access_type::WRITE );
+#ifdef DEBUG_INFO
     std::cout<<"pool destructor global garbage clear: " << _gc._global_garbage.size() << std::endl;
+#endif
     for( auto & i : _gc._global_garbage ){
 	if( i ) delete i;
     }

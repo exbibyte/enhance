@@ -7,10 +7,13 @@
 #include "scheduler_0.hpp"
 #include "thread_0.hpp"
 #include "threadpool_0.hpp"
+#include "buffer.hpp"
 
 #include "memory_manager_p1t_g1_ff.hpp"
 
 namespace e2 { namespace kernel {
+
+constexpr size_t len_bytes_memory_buffer = 1 << 24; //16.7MB per memory buffer
 
 class kernel_0_impl {
 public:
@@ -26,9 +29,9 @@ private:
     
     std::list< ::e2::mt::thread_0 * > _threads;
 
-    // ::e2::memory::buffer _memory_buffer;
+    std::list< ::e2::memory::buffer > _memory_buffers;
 
-    ::e2::memory::memory_manager_p1t_g1_ff _mem_manager;
+    // ::e2::memory::memory_manager_p1t_g1_ff _mem_manager;
 };
 
 class kernel_0 : public ::e2::interface::i_kernel < kernel_0_impl > {};

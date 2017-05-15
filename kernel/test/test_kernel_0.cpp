@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "kernel_0.hpp"
+#include "buffer.hpp"
 
 static ::e2::kernel::kernel_0  _kernel;
 

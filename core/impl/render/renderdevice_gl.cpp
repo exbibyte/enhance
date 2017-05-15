@@ -21,8 +21,6 @@ renderdevice_gl_impl::renderdevice_gl_impl(){
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
 						 ::e2::interface::e_renderresource_type::windowing,
 						 ::e2::interface::e_renderpayload_type::na ) ] = &process_deinit_window;
-
-    _buf = nullptr;
 }
 
 bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackage p ){
@@ -31,12 +29,16 @@ bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackag
 }
 
 bool renderdevice_gl_impl::process_init_window_size( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+#ifdef DEBUG_INFO
     std::cout << "process init window size" << std::endl;
+#endif
     return true;
 }
 
 bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+#ifdef DEBUG_INFO
     std::cout << "process init window" << std::endl;
+#endif
     if( false == glfwInit() ){
 	assert( false && "glfw init failed." );
 	return false;
@@ -46,12 +48,12 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
 	    assert( false && "init window dim invalid." );
 	    return false;
 	}
-	if( nullptr == context->_buf ){
+	if( nullptr == p._payload->_buf ){
 	    assert( false && "buffer invalid." );
 	    return false;
 	}
         int * wind_dim;
-	if( false == context->_buf->buffer_get( p._payload->_offset, &wind_dim, 2 ) ){
+	if( false == p._payload->_buf->buffer_get( p._payload->_offset, &wind_dim, 2 ) ){
 	    assert( false && "buffer data invalid." );
 	    return false;
 	}
@@ -102,7 +104,9 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
 }
 
 bool renderdevice_gl_impl::process_deinit_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+#ifdef DEBUG_INFO
     std::cout << "process deinit window" << std::endl;
+#endif
     if( nullptr != context->_window ){
 	glfwDestroyWindow( context->_window );
 	context->_window = nullptr;

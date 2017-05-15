@@ -34,13 +34,13 @@ int main(){
     //set window size
     int * window_dim;
     size_t offset;
-    rd._buf = &buf;
     if( false == buf.buffer_get_next_available( &offset, &window_dim, 2 ) ){
 	assert( false && "window dimenstion store failed." );
     }
     *window_dim++ = 700;
     *window_dim = 500;
     ::e2::interface::i_renderpayload payload;
+    payload._buf = &buf;
     payload._offset = offset;
 
     {
