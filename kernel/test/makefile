@@ -28,7 +28,7 @@ libs := -pthread -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
 pkg_config_flags = `pkg-config --cflags glfw3`
 
 %: %.cpp
-	$(CXX) -g -std=c++14 -o $(dir_build)/$@ $(pkg_config_flags) $^ $(object_files) $(include_flags) $(libs)
+	$(CXX) -DDEBUG_INFO -g -std=c++14 -o $(dir_build)/$@ $(pkg_config_flags) $^ $(object_files) $(include_flags) $(libs)
 
 .PHONY: all
 all: $(targets)
