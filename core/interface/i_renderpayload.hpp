@@ -1,11 +1,13 @@
 #ifndef E2_I_RENDER_PAYLOAD_HPP
 #define E2_I_RENDER_PAYLOAD_HPP
 
+#include <cstdint>
+
 #include "buffer.hpp"
 
 namespace e2 { namespace interface {
 
-enum e_renderpayload_type { //list of primitive resources that can be manipulated
+enum e_renderpayload_type : uint64_t { //list of primitive resources that can be manipulated
     na = 1,
     float_1,
     float_2,

@@ -21,11 +21,14 @@ renderdevice_gl_impl::renderdevice_gl_impl(){
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
 						 ::e2::interface::e_renderresource_type::windowing,
 						 ::e2::interface::e_renderpayload_type::na ) ] = &process_deinit_window;
+
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::exec,
+						 ::e2::interface::e_renderresource_type::windowing,
+						 ::e2::interface::e_renderpayload_type::na ) ] = &process_window_exec;
 }
 
 bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackage p ){
     return _dispatch.dispatch_process( this, p );
-    return true;
 }
 
 bool renderdevice_gl_impl::process_init_window_size( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
@@ -57,9 +60,9 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
 	    assert( false && "buffer data invalid." );
 	    return false;
 	}
-	context->_device_resources[ resource_id::window_dim ] = wind_dim;
+	context->_device_resources[ ::e2::interface::e_renderresource_window::window_dim ] = wind_dim;
 		
-	auto it = context->_device_resources.find( window_dim );
+	auto it = context->_device_resources.find( ::e2::interface::e_renderresource_window::window_dim );
 	if( context->_device_resources.end() == it ){
 	    assert( false && "device resource not found" );
 	    return false;
@@ -114,5 +117,25 @@ bool renderdevice_gl_impl::process_deinit_window( renderdevice_gl_impl * context
     glfwTerminate();
     return true;
 }
-	
+
+bool renderdevice_gl_impl::process_window_exec( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+    switch( p._resource->_id ){
+    case ::e2::interface::e_renderresource_window::window_buf_swap:
+    {
+	assert( context->_window );
+#ifdef DEBUG_INFO
+	std::cout << "process window buf swap" << std::endl;
+#endif
+	glfwMakeContextCurrent( context->_window );
+	glfwSwapBuffers( context->_window );
+    }
+    break;
+    default:
+    {
+	return false;
+    }
+    }
+    return true;
+}
+
 } }

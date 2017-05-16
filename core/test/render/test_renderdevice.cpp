@@ -42,7 +42,7 @@ int main(){
     ::e2::interface::i_renderpayload payload;
     payload._buf = &buf;
     payload._offset = offset;
-
+    //task package for initializing window
     {
 	::e2::interface::i_renderpackage pkg;
 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::init );
@@ -51,6 +51,11 @@ int main(){
 	pkg._payload = &payload;
 	rd.renderdevice_process( pkg );
     }
+
+    //task resource for swapping window buffer operation
+    ::e2::interface::i_renderresource resource_window_buf_swap;
+    resource_window_buf_swap._id = ::e2::interface::e_renderresource_window::window_buf_swap;
+    
     glfwMakeContextCurrent( rd._window );
     glfwSetKeyCallback( rd._window, process_key_input );
     glfwSetMouseButtonCallback( rd._window, process_mouse_button );
@@ -61,7 +66,16 @@ int main(){
 	    glfwSetWindowShouldClose( rd._window, GLFW_TRUE);
 	}
 	glClearColor( 50, 50, 50, 1.0 );
-	glfwSwapBuffers( rd._window );
+
+	//submit windowing buffer swap operation
+	{
+	    ::e2::interface::i_renderpackage pkg;
+	    pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::exec );
+	    pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
+	    pkg.set_render_payload_type( ::e2::interface::e_renderpayload_type::na );
+	    pkg._resource = &resource_window_buf_swap;
+	    rd.renderdevice_process( pkg );
+	}
 	glfwPollEvents();
 	std::this_thread::sleep_for( std::chrono::milliseconds(25) );
     }

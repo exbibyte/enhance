@@ -2,7 +2,9 @@
 #define E2_RENDERDEVICE_DISPATCH_HPP
 
 #include <map>
+#include <unordered_map>
 #include <cstring>
+#include <functional>
 
 #include "i_rendercmd.hpp"
 #include "i_renderpackage.hpp"
@@ -18,14 +20,18 @@ public:
     size_t _resource_type;
     size_t _payload_type;
 };
+struct hash_dispatch {
+    size_t operator()( renderdispatch_key const & a ) const {
+	std::hash<uint64_t> hasher;
+	return ( ( hasher( a._cmd_type ) ^ ( hasher( a._resource_type ) << 1 ) ) >> 1 ) ^ ( hasher( a._payload_type ) << 1 );
+    }
+};
+
 struct comp_dispatch {
-    bool operator()( renderdispatch_key const & a, renderdispatch_key const & b ){
-	if( a._cmd_type < b._cmd_type ||
-	    a._resource_type < b._resource_type ||
-	    a._payload_type < b._payload_type ){
-	    return true;
-	}
-	return false;
+    bool operator()( renderdispatch_key const & a, renderdispatch_key const & b ) const {
+	return a._cmd_type == b._cmd_type
+	    && a._resource_type == b._resource_type
+	    && a._payload_type == b._payload_type;
     }
 };
 	
@@ -43,7 +49,7 @@ public:
 	ret = (*f)( context, pkg );
 	return ret;
     }
-    std::map< renderdispatch_key, bool(*)( Impl *, ::e2::interface::i_renderpackage ), comp_dispatch > _dispatch_map;
+    std::unordered_map< renderdispatch_key, bool(*)( Impl *, ::e2::interface::i_renderpackage ), hash_dispatch, comp_dispatch > _dispatch_map;
 };
 
 } }

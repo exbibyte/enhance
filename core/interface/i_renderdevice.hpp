@@ -3,9 +3,10 @@
 
 #include <utility>
 #include <functional>
+#include <cstdint>
 
 namespace e2 { namespace interface {
-
+	
 template< class Impl, class RenderPackage >
 class i_renderdevice : public virtual Impl {
 public:
@@ -13,7 +14,7 @@ public:
 
                template< class... Args >
                i_renderdevice( Args && ... args ) : Impl( std::move( args ) ... ) {}
-        inline bool renderdevice_process( RenderPackage p ){ return Impl::renderdevice_process( p ); }
+   inline bool renderdevice_process( RenderPackage p ){ return Impl::renderdevice_process( p ); }
 };
 
 } }
