@@ -16,8 +16,6 @@ public:
                                       size_t _num_payload;
                            i_renderpayload * _payload;
                           i_renderresource * _resource;
-                                      size_t _num_resource_payload_map;
-               std::pair< size_t, size_t > * _resource_payload_map;
 
     void set_render_cmd_type( size_t val ){
 	_render_key &= ~( (uint64_t) 0xFFFF << 48 );
@@ -27,10 +25,10 @@ public:
 	_render_key &= ~( (uint64_t) 0xFFFF << 32 );
         _render_key |= ( (uint64_t) 0xFFFF & val ) << 32;
     }
-    void set_render_payload_type( size_t val ){
-	_render_key &= ~( (uint64_t) 0xFFFF << 16 );
-        _render_key |= ( (uint64_t) 0xFFFF & val ) << 16;
-    }
+    // void set_render_payload_type( size_t val ){
+    // 	_render_key &= ~( (uint64_t) 0xFFFF << 16 );
+    //     _render_key |= ( (uint64_t) 0xFFFF & val ) << 16;
+    // }
     void set_render_channel_type( size_t val ){
 	_render_key &= ~( (uint64_t) 0xFFFF );
         _render_key |= ( (uint64_t) 0xFFFF & val );
@@ -41,9 +39,9 @@ public:
     size_t extract_render_resource_type(){
 	return ( _render_key & ( (uint64_t) 0xFFFF << 32 ) ) >> 32;
     }
-    size_t extract_render_payload_type(){
-	return ( _render_key & ( (uint64_t) 0xFFFF << 16 ) ) >> 16;
-    }
+    // size_t extract_render_payload_type(){
+    // 	return ( _render_key & ( (uint64_t) 0xFFFF << 16 ) ) >> 16;
+    // }
     size_t extract_render_channel_type(){
 	return _render_key & (uint64_t) 0xFFFF;
     }

@@ -15,23 +15,21 @@ namespace e2 { namespace render {
 class renderdispatch_key {
 public:
     renderdispatch_key(){}
-    renderdispatch_key( size_t c, size_t r, size_t p ) : _cmd_type( c ), _resource_type ( r ), _payload_type( p ) {}
+    renderdispatch_key( size_t c, size_t r ) : _cmd_type( c ), _resource_type ( r ) {}
     size_t _cmd_type;
     size_t _resource_type;
-    size_t _payload_type;
 };
 struct hash_dispatch {
     size_t operator()( renderdispatch_key const & a ) const {
 	std::hash<uint64_t> hasher;
-	return ( ( hasher( a._cmd_type ) ^ ( hasher( a._resource_type ) << 1 ) ) >> 1 ) ^ ( hasher( a._payload_type ) << 1 );
+	return ( ( hasher( a._cmd_type ) ^ ( hasher( a._resource_type ) << 1 ) ) >> 1 );
     }
 };
 
 struct comp_dispatch {
     bool operator()( renderdispatch_key const & a, renderdispatch_key const & b ) const {
 	return a._cmd_type == b._cmd_type
-	    && a._resource_type == b._resource_type
-	    && a._payload_type == b._payload_type;
+	    && a._resource_type == b._resource_type;
     }
 };
 	
@@ -40,7 +38,7 @@ class renderdevice_dispatch {
 public:
     bool dispatch_process( Impl * context, ::e2::interface::i_renderpackage pkg ){
 	bool ret;
-	renderdispatch_key k ( pkg.extract_render_cmd_type(), pkg.extract_render_resource_type(), pkg.extract_render_payload_type() );
+	renderdispatch_key k ( pkg.extract_render_cmd_type(), pkg.extract_render_resource_type() );
 
 	auto it = _dispatch_map.find( k );
 	if( _dispatch_map.end() == it )

@@ -9,7 +9,7 @@ enum class GLSLShaderType {
     VERTEX, FRAGMENT, GEOMETRY,TESS_CONTROL, TESS_EVALUATION
 };
 
-class render_helper_gl {
+class gl_helper {
 public:
     static bool compile_shader_from_string( GLuint * shader, char const * Source, GLSLShaderType type );
     static bool compile_shader_from_file( GLuint * shader, char const * fileName, GLSLShaderType type );

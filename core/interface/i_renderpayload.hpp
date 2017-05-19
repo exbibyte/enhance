@@ -19,22 +19,28 @@ enum e_renderpayload_type : uint64_t { //list of primitive resources that can be
     quat,
     array_float_2,
     array_float_3,
+    array_float_4,
     array_float_n,
     int_1,
     int_2,
     int_3,
     int_4,
     int_n,
+    uint_1,
+    uint_2,
+    uint_3,
+    uint_4,
+    uint_n,
     array_int_n,
     text,
 };
 	
 class i_renderpayload {
 public:
+        e_renderpayload_type _payload_type;
                       size_t _id;
       ::e2::memory::buffer * _buf;
                       size_t _offset;
-                      size_t _len;
 };
 	
 } }

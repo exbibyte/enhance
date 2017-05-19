@@ -1,4 +1,5 @@
-src_files = $(wildcard *.cpp)
+# src_files = $(wildcard *.cpp)
+src_files = gl_helper.cpp
 
 inc_folder_core := $(dir $(wildcard ../../*/ ) )
 inc_folder_gl := ./

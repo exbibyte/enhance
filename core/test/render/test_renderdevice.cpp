@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 #include <cassert>
+#include <cstdint>
 
 #include "renderdevice_gl.hpp"
 #include "gl_includes.hpp"
@@ -32,7 +33,7 @@ int main(){
     ::e2::render::renderdevice_gl rd;
 
     //set window size
-    int * window_dim;
+    uint64_t * window_dim;
     size_t offset;
     if( false == buf.buffer_get_next_available( &offset, &window_dim, 2 ) ){
 	assert( false && "window dimenstion store failed." );
@@ -42,13 +43,14 @@ int main(){
     ::e2::interface::i_renderpayload payload;
     payload._buf = &buf;
     payload._offset = offset;
+    payload._payload_type = ::e2::interface::uint_2;
     //task package for initializing window
     {
 	::e2::interface::i_renderpackage pkg;
 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::init );
 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
-	pkg.set_render_payload_type( ::e2::interface::e_renderpayload_type::int_2 );
 	pkg._payload = &payload;
+	pkg._num_payload = 1;
 	rd.renderdevice_process( pkg );
     }
 
@@ -59,6 +61,7 @@ int main(){
     glfwMakeContextCurrent( rd._window );
     glfwSetKeyCallback( rd._window, process_key_input );
     glfwSetMouseButtonCallback( rd._window, process_mouse_button );
+
     glfwSetCursorPosCallback( rd._window, process_mouse_move );
     while( false == glfwWindowShouldClose( rd._window ) ){
 	glfwMakeContextCurrent( rd._window );
@@ -72,8 +75,8 @@ int main(){
 	    ::e2::interface::i_renderpackage pkg;
 	    pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::exec );
 	    pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
-	    pkg.set_render_payload_type( ::e2::interface::e_renderpayload_type::na );
 	    pkg._resource = &resource_window_buf_swap;
+	    pkg._num_payload = 0;
 	    rd.renderdevice_process( pkg );
 	}
 	glfwPollEvents();
@@ -84,7 +87,7 @@ int main(){
 	::e2::interface::i_renderpackage pkg;
 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::deinit );
 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
-	pkg.set_render_payload_type( ::e2::interface::e_renderpayload_type::int_2 );
+	pkg._num_payload = 0;
 	rd.renderdevice_process( pkg );
     }
     return 0;

@@ -8,7 +8,7 @@
 
 namespace e2 { namespace render { namespace gl {
 
-bool render_helper_gl::compile_shader_from_string( GLuint * shader, char const * Source, GLSLShaderType type ){
+bool gl_helper::compile_shader_from_string( GLuint * shader, char const * Source, GLSLShaderType type ){
     bool ret;
     if( nullptr == shader ) return false;
 
@@ -53,7 +53,7 @@ bool render_helper_gl::compile_shader_from_string( GLuint * shader, char const *
     }
     return ret;
 }
-bool render_helper_gl::compile_shader_from_file( GLuint * shader, char const * fileName, GLSLShaderType type ){
+bool gl_helper::compile_shader_from_file( GLuint * shader, char const * fileName, GLSLShaderType type ){
     bool ret;
     std::vector<char> sourceText;
     ret = ::e2::file::text_read_write::read( fileName, &sourceText );
@@ -64,7 +64,7 @@ bool render_helper_gl::compile_shader_from_file( GLuint * shader, char const * f
     char const * sourceTextConst = &sourceText[0];
     return compile_shader_from_string( shader, sourceTextConst, type );
 }
-bool render_helper_gl::create_program( GLuint & program ){
+bool gl_helper::create_program( GLuint & program ){
     program = glCreateProgram();
     if( 0 == program ){
 	std::cerr<< "Error creating program object" <<std::endl;
@@ -73,7 +73,7 @@ bool render_helper_gl::create_program( GLuint & program ){
         return true;
     }
 }
-bool render_helper_gl::link_program( GLuint & program ){
+bool gl_helper::link_program( GLuint & program ){
     glLinkProgram(program);
     check_error();
     GLint status;
@@ -95,12 +95,12 @@ bool render_helper_gl::link_program( GLuint & program ){
         return true;
     }
 }
-bool render_helper_gl::use_program( GLuint & program ){
+bool gl_helper::use_program( GLuint & program ){
     glUseProgram(program);
     return check_error();
 }
 
-bool render_helper_gl::print_info(){
+bool gl_helper::print_info(){
     const GLubyte * renderer = glGetString( GL_RENDERER );
     const GLubyte * vendor = glGetString( GL_VENDOR );
     const GLubyte * version = glGetString( GL_VERSION );
@@ -117,17 +117,17 @@ bool render_helper_gl::print_info(){
     return check_error();
 }
 
-bool render_helper_gl::bind_attrib_location( GLuint Program, GLuint Loc, char const * Name ){
+bool gl_helper::bind_attrib_location( GLuint Program, GLuint Loc, char const * Name ){
     glBindAttribLocation( Program, Loc, (GLchar const * ) Name );
     return check_error();
 }
 
-bool render_helper_gl::bind_frag_data_location( GLuint Program, GLuint Loc, char const * Name ){
+bool gl_helper::bind_frag_data_location( GLuint Program, GLuint Loc, char const * Name ){
     glBindFragDataLocation( Program, Loc, (GLchar const * ) Name );
     return check_error();
 }
 
-bool render_helper_gl::set_uniform_vec3( GLuint Program, char const * Name, float * v ){
+bool gl_helper::set_uniform_vec3( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform3fv( location, 1, v );
@@ -139,7 +139,7 @@ bool render_helper_gl::set_uniform_vec3( GLuint Program, char const * Name, floa
     }
 }
 
-bool render_helper_gl::set_uniform_vec4( GLuint Program, char const * Name, float * v ){
+bool gl_helper::set_uniform_vec4( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform4fv( location, 1, v );
@@ -150,7 +150,7 @@ bool render_helper_gl::set_uniform_vec4( GLuint Program, char const * Name, floa
         return false;
     }
 }
-bool render_helper_gl::set_uniform_mat3( GLuint Program, char const * Name, float * m ){
+bool gl_helper::set_uniform_mat3( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix3fv( location, 1, GL_FALSE, m );
@@ -161,7 +161,7 @@ bool render_helper_gl::set_uniform_mat3( GLuint Program, char const * Name, floa
         return false;
     }
 }
-bool render_helper_gl::set_uniform_mat4( GLuint Program, char const * Name, float * m ){
+bool gl_helper::set_uniform_mat4( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix4fv( location, 1, GL_FALSE, m );
@@ -172,7 +172,7 @@ bool render_helper_gl::set_uniform_mat4( GLuint Program, char const * Name, floa
     }
 }
 
-bool render_helper_gl::set_uniform_single_f( GLuint Program, char const * Name, float val ){
+bool gl_helper::set_uniform_single_f( GLuint Program, char const * Name, float val ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform1f( location, val );
@@ -183,7 +183,7 @@ bool render_helper_gl::set_uniform_single_f( GLuint Program, char const * Name, 
         return false;
     }
 }
-bool render_helper_gl::set_uniform_single_i( GLuint Program, char const * Name, int val ){
+bool gl_helper::set_uniform_single_i( GLuint Program, char const * Name, int val ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform1i( location, val );
@@ -194,7 +194,7 @@ bool render_helper_gl::set_uniform_single_i( GLuint Program, char const * Name, 
         return false;
     }
 }
-bool render_helper_gl::set_uniform_single_b( GLuint Program, char const * Name, bool val ){
+bool gl_helper::set_uniform_single_b( GLuint Program, char const * Name, bool val ){
     
     int ValInt;
     if(val){
@@ -214,7 +214,7 @@ bool render_helper_gl::set_uniform_single_b( GLuint Program, char const * Name, 
     }
 }
 
-bool render_helper_gl::print_active_uniforms( GLuint Program )
+bool gl_helper::print_active_uniforms( GLuint Program )
 {
     GLint nUniforms, maxLen;
     GLenum err = glGetError();
@@ -241,7 +241,7 @@ bool render_helper_gl::print_active_uniforms( GLuint Program )
     return check_error();
 }
 
-bool render_helper_gl::print_active_attribs( GLuint Program )
+bool gl_helper::print_active_attribs( GLuint Program )
 {
     GLint maxLength, nAttribs;
     glGetProgramiv(Program, GL_ACTIVE_ATTRIBUTES, &nAttribs);
@@ -261,7 +261,7 @@ bool render_helper_gl::print_active_attribs( GLuint Program )
     return check_error();
 }
 
-bool render_helper_gl::gen_textures( int Size, GLuint * TexNames )
+bool gl_helper::gen_textures( int Size, GLuint * TexNames )
 {
     if( Size <= 0 ){
         return false;
@@ -272,7 +272,7 @@ bool render_helper_gl::gen_textures( int Size, GLuint * TexNames )
     }
 }
 
-bool render_helper_gl::set_texture( int GLTextureUnitOffset, GLuint TexName, unsigned char const * TexData, int Width, int Height )
+bool gl_helper::set_texture( int GLTextureUnitOffset, GLuint TexName, unsigned char const * TexData, int Width, int Height )
 {
     glBindTexture( GL_TEXTURE_2D, TexName );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, Width,
@@ -285,24 +285,24 @@ bool render_helper_gl::set_texture( int GLTextureUnitOffset, GLuint TexName, uns
     return check_error();
 }
 
-bool render_helper_gl::bind_vertex_array( GLuint vbo )
+bool gl_helper::bind_vertex_array( GLuint vbo )
 {
     glBindVertexArray( vbo );
     return check_error();
 }
-bool render_helper_gl::unbind_vertex_array()
+bool gl_helper::unbind_vertex_array()
 {
     glBindVertexArray( 0 );
     return check_error();
 }
 
-bool render_helper_gl::uniform_subroutinesuiv( GLenum ShaderType, GLsizei Count, GLuint const * Indices )
+bool gl_helper::uniform_subroutinesuiv( GLenum ShaderType, GLsizei Count, GLuint const * Indices )
 {
     glUniformSubroutinesuiv( ShaderType, Count, Indices );
     return check_error();
 }
 
-bool render_helper_gl::get_subroutine_uniform_location( GLuint Program, GLenum Shadertype, GLchar const * Name, GLint * ret )
+bool gl_helper::get_subroutine_uniform_location( GLuint Program, GLenum Shadertype, GLchar const * Name, GLint * ret )
 {
     *ret = glGetSubroutineUniformLocation( Program, Shadertype, Name );
     if( GL_INVALID_ENUM == *ret ||
@@ -313,7 +313,7 @@ bool render_helper_gl::get_subroutine_uniform_location( GLuint Program, GLenum S
     return true;
 }
 
-bool render_helper_gl::get_subroutine_index(GLuint program, GLenum shadertype, const GLchar * name, GLuint * ret )
+bool gl_helper::get_subroutine_index(GLuint program, GLenum shadertype, const GLchar * name, GLuint * ret )
 {
     *ret = glGetSubroutineIndex( program, shadertype, name );
     if( GL_INVALID_ENUM == *ret ||
@@ -324,9 +324,9 @@ bool render_helper_gl::get_subroutine_index(GLuint program, GLenum shadertype, c
     return true;
 }
 
-bool render_helper_gl::check_error(){
+bool gl_helper::check_error(){
     GLenum ret = glGetError();
-    if( GL_NO_ERROR != ret ){
+    if( GL_NO_ERROR != ret ){	
 	assert(false);
 	return false;
     }

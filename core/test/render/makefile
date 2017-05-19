@@ -8,8 +8,10 @@ include_dirs = $(inc_folder_basic) $(inc_folder_test) $(inc_folder_interface) $(
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
 objects_render = $(wildcard ../../impl/render/intermediate/*.o)
+objects_render_gl = $(wildcard ../../impl/render/gl/intermediate/*.o)
+objects_file = $(wildcard ../../impl/file/intermediate/*.o)
 
-object_files = $(objects_render)
+object_files = $(objects_render) $(objects_render_gl) $(objects_file)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))

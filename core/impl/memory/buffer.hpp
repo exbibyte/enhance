@@ -2,9 +2,9 @@
 #define E2_BUFFER_HPP
 
 #include <vector>
+#include <cstring>
 
 namespace e2 { namespace memory {
-
 
 class buffer {
 public:
