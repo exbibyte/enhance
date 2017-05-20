@@ -37,3 +37,7 @@ custom memory management
 statistics for memory and rendering functions
 
 physically based renderer
+
+# Video logs of progress:
+
+https://youtu.be/pxU5Jtvp9Z4
