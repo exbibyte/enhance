@@ -33,31 +33,39 @@ int main(){
     ::e2::render::renderdevice_gl rd;
 
     //set window size
-    uint64_t * window_dim;
-    size_t offset;
-    if( false == buf.buffer_get_next_available( &offset, &window_dim, 2 ) ){
-	assert( false && "window dimenstion store failed." );
-    }
-    *window_dim++ = 700;
-    *window_dim = 500;
     ::e2::interface::i_renderpayload payload;
-    payload._buf = &buf;
-    payload._offset = offset;
-    payload._payload_type = ::e2::interface::uint_2;
+    {
+	uint64_t * data;
+	size_t offset;
+	if( false == buf.buffer_get_next_available( &offset, &data, 3 ) ){
+	    assert( false && "window dimenstion store failed." );
+	}
+	*data++ = 2;
+	*data++ = 700;
+	*data = 500;
+	payload._buf = &buf;
+	payload._offset = offset;
+	payload._payload_type = ::e2::interface::uint_n;
+    }
+    ::e2::interface::i_renderresource resource_window_dim;
+    resource_window_dim._empty_payload = false;
+    resource_window_dim._offset_payload = 0;
     //task package for initializing window
     {
 	::e2::interface::i_renderpackage pkg;
 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::init );
 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
 	pkg._payload = &payload;
+	pkg._resource = &resource_window_dim;
 	pkg._num_payload = 1;
+	pkg._num_resource = 1;
 	rd.renderdevice_process( pkg );
     }
 
     //task resource for swapping window buffer operation
     ::e2::interface::i_renderresource resource_window_buf_swap;
     resource_window_buf_swap._id = ::e2::interface::e_renderresource_window::window_buf_swap;
-    
+    resource_window_buf_swap._empty_payload = true;
     glfwMakeContextCurrent( rd._window );
     glfwSetKeyCallback( rd._window, process_key_input );
     glfwSetMouseButtonCallback( rd._window, process_mouse_button );
@@ -77,6 +85,7 @@ int main(){
 	    pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
 	    pkg._resource = &resource_window_buf_swap;
 	    pkg._num_payload = 0;
+	    pkg._num_resource = 1;
 	    rd.renderdevice_process( pkg );
 	}
 	glfwPollEvents();
@@ -88,6 +97,7 @@ int main(){
 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::deinit );
 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::windowing );
 	pkg._num_payload = 0;
+	pkg._num_resource = 0;
 	rd.renderdevice_process( pkg );
     }
     return 0;

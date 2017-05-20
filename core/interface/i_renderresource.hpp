@@ -61,9 +61,15 @@ enum e_renderresource_buffer : uint64_t {
     renderresource_buffer_uniform_buffer,
 };
 
+enum e_renderresource_binding : uint64_t {
+    renderresource_binding_vertex_array = 1,
+};
+
 class i_renderresource {
 public:
     size_t _id;
+    size_t _offset_payload;
+    bool _empty_payload;
 };
 
 } }

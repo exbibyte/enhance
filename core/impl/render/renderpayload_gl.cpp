@@ -15,42 +15,6 @@ bool renderpayload_gl::unpack( size_t count_unpack, ::e2::interface::i_renderpay
 	case ::e2::interface::na:
 	{
 	}
-	break;	
-	case ::e2::interface::float_1:
-	{
-	    float ** d = ( float ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 1 ) ){
-		assert( "unpack float 1 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::float_2:
-	{
-	    float ** d = ( float ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 2 ) ){
-		assert( "unpack float 2 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::float_3:
-	{
-	    float ** d = ( float ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 3 ) ){
-		assert( "unpack float 3 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::float_4:
-	{
-	    float ** d = ( float ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 4 ) ){
-		assert( "unpack float 4 failed." );
-		return false;
-	    }
-	}
 	break;
 	case ::e2::interface::float_n:
 	{
@@ -80,42 +44,6 @@ bool renderpayload_gl::unpack( size_t count_unpack, ::e2::interface::i_renderpay
 	{
 	}
 	break;
-	case ::e2::interface::int_1:
-	{
-	    int64_t ** d = ( int64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 1 ) ){
-		assert( "unpack int64_t 1 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::int_2:
-	{
-	    int64_t ** d = ( int64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 2 ) ){
-		assert( "unpack int64_t 2 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::int_3:
-	{
-	    int64_t ** d = ( int64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 3 ) ){
-		assert( "unpack int64_t 3 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::int_4:
-	{
-	    int64_t ** d = ( int64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 4 ) ){
-		assert( "unpack int64_t 4 failed." );
-		return false;
-	    }
-	}
-	break;
 	case ::e2::interface::int_n:
 	{
 	    uint64_t ** n = ( uint64_t ** ) data;
@@ -128,42 +56,6 @@ bool renderpayload_gl::unpack( size_t count_unpack, ::e2::interface::i_renderpay
 	    int64_t ** d_n = ( int64_t ** ) d;
 	    if( false == p->_buf->buffer_get( p->_offset, d_n, **n ) ){
 		assert( "unpack uint64_t n failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::uint_1:
-	{
-	    uint64_t ** d = ( uint64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 1 ) ){
-		assert( "unpack uint64_t 1 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::uint_2:
-	{
-	    uint64_t ** d = (uint64_t **) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 2 ) ){
-		assert( "unpack uint64_t 2 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::uint_3:
-	{
-	    uint64_t ** d = ( uint64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 3 ) ){
-		assert( "unpack uint64_t 3 failed." );
-		return false;
-	    }
-	}
-	break;
-	case ::e2::interface::uint_4:
-	{
-	    uint64_t ** d = ( uint64_t ** ) data;
-	    if( false == p->_buf->buffer_get( p->_offset, d, 4 ) ){
-		assert( "unpack uint64_t 4 failed." );
 		return false;
 	    }
 	}

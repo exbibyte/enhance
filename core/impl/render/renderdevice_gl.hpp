@@ -25,11 +25,11 @@ public:
                                            static bool process_deinit_window( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
 
                                            static bool process_exec_window( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
+                                           static bool process_store_binding( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_exec_draw_batch( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_store_buffer( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                                 GLuint _program;
                                           GLFWwindow * _window;
-                       std::map< uint64_t, void * > _device_resources;
 };
 
 class renderdevice_gl : public ::e2::interface::i_renderdevice< renderdevice_gl_impl, ::e2::interface::i_renderpackage > {};
