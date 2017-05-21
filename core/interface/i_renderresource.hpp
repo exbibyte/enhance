@@ -8,11 +8,16 @@ namespace e2 { namespace interface {
 
 enum e_renderresource_type : uint64_t { //list of primitive resources that can be manipulated/executed
     windowing = 1,
-    camera,
-    attributes,
+    defineformat,
+    drawbatch,
+    attrib,
     buffer,
-    binding,
-    draw_batch,
+    object,
+    program,
+    shader,
+    persistent,
+//todo:
+    camera,
     transform_rotate,
     transform_translate,
 };
@@ -44,6 +49,10 @@ enum e_renderresource_primitives : uint64_t {
     renderresource_primitive_patches,
 };
 
+enum e_renderresource_object : uint64_t {
+    renderresource_object_vertex_array = 1,
+};
+	
 enum e_renderresource_buffer : uint64_t {
     renderresource_buffer_array_buffer = 1,
     renderresource_buffer_atomic_counter_buffer,
@@ -61,8 +70,30 @@ enum e_renderresource_buffer : uint64_t {
     renderresource_buffer_uniform_buffer,
 };
 
-enum e_renderresource_binding : uint64_t {
-    renderresource_binding_vertex_array = 1,
+enum e_renderresource_defineformat : uint64_t {
+    renderresource_defineformat_vertex_attrib_data = 1,
+};
+
+enum e_renderresource_enable_attrib : uint64_t {
+    renderresource_enable_attrib_vertex_attrib_array = 1,
+};
+
+enum e_renderresource_disable_attrib : uint64_t {
+    renderresource_disable_attrib_vertex_attrib_array = 1,
+};
+
+enum e_renderresource_attrib : uint64_t {
+    renderresource_attrib_attrib_location = 1,
+    renderresource_attrib_frag,
+};
+
+enum e_renderresource_persistent : uint64_t {
+    renderresource_persistent_vec_f = 1,
+    renderresource_persistent_vec_u,
+    renderresource_persistent_vec_i,	
+    renderresource_persistent_mat_f,
+    renderresource_persistent_mat_u,
+    renderresource_persistent_mat_i,
 };
 
 class i_renderresource {

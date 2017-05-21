@@ -11,7 +11,7 @@ namespace e2 { namespace render {
 class rendermap_gl {
 public:
     static std::unordered_map< uint64_t, GLenum > _map_render_primitives;
-    static std::unordered_map< uint64_t, GLenum > _map_render_buffer;
+    static std::unordered_map< uint64_t, GLenum > _map_render_bind_buffer;
 };
 
 } }

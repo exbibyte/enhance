@@ -64,39 +64,46 @@ bool gl_helper::compile_shader_from_file( GLuint * shader, char const * fileName
     char const * sourceTextConst = &sourceText[0];
     return compile_shader_from_string( shader, sourceTextConst, type );
 }
-bool gl_helper::create_program( GLuint & program ){
-    program = glCreateProgram();
-    if( 0 == program ){
-	std::cerr<< "Error creating program object" <<std::endl;
-        return false;
-    }else{
-        return true;
+bool gl_helper::create_program( GLuint * program_handle ){
+    if( nullptr == program_handle ){
+	assert( "gl program handle invalid." );
+	return false;
     }
+    *program_handle = glCreateProgram();
+    if( 0 == *program_handle ){
+	assert( "gl program creation failed.");
+        return false;
+    }
+    return true;
 }
-bool gl_helper::link_program( GLuint & program ){
-    glLinkProgram(program);
+
+bool gl_helper::delete_program( GLuint program_handle ){
+    glDeleteProgram( program_handle );
+    return check_error();
+}
+
+bool gl_helper::link_program( GLuint program_handle ){
+    glLinkProgram( program_handle );
     check_error();
     GLint status;
-    glGetProgramiv( program, GL_LINK_STATUS, &status );
+    glGetProgramiv( program_handle, GL_LINK_STATUS, &status );
     if( GL_FALSE == status ){
-	std::cerr << "Failed to link shader program!" <<std::endl;
         GLint logLen;
-        glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logLen);
+        glGetProgramiv( program_handle, GL_INFO_LOG_LENGTH, &logLen);
         if( logLen > 0 ){
             char * log = (char *)malloc(logLen);
             GLsizei written;
-            glGetProgramInfoLog( program, logLen, &written, log);
+            glGetProgramInfoLog( program_handle, logLen, &written, log);
 	    std::cerr<< "Program log: \n" << log <<std::endl;
             free(log);
         }
-	assert( false );
+	assert( false && "gl link program failed." );
         return false;
-    }else{
-        return true;
     }
+    return true;
 }
-bool gl_helper::use_program( GLuint & program ){
-    glUseProgram(program);
+bool gl_helper::use_program( GLuint program_handle ){
+    glUseProgram( program_handle );
     return check_error();
 }
 
@@ -117,17 +124,94 @@ bool gl_helper::print_info(){
     return check_error();
 }
 
-bool gl_helper::bind_attrib_location( GLuint Program, GLuint Loc, char const * Name ){
-    glBindAttribLocation( Program, Loc, (GLchar const * ) Name );
+bool gl_helper::bind_attrib_location( GLuint program_handle, GLuint index, GLchar * attrib_name ){
+    glBindAttribLocation( program_handle, index, attrib_name );
     return check_error();
 }
 
-bool gl_helper::bind_frag_data_location( GLuint Program, GLuint Loc, char const * Name ){
-    glBindFragDataLocation( Program, Loc, (GLchar const * ) Name );
+bool gl_helper::define_vertex_attrib_data( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLvoid * pointer ){
+    glVertexAttribPointer( index, size, type, normalized, stride, pointer );
+    return check_error();
+}
+	    
+bool gl_helper::bind_frag_data_location( GLuint program_handle, GLuint color_number, char const * name ){
+    glBindFragDataLocation( program_handle, color_number, name );
     return check_error();
 }
 
-bool gl_helper::set_uniform_vec3( GLuint Program, char const * Name, float * v ){
+bool gl_helper::set_uniform_i1( GLuint Program, char const * Name, int * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform1iv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_i2( GLuint Program, char const * Name, int * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform2iv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_i3( GLuint Program, char const * Name, int * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform3iv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_i4( GLuint Program, char const * Name, int * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform4iv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_f1( GLuint Program, char const * Name, float * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform1fv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_f2( GLuint Program, char const * Name, float * v ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniform2fv( location, 1, v );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_f3( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform3fv( location, 1, v );
@@ -139,7 +223,7 @@ bool gl_helper::set_uniform_vec3( GLuint Program, char const * Name, float * v )
     }
 }
 
-bool gl_helper::set_uniform_vec4( GLuint Program, char const * Name, float * v ){
+bool gl_helper::set_uniform_f4( GLuint Program, char const * Name, float * v ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniform4fv( location, 1, v );
@@ -150,7 +234,20 @@ bool gl_helper::set_uniform_vec4( GLuint Program, char const * Name, float * v )
         return false;
     }
 }
-bool gl_helper::set_uniform_mat3( GLuint Program, char const * Name, float * m ){
+
+bool gl_helper::set_uniform_matf2( GLuint Program, char const * Name, float * m ){
+    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
+    if( location >= 0 ){
+        glUniformMatrix2fv( location, 1, GL_FALSE, m );
+	return check_error();
+    }
+    else{
+	assert( false );
+        return false;
+    }
+}
+
+bool gl_helper::set_uniform_matf3( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix3fv( location, 1, GL_FALSE, m );
@@ -161,55 +258,14 @@ bool gl_helper::set_uniform_mat3( GLuint Program, char const * Name, float * m )
         return false;
     }
 }
-bool gl_helper::set_uniform_mat4( GLuint Program, char const * Name, float * m ){
+
+bool gl_helper::set_uniform_matf4( GLuint Program, char const * Name, float * m ){
     GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
     if( location >= 0 ){
         glUniformMatrix4fv( location, 1, GL_FALSE, m );
         return true;
     }
     else{
-        return false;
-    }
-}
-
-bool gl_helper::set_uniform_single_f( GLuint Program, char const * Name, float val ){
-    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 ){
-        glUniform1f( location, val );
-	return check_error();
-    }
-    else{
-	assert( false );
-        return false;
-    }
-}
-bool gl_helper::set_uniform_single_i( GLuint Program, char const * Name, int val ){
-    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 ){
-        glUniform1i( location, val );
-	return check_error();
-    }
-    else{
-	assert( false );
-        return false;
-    }
-}
-bool gl_helper::set_uniform_single_b( GLuint Program, char const * Name, bool val ){
-    
-    int ValInt;
-    if(val){
-        ValInt = 1;
-    }else{
-        ValInt = 0;
-    }
-
-    GLint location = glGetUniformLocation( Program, (GLchar const * ) Name );
-    if( location >= 0 ){
-        glUniform1i( location, ValInt );
-	return check_error();
-    }
-    else{
-	assert( false );
         return false;
     }
 }
@@ -285,6 +341,11 @@ bool gl_helper::set_texture( int GLTextureUnitOffset, GLuint TexName, unsigned c
     return check_error();
 }
 
+bool gl_helper::bind_buffer( GLenum buffertype, GLuint bufferhandle ){
+    glBindBuffer( buffertype, bufferhandle );
+    return check_error();
+}
+	    
 bool gl_helper::bind_vertex_array( GLuint vbo )
 {
     glBindVertexArray( vbo );
@@ -333,4 +394,49 @@ bool gl_helper::check_error(){
     return true;
 }
 
+bool gl_helper::enable_vertex_attrib_array( GLuint index ){
+    glEnableVertexAttribArray( index );
+    return check_error();
+}
+
+bool gl_helper::disable_vertex_attrib_array( GLuint index ){
+    glDisableVertexAttribArray( index );
+    return check_error();
+}
+
+bool gl_helper::generate_vertex_arrays( GLsizei n, GLuint * arrays ){
+    glGenVertexArrays( n, arrays );
+    return check_error();
+}
+
+bool gl_helper::delete_vertex_arrays( GLsizei n, GLuint * arrays ){
+    glDeleteVertexArrays( n, arrays );
+    return check_error();
+}
+
+bool gl_helper::store_buffer_data( GLenum target, GLsizeiptr size, GLvoid * data, GLenum usage ){
+    glBufferData( target, size, data, usage );
+    return check_error();
+}
+
+bool gl_helper::generate_buffers( GLsizei n, GLuint * buffers ){
+    glGenBuffers( n, buffers );
+    return check_error();
+}
+
+bool gl_helper::delete_buffers( GLsizei n, GLuint * buffers ){
+    glDeleteBuffers( n, buffers );
+    return check_error();
+}
+
+bool gl_helper::attach_shader( GLuint program_handle, GLuint shader_handle ){
+    glAttachShader( program_handle, shader_handle );
+    return check_error();
+}
+	    
+bool gl_helper::detach_shader( GLuint program_handle, GLuint shader_handle ){
+    glDetachShader( program_handle, shader_handle );
+    return check_error();
+}
+	    
 } } }

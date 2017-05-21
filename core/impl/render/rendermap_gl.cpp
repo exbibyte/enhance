@@ -21,7 +21,7 @@ std::unordered_map< uint64_t, GLenum > rendermap_gl::_map_render_primitives = {
     { ::e2::interface::renderresource_primitive_triangles_adjacency, GL_TRIANGLES_ADJACENCY },
     { ::e2::interface::renderresource_primitive_patches, GL_PATCHES },
 };
-std::unordered_map< uint64_t, GLenum > rendermap_gl::_map_render_buffer = {
+std::unordered_map< uint64_t, GLenum > rendermap_gl::_map_render_bind_buffer = {
     { ::e2::interface::renderresource_buffer_array_buffer, GL_ARRAY_BUFFER },
     { ::e2::interface::renderresource_buffer_atomic_counter_buffer, GL_ATOMIC_COUNTER_BUFFER },
     { ::e2::interface::renderresource_buffer_copy_read_buffer, GL_COPY_READ_BUFFER },

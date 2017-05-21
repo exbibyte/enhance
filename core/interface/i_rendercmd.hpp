@@ -12,8 +12,11 @@ enum e_rendercmd_type : uint64_t {
     load,
     init,
     deinit,
-    point,
     exec,
+    enable,
+    disable,
+    bind,
+    unbind,
 };
 
 
