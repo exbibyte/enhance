@@ -21,11 +21,13 @@ bool text_read_write::read(char const * fn, std::vector<char> * read ){
     count = ftell(fp);
     rewind(fp);
 
+    std::vector<char> text;
     if (count > 0) {
-	read->resize( count + 1 );
-	count = fread( &read[0], sizeof(char), count, fp);
-        (*read)[count] = '\0';
+        text.resize( count + 1 );
+	count = fread( &text[0], sizeof(char), count, fp);
+        text[count] = '\0';
     }
+    *read = text;
     fclose(fp);
 
     return true;

@@ -44,7 +44,11 @@ public:
     }
     bool buffer_stat_fraction_free( double * v ){
 	if( nullptr == v ) return false;
-	*v = (double) _next / _buf.size();
+	if( 0 == _buf.size() ){
+	    *v = 0;
+	}else{
+	    *v = 1.0 - ((double) _next / _buf.size());
+	}
     	return true;
     }
     bool buffer_stat_total_bytes( size_t * v ){

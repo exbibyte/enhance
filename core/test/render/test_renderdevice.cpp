@@ -10,6 +10,7 @@
 #include "buffer.hpp"
 #include "i_renderpayload.hpp"
 #include "gl_helper.hpp"
+#include "renderbackend_gl.hpp"
 
 bool quit = false;
 static void process_key_input( GLFWwindow * win, int key, int scancode, int action, int mods ){
@@ -27,233 +28,76 @@ static void process_mouse_move( GLFWwindow * win, double xpos, double ypos ){
 }
 
 int main(){
-
+	
     constexpr size_t buf_len_bytes = 1 << 20;
     std::cout << "allocated buffer of length: " << buf_len_bytes << std::endl;
     ::e2::memory::buffer buf( buf_len_bytes );
-
     ::e2::render::renderdevice_gl rd;
+    ::e2::render::renderbackend_gl renderback;
 
-    //set window size
+    //serialize tasks
+    //init window
     ::e2::interface::i_renderpackage * pkg_init_window;
-    void ** data_ptr;
-    {
-	int * data;
-	size_t offset;
-	if( false == buf.buffer_get_next_available( &offset, &data, 2 ) ){
-	    assert( false && "mem buffer for init window failed." );
-	}
-	int * data_start = data;
-	*data++ = 700;
-	*data++ = 500;
-	if( false == buf.buffer_get_next_available( &offset, &data_ptr, 2 ) ){
-	    assert( false && "mem buffer for init window failed." );
-	}
-	data_ptr[0] = data_start;
-	data_ptr[1] = &data_start[1];
-	uint64_t * key;
-	if( false == buf.buffer_get_next_available( &offset, &key, 2 ) ){
-	    assert( false && "mem buffer for init window failed." );
-	}
-	key[0] = ::e2::interface::e_renderresourcekey_wind_dimx;
-	key[1] = ::e2::interface::e_renderresourcekey_wind_dimy;
-	assert( ::e2::render::renderpackage_gl::pack( &buf, &pkg_init_window, key, (void**)data_ptr, 2 ) );
-	pkg_init_window->set_render_cmd_type( ::e2::interface::e_rendercmd_type_init );
-	pkg_init_window->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
-	pkg_init_window->_resource_subtype = ::e2::interface::e_renderresource_subtype_na;
-    }
-    rd.renderdevice_process( *pkg_init_window );
+    renderback.init_window( &buf, &pkg_init_window, 700, 500 );
 
-    // //create program
-    // uint64_t * program_handle;
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 2 ) ){
-    // 	    assert( false && "mem buffer for create program failed." );
-    // 	}
-    // 	*data++ = 1;
-    // 	program_handle = data;
-    // 	::e2::interface::i_renderresource resource_create_program;
-    //     resource_create_program._empty_payload = false;
-    //     resource_create_program._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_create_program;
-    // 	payload_create_program._buf = &buf;
-    //     payload_create_program._offset = offset;
-    // 	payload_create_program._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::init );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::program );
-    // 	pkg._payload = &payload_create_program;
-    // 	pkg._resource = &resource_create_program;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
-    // //load shaders
-    // uint64_t * shader_vertex;
-    // char * shader_vertex_source = "assets/ADS.vert";
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 4 ) ){
-    // 	    assert( false && "mem buffer for loading vertex shader failed." );
-    // 	}
-    // 	*data++ = 3;
-    // 	shader_vertex = data++;
-    // 	uint64_t shader_vertex_source_casted = *reinterpret_cast<uint64_t*>( shader_vertex_source );
-    // 	*data++ = shader_vertex_source_casted;
-    // 	*data = ::e2::render::gl::VERTEX;
-	
-    // 	::e2::interface::i_renderresource resource_load_shader;
-    // 	resource_load_shader._id = ::e2::interface::renderresource_shader_file;
-    //     resource_load_shader._empty_payload = false;
-    //     resource_load_shader._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_load_shader;
-    // 	payload_load_shader._buf = &buf;
-    //     payload_load_shader._offset = offset;
-    //     payload_load_shader._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::load );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::shader );
-    // 	pkg._payload = &payload_load_shader;
-    // 	pkg._resource = &resource_load_shader;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
-    // uint64_t * shader_frag;
-    // char * shader_frag_source = "assets/ADS.frag";
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 4 ) ){
-    // 	    assert( false && "mem buffer for loading fragment shader failed." );
-    // 	}
-    // 	*data++ = 3;
-    // 	shader_frag = data++;
-    // 	*data++ = reinterpret_cast<uint64_t>(shader_frag_source);
-    // 	*data = ::e2::render::gl::FRAGMENT;
-	
-    // 	::e2::interface::i_renderresource resource_load_shader;
-    // 	resource_load_shader._id = ::e2::interface::renderresource_shader_file;
-    //     resource_load_shader._empty_payload = false;
-    //     resource_load_shader._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_load_shader;
-    // 	payload_load_shader._buf = &buf;
-    //     payload_load_shader._offset = offset;
-    //     payload_load_shader._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::load );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::shader );
-    // 	pkg._payload = &payload_load_shader;
-    // 	pkg._resource = &resource_load_shader;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
+    //init opengl program
+    ::e2::interface::i_renderpackage * pkg_init_program;
+    uint64_t program_handle;
+    uint64_t * p_program_handle = &program_handle;
+    renderback.init_program( &buf, &pkg_init_program, p_program_handle );
 
-    // //bind shaders to program
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 3 ) ){
-    // 	    assert( false && "mem buffer for binding vertex shader failed." );
-    // 	}
-    // 	*data++ = 2;
-    // 	*data++ = *program_handle;
-    // 	*data++ = *shader_vertex;
-	
-    // 	::e2::interface::i_renderresource resource_bind_shader;
-    //     resource_bind_shader._empty_payload = false;
-    //     resource_bind_shader._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_bind_shader;
-    // 	payload_bind_shader._buf = &buf;
-    //     payload_bind_shader._offset = offset;
-    //     payload_bind_shader._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::bind );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::shader );
-    // 	pkg._payload = &payload_bind_shader;
-    // 	pkg._resource = &resource_bind_shader;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 3 ) ){
-    // 	    assert( false && "mem buffer for binding fragment shader failed." );
-    // 	}
-    // 	*data++ = 2;
-    // 	*data++ = *program_handle;
-    // 	*data++ = *shader_frag;
-	
-    // 	::e2::interface::i_renderresource resource_bind_shader;
-    //     resource_bind_shader._empty_payload = false;
-    //     resource_bind_shader._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_bind_shader;
-    // 	payload_bind_shader._buf = &buf;
-    //     payload_bind_shader._offset = offset;
-    //     payload_bind_shader._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::bind );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::shader );
-    // 	pkg._payload = &payload_bind_shader;
-    // 	pkg._resource = &resource_bind_shader;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
-
-
-    // //compile program
-    // {
-    // 	uint64_t * data;
-    // 	size_t offset;
-    // 	if( false == buf.buffer_get_next_available( &offset, &data, 2 ) ){
-    // 	    assert( false && "mem buffer for binding fragment shader failed." );
-    // 	}
-    // 	*data++ = 1;
-    // 	*data = *program_handle;
-	
-    // 	::e2::interface::i_renderresource resource_compile_program;
-    // 	resource_compile_program._empty_payload = false;
-    // 	resource_compile_program._offset_payload = 0;
-    // 	::e2::interface::i_renderpayload payload_compile_program;
-    // 	payload_compile_program._buf = &buf;
-    //     payload_compile_program._offset = offset;
-    //     payload_compile_program._payload_type = ::e2::interface::uint_n;
-	
-    // 	::e2::interface::i_renderpackage pkg;
-    // 	pkg.set_render_cmd_type( ::e2::interface::e_rendercmd_type::compute );
-    // 	pkg.set_render_resource_type( ::e2::interface::e_renderresource_type::program );
-    // 	pkg._payload = &payload_compile_program;
-    // 	pkg._resource = &resource_compile_program;
-    // 	pkg._num_payload = 1;
-    // 	pkg._num_resource = 1;
-    // 	rd.renderdevice_process( pkg );
-    // }
-
-    //task for swapping window buffer operation
+    //swap window buffer
     ::e2::interface::i_renderpackage * pkg_swap_window_buffer;
-    {
-	assert( ::e2::render::renderpackage_gl::pack( &buf, &pkg_swap_window_buffer, nullptr, nullptr, 0 ) );
-	pkg_swap_window_buffer->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
-	pkg_swap_window_buffer->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
-	pkg_swap_window_buffer->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buf_swap;
-    }
-    
+    renderback.swap_window_buffer( &buf, &pkg_swap_window_buffer );
+
+    //deinint opengl program
+    ::e2::interface::i_renderpackage * pkg_deinit_program;
+    renderback.deinit_program( &buf, &pkg_deinit_program, p_program_handle );
+
+    //deinint window
+    ::e2::interface::i_renderpackage * pkg_deinit_window;
+    renderback.deinit_window( &buf, &pkg_deinit_window );
+
+    //load vertex shader
+    ::e2::interface::i_renderpackage * pkg_load_shader_vertex;
+    uint64_t vertex_shader_handle;
+    uint64_t shader_type_vertex = ::e2::render::gl::VERTEX;
+    char * source_vertex_shader = "assets/ADS.vert";
+    renderback.load_shader( &buf, &pkg_load_shader_vertex, &vertex_shader_handle, &shader_type_vertex, source_vertex_shader, ::e2::interface::e_renderresource_subtype_shader_file );
+
+    //load frag shader
+    ::e2::interface::i_renderpackage * pkg_load_shader_frag;
+    uint64_t frag_shader_handle;
+    uint64_t shader_type_frag = ::e2::render::gl::FRAGMENT;
+    char * source_frag_shader = "assets/ADS.frag";
+    renderback.load_shader( &buf, &pkg_load_shader_frag, &frag_shader_handle, &shader_type_frag, source_frag_shader, ::e2::interface::e_renderresource_subtype_shader_file );
+
+    //bind vertex shader
+    ::e2::interface::i_renderpackage * pkg_bind_shader_vertex;
+    renderback.bind_shader( &buf, &pkg_bind_shader_vertex, p_program_handle, &vertex_shader_handle );
+    //bind fragment shader
+    ::e2::interface::i_renderpackage * pkg_bind_shader_frag;
+    renderback.bind_shader( &buf, &pkg_bind_shader_frag, p_program_handle, &frag_shader_handle );
+
+    //todo: set up and map attributes, uniform variables, frag outputs
+
+    //compile opengl program
+    ::e2::interface::i_renderpackage * pkg_bind_program;
+    renderback.bind_program( &buf, &pkg_bind_program, p_program_handle );
+
+    //start sequences
+    rd.renderdevice_process( *pkg_init_window );
+    rd.renderdevice_process( *pkg_init_program );
+    rd.renderdevice_process( *pkg_load_shader_vertex );
+    rd.renderdevice_process( *pkg_load_shader_frag );
+    rd.renderdevice_process( *pkg_bind_shader_vertex );
+    rd.renderdevice_process( *pkg_bind_shader_frag );
+    //todo: attributes, uniforms, frag output setup
+    // rd.renderdevice_process( *pkg_bind_program ); 
+
     glfwMakeContextCurrent( rd._window );
     glfwSetKeyCallback( rd._window, process_key_input );
     glfwSetMouseButtonCallback( rd._window, process_mouse_button );
-
     glfwSetCursorPosCallback( rd._window, process_mouse_move );
     while( false == glfwWindowShouldClose( rd._window ) ){
 	glfwMakeContextCurrent( rd._window );
@@ -261,20 +105,14 @@ int main(){
 	    glfwSetWindowShouldClose( rd._window, GLFW_TRUE);
 	}
 	glClearColor( 50, 50, 50, 1.0 );
-	//submit windowing buffer swap operation
 	rd.renderdevice_process( *pkg_swap_window_buffer );
 	glfwPollEvents();
 	std::this_thread::sleep_for( std::chrono::milliseconds(25) );
     }
-
-    {
-	::e2::interface::i_renderpackage * pkg_deinit_window;
-	assert( ::e2::render::renderpackage_gl::pack( &buf, &pkg_deinit_window, nullptr, nullptr, 0 ) );
-        pkg_deinit_window->set_render_cmd_type( ::e2::interface::e_rendercmd_type_deinit );
-        pkg_deinit_window->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
-        pkg_deinit_window->_resource_subtype = ::e2::interface::e_renderresource_subtype_na;
-	rd.renderdevice_process( *pkg_deinit_window );
-    }
-
+    rd.renderdevice_process( *pkg_deinit_program );
+    rd.renderdevice_process( *pkg_deinit_window );
+    double frac_free;
+    buf.buffer_stat_fraction_free( &frac_free );
+    std::cout << "buffer fraction free: " << frac_free << std::endl;
     return 0;
 }

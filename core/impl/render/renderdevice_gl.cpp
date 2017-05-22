@@ -72,6 +72,9 @@ renderdevice_gl_impl::renderdevice_gl_impl(){
                                                  ::e2::interface::e_renderresource_type_program ) ] = &process_compute_program;
 
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
+                                                 ::e2::interface::e_renderresource_type_shader ) ] = &process_bind_shader;
+	
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
                                                  ::e2::interface::e_renderresource_type_program ) ] = &process_bind_program;
 
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
@@ -121,12 +124,14 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
 
         glfwMakeContextCurrent( context->_window );
 
-        if( 0 != gl3wInit() ){
+	if (gl3wInit()) {
             assert( false && "gl3w initialization failed." );
-            return false;
-        }
-        glEnable( GL_DEPTH_TEST );
-        glClearColor( 50, 50, 50, 1.0 );
+	    return false;
+	}
+	if (!gl3wIsSupported(3, 3)) {
+	    assert( false && "OpenGL 3.3 not supported");
+	    return false;
+	}		
 
         const GLubyte * renderer = glGetString( GL_RENDERER );
         const GLubyte * vendor = glGetString( GL_VENDOR );
@@ -140,6 +145,9 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
         printf("gl version (string) : %s\n", version);
         printf("gl version (integer) : %d.%d\n", major, minor);
         printf("glsl version : %s\n", glslversion);
+
+	glEnable( GL_DEPTH_TEST );
+        glClearColor( 50, 50, 50, 1.0 );
     }
     return true;
 }
