@@ -8,7 +8,7 @@
 
 namespace e2 { namespace render { namespace gl {
 
-bool gl_helper::compile_shader_from_string( GLuint * shader, char const * Source, GLSLShaderType type ){
+bool gl_helper::compile_shader_from_string( GLuint * shader, char const * source, GLSLShaderType type ){
     bool ret;
     if( nullptr == shader ) return false;
 
@@ -25,7 +25,7 @@ bool gl_helper::compile_shader_from_string( GLuint * shader, char const * Source
 	assert( false );
 	return false;
     }
-    char const * sourceTextConst = Source;
+    char const * sourceTextConst = source;
     glShaderSource( *shader, 1, &sourceTextConst, NULL);	
     check_error();
 
@@ -106,7 +106,11 @@ bool gl_helper::use_program( GLuint program_handle ){
     glUseProgram( program_handle );
     return check_error();
 }
-
+bool gl_helper::set_program_parameter( GLuint program_handle, GLenum parameter, GLint value ){
+    glProgramParameteri( program_handle, parameter, value );
+    return check_error();
+}
+	    
 bool gl_helper::print_info(){
     const GLubyte * renderer = glGetString( GL_RENDERER );
     const GLubyte * vendor = glGetString( GL_VENDOR );

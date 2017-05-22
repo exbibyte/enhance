@@ -8,10 +8,10 @@
 
 namespace e2 { namespace render {
 
-class renderpayload_gl {
-public:
-    static bool unpack( size_t count_unpack, ::e2::interface::i_renderpayload *, void ** );
-};
+// class renderpayload_gl {
+// public:
+//     static bool unpack( size_t count_unpack, ::e2::interface::i_renderpayload *, void ** );
+// };
 
 } }
 

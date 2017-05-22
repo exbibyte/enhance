@@ -6,17 +6,17 @@
 namespace e2 { namespace interface {
 	
 enum e_rendercmd_type : uint64_t {
-    query = 1,
-    compute,
-    store,
-    load,
-    init,
-    deinit,
-    exec,
-    enable,
-    disable,
-    bind,
-    unbind,
+    e_rendercmd_type_query = 1,
+    e_rendercmd_type_compute,
+    e_rendercmd_type_store,
+    e_rendercmd_type_load,
+    e_rendercmd_type_init,
+    e_rendercmd_type_deinit,
+    e_rendercmd_type_exec,
+    e_rendercmd_type_enable,
+    e_rendercmd_type_disable,
+    e_rendercmd_type_bind,
+    e_rendercmd_type_unbind,
 };
 
 

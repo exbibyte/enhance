@@ -17,65 +17,71 @@ namespace e2 { namespace render {
 
 renderdevice_gl_impl::renderdevice_gl_impl(){
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::init,
-						 ::e2::interface::e_renderresource_type::windowing ) ] = &process_init_window;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_init,
+                                                 ::e2::interface::e_renderresource_type_windowing ) ] = &process_init_window;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
-						 ::e2::interface::e_renderresource_type::windowing ) ] = &process_deinit_window;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_deinit,
+                                                 ::e2::interface::e_renderresource_type_windowing ) ] = &process_deinit_window;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::exec,
-						 ::e2::interface::e_renderresource_type::windowing  ) ] = &process_exec_window;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_exec,
+                                                 ::e2::interface::e_renderresource_type_windowing  ) ] = &process_exec_window;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::store,
-						 ::e2::interface::e_renderresource_type::defineformat ) ] = &process_store_defineformat;
-	
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::bind,
-						 ::e2::interface::e_renderresource_type::object ) ] = &process_bind_object;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
+                                                 ::e2::interface::e_renderresource_type_defineformat ) ] = &process_store_defineformat;
+        
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
+                                                 ::e2::interface::e_renderresource_type_object ) ] = &process_bind_object;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::bind,
-						 ::e2::interface::e_renderresource_type::buffer ) ] = &process_bind_buffer;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
+                                                 ::e2::interface::e_renderresource_type_buffer ) ] = &process_bind_buffer;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::exec,
-						 ::e2::interface::e_renderresource_type::drawbatch ) ] = &process_exec_drawbatch;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_exec,
+                                                 ::e2::interface::e_renderresource_type_drawbatch ) ] = &process_exec_drawbatch;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::enable,
-						 ::e2::interface::e_renderresource_type::attrib ) ] = &process_enable_attrib;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_enable,
+                                                 ::e2::interface::e_renderresource_type_attrib ) ] = &process_enable_attrib;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::disable,
-						 ::e2::interface::e_renderresource_type::attrib ) ] = &process_disable_attrib;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_disable,
+                                                 ::e2::interface::e_renderresource_type_attrib ) ] = &process_disable_attrib;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::init,
-						 ::e2::interface::e_renderresource_type::object ) ] = &process_init_object;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_init,
+                                                 ::e2::interface::e_renderresource_type_object ) ] = &process_init_object;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
-						 ::e2::interface::e_renderresource_type::object ) ] = &process_deinit_object;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_deinit,
+                                                 ::e2::interface::e_renderresource_type_object ) ] = &process_deinit_object;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::store,
-						 ::e2::interface::e_renderresource_type::buffer ) ] = &process_store_buffer;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
+                                                 ::e2::interface::e_renderresource_type_buffer ) ] = &process_store_buffer;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::init,
-						 ::e2::interface::e_renderresource_type::buffer ) ] = &process_init_buffer;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_init,
+                                                 ::e2::interface::e_renderresource_type_buffer ) ] = &process_init_buffer;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
-						 ::e2::interface::e_renderresource_type::buffer ) ] = &process_deinit_buffer;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_deinit,
+                                                 ::e2::interface::e_renderresource_type_buffer ) ] = &process_deinit_buffer;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::bind,
-						 ::e2::interface::e_renderresource_type::attrib ) ] = &process_bind_attrib;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
+                                                 ::e2::interface::e_renderresource_type_attrib ) ] = &process_bind_attrib;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::init,
-						 ::e2::interface::e_renderresource_type::program ) ] = &process_init_program;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_init,
+                                                 ::e2::interface::e_renderresource_type_program ) ] = &process_init_program;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::deinit,
-						 ::e2::interface::e_renderresource_type::program ) ] = &process_deinit_program;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_deinit,
+                                                 ::e2::interface::e_renderresource_type_program ) ] = &process_deinit_program;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::compute,
-						 ::e2::interface::e_renderresource_type::program ) ] = &process_compute_program;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_compute,
+                                                 ::e2::interface::e_renderresource_type_program ) ] = &process_compute_program;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::bind,
-						 ::e2::interface::e_renderresource_type::program ) ] = &process_bind_program;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_bind,
+                                                 ::e2::interface::e_renderresource_type_program ) ] = &process_bind_program;
 
-    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type::store,
-						 ::e2::interface::e_renderresource_type::persistent ) ] = &process_store_persistent;
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
+                                                 ::e2::interface::e_renderresource_type_persistent ) ] = &process_store_persistent;
+
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_load,
+                                                 ::e2::interface::e_renderresource_type_shader ) ] = &process_load_shader;
+
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
+                                                 ::e2::interface::e_renderresource_type_program ) ] = &process_store_program;
 }
 
 bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackage p ){
@@ -93,60 +99,47 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
 #ifdef debug_info
     std::cout << "process init window" << std::endl;
 #endif
-    void * payload [256];
     if( false == glfwInit() ){
-	assert( false && "glfw init failed." );
-	return false;
+        assert( false && "glfw init failed." );
+        return false;
     }
     {
-	if( nullptr == p._payload ){
-	    assert( false && "init window dim invalid." );
-	    return false;
-	}
-	if( nullptr == p._payload->_buf ){
-	    assert( false && "buffer invalid." );
-	    return false;
-	}
-	if( false == renderpackage_gl::unpack( &p, payload ) )
-	    return false;
-	uint64_t * n_data = ( uint64_t * ) payload[0];
-	assert( n_data );
-	assert( 2 == *n_data );
-	uint64_t * wind_dim = ( uint64_t * ) payload[1];
-	assert( wind_dim );
-	int dimx = (int)*wind_dim;
-	++wind_dim;
-	int dimy = (int)*wind_dim;
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
-	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	context->_window = glfwCreateWindow( dimx, dimy, "renderdevice_gl window", nullptr, nullptr );
-	if( false == context->_window ){
-	    assert( false && "window creation failed." );
-	    return false;
-	}
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_wind_dimx,
+		                               ::e2::interface::e_renderresourcekey_wind_dimy } );
+        if( false == renderpackage_gl::unpack( &p, &f ) )
+            return false;
+        int * dimx = ( int * ) f[ ::e2::interface::e_renderresourcekey_wind_dimx ];
+	int * dimy = ( int * ) f[ ::e2::interface::e_renderresourcekey_wind_dimy ];
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+        context->_window = glfwCreateWindow( *dimx, *dimy, "renderdevice_gl window", nullptr, nullptr );
+        if( false == context->_window ){
+            assert( false && "window creation failed." );
+            return false;
+        }
 
-	glfwMakeContextCurrent( context->_window );
+        glfwMakeContextCurrent( context->_window );
 
-	if( 0 != gl3wInit() ){
-	    assert( false && "gl3w initialization failed." );
-	    return false;
-	}
-	glEnable( GL_DEPTH_TEST );
-	glClearColor( 50, 50, 50, 1.0 );
+        if( 0 != gl3wInit() ){
+            assert( false && "gl3w initialization failed." );
+            return false;
+        }
+        glEnable( GL_DEPTH_TEST );
+        glClearColor( 50, 50, 50, 1.0 );
 
-	const GLubyte * renderer = glGetString( GL_RENDERER );
-	const GLubyte * vendor = glGetString( GL_VENDOR );
-	const GLubyte * version = glGetString( GL_VERSION );
-	const GLubyte * glslversion = glGetString( GL_SHADING_LANGUAGE_VERSION );
-	GLint major, minor;
-	glGetIntegerv(GL_MAJOR_VERSION, &major);
-	glGetIntegerv(GL_MINOR_VERSION, &minor);
-	printf("gl vendor: %s\n", vendor);
-	printf("gl renderer : %s\n", renderer);
-	printf("gl version (string) : %s\n", version);
-	printf("gl version (integer) : %d.%d\n", major, minor);
-	printf("glsl version : %s\n", glslversion);
+        const GLubyte * renderer = glGetString( GL_RENDERER );
+        const GLubyte * vendor = glGetString( GL_VENDOR );
+        const GLubyte * version = glGetString( GL_VERSION );
+        const GLubyte * glslversion = glGetString( GL_SHADING_LANGUAGE_VERSION );
+        GLint major, minor;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+        printf("gl vendor: %s\n", vendor);
+        printf("gl renderer : %s\n", renderer);
+        printf("gl version (string) : %s\n", version);
+        printf("gl version (integer) : %d.%d\n", major, minor);
+        printf("glsl version : %s\n", glslversion);
     }
     return true;
 }
@@ -156,56 +149,55 @@ bool renderdevice_gl_impl::process_deinit_window( renderdevice_gl_impl * context
     std::cout << "process deinit window" << std::endl;
 #endif
     if( nullptr != context->_window ){
-	glfwDestroyWindow( context->_window );
-	context->_window = nullptr;
+        glfwDestroyWindow( context->_window );
+        context->_window = nullptr;
     }
     glfwTerminate();
     return true;
 }
 
 bool renderdevice_gl_impl::process_exec_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    switch( p._resource->_id ){
-    case ::e2::interface::e_renderresource_window::window_buf_swap:
+    switch( p._resource_subtype ){
+    case ::e2::interface::e_renderresource_subtype_window_buf_swap:
     {
-	assert( context->_window );
+        assert( context->_window );
 #ifdef debug_info
-	std::cout << "process window buf swap" << std::endl;
+        std::cout << "process window buf swap" << std::endl;
 #endif
-	glfwMakeContextCurrent( context->_window );
-	glfwSwapBuffers( context->_window );
+        glfwMakeContextCurrent( context->_window );
+        glfwSwapBuffers( context->_window );
     }
     break;
     default:
     {
-	return false;
+        return false;
     }
     }
     return true;
 }
 
 bool renderdevice_gl_impl::process_exec_drawbatch( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    GLenum gl_primitive_type;
-    GLint gl_first;
-    GLsizei gl_count;
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_primitive_type,
+		                           ::e2::interface::e_renderresourcekey_primitive_offset,
+		                           ::e2::interface::e_renderresourcekey_primitive_count } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * primitive_type = ( uint64_t * )payload[1];
-    uint64_t * offset = ( uint64_t * )payload[2];
-    uint64_t * count = ( uint64_t * )payload[3];
-    assert( n_data );
-    assert( 3 == *n_data );
+    uint64_t * primitive_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_primitive_type ];
+    int * offset = ( int * ) f[ ::e2::interface::e_renderresourcekey_primitive_offset ];
+    int * count = ( int * ) f[ ::e2::interface::e_renderresourcekey_primitive_count ];
     assert( primitive_type );
     assert( offset );
     assert( count );
+    GLenum gl_primitive_type;
+    GLint gl_first;
+    GLsizei gl_count;
     {
-	auto it = rendermap_gl::_map_render_primitives.find( *primitive_type );
-	if( rendermap_gl::_map_render_primitives.end() == it ){
-	    assert( false && "map render primitive invalid." );
-	    return false;
-	}
-	gl_primitive_type = it->second;
+        auto it = rendermap_gl::_map_render_primitives.find( *primitive_type );
+        if( rendermap_gl::_map_render_primitives.end() == it ){
+            assert( false && "map render primitive invalid." );
+            return false;
+        }
+        gl_primitive_type = it->second;
     }
     gl_first = static_cast< GLint >( *offset );
     gl_count = static_cast< GLsizei >( *count );
@@ -214,407 +206,391 @@ bool renderdevice_gl_impl::process_exec_drawbatch( renderdevice_gl_impl * contex
 }
 
 bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_defineformat_vertex_attrib_data == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * va_index = ( uint64_t * )payload[1];
-	uint64_t * va_size = ( uint64_t * )payload[2];
-	uint64_t * va_type = ( uint64_t * )payload[3];
-	uint64_t * va_normalized = ( uint64_t * )payload[4];
-	uint64_t * va_stride = ( uint64_t * )payload[5];
-	uint64_t * va_pointer = ( uint64_t * )payload[6];
-	assert( n_data );
-	assert( va_index );
-	assert( va_size );
-	assert( va_type );
-	assert( va_normalized );
-	assert( va_stride );
-	assert( va_pointer );
-	assert( 6 == *n_data );
-	GLuint gl_va_index = ( GLuint ) *va_index;
-	GLint gl_va_size = ( GLint ) *va_size;
-	GLenum gl_va_type = ( GLenum ) *va_type;
-	GLboolean gl_va_normalized = ( GLboolean ) *va_normalized;
-	GLsizei gl_va_stride = ( GLsizei ) *va_stride;
-	GLvoid * gl_va_pointer = ( GLvoid * ) *va_pointer;
-	ret = ::e2::render::gl::gl_helper::define_vertex_attrib_data( gl_va_index, gl_va_size, gl_va_type, gl_va_normalized, gl_va_stride, gl_va_pointer );
+    if( ::e2::interface::e_renderresource_subtype_vertex_attrib_data == p._resource_subtype ){
+
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_index,
+		                               ::e2::interface::e_renderresourcekey_size,
+		                               ::e2::interface::e_renderresourcekey_normalized,
+		                               ::e2::interface::e_renderresourcekey_stride,
+		                               ::e2::interface::e_renderresourcekey_pointer } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+        GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_index ];
+	GLint * gl_va_size = ( GLint * ) f[ ::e2::interface::e_renderresourcekey_size ];
+	GLenum * gl_va_type = ( GLenum * ) f[ ::e2::interface::e_renderresourcekey_type ];
+	GLboolean * gl_va_normalized = ( GLboolean * ) f[ ::e2::interface::e_renderresourcekey_normalized ];
+	GLsizei * gl_va_stride = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_stride ];
+	GLvoid * gl_va_pointer = ( GLvoid * ) f[ ::e2::interface::e_renderresourcekey_pointer ];       
+        assert( gl_va_index );
+        assert( gl_va_size );
+        assert( gl_va_type );
+        assert( gl_va_normalized );
+        assert( gl_va_stride );
+        assert( gl_va_pointer );
+	return ::e2::render::gl::gl_helper::define_vertex_attrib_data( *gl_va_index, *gl_va_size, *gl_va_type, *gl_va_normalized, *gl_va_stride, gl_va_pointer );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_bind_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_object_vertex_array == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * vertex_array_handle = ( uint64_t * )payload[1];
-	assert( n_data );
-	assert( 1 == *n_data );
-	assert( vertex_array_handle );
-	GLuint gl_vertex_array_handle = ( GLuint ) *vertex_array_handle;
-	ret = ::e2::render::gl::gl_helper::bind_vertex_array( gl_vertex_array_handle );
+    if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_handle } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+        GLuint * gl_vertex_array_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_handle ];
+        assert( gl_vertex_array_handle );
+	return ::e2::render::gl::gl_helper::bind_vertex_array( *gl_vertex_array_handle );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_bind_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_type,
+		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    auto it = rendermap_gl::_map_render_bind_buffer.find( p._resource->_id );
+    uint64_t * buffer_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_type ];
+    GLuint * gl_buffer_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_handle ];
+    assert( gl_buffer_handle );
+    assert( buffer_type );
+    auto it = rendermap_gl::_map_render_bind_buffer.find( *buffer_type );
     if( rendermap_gl::_map_render_bind_buffer.end() == it ){
-	assert( false && "bind buffer type invalid." );
-	return false;
+        assert( false && "bind buffer type invalid." );
+        return false;
     }
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * buffer_handle = ( uint64_t * )payload[1];
-    assert( n_data );
-    assert( buffer_handle );
-    assert( 1 == *n_data );
     GLenum gl_buffer_type = it->second;
-    GLuint gl_buffer_handle = ( GLuint ) *buffer_handle;
-    return ::e2::render::gl::gl_helper::bind_buffer( gl_buffer_type, gl_buffer_handle );
+    return ::e2::render::gl::gl_helper::bind_buffer( gl_buffer_type, *gl_buffer_handle );
 }
 
 bool renderdevice_gl_impl::process_enable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_enable_attrib_vertex_attrib_array == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * va_index = ( uint64_t * )payload[1];
-	assert( n_data );
-	assert( 1 == *n_data );
-	assert( va_index );
-	GLuint gl_va_index = ( GLuint ) *va_index;
-	ret = ::e2::render::gl::gl_helper::enable_vertex_attrib_array( gl_va_index );
+    if( ::e2::interface::e_renderresource_subtype_vertex_attrib_array == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
+	assert( gl_va_index );
+        return ::e2::render::gl::gl_helper::enable_vertex_attrib_array( *gl_va_index );
     }
-    return ret;
+    return false;
 }
 
-bool renderdevice_gl_impl::process_disable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_disable_attrib_vertex_attrib_array == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * va_index = ( uint64_t * )payload[1];
-	assert( n_data );
-	assert( 1 == *n_data );
-	assert( va_index );
-	GLuint gl_va_index = ( GLuint ) *va_index;
-	ret = ::e2::render::gl::gl_helper::disable_vertex_attrib_array( gl_va_index );
+bool renderdevice_gl_impl::process_disable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){;
+    if( ::e2::interface::e_renderresource_subtype_vertex_attrib_array == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
+        assert( gl_va_index );
+        return ::e2::render::gl::gl_helper::disable_vertex_attrib_array( *gl_va_index );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_init_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_object_vertex_array == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * size_va_names = ( uint64_t * )payload[1];
-	uint64_t * va_array = ( uint64_t * )payload[2];
-	assert( n_data );
-	assert( 2 == *n_data );
-	assert( size_va_names );
-	assert( va_array );
-	GLsizei gl_size_va_names = ( GLsizei ) *size_va_names;
-        GLuint * gl_va_array = ( GLuint * ) va_array;
-	ret = ::e2::render::gl::gl_helper::generate_vertex_arrays( gl_size_va_names, gl_va_array );
+    if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_names,
+		                               ::e2::interface::e_renderresourcekey_va_array } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_names ];
+        GLuint * gl_va_array = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_array ];
+        assert( gl_size_va_names );
+        assert( gl_va_array );
+	return ::e2::render::gl::gl_helper::generate_vertex_arrays( *gl_size_va_names, gl_va_array );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_deinit_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_object_vertex_array == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * size_va_names = ( uint64_t * )payload[1];
-	uint64_t * va_array = ( uint64_t * )payload[2];
-	assert( n_data );
-	assert( 2 == *n_data );
-	assert( size_va_names );
-	assert( va_array );
-	GLsizei gl_size_va_names = ( GLsizei ) *size_va_names;
-        GLuint * gl_va_array = ( GLuint * ) va_array;
-	ret = ::e2::render::gl::gl_helper::delete_vertex_arrays( gl_size_va_names, gl_va_array );
+    if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_names,
+		                               ::e2::interface::e_renderresourcekey_va_array } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_names ];
+        GLuint * gl_va_array = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_array ];
+        assert( gl_size_va_names );
+        assert( gl_va_array );
+	return ::e2::render::gl::gl_helper::delete_vertex_arrays( *gl_size_va_names, gl_va_array );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_store_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_type,
+		                           ::e2::interface::e_renderresourcekey_buffer_size,
+		                           ::e2::interface::e_renderresourcekey_buffer_data,
+		                           ::e2::interface::e_renderresourcekey_buffer_usage } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    auto it = rendermap_gl::_map_render_bind_buffer.find( p._resource->_id );
+    uint64_t * buffer_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_type ];
+    GLsizeiptr * gl_bytes_size = ( GLsizeiptr * ) f[ ::e2::interface::e_renderresourcekey_buffer_size ];
+    GLvoid * gl_data = ( GLvoid * ) f[ ::e2::interface::e_renderresourcekey_buffer_data ];
+    GLenum * gl_usage = ( GLenum * ) f[ ::e2::interface::e_renderresourcekey_buffer_usage ];
+    assert( buffer_type );
+    assert( gl_bytes_size );
+    assert( gl_data );
+    assert( gl_usage );
+    auto it = rendermap_gl::_map_render_bind_buffer.find( *buffer_type );
     if( rendermap_gl::_map_render_bind_buffer.end() == it ){
-	assert( false && "bind buffer type invalid." );
-	return false;
+        assert( false && "bind buffer type invalid." );
+        return false;
     }
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * bytes_size = ( uint64_t * )payload[1];
-    uint64_t * data = ( uint64_t * )payload[2];
-    uint64_t * usage = ( uint64_t * )payload[3];
-    assert( n_data );
-    assert( bytes_size );
-    assert( data );
-    assert( usage );
-    assert( 3 == *n_data );
     GLenum gl_buffer_type = it->second;
-    GLsizeiptr gl_bytes_size = ( GLsizeiptr ) *bytes_size;
-    GLvoid * gl_data = ( GLvoid * ) data;
-    GLenum gl_usage = ( GLenum ) *usage;
-    return ::e2::render::gl::gl_helper::store_buffer_data( gl_buffer_type, gl_bytes_size, gl_data, gl_usage );
+    return ::e2::render::gl::gl_helper::store_buffer_data( gl_buffer_type, *gl_bytes_size, gl_data, *gl_usage );
 }
 
 bool renderdevice_gl_impl::process_init_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_num,
+		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    bool ret = false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * num_buffers = ( uint64_t * )payload[1];
-    uint64_t * buffers = ( uint64_t * )payload[2];
-    assert( n_data );
-    assert( 2 == *n_data );
-    assert( num_buffers );
-    assert( buffers );
-    GLsizei gl_num_buffers = ( GLsizei ) *num_buffers;
-    GLuint * gl_buffers = ( GLuint * ) buffers;
-    ret = ::e2::render::gl::gl_helper::generate_buffers( gl_num_buffers, gl_buffers );
-    return ret;
+    GLsizei * gl_num_buffers = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
+    GLuint * gl_buffers = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];    
+    assert( gl_num_buffers );
+    assert( gl_buffers );
+    return ::e2::render::gl::gl_helper::generate_buffers( *gl_num_buffers, gl_buffers );
 }
 
 bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_num,
+		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    bool ret = false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * num_buffers = ( uint64_t * )payload[1];
-    uint64_t * buffers = ( uint64_t * )payload[2];
-    assert( n_data );
-    assert( 2 == *n_data );
-    assert( num_buffers );
-    assert( buffers );
-    GLsizei gl_num_buffers = ( GLsizei ) *num_buffers;
-    GLuint * gl_buffers = ( GLuint * ) buffers;
-    ret = ::e2::render::gl::gl_helper::delete_buffers( gl_num_buffers, gl_buffers );
-    return ret;
+    GLsizei * gl_num_buffers = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
+    GLuint * gl_buffers = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];    
+    assert( gl_num_buffers );
+    assert( gl_buffers );
+    return ::e2::render::gl::gl_helper::delete_buffers( *gl_num_buffers, gl_buffers );
 }
 
 bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    bool ret = false;
-    if( ::e2::interface::renderresource_attrib_attrib_location == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * program_handle = ( uint64_t * )payload[1];
-	uint64_t * attrib_index = ( uint64_t * )payload[2];
-	uint64_t * attrib_name = ( uint64_t * )payload[3];
-	assert( n_data );
-	assert( 3 == *n_data );
-	assert( program_handle );
-	assert( attrib_index );
-	assert( attrib_name );
-	GLuint gl_program_handle = ( GLuint ) *program_handle;
-	GLuint gl_attrib_index = ( GLuint ) *attrib_index;
-        GLchar * gl_attrib_name = ( GLchar * ) attrib_name;
-	ret = ::e2::render::gl::gl_helper::bind_attrib_location( gl_program_handle, gl_attrib_index, gl_attrib_name );
-    }else if( ::e2::interface::renderresource_attrib_frag == p._resource->_id ){
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * program_handle = ( uint64_t * )payload[1];
-	uint64_t * attrib_index = ( uint64_t * )payload[2];
-	uint64_t * attrib_name = ( uint64_t * )payload[3];
-	assert( n_data );
-	assert( 3 == *n_data );
-	assert( program_handle );
-	assert( attrib_index );
-	assert( attrib_name );
-	GLuint gl_program_handle = ( GLuint ) *program_handle;
-	GLuint gl_color_num = ( GLuint ) *attrib_index;
-        char * gl_varying_name = ( char * ) attrib_name;
-	ret = ::e2::render::gl::gl_helper::bind_frag_data_location( gl_program_handle, gl_color_num, gl_varying_name );
+    if( ::e2::interface::e_renderresource_subtype_attrib_location == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                               ::e2::interface::e_renderresourcekey_attrib_index,
+		                               ::e2::interface::e_renderresourcekey_attrib_name } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+	GLuint * gl_attrib_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_attrib_index ];
+	GLchar * gl_attrib_name = ( GLchar * ) f[ ::e2::interface::e_renderresourcekey_attrib_name ];
+	assert( gl_program_handle );
+        assert( gl_attrib_index );
+        assert( gl_attrib_name );
+        return ::e2::render::gl::gl_helper::bind_attrib_location( *gl_program_handle, *gl_attrib_index, gl_attrib_name );
+    }else if( ::e2::interface::e_renderresource_subtype_attrib_frag == p._resource_subtype ){
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                               ::e2::interface::e_renderresourcekey_frag_location,
+		                               ::e2::interface::e_renderresourcekey_frag_name } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+	GLuint * gl_frag_location = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_frag_location ];
+	char * gl_frag_name = ( char * ) f[ ::e2::interface::e_renderresourcekey_frag_name ];
+	assert( gl_program_handle );
+        assert( gl_frag_location );
+        assert( gl_frag_name );
+        return ::e2::render::gl::gl_helper::bind_frag_data_location( *gl_program_handle, *gl_frag_location, gl_frag_name );
     }
-    return ret;
+    return false;
 }
 
 bool renderdevice_gl_impl::process_init_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    assert( n_data );
-    assert( 1 == *n_data );
-    assert( program_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;    
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
     return ::e2::render::gl::gl_helper::create_program( gl_program_handle );
 }
 
 bool renderdevice_gl_impl::process_deinit_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    assert( n_data );
-    assert( 1 == *n_data );
-    assert( program_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
     return ::e2::render::gl::gl_helper::delete_program( *gl_program_handle );
 }
 
 bool renderdevice_gl_impl::process_bind_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                           ::e2::interface::e_renderresourcekey_shader_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    uint64_t * shader_handle = ( uint64_t * )payload[2];
-    assert( n_data );
-    assert( 2 == *n_data );
-    assert( program_handle );
-    assert( shader_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;
-    GLuint * gl_shader_handle = ( GLuint * ) shader_handle;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    GLuint * gl_shader_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_shader_handle ];
+    assert( gl_program_handle );
+    assert( gl_shader_handle );
     return ::e2::render::gl::gl_helper::attach_shader( *gl_program_handle, *gl_shader_handle );
 }
 
 bool renderdevice_gl_impl::process_unbind_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                           ::e2::interface::e_renderresourcekey_shader_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    uint64_t * shader_handle = ( uint64_t * )payload[2];
-    assert( n_data );
-    assert( 2 == *n_data );
-    assert( program_handle );
-    assert( shader_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;
-    GLuint * gl_shader_handle = ( GLuint * ) shader_handle;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    GLuint * gl_shader_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_shader_handle ];
+    assert( gl_program_handle );
+    assert( gl_shader_handle );
     return ::e2::render::gl::gl_helper::detach_shader( *gl_program_handle, *gl_shader_handle );
 }
 
 bool renderdevice_gl_impl::process_compute_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    assert( n_data );
-    assert( 1 == *n_data );
-    assert( program_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
     return ::e2::render::gl::gl_helper::link_program( *gl_program_handle );
 }
 
 bool renderdevice_gl_impl::process_bind_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    uint64_t * n_data = ( uint64_t * )payload[0];
-    uint64_t * program_handle = ( uint64_t * )payload[1];
-    assert( n_data );
-    assert( 1 == *n_data );
-    assert( program_handle );
-    GLuint * gl_program_handle = ( GLuint * ) program_handle;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
     return ::e2::render::gl::gl_helper::use_program( *gl_program_handle );
 }
 
 bool renderdevice_gl_impl::process_store_persistent( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    void * payload [256];
-    if( false == renderpackage_gl::unpack( &p, payload ) )
-	return false;
-    switch( p._resource->_id ){
-    case ::e2::interface::renderresource_persistent_vec_f:
+    switch( p._resource_subtype ){
+    case ::e2::interface::e_renderresource_subtype_persistent_vec_f:
     {
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * dim = ( uint64_t * )payload[1];
-        GLuint * gl_program_handle = ( GLuint * )payload[2];
-        char * name = ( char * )payload[3];
-        float * vec = ( float * )payload[4];
-	assert( n_data );
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                               ::e2::interface::e_renderresourcekey_dim,
+		                               ::e2::interface::e_renderresourcekey_name,
+		                               ::e2::interface::e_renderresourcekey_arrayf } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+	uint64_t * dim = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_dim ];
+	char * name = ( char * ) f[ ::e2::interface::e_renderresourcekey_name ];
+	float * vec = ( float * ) f[ ::e2::interface::e_renderresourcekey_arrayf ];
+	assert( gl_program_handle );	    
 	assert( dim );
-	assert( gl_program_handle );
 	assert( name );
 	assert( vec );
-	assert( 4 == *n_data );
-	switch( *dim ){
-	case 1:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_f1( *gl_program_handle, name, vec );
-	}
-	break;
-	case 2:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_f2( *gl_program_handle, name, vec );
-	}
-	break;
-	case 3:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_f3( *gl_program_handle, name, vec );
-	}
-	break;
-	case 4:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_f4( *gl_program_handle, name, vec );
-	}
-	break;
-	}
+        switch( *dim ){
+        case 1:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_f1( *gl_program_handle, name, vec );
+        }
+        break;
+        case 2:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_f2( *gl_program_handle, name, vec );
+        }
+        break;
+        case 3:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_f3( *gl_program_handle, name, vec );
+        }
+        break;
+        case 4:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_f4( *gl_program_handle, name, vec );
+        }
+        break;
+        }
     }
     break;
-    case ::e2::interface::renderresource_persistent_mat_f:
+    case ::e2::interface::e_renderresource_subtype_persistent_mat_f:
     {
-	uint64_t * n_data = ( uint64_t * )payload[0];
-	uint64_t * dim = ( uint64_t * )payload[1];
-        GLuint * gl_program_handle = ( GLuint * )payload[2];
-        char * name = ( char * )payload[3];
-        float * m = ( float * )payload[4];
-	assert( n_data );
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                               ::e2::interface::e_renderresourcekey_dim,
+		                               ::e2::interface::e_renderresourcekey_name,
+		                               ::e2::interface::e_renderresourcekey_arrayf } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+	uint64_t * dim = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_dim ];
+	char * name = ( char * ) f[ ::e2::interface::e_renderresourcekey_name ];
+	float * vec = ( float * ) f[ ::e2::interface::e_renderresourcekey_arrayf ];
+	assert( gl_program_handle );	    
 	assert( dim );
-	assert( gl_program_handle );
 	assert( name );
-	assert( m );
-	assert( 4 == *n_data );
-	switch( *dim ){
-	case 2:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_matf2( *gl_program_handle, name, m );
-	}
-	break;
-	case 3:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_matf3( *gl_program_handle, name, m );
-	}
-	break;
-	case 4:
-	{
-	    return ::e2::render::gl::gl_helper::set_uniform_matf4( *gl_program_handle, name, m );
-	}
-	break;
-	}
+	assert( vec );
+        switch( *dim ){
+        case 2:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_matf2( *gl_program_handle, name, vec );
+        }
+        break;
+        case 3:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_matf3( *gl_program_handle, name, vec );
+        }
+        break;
+        case 4:
+        {
+            return ::e2::render::gl::gl_helper::set_uniform_matf4( *gl_program_handle, name, vec );
+        }
+        break;
+        }
     }
     break;
     default:
     {
     }
     break;
+    }
+    return false;
+}
+
+bool renderdevice_gl_impl::process_load_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_shader_handle,
+		                           ::e2::interface::e_renderresourcekey_shader_source,
+		                           ::e2::interface::e_renderresourcekey_shader_type } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
+	return false;
+    GLuint * gl_shader_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_shader_handle ];
+    char * shader_source = ( char * ) f[ ::e2::interface::e_renderresourcekey_shader_source ];
+    uint64_t * shader_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_shader_type ];
+    assert( gl_shader_handle );
+    assert( shader_source );
+    assert( shader_type );
+    switch( p._resource_subtype ){
+    case ::e2::interface::e_renderresource_subtype_shader_file:
+    {
+        return ::e2::render::gl::gl_helper::compile_shader_from_file( gl_shader_handle, shader_source, ( ::e2::render::gl::GLSLShaderType ) *shader_type );
+    }
+    break;
+    case ::e2::interface::e_renderresource_subtype_shader_string:
+    {
+        return ::e2::render::gl::gl_helper::compile_shader_from_string( gl_shader_handle, shader_source, ( ::e2::render::gl::GLSLShaderType ) *shader_type );
+    }
+    break;
+    default:
+    {
+    }
+    }
+    return false;
+}
+
+bool renderdevice_gl_impl::process_store_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){   
+    switch( p._resource_subtype ){
+    case ::e2::interface::e_renderresource_subtype_program_parameter:
+    {
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
+		                               ::e2::interface::e_renderresourcekey_program_param_type,
+		                               ::e2::interface::e_renderresourcekey_program_param_val } );
+	if( false == renderpackage_gl::unpack( &p, &f ) )
+	    return false;
+	GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+	GLuint * gl_parameter = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_param_type ];
+	GLuint * gl_parameter_value = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_param_val ];
+        assert( gl_program_handle );
+        assert( gl_parameter );
+        assert( gl_parameter_value );
+        return ::e2::render::gl::gl_helper::set_program_parameter( *gl_program_handle, *gl_parameter, *gl_parameter_value );
+    }
+    break;
+    default:
+    {
+    }
     }
     return false;
 }

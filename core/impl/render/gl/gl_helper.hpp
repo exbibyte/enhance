@@ -5,8 +5,8 @@
 
 namespace e2 { namespace render { namespace gl {
 
-enum class GLSLShaderType {
-    VERTEX, FRAGMENT, GEOMETRY,TESS_CONTROL, TESS_EVALUATION
+enum GLSLShaderType {
+    VERTEX = 1, FRAGMENT, GEOMETRY,TESS_CONTROL, TESS_EVALUATION
 };
 
 class gl_helper {
@@ -20,6 +20,7 @@ public:
     static bool detach_shader( GLuint program_handle, GLuint shader_handle );
     static bool link_program( GLuint program );
     static bool use_program( GLuint program );
+    static bool set_program_parameter( GLuint program_handle, GLenum parameter, GLint value );
     static bool print_info();
     static bool check_error();
 
