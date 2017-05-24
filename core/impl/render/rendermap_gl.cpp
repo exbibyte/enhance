@@ -38,4 +38,8 @@ std::unordered_map< uint64_t, GLenum > rendermap_gl::_map_render_bind_buffer = {
     { ::e2::interface::e_renderresource_buffer_uniform_buffer, GL_UNIFORM_BUFFER },
 };
 
+std::unordered_map< uint64_t, GLenum > rendermap_gl::_map_render_data_type = {
+    { ::e2::interface::e_renderresource_data_type_float, GL_FLOAT },
+};
+
 } }

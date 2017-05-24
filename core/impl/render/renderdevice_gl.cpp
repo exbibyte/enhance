@@ -85,6 +85,13 @@ renderdevice_gl_impl::renderdevice_gl_impl(){
 
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_store,
                                                  ::e2::interface::e_renderresource_type_program ) ] = &process_store_program;
+
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_query,
+                                                 ::e2::interface::e_renderresource_type_persistent ) ] = &process_query_persistent;
+
+    _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_query,
+                                                 ::e2::interface::e_renderresource_type_attrib ) ] = &process_query_attrib;
+						 
 }
 
 bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackage p ){
@@ -218,6 +225,7 @@ bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * co
 
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_index,
 		                               ::e2::interface::e_renderresourcekey_size,
+		                               ::e2::interface::e_renderresourcekey_type,
 		                               ::e2::interface::e_renderresourcekey_normalized,
 		                               ::e2::interface::e_renderresourcekey_stride,
 		                               ::e2::interface::e_renderresourcekey_pointer } );
@@ -225,17 +233,23 @@ bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * co
 	    return false;
         GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_index ];
 	GLint * gl_va_size = ( GLint * ) f[ ::e2::interface::e_renderresourcekey_size ];
-	GLenum * gl_va_type = ( GLenum * ) f[ ::e2::interface::e_renderresourcekey_type ];
+        uint64_t * va_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_type ];
 	GLboolean * gl_va_normalized = ( GLboolean * ) f[ ::e2::interface::e_renderresourcekey_normalized ];
 	GLsizei * gl_va_stride = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_stride ];
-	GLvoid * gl_va_pointer = ( GLvoid * ) f[ ::e2::interface::e_renderresourcekey_pointer ];       
+	GLvoid * gl_va_pointer = ( GLvoid * ) f[ ::e2::interface::e_renderresourcekey_pointer ];   
         assert( gl_va_index );
         assert( gl_va_size );
-        assert( gl_va_type );
+        assert( va_type );
         assert( gl_va_normalized );
         assert( gl_va_stride );
         assert( gl_va_pointer );
-	return ::e2::render::gl::gl_helper::define_vertex_attrib_data( *gl_va_index, *gl_va_size, *gl_va_type, *gl_va_normalized, *gl_va_stride, gl_va_pointer );
+	auto it = rendermap_gl::_map_render_data_type.find( *va_type );
+	if( rendermap_gl::_map_render_data_type.end() == it ){
+	    assert( false && "data type invalid." );
+	    return false;
+	}
+	GLenum gl_va_type = it->second;
+	return ::e2::render::gl::gl_helper::define_vertex_attrib_data( *gl_va_index, *gl_va_size, gl_va_type, *gl_va_normalized, *gl_va_stride, gl_va_pointer );
     }
     return false;
 }
@@ -296,12 +310,12 @@ bool renderdevice_gl_impl::process_disable_attrib( renderdevice_gl_impl * contex
 
 bool renderdevice_gl_impl::process_init_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
-	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_names,
-		                               ::e2::interface::e_renderresourcekey_va_array } );
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_num,
+		                               ::e2::interface::e_renderresourcekey_va_handle } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
 	    return false;
-	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_names ];
-        GLuint * gl_va_array = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_array ];
+	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_num ];
+        GLuint * gl_va_array = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_handle ];
         assert( gl_size_va_names );
         assert( gl_va_array );
 	return ::e2::render::gl::gl_helper::generate_vertex_arrays( *gl_size_va_names, gl_va_array );
@@ -311,11 +325,11 @@ bool renderdevice_gl_impl::process_init_object( renderdevice_gl_impl * context, 
 
 bool renderdevice_gl_impl::process_deinit_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
-	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_names,
+	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_num,
 		                               ::e2::interface::e_renderresourcekey_va_array } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
 	    return false;
-	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_names ];
+	GLsizei * gl_size_va_names = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_va_num ];
         GLuint * gl_va_array = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_array ];
         assert( gl_size_va_names );
         assert( gl_va_array );
@@ -353,11 +367,17 @@ bool renderdevice_gl_impl::process_init_buffer( renderdevice_gl_impl * context, 
 		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    GLsizei * gl_num_buffers = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
-    GLuint * gl_buffers = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];    
-    assert( gl_num_buffers );
-    assert( gl_buffers );
-    return ::e2::render::gl::gl_helper::generate_buffers( *gl_num_buffers, gl_buffers );
+    uint64_t * num_buffers = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
+    uint64_t * buffers = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_handle ];
+    assert( num_buffers );
+    assert( buffers );
+    GLsizei gl_num_buffers = ( GLsizei ) *num_buffers;
+    std::vector< GLuint > gl_buffers( *num_buffers );
+    assert( ::e2::render::gl::gl_helper::generate_buffers( gl_num_buffers, &gl_buffers[0] ) );
+    for( size_t i = 0; i < *num_buffers; ++i ){
+	buffers[i] = gl_buffers[i];
+    }
+    return true;
 }
 
 bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
@@ -373,7 +393,7 @@ bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context
 }
 
 bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    if( ::e2::interface::e_renderresource_subtype_attrib_location == p._resource_subtype ){
+    if( ::e2::interface::e_renderresource_subtype_attrib_attrib_location == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
 		                               ::e2::interface::e_renderresourcekey_attrib_index,
 		                               ::e2::interface::e_renderresourcekey_attrib_name } );
@@ -386,7 +406,7 @@ bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, 
         assert( gl_attrib_index );
         assert( gl_attrib_name );
         return ::e2::render::gl::gl_helper::bind_attrib_location( *gl_program_handle, *gl_attrib_index, gl_attrib_name );
-    }else if( ::e2::interface::e_renderresource_subtype_attrib_frag == p._resource_subtype ){
+    }else if( ::e2::interface::e_renderresource_subtype_attrib_frag_location == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
 		                               ::e2::interface::e_renderresourcekey_frag_location,
 		                               ::e2::interface::e_renderresourcekey_frag_name } );
@@ -601,6 +621,23 @@ bool renderdevice_gl_impl::process_store_program( renderdevice_gl_impl * context
     }
     }
     return false;
+}
+
+bool renderdevice_gl_impl::process_query_persistent( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p ){
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
+        return false;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
+    return ::e2::render::gl::gl_helper::print_active_uniforms( *gl_program_handle );
+}
+bool renderdevice_gl_impl::process_query_attrib( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p ){
+    ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
+    if( false == renderpackage_gl::unpack( &p, &f ) )
+        return false;
+    GLuint * gl_program_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_program_handle ];
+    assert( gl_program_handle );
+    return ::e2::render::gl::gl_helper::print_active_attribs( *gl_program_handle );
 }
 
 } }

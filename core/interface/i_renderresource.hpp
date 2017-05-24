@@ -22,7 +22,7 @@ enum e_renderresourcekey : uint64_t {
     e_renderresourcekey_buffer_handle,
     e_renderresourcekey_buffer_type,
     e_renderresourcekey_va_index,
-    e_renderresourcekey_va_names,
+    e_renderresourcekey_va_num,
     e_renderresourcekey_va_array,
     e_renderresourcekey_va_handle,
     e_renderresourcekey_buffer_size,
@@ -74,6 +74,10 @@ enum e_renderresource_buffer : uint64_t {
     e_renderresource_buffer_texture_buffer,
     e_renderresource_buffer_transform_feedback_buffer,
     e_renderresource_buffer_uniform_buffer,
+};
+
+enum e_renderresource_data_type : uint64_t {
+    e_renderresource_data_type_float = 1,
 };
 
 } }

@@ -53,6 +53,9 @@ public:
 
                                            static bool process_load_shader( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_store_program( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
+
+                                           static bool process_query_persistent( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
+                                           static bool process_query_attrib( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
     
                                                 GLuint _program;
                                           GLFWwindow * _window;
