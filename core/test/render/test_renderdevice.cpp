@@ -161,11 +161,11 @@ int main(){
     //vertex attribute arrays enable
     uint64_t attrib_index_pos = 0;
     ::e2::interface::i_renderpackage * pkg_enable_vaa_pos;
-    renderback.bind_object( &buf, &pkg_enable_vaa_pos, obj_type_va, &attrib_index_pos );
+    renderback.enable_attrib( &buf, &pkg_enable_vaa_pos, obj_type_va, &attrib_index_pos );
 
     uint64_t attrib_index_color = 1;
     ::e2::interface::i_renderpackage * pkg_enable_vaa_color;
-    renderback.bind_object( &buf, &pkg_enable_vaa_color, obj_type_va, &attrib_index_color );
+    renderback.enable_attrib( &buf, &pkg_enable_vaa_color, obj_type_va, &attrib_index_color );
 
     //map data buffers to corresponding shader input variables
     ::e2::interface::i_renderpackage * pkg_map_attrib_vert_pos;
@@ -184,39 +184,45 @@ int main(){
     uint64_t count = 3;
     renderback.exec_drawbatch( &buf, &pkg_draw_batch, &primitive_type, &offset, &count );
 	
-    //start sequences
+    //setup for shaders and program
     rd.renderdevice_process( *pkg_init_window );
     rd.renderdevice_process( *pkg_init_program );
     rd.renderdevice_process( *pkg_load_shader_vertex );
     rd.renderdevice_process( *pkg_load_shader_frag );
     rd.renderdevice_process( *pkg_bind_shader_vertex );
     rd.renderdevice_process( *pkg_bind_shader_frag );
-    //setup sahder variable mapping
+    
+    //setup shader variable pipeline mapping
     rd.renderdevice_process( *pkg_bind_attrib_loc_vert_pos );
     rd.renderdevice_process( *pkg_bind_attrib_loc_vert_color );
     rd.renderdevice_process( *pkg_bind_attrib_loc_frag_color );
-    
+
+    //compile opengl program
     rd.renderdevice_process( *pkg_link_program );
     rd.renderdevice_process( *pkg_bind_program );
     rd.renderdevice_process( *pkg_query_active_attrib );
     rd.renderdevice_process( *pkg_query_active_persistent );
+    
+    //store shader input data to buffers
+    rd.renderdevice_process( *pkg_init_vbos );
+    rd.renderdevice_process( *pkg_bind_pos_buf );
+    rd.renderdevice_process( *pkg_store_pos_buf );
+    rd.renderdevice_process( *pkg_bind_color_buf );
+    rd.renderdevice_process( *pkg_store_color_buf );
 
-    rd.renderdevice_process( *pkg_init_vbos);
+    //create vertex array object to map different buffer data to one entity
+    rd.renderdevice_process( *pkg_init_object_va );
+    
+    rd.renderdevice_process( *pkg_bind_object_va );
+    //map vertex array index for position buffer
     rd.renderdevice_process( *pkg_bind_pos_buf);
-    rd.renderdevice_process( *pkg_store_pos_buf);
+    rd.renderdevice_process( *pkg_enable_vaa_pos );
+    rd.renderdevice_process( *pkg_map_attrib_vert_pos);
+    //map vertex array index for colour buffer
     rd.renderdevice_process( *pkg_bind_color_buf);
-    rd.renderdevice_process( *pkg_store_color_buf);
-
-    rd.renderdevice_process( *pkg_init_object_va);
-    rd.renderdevice_process( *pkg_bind_object_va);
-    rd.renderdevice_process( *pkg_enable_vaa_pos);
-    rd.renderdevice_process( *pkg_enable_vaa_color);
-
-    rd.renderdevice_process( *pkg_bind_pos_buf);
-    rd.renderdevice_process( *pkg_map_attrib_vert_pos);    
-    rd.renderdevice_process( *pkg_bind_color_buf);
+    rd.renderdevice_process( *pkg_enable_vaa_color );
     rd.renderdevice_process( *pkg_map_attrib_vert_color);
-
+	
     glfwMakeContextCurrent( rd._window );
     glfwSetKeyCallback( rd._window, process_key_input );
     glfwSetMouseButtonCallback( rd._window, process_mouse_button );
@@ -226,7 +232,10 @@ int main(){
 	if( quit ){
 	    glfwSetWindowShouldClose( rd._window, GLFW_TRUE);
 	}
-	glClearColor( 50, 50, 50, 1.0 );
+	glClearColor( 0.0f, 0.1f, 0.3f, 1.0f );
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable( GL_DEPTH_TEST );
+	rd.renderdevice_process( *pkg_bind_program );
 	rd.renderdevice_process( *pkg_bind_object_va);
 	rd.renderdevice_process( *pkg_draw_batch );
 	rd.renderdevice_process( *pkg_swap_window_buffer );

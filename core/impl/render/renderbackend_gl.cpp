@@ -133,7 +133,7 @@ bool renderbackend_gl::bind_shader( ::e2::memory::buffer * buf, ::e2::interface:
 }
 bool renderbackend_gl::bind_program( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, uint64_t * program_handle ){
     size_t offset;
-    uint64_t ** p_data;
+    void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
 	assert( false && "mem buffer for loading vertex shader failed." );
     }
@@ -242,7 +242,7 @@ bool renderbackend_gl::init_buffer( ::e2::memory::buffer * buf, ::e2::interface:
 }
 bool renderbackend_gl::bind_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, uint64_t * buffer_type, uint64_t * handle_buffers ){
     size_t offset;
-    uint64_t ** p_data;
+    void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
 	assert( false && "mem buffer for loading vertex shader failed." );
     }
@@ -342,7 +342,7 @@ bool renderbackend_gl::enable_attrib( ::e2::memory::buffer * buf, ::e2::interfac
 bool renderbackend_gl::store_defineformat_vertexattrib( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, uint64_t * attrib_handle, uint64_t * attrib_size, uint64_t * attrib_data_type, bool * attrib_normalized, uint64_t * attrib_stride, void * attrib_pointer ){
     size_t offset;
     void ** p_data;
-    if( false == buf->buffer_get_next_available( &offset, &p_data, 5 ) ){
+    if( false == buf->buffer_get_next_available( &offset, &p_data, 6 ) ){
 	assert( false && "mem buffer for loading vertex shader failed." );
     }
     p_data[0]= attrib_handle;

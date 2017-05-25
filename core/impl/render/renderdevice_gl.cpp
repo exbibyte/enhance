@@ -231,25 +231,30 @@ bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * co
 		                               ::e2::interface::e_renderresourcekey_pointer } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
 	    return false;
-        GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_index ];
-	GLint * gl_va_size = ( GLint * ) f[ ::e2::interface::e_renderresourcekey_size ];
+	
+        uint64_t * va_index = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_index ];
+        uint64_t * va_size = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_size ];
         uint64_t * va_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_type ];
-	GLboolean * gl_va_normalized = ( GLboolean * ) f[ ::e2::interface::e_renderresourcekey_normalized ];
-	GLsizei * gl_va_stride = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_stride ];
-	GLvoid * gl_va_pointer = ( GLvoid * ) f[ ::e2::interface::e_renderresourcekey_pointer ];   
-        assert( gl_va_index );
-        assert( gl_va_size );
+        bool * va_normalized = ( bool * ) f[ ::e2::interface::e_renderresourcekey_normalized ];
+        uint64_t * va_stride = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_stride ];
+        void * va_pointer = ( void * ) f[ ::e2::interface::e_renderresourcekey_pointer ];
+        assert( va_index );
+        assert( va_size );
         assert( va_type );
-        assert( gl_va_normalized );
-        assert( gl_va_stride );
-        assert( gl_va_pointer );
+        assert( va_normalized );
+        assert( va_stride );
+	GLuint gl_va_index = *va_index;
+        GLint gl_va_size = *va_size;
+        GLboolean gl_va_normalized = *va_normalized;
+        GLsizei gl_va_stride = *va_stride;
+        GLvoid * gl_va_pointer = va_pointer;
 	auto it = rendermap_gl::_map_render_data_type.find( *va_type );
 	if( rendermap_gl::_map_render_data_type.end() == it ){
 	    assert( false && "data type invalid." );
 	    return false;
 	}
 	GLenum gl_va_type = it->second;
-	return ::e2::render::gl::gl_helper::define_vertex_attrib_data( *gl_va_index, *gl_va_size, gl_va_type, *gl_va_normalized, *gl_va_stride, gl_va_pointer );
+	return ::e2::render::gl::gl_helper::define_vertex_attrib_data( gl_va_index, gl_va_size, gl_va_type, gl_va_normalized, gl_va_stride, gl_va_pointer );
     }
     return false;
 }
@@ -272,26 +277,29 @@ bool renderdevice_gl_impl::process_bind_buffer( renderdevice_gl_impl * context, 
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
     uint64_t * buffer_type = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_type ];
-    GLuint * gl_buffer_handle = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_handle ];
-    assert( gl_buffer_handle );
+    uint64_t * buffer_handle = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_handle ];
     assert( buffer_type );
+    assert( buffer_handle );
+    GLuint gl_buffer_handle = *buffer_handle;
     auto it = rendermap_gl::_map_render_bind_buffer.find( *buffer_type );
     if( rendermap_gl::_map_render_bind_buffer.end() == it ){
         assert( false && "bind buffer type invalid." );
         return false;
     }
-    GLenum gl_buffer_type = it->second;
-    return ::e2::render::gl::gl_helper::bind_buffer( gl_buffer_type, *gl_buffer_handle );
+        // GLenum gl_buffer_type = it->second;
+    GLenum gl_buffer_type = GL_ARRAY_BUFFER;
+    return ::e2::render::gl::gl_helper::bind_buffer( gl_buffer_type, gl_buffer_handle );
 }
 
 bool renderdevice_gl_impl::process_enable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
-    if( ::e2::interface::e_renderresource_subtype_vertex_attrib_array == p._resource_subtype ){
+    if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
 	    return false;
-	GLuint * gl_va_index = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
-	assert( gl_va_index );
-        return ::e2::render::gl::gl_helper::enable_vertex_attrib_array( *gl_va_index );
+        uint64_t * va_index = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
+	assert( va_index );
+	GLuint gl_va_index = (GLuint) *va_index;
+        return ::e2::render::gl::gl_helper::enable_vertex_attrib_array( gl_va_index );
     }
     return false;
 }
