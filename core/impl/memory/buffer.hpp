@@ -11,6 +11,8 @@ public:
     buffer( size_t s = 1024 ){
     	_buf.resize( s );
 	_next = 0;
+	_buf_next = nullptr;
+	_buf_prev = nullptr;
     }
     template< class TypeData >
     bool buffer_get( size_t const offset, TypeData ** data, size_t const num_data ){
@@ -59,6 +61,8 @@ public:
 private:
     std::vector< char > _buf;
     size_t _next;
+    buffer * _buf_next;
+    buffer * _buf_prev;
 };
 
 } }
