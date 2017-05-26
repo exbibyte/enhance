@@ -132,6 +132,9 @@ int main(){
     ::e2::interface::i_renderpackage * pkg_init_vbos;
     renderback.init_buffer( &buf, &pkg_init_vbos, &num_buf, vbos );
 
+    ::e2::interface::i_renderpackage * pkg_deinit_vbos;
+    renderback.deinit_buffer( &buf, &pkg_deinit_vbos, &num_buf, vbos );
+
     //vbos data population : vert pos
     uint64_t buf_type_array = ::e2::interface::e_renderresource_buffer_array_buffer;
     ::e2::interface::i_renderpackage * pkg_bind_pos_buf;
@@ -183,7 +186,16 @@ int main(){
     int64_t offset = 0;
     uint64_t count = 3;
     renderback.exec_drawbatch( &buf, &pkg_draw_batch, &primitive_type, &offset, &count );
-	
+
+    ::e2::interface::i_renderpackage * pkg_exec_window_clear_colour;
+    renderback.clear_window_buffer_colour( &buf, &pkg_exec_window_clear_colour );
+
+    ::e2::interface::i_renderpackage * pkg_exec_window_clear_depth;
+    renderback.clear_window_buffer_depth( &buf, &pkg_exec_window_clear_depth );
+
+    ::e2::interface::i_renderpackage * pkg_exec_window_buffer_disable_depth;
+    renderback.disable_window_buffer_depth( &buf, &pkg_exec_window_buffer_disable_depth );
+
     //setup for shaders and program
     rd.renderdevice_process( *pkg_init_window );
     rd.renderdevice_process( *pkg_init_program );
@@ -233,8 +245,9 @@ int main(){
 	    glfwSetWindowShouldClose( rd._window, GLFW_TRUE);
 	}
 	glClearColor( 0.0f, 0.1f, 0.3f, 1.0f );
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable( GL_DEPTH_TEST );
+	rd.renderdevice_process( *pkg_exec_window_clear_colour );
+	// rd.renderdevice_process( *pkg_exec_window_clear_depth );
+	rd.renderdevice_process( *pkg_exec_window_buffer_disable_depth );
 	rd.renderdevice_process( *pkg_bind_program );
 	rd.renderdevice_process( *pkg_bind_object_va);
 	rd.renderdevice_process( *pkg_draw_batch );
@@ -243,6 +256,7 @@ int main(){
 	std::this_thread::sleep_for( std::chrono::milliseconds(25) );
     }
     rd.renderdevice_process( *pkg_deinit_program );
+    rd.renderdevice_process( *pkg_deinit_vbos );
     rd.renderdevice_process( *pkg_deinit_window );
     double frac_free;
     buf.buffer_stat_fraction_free( &frac_free );

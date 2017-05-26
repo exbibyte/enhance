@@ -183,6 +183,26 @@ bool renderdevice_gl_impl::process_exec_window( renderdevice_gl_impl * context, 
         glfwSwapBuffers( context->_window );
     }
     break;
+    case ::e2::interface::e_renderresource_subtype_window_clear_colour:
+    {
+	glClear( GL_COLOR_BUFFER_BIT );
+    }
+    break;
+    case ::e2::interface::e_renderresource_subtype_window_clear_depth:
+    {
+	glClear( GL_DEPTH_BUFFER_BIT );
+    }
+    break;
+    case ::e2::interface::e_renderresource_subtype_window_buffer_disable_depth:
+    {
+	glDisable( GL_DEPTH_TEST );
+    }
+    break;
+    case ::e2::interface::e_renderresource_subtype_window_buffer_enable_depth:
+    {
+	glEnable( GL_DEPTH_TEST );
+    }
+    break;
     default:
     {
         return false;
@@ -393,11 +413,16 @@ bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context
 		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
-    GLsizei * gl_num_buffers = ( GLsizei * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
-    GLuint * gl_buffers = ( GLuint * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];    
-    assert( gl_num_buffers );
-    assert( gl_buffers );
-    return ::e2::render::gl::gl_helper::delete_buffers( *gl_num_buffers, gl_buffers );
+    uint64_t * num_buffers = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_num ];
+    uint64_t * buffers = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_buffer_handle ];
+    assert( num_buffers );
+    assert( buffers );
+    GLsizei gl_num_buffers = ( GLsizei ) *num_buffers;
+    std::vector< GLuint > gl_buffers( *num_buffers );
+    for( size_t i = 0; i < gl_buffers.size(); ++i ){
+	gl_buffers[i] = buffers[i];
+    }
+    return ::e2::render::gl::gl_helper::delete_buffers( gl_num_buffers, &gl_buffers[0] );
 }
 
 bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){

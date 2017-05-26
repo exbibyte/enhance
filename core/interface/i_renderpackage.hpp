@@ -32,6 +32,10 @@ enum e_renderresource_type : uint64_t { //list of primitive resources
 enum e_renderresource_subtype : uint64_t { //list of primitive resources
     e_renderresource_subtype_na = 1,
     e_renderresource_subtype_window_buf_swap,
+    e_renderresource_subtype_window_clear_colour,
+    e_renderresource_subtype_window_clear_depth,
+    e_renderresource_subtype_window_buffer_disable_depth,
+    e_renderresource_subtype_window_buffer_enable_depth,
     e_renderresource_subtype_vertex_attrib_data,
     e_renderresource_subtype_vertex_attrib_array,
     e_renderresource_subtype_object_vertex_array,

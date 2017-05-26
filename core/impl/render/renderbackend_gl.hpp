@@ -15,6 +15,7 @@ public:
 
     bool deinit_window( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
     bool deinit_program( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, uint64_t * program_handle );
+    bool deinit_buffer( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, uint64_t * num_buf, uint64_t * buffers );
 
     bool query_attrib( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, uint64_t * program_handle );
     bool query_persistent( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, uint64_t * program_handle );
@@ -37,6 +38,10 @@ public:
     bool exec_drawbatch( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, uint64_t *primitive_type , int64_t * offset, uint64_t * count );
 
     bool swap_window_buffer( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
+    bool clear_window_buffer_colour( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
+    bool clear_window_buffer_depth( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
+    bool disable_window_buffer_depth( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
+    bool enable_window_buffer_depth( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg );
 };
 
 } }

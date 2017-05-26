@@ -46,6 +46,34 @@ bool renderbackend_gl::swap_window_buffer( ::e2::memory::buffer * buf, ::e2::int
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buf_swap;
     return true;
 }
+bool renderbackend_gl::clear_window_buffer_colour( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg ){
+    assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
+    (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
+    (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
+    (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_clear_colour;
+    return true;
+}
+bool renderbackend_gl::clear_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg ){
+    assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
+    (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
+    (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
+    (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_clear_depth;
+    return true;
+}
+bool renderbackend_gl::disable_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg ){
+    assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
+    (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
+    (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
+    (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buffer_disable_depth;
+    return true;
+}
+bool renderbackend_gl::enable_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg ){
+    assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
+    (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
+    (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
+    (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buffer_enable_depth;
+    return true;
+}
 bool renderbackend_gl::deinit_window( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_deinit );
@@ -237,6 +265,25 @@ bool renderbackend_gl::init_buffer( ::e2::memory::buffer * buf, ::e2::interface:
     key[1] = ::e2::interface::e_renderresourcekey_buffer_handle;
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, key, (void**)p_data, 2 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_init );
+    (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
+    return true;
+}
+bool renderbackend_gl::deinit_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, uint64_t * num_buf, uint64_t * buffers ){
+    size_t offset;
+    void ** p_data;
+    if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
+	assert( false && "mem buffer for loading vertex shader failed." );
+    }
+    p_data[0]= num_buf;
+    p_data[1]= buffers;
+    uint64_t * key;
+    if( false == buf->buffer_get_next_available( &offset, &key, 2 ) ){
+	assert( false && "mem buffer for loading vertex shader failed." );
+    }
+    key[0] = ::e2::interface::e_renderresourcekey_buffer_num;
+    key[1] = ::e2::interface::e_renderresourcekey_buffer_handle;
+    assert( ::e2::render::renderpackage_gl::pack( buf, pkg, key, (void**)p_data, 2 ) );
+    (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_deinit );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
     return true;
 }

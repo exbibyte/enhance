@@ -36,6 +36,7 @@ public:
                                            static bool process_store_defineformat( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_store_buffer( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_store_persistent( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
+                                           static bool process_store_window( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
     
                                            static bool process_enable_attrib( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
     
@@ -56,7 +57,7 @@ public:
 
                                            static bool process_query_persistent( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
                                            static bool process_query_attrib( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p );
-    
+
                                                 GLuint _program;
                                           GLFWwindow * _window;
 };
