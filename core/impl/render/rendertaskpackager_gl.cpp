@@ -6,7 +6,7 @@
 
 namespace e2 { namespace render {
 
-bool rendertaskpackager_gl::init_window( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_window * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_window * n ){
     //set window size
     void ** data_ptr;
     {
@@ -39,49 +39,49 @@ bool rendertaskpackager_gl::init_window( ::e2::memory::buffer * buf, ::e2::inter
     }
     return true;
 }
-bool rendertaskpackager_gl::swap_window_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_swap_window_buffer * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_swap_window_buffer * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buf_swap;
     return true;
 }
-bool rendertaskpackager_gl::clear_window_buffer_colour( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_clear_window_buffer_colour * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_clear_window_buffer_colour * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_clear_colour;
     return true;
 }
-bool rendertaskpackager_gl::clear_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_clear_window_buffer_depth * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_clear_window_buffer_depth * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_clear_depth;
     return true;
 }
-bool rendertaskpackager_gl::disable_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_disable_window_buffer_depth * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_disable_window_buffer_depth * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buffer_disable_depth;
     return true;
 }
-bool rendertaskpackager_gl::enable_window_buffer_depth( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_enable_window_buffer_depth * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_enable_window_buffer_depth * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_exec );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_window_buffer_enable_depth;
     return true;
 }
-bool rendertaskpackager_gl::deinit_window( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_window * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_window * n ){
     assert( ::e2::render::renderpackage_gl::pack( buf, pkg, nullptr, nullptr, 0 ) );
     (*pkg)->set_render_cmd_type( ::e2::interface::e_rendercmd_type_deinit );
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_windowing );
     (*pkg)->_resource_subtype = ::e2::interface::e_renderresource_subtype_na;
     return true;
 }
-bool rendertaskpackager_gl::init_program( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_program * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_program * n ){
     size_t offset;
     uint64_t * key;
     if( false == buf->buffer_get_next_available( &offset, &key, 1 ) ){
@@ -93,7 +93,7 @@ bool rendertaskpackager_gl::init_program( ::e2::memory::buffer * buf, ::e2::inte
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_program );
     return true;
 }
-bool rendertaskpackager_gl::deinit_program( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_program * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_program * n ){
     size_t offset;
     uint64_t * key;
     if( false == buf->buffer_get_next_available( &offset, &key, 1 ) ){
@@ -110,7 +110,7 @@ bool rendertaskpackager_gl::deinit_program( ::e2::memory::buffer * buf, ::e2::in
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_program );
     return true;
 }
-bool rendertaskpackager_gl::load_shader( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_load_shader * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_load_shader * n ){
     size_t offset;
     uint64_t ** p_shader_handle;
     if( false == buf->buffer_get_next_available( &offset, &p_shader_handle, 1 ) ){
@@ -140,7 +140,7 @@ bool rendertaskpackager_gl::load_shader( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->_resource_subtype = n->_source_type;
     return true;
 }
-bool rendertaskpackager_gl::bind_shader( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_shader * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_shader * n ){
     size_t offset;
     uint64_t ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
@@ -159,7 +159,7 @@ bool rendertaskpackager_gl::bind_shader( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_shader );
     return true;
 }
-bool rendertaskpackager_gl::bind_program( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_program * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_program * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -176,7 +176,7 @@ bool rendertaskpackager_gl::bind_program( ::e2::memory::buffer * buf, ::e2::inte
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_program );
     return true;
 }
-bool rendertaskpackager_gl::query_attrib( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_query_attrib * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_query_attrib * n ){
     size_t offset;
     uint64_t ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -193,7 +193,7 @@ bool rendertaskpackager_gl::query_attrib( ::e2::memory::buffer * buf, ::e2::inte
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_attrib );
     return true;
 }
-bool rendertaskpackager_gl::query_persistent( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_query_persistent * n){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_query_persistent * n){
     size_t offset;
     uint64_t ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -210,7 +210,7 @@ bool rendertaskpackager_gl::query_persistent( ::e2::memory::buffer * buf, ::e2::
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_persistent );
     return true;
 }
-bool rendertaskpackager_gl::bind_attrib( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_attrib * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_attrib * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 3 ) ){
@@ -232,7 +232,7 @@ bool rendertaskpackager_gl::bind_attrib( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_attrib );
     return true;    
 }
-bool rendertaskpackager_gl::compute_program( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_compute_program * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_compute_program * n ){
     size_t offset;
     uint64_t ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -249,7 +249,7 @@ bool rendertaskpackager_gl::compute_program( ::e2::memory::buffer * buf, ::e2::i
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_program );
     return true;
 }
-bool rendertaskpackager_gl::init_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_buffer * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_buffer * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
@@ -268,7 +268,7 @@ bool rendertaskpackager_gl::init_buffer( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
     return true;
 }
-bool rendertaskpackager_gl::deinit_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_buffer * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_deinit_buffer * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
@@ -287,7 +287,7 @@ bool rendertaskpackager_gl::deinit_buffer( ::e2::memory::buffer * buf, ::e2::int
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
     return true;
 }
-bool rendertaskpackager_gl::bind_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_buffer * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_buffer * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
@@ -306,7 +306,7 @@ bool rendertaskpackager_gl::bind_buffer( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
     return true;
 }
-bool rendertaskpackager_gl::store_buffer( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_store_buffer * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_store_buffer * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 4 ) ){
@@ -329,7 +329,7 @@ bool rendertaskpackager_gl::store_buffer( ::e2::memory::buffer * buf, ::e2::inte
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_buffer );
     return true;
 }
-bool rendertaskpackager_gl::init_object( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_object * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_object * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 2 ) ){
@@ -350,7 +350,7 @@ bool rendertaskpackager_gl::init_object( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_object );
     return true;    
 }
-bool rendertaskpackager_gl::bind_object( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_object * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_bind_object * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -368,7 +368,7 @@ bool rendertaskpackager_gl::bind_object( ::e2::memory::buffer * buf, ::e2::inter
     (*pkg)->set_render_resource_type( ::e2::interface::e_renderresource_type_object );
     return true;
 }
-bool rendertaskpackager_gl::enable_attrib( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_enable_attrib * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_enable_attrib * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 1 ) ){
@@ -387,7 +387,7 @@ bool rendertaskpackager_gl::enable_attrib( ::e2::memory::buffer * buf, ::e2::int
     return true;
 }
 
-bool rendertaskpackager_gl::store_defineformat_vertexattrib( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_store_defineformat_vertexattrib * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_store_defineformat_vertexattrib * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 6 ) ){
@@ -416,7 +416,7 @@ bool rendertaskpackager_gl::store_defineformat_vertexattrib( ::e2::memory::buffe
     return true;
 }
 
-bool rendertaskpackager_gl::exec_drawbatch( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_exec_drawbatch * n ){
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_exec_drawbatch * n ){
     size_t offset;
     void ** p_data;
     if( false == buf->buffer_get_next_available( &offset, &p_data, 3 ) ){
