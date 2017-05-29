@@ -9,10 +9,9 @@ namespace e2 { namespace memory {
 
 class buffer {
 public:
-    buffer( size_t s = 1024 ){
+    buffer( size_t s = 1024 ) : _buf( {} ) {
 	std::vector< char > block( s );
 	_buf.push_back( std::move( block ) );
-    	// _buf.resize( s );
 	_next = 0;
     }
     template< class TypeData >

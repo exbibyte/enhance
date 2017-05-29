@@ -315,8 +315,7 @@ bool renderdevice_gl_impl::process_enable_attrib( renderdevice_gl_impl * context
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
-	    return false;
-        uint64_t * va_index = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
+	    return false;        uint64_t * va_index = ( uint64_t * ) f[ ::e2::interface::e_renderresourcekey_va_index ];
 	assert( va_index );
 	GLuint gl_va_index = (GLuint) *va_index;
         return ::e2::render::gl::gl_helper::enable_vertex_attrib_array( gl_va_index );
