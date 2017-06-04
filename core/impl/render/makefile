@@ -39,3 +39,6 @@ all: build_gl $(objects)
 clean: clean_gl
 	rm -f $(dir_intermediate)/*.o 
 
+.PHONY: rendergraph
+rendergraph:
+	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/rendergraphscheduler0 rendergraphscheduler0.cpp  $(include_flags)

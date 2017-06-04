@@ -10,6 +10,8 @@ namespace e2 { namespace render {
 
 class rendertaskpackager_gl : public ::e2::interface::i_rendertaskpackager {
 public:
+    bool process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode * n ) override;
+
     bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_window * n ) override;
     bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_program * n ) override;
     bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_buffer * n ) override;

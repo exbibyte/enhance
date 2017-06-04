@@ -10,8 +10,10 @@ include_flags = $(foreach d, $(include_dirs), -I$d)
 objects_render = $(wildcard ../../impl/render/intermediate/*.o)
 objects_render_gl = $(wildcard ../../impl/render/gl/intermediate/*.o)
 objects_file = $(wildcard ../../impl/file/intermediate/*.o)
+objects_algo = $(wildcard ../../impl/algo/intermediate/*.o)
+objects_interface = $(wildcard ../../interface/intermediate/*.o)
 
-object_files = $(objects_render) $(objects_render_gl) $(objects_file)
+object_files = $(objects_render) $(objects_render_gl) $(objects_file) $(objects_algo) $(objects_interface)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))
@@ -41,3 +43,7 @@ testcases:
 	@for i in $(filter-out $(testcase_excludes), $(wildcard $(dir_build)/*) ); do \
 		./$$i; \
 	done \
+
+.PHONY: test_rendergraphscheduler
+test_rendergraphscheduler:
+	$(CXX) -g -std=c++14 test_rendergraphscheduler.cpp -o $(dir_build)/test_rendergraphscheduler $(object_files) $(include_flags) $(libs)

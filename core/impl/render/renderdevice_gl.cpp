@@ -15,7 +15,7 @@
 
 namespace e2 { namespace render {
 
-renderdevice_gl_impl::renderdevice_gl_impl(){
+renderdevice_gl::renderdevice_gl(){
 
     _dispatch._dispatch_map[ renderdispatch_key( ::e2::interface::e_rendercmd_type_init,
                                                  ::e2::interface::e_renderresource_type_windowing ) ] = &process_init_window;
@@ -94,18 +94,18 @@ renderdevice_gl_impl::renderdevice_gl_impl(){
 						 
 }
 
-bool renderdevice_gl_impl::renderdevice_process( ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::renderdevice_process( ::e2::interface::i_renderpackage p ){
     return _dispatch.dispatch_process( this, p );
 }
 
-bool renderdevice_gl_impl::process_init_window_size( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_init_window_size( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
 #ifdef debug_info
     std::cout << "process init window size" << std::endl;
 #endif
     return true;
 }
 
-bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_init_window( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
 #ifdef debug_info
     std::cout << "process init window" << std::endl;
 #endif
@@ -159,7 +159,7 @@ bool renderdevice_gl_impl::process_init_window( renderdevice_gl_impl * context, 
     return true;
 }
 
-bool renderdevice_gl_impl::process_deinit_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_deinit_window( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
 #ifdef debug_info
     std::cout << "process deinit window" << std::endl;
 #endif
@@ -171,7 +171,7 @@ bool renderdevice_gl_impl::process_deinit_window( renderdevice_gl_impl * context
     return true;
 }
 
-bool renderdevice_gl_impl::process_exec_window( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_exec_window( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     switch( p._resource_subtype ){
     case ::e2::interface::e_renderresource_subtype_window_buf_swap:
     {
@@ -211,7 +211,7 @@ bool renderdevice_gl_impl::process_exec_window( renderdevice_gl_impl * context, 
     return true;
 }
 
-bool renderdevice_gl_impl::process_exec_drawbatch( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_exec_drawbatch( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_primitive_type,
 		                           ::e2::interface::e_renderresourcekey_primitive_offset,
 		                           ::e2::interface::e_renderresourcekey_primitive_count } );
@@ -240,7 +240,7 @@ bool renderdevice_gl_impl::process_exec_drawbatch( renderdevice_gl_impl * contex
     return ::e2::render::gl::gl_helper::check_error();
 }
 
-bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_store_defineformat( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_vertex_attrib_data == p._resource_subtype ){
 
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_index,
@@ -279,7 +279,7 @@ bool renderdevice_gl_impl::process_store_defineformat( renderdevice_gl_impl * co
     return false;
 }
 
-bool renderdevice_gl_impl::process_bind_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_bind_object( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_handle } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -291,7 +291,7 @@ bool renderdevice_gl_impl::process_bind_object( renderdevice_gl_impl * context, 
     return false;
 }
 
-bool renderdevice_gl_impl::process_bind_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_bind_buffer( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_type,
 		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -311,7 +311,7 @@ bool renderdevice_gl_impl::process_bind_buffer( renderdevice_gl_impl * context, 
     return ::e2::render::gl::gl_helper::bind_buffer( gl_buffer_type, gl_buffer_handle );
 }
 
-bool renderdevice_gl_impl::process_enable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_enable_attrib( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -323,7 +323,7 @@ bool renderdevice_gl_impl::process_enable_attrib( renderdevice_gl_impl * context
     return false;
 }
 
-bool renderdevice_gl_impl::process_disable_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){;
+bool renderdevice_gl::process_disable_attrib( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){;
     if( ::e2::interface::e_renderresource_subtype_vertex_attrib_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_index } );
 	if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -335,7 +335,7 @@ bool renderdevice_gl_impl::process_disable_attrib( renderdevice_gl_impl * contex
     return false;
 }
 
-bool renderdevice_gl_impl::process_init_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_init_object( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_num,
 		                               ::e2::interface::e_renderresourcekey_va_handle } );
@@ -350,7 +350,7 @@ bool renderdevice_gl_impl::process_init_object( renderdevice_gl_impl * context, 
     return false;
 }
 
-bool renderdevice_gl_impl::process_deinit_object( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_deinit_object( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_object_vertex_array == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_va_num,
 		                               ::e2::interface::e_renderresourcekey_va_array } );
@@ -365,7 +365,7 @@ bool renderdevice_gl_impl::process_deinit_object( renderdevice_gl_impl * context
     return false;
 }
 
-bool renderdevice_gl_impl::process_store_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_store_buffer( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_type,
 		                           ::e2::interface::e_renderresourcekey_buffer_size,
 		                           ::e2::interface::e_renderresourcekey_buffer_data,
@@ -389,7 +389,7 @@ bool renderdevice_gl_impl::process_store_buffer( renderdevice_gl_impl * context,
     return ::e2::render::gl::gl_helper::store_buffer_data( gl_buffer_type, *gl_bytes_size, gl_data, *gl_usage );
 }
 
-bool renderdevice_gl_impl::process_init_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_init_buffer( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_num,
 		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -407,7 +407,7 @@ bool renderdevice_gl_impl::process_init_buffer( renderdevice_gl_impl * context, 
     return true;
 }
 
-bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_deinit_buffer( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_buffer_num,
 		                           ::e2::interface::e_renderresourcekey_buffer_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -424,7 +424,7 @@ bool renderdevice_gl_impl::process_deinit_buffer( renderdevice_gl_impl * context
     return ::e2::render::gl::gl_helper::delete_buffers( gl_num_buffers, &gl_buffers[0] );
 }
 
-bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_bind_attrib( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     if( ::e2::interface::e_renderresource_subtype_attrib_attrib_location == p._resource_subtype ){
 	::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
 		                               ::e2::interface::e_renderresourcekey_attrib_index,
@@ -455,7 +455,7 @@ bool renderdevice_gl_impl::process_bind_attrib( renderdevice_gl_impl * context, 
     return false;
 }
 
-bool renderdevice_gl_impl::process_init_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_init_program( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
@@ -464,7 +464,7 @@ bool renderdevice_gl_impl::process_init_program( renderdevice_gl_impl * context,
     return ::e2::render::gl::gl_helper::create_program( gl_program_handle );
 }
 
-bool renderdevice_gl_impl::process_deinit_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_deinit_program( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
@@ -473,7 +473,7 @@ bool renderdevice_gl_impl::process_deinit_program( renderdevice_gl_impl * contex
     return ::e2::render::gl::gl_helper::delete_program( *gl_program_handle );
 }
 
-bool renderdevice_gl_impl::process_bind_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_bind_shader( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
 		                           ::e2::interface::e_renderresourcekey_shader_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -485,7 +485,7 @@ bool renderdevice_gl_impl::process_bind_shader( renderdevice_gl_impl * context, 
     return ::e2::render::gl::gl_helper::attach_shader( *gl_program_handle, *gl_shader_handle );
 }
 
-bool renderdevice_gl_impl::process_unbind_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_unbind_shader( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle,
 		                           ::e2::interface::e_renderresourcekey_shader_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
@@ -497,7 +497,7 @@ bool renderdevice_gl_impl::process_unbind_shader( renderdevice_gl_impl * context
     return ::e2::render::gl::gl_helper::detach_shader( *gl_program_handle, *gl_shader_handle );
 }
 
-bool renderdevice_gl_impl::process_compute_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_compute_program( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
@@ -506,7 +506,7 @@ bool renderdevice_gl_impl::process_compute_program( renderdevice_gl_impl * conte
     return ::e2::render::gl::gl_helper::link_program( *gl_program_handle );
 }
 
-bool renderdevice_gl_impl::process_bind_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_bind_program( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
 	return false;
@@ -515,7 +515,7 @@ bool renderdevice_gl_impl::process_bind_program( renderdevice_gl_impl * context,
     return ::e2::render::gl::gl_helper::use_program( *gl_program_handle );
 }
 
-bool renderdevice_gl_impl::process_store_persistent( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_store_persistent( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     switch( p._resource_subtype ){
     case ::e2::interface::e_renderresource_subtype_persistent_vec_f:
     {
@@ -600,7 +600,7 @@ bool renderdevice_gl_impl::process_store_persistent( renderdevice_gl_impl * cont
     return false;
 }
 
-bool renderdevice_gl_impl::process_load_shader( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_load_shader( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_shader_handle,
 		                           ::e2::interface::e_renderresourcekey_shader_source,
 		                           ::e2::interface::e_renderresourcekey_shader_type } );
@@ -630,7 +630,7 @@ bool renderdevice_gl_impl::process_load_shader( renderdevice_gl_impl * context, 
     return false;
 }
 
-bool renderdevice_gl_impl::process_store_program( renderdevice_gl_impl * context, ::e2::interface::i_renderpackage p ){   
+bool renderdevice_gl::process_store_program( renderdevice_gl * context, ::e2::interface::i_renderpackage p ){   
     switch( p._resource_subtype ){
     case ::e2::interface::e_renderresource_subtype_program_parameter:
     {
@@ -655,7 +655,7 @@ bool renderdevice_gl_impl::process_store_program( renderdevice_gl_impl * context
     return false;
 }
 
-bool renderdevice_gl_impl::process_query_persistent( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_query_persistent( renderdevice_gl *, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
         return false;
@@ -663,7 +663,7 @@ bool renderdevice_gl_impl::process_query_persistent( renderdevice_gl_impl *, ::e
     assert( gl_program_handle );
     return ::e2::render::gl::gl_helper::print_active_uniforms( *gl_program_handle );
 }
-bool renderdevice_gl_impl::process_query_attrib( renderdevice_gl_impl *, ::e2::interface::i_renderpackage p ){
+bool renderdevice_gl::process_query_attrib( renderdevice_gl *, ::e2::interface::i_renderpackage p ){
     ::e2::interface::i_package_filter f( { ::e2::interface::e_renderresourcekey_program_handle } );
     if( false == renderpackage_gl::unpack( &p, &f ) )
         return false;

@@ -4,10 +4,16 @@
 #include <cstdint>
 #include <cstring>
 
+#include "buffer.hpp"
+#include "i_renderpackage.hpp"
+#include "i_rendernode.hpp"
+
 namespace e2 { namespace interface {
 
 class i_rendertaskpackager {
 public:
+    virtual bool process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode * n ) = 0;
+    
     virtual bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_window * n ) = 0;
     virtual bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_program * n ) = 0;
     virtual bool process( ::e2::memory::buffer *, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_buffer * n ) = 0;

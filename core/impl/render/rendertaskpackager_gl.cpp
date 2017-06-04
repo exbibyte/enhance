@@ -6,6 +6,10 @@
 
 namespace e2 { namespace render {
 
+bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode * n ){
+    return n->package( buf, pkg, this );
+}
+
 bool rendertaskpackager_gl::process( ::e2::memory::buffer * buf, ::e2::interface::i_renderpackage ** pkg, ::e2::interface::i_rendernode_init_window * n ){
     //set window size
     void ** data_ptr;

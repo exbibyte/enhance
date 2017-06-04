@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <initializer_list>
+#include <cassert>
 
 #include "i_rendercmd.hpp"
 #include "i_renderresource.hpp"
