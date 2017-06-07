@@ -17,9 +17,14 @@ $(shell mkdir -p $(dir_intermediate))
 %.o: %.cpp
 	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/$@ $< $(include_flags)
 
+.PHONY: gl_related
+
+gl_related:
+	$(CXX) -g -std=c++14 -c -o $(dir_intermediate)/gl3w.o GL/gl3w.c $(include_flags)
+
 .PHONY: all
 
-all: $(objects)
+all: $(objects) gl_related
 
 .PHONY: clean
 

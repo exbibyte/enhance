@@ -26,6 +26,10 @@
 documentation/
 build/
 intermediate/
+gl3w/
+GL/
+temp/
+glfw/
 
 # Generated Files
 *.ini

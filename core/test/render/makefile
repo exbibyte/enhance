@@ -23,7 +23,7 @@ target_excludes :=
 
 targets := $(filter-out $(target_excludes), $(patsubst %.cpp, %, $(wildcard *.cpp)) )
 
-libs := -pthread -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
+libs := -pthread -lGL `pkg-config --static --libs glfw3`
 
 pkg_config_flags = `pkg-config --cflags glfw3`
 
