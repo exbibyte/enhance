@@ -14,6 +14,6 @@ rm -r -f temp gl3w
 
 echo "downloading and installing http://github.com/glfw/glfw"
 git clone http://github.com/glfw/glfw.git
-cd glfw && cmake CMakeLists.txt && make && make install && cd ../ && rm -r -f glfw
+cd glfw && cmake CMakeLists.txt && make && sudo make install && cd ../ && rm -r -f glfw
 
 echo "finished."
