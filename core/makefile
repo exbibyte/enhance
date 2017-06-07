@@ -1,6 +1,9 @@
 src_dir :=  ./impl
 test_dir :=  ./test
 
+build_interface:
+	$(MAKE) -C ./interface all
+
 build_test_ds:
 	$(MAKE) -C $(test_dir)/ds all
 build_src_ds:
@@ -37,9 +40,16 @@ build_test_render:
 build_src_render:
 	$(MAKE) -C $(src_dir)/render all
 
-builds: build_src_ds build_src_memory build_src_dsc build_src_math build_src_hash build_src_file build_src_mt build_src_render
+build_test_algo:
+	$(MAKE) -C $(test_dir)/algo all
+build_src_algo:
+	$(MAKE) -C $(src_dir)/algo all
 
-tests: build_test_ds build_test_dsc build_test_hash build_test_mt build_test_render
+builds: build_src_ds build_src_memory build_src_dsc build_src_math build_src_hash build_src_file build_src_mt build_src_render build_src_algo
+
+tests: build_test_ds build_test_dsc build_test_hash build_test_mt build_test_render build_test_algo
+
+builds: build_interface
 
 .PHONY: all
 all: builds tests

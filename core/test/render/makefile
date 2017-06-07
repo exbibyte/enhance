@@ -7,11 +7,11 @@ include_dirs = $(inc_folder_basic) $(inc_folder_test) $(inc_folder_interface) $(
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
+objects_interface = $(wildcard ../../interface/intermediate/*.o)
 objects_render = $(wildcard ../../impl/render/intermediate/*.o)
 objects_render_gl = $(wildcard ../../impl/render/gl/intermediate/*.o)
 objects_file = $(wildcard ../../impl/file/intermediate/*.o)
 objects_algo = $(wildcard ../../impl/algo/intermediate/*.o)
-objects_interface = $(wildcard ../../interface/intermediate/*.o)
 
 object_files = $(objects_render) $(objects_render_gl) $(objects_file) $(objects_algo) $(objects_interface)
 
