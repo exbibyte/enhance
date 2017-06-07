@@ -33,7 +33,7 @@ object_files := $(objects_kernel) $(objects_modules) $(objects_gl) $(objects_ren
 
 dir_build := ./build
 
-libs =  -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
+libs =  -lGL `pkg-config --static --libs glfw3`
 
 pkg_config_flags = `pkg-config --cflags glfw3`
 
