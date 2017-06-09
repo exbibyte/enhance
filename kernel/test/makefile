@@ -9,11 +9,12 @@ include_dirs = $(inc_folder_test) $(inc_folder_core_impl) $(inc_folder_core_inte
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
+objects_interface := $(wildcard ../../core/interface/intermediate/*.o)
 objects_core := $(wildcard ../../core/impl/*/intermediate/*.o)
 objects_kernel := $(wildcard ../../kernel/impl/intermediate/*.o)
-objects_render = $(wildcard ../../core/impl/render/intermediate/*.o)
+objects_render_gl := $(wildcard ../../core/impl/render/gl/intermediate/*.o)
 
-object_files = $(objects_kernel) $(objects_core)
+object_files = $(objects_kernel) $(objects_core) $(objects_interface) $(objects_render) $(objects_file) $(objects_render_gl)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))
@@ -23,7 +24,7 @@ target_excludes :=
 
 targets := $(filter-out $(target_excludes), $(patsubst %.cpp, %, $(wildcard *.cpp)) )
 
-libs := -pthread -lGL -lGLEW -lgl3w `pkg-config --static --libs glfw3`
+libs := -pthread -lGL `pkg-config --static --libs glfw3`
 
 pkg_config_flags = `pkg-config --cflags glfw3`
 
