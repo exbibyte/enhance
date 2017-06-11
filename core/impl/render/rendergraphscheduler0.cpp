@@ -25,11 +25,14 @@ bool rendergraphscheduler0_impl::schedule_graph( std::list< ::e2::interface::i_r
 	for( auto j = (*it)->_inputs.begin(), j_e = (*it)->_inputs.end(); j != j_e; ++j ){
 	    assert( *j );
 	    dependencies.push_back( { (*j)->_handle, (*it)->_handle } );
+#ifdef DEBUG_INFO
 	    std::cout <<  (*j)->_handle << ", " << (*it)->_handle << std::endl;
+#endif
 	}
     }
-
+#ifdef DEBUG_INFO
     std::cout << "-------" << std::endl;
+#endif
 
     ::e2::algo::sort_topo s;
     std::list< uint64_t > linearized;

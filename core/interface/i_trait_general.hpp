@@ -1,6 +1,10 @@
 #ifndef E2_I_TRAIT_GENERAL_HPP
 #define E2_I_TRAIT_GENERAL_HPP
 
+#include <type_traits>
+
+#include "i_renderfrontend.hpp"
+
 namespace e2 { namespace trait {
 
 template< class T >

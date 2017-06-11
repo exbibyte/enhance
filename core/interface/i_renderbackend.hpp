@@ -3,6 +3,9 @@
 
 #include <utility>
 #include <functional>
+#include <list>
+
+#include "i_rendernode.hpp"
 
 namespace e2 { namespace interface {
 
@@ -17,8 +20,12 @@ public:
 
                template< class... Args >
                i_renderbackend( Args && ... args ) : Impl( std::forward< Args >( std::move( args ) ) ... ) {}
-               template< class Arg >
-	       bool renderbackend_process( e_renderbackend_action a, Arg arg ){ return Impl::renderbackend_process( a, arg ); }
+	       bool renderbackend_process_rendernodes( std::list< ::e2::interface::i_rendernode * > * nodes  ){ return Impl::renderbackend_process_rendernodes( nodes ); }
+               //swaps committed rangerpackages with a fresh one
+               bool renderbackend_process_commit(){ return Impl::renderbackend_process_commit(); }
+               //executes committed renderpackages
+               bool renderbackend_process_renderpackages( int count ){ return Impl::renderbackend_process_renderpackages( count ); }
+               bool renderbackend_get_window( void ** win ){ return Impl::renderbackend_get_window( win ); }
 };
 
 } }

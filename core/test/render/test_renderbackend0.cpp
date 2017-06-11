@@ -7,17 +7,11 @@
 #include "i_rendernode.hpp"
 #include "i_rendernode.hpp"
 #include "i_renderpayload.hpp"
-#include "rendertaskpackager_gl.hpp"
-#include "renderdevice_gl.hpp"
-#include "gl_includes.hpp"
-#include "buffer.hpp"
 
+#include "gl_includes.hpp"
 #include "gl_helper.hpp"
-#include "rendertaskpackager_gl.hpp"
 #include "rendergraphbuilder0.hpp"
-#include "renderpkgexec0.hpp"
-#include "rendergraphconverter_gl.hpp"
-#include "rendergraphscheduler0.hpp"
+#include "renderbackend0.hpp"
 
 bool quit = false;
 static void process_key_input( GLFWwindow * win, int key, int scancode, int action, int mods ){
@@ -36,23 +30,15 @@ static void process_mouse_move( GLFWwindow * win, double xpos, double ypos ){
 
 int main(){
 
-    constexpr size_t buf_len_bytes = 1 << 20;
-    std::cout << "allocated buffer of length: " << buf_len_bytes << std::endl;
-    ::e2::memory::buffer buf( buf_len_bytes );
-    ::e2::render::renderdevice_gl rd;
-    ::e2::render::rendertaskpackager_gl packager;
-
     std::list< ::e2::interface::i_rendernode * > nodes_init {};
     std::list< ::e2::interface::i_rendernode * > nodes_draw_loop {};
     std::list< ::e2::interface::i_rendernode * > nodes_deinit {};
-    ::e2::render::rendergraphbuilder0 gb_init;
-    ::e2::render::rendergraphbuilder0 gb_draw_loop;
-    ::e2::render::rendergraphbuilder0 gb_deinit;
-
-    ::e2::render::renderpkgexec0 executer;
-    ::e2::render::rendergraphconverter_gl converter;
+    ::e2::render::rendergraphbuilder0 gb;
+    ::e2::render::renderbackend0 rb;
     
-    //serialize tasks
+    //define render tasks
+    //todo: move these into render front end
+
     //init window
     ::e2::interface::i_rendernode_init_window n_init_win;
     n_init_win._x = 700;
@@ -271,195 +257,192 @@ int main(){
 
     ::e2::interface::i_rendernode_query_persistent n_query_active_persistent;
     n_query_active_persistent._program_handle = &program_handle;
-	
-    //setup for shaders and program
-    gb_init.set_handle( &n_init_win );
-    nodes_init.push_back( &n_init_win );
 
-    gb_init.set_handle( &n_init_prog );
-    gb_init.link_prerequisite( &n_init_prog, &n_init_win );
-    nodes_init.push_back( &n_init_prog );
+    //sequencing render nodes
+    //todo: move these into render front end
+    {
+	//setup for shaders and program
+	gb.set_handle( &n_init_win );
+	nodes_init.push_back( &n_init_win );
 
-    gb_init.set_handle( &n_load_shader_vert );
-    gb_init.link_prerequisite( &n_load_shader_vert, &n_init_prog );
-    nodes_init.push_back( &n_load_shader_vert );
+	gb.set_handle( &n_init_prog );
+	gb.link_prerequisite( &n_init_prog, &n_init_win );
+	nodes_init.push_back( &n_init_prog );
+
+	gb.set_handle( &n_load_shader_vert );
+	gb.link_prerequisite( &n_load_shader_vert, &n_init_prog );
+	nodes_init.push_back( &n_load_shader_vert );
     
-    gb_init.set_handle( &n_load_shader_frag );
-    gb_init.link_prerequisite( &n_load_shader_frag, &n_init_prog );
-    nodes_init.push_back( &n_load_shader_frag );
+	gb.set_handle( &n_load_shader_frag );
+	gb.link_prerequisite( &n_load_shader_frag, &n_init_prog );
+	nodes_init.push_back( &n_load_shader_frag );
 
-    gb_init.set_handle( &n_bind_shader_vert );
-    gb_init.link_prerequisite( &n_bind_shader_vert, &n_load_shader_vert );
-    nodes_init.push_back( &n_bind_shader_vert );
+	gb.set_handle( &n_bind_shader_vert );
+	gb.link_prerequisite( &n_bind_shader_vert, &n_load_shader_vert );
+	nodes_init.push_back( &n_bind_shader_vert );
 
-    gb_init.set_handle( &n_bind_shader_frag );
-    gb_init.link_prerequisite( &n_bind_shader_frag, &n_load_shader_frag );
-    nodes_init.push_back( &n_bind_shader_frag );
+	gb.set_handle( &n_bind_shader_frag );
+	gb.link_prerequisite( &n_bind_shader_frag, &n_load_shader_frag );
+	nodes_init.push_back( &n_bind_shader_frag );
     
-    //setup shader variable pipeline mapping
-    gb_init.set_handle( &n_bind_attrib_vert_pos );
-    gb_init.link_prerequisite( &n_bind_attrib_vert_pos, &n_bind_shader_frag );
-    nodes_init.push_back( &n_bind_attrib_vert_pos );
+	//setup shader variable pipeline mapping
+	gb.set_handle( &n_bind_attrib_vert_pos );
+	gb.link_prerequisite( &n_bind_attrib_vert_pos, &n_bind_shader_frag );
+	nodes_init.push_back( &n_bind_attrib_vert_pos );
 
-    gb_init.set_handle( &n_bind_attrib_vert_color );
-    gb_init.link_prerequisite( &n_bind_attrib_vert_color, &n_bind_attrib_vert_pos );
-    nodes_init.push_back( &n_bind_attrib_vert_color );
+	gb.set_handle( &n_bind_attrib_vert_color );
+	gb.link_prerequisite( &n_bind_attrib_vert_color, &n_bind_attrib_vert_pos );
+	nodes_init.push_back( &n_bind_attrib_vert_color );
 
-    gb_init.set_handle( &n_bind_attrib_frag_color );
-    gb_init.link_prerequisite( &n_bind_attrib_frag_color, &n_bind_attrib_vert_color );
-    nodes_init.push_back( &n_bind_attrib_frag_color );
+	gb.set_handle( &n_bind_attrib_frag_color );
+	gb.link_prerequisite( &n_bind_attrib_frag_color, &n_bind_attrib_vert_color );
+	nodes_init.push_back( &n_bind_attrib_frag_color );
 
-    //compile opengl program
-    gb_init.set_handle( &n_link_program );
-    gb_init.link_prerequisite( &n_link_program, &n_bind_attrib_frag_color );
-    nodes_init.push_back( &n_link_program );
+	//compile opengl program
+	gb.set_handle( &n_link_program );
+	gb.link_prerequisite( &n_link_program, &n_bind_attrib_frag_color );
+	nodes_init.push_back( &n_link_program );
 
-    gb_init.set_handle( &n_bind_program );
-    gb_init.link_prerequisite( &n_bind_program, &n_link_program );
-    nodes_init.push_back( &n_bind_program );
+	gb.set_handle( &n_bind_program );
+	gb.link_prerequisite( &n_bind_program, &n_link_program );
+	nodes_init.push_back( &n_bind_program );
 
-    gb_init.set_handle( &n_query_active_attrib );
-    gb_init.link_prerequisite( &n_query_active_attrib, &n_bind_program );
-    nodes_init.push_back( &n_query_active_attrib );
+	gb.set_handle( &n_query_active_attrib );
+	gb.link_prerequisite( &n_query_active_attrib, &n_bind_program );
+	nodes_init.push_back( &n_query_active_attrib );
 
-    gb_init.set_handle( &n_query_active_persistent );
-    gb_init.link_prerequisite( &n_query_active_persistent, &n_query_active_attrib );
-    nodes_init.push_back( &n_query_active_persistent );
+	gb.set_handle( &n_query_active_persistent );
+	gb.link_prerequisite( &n_query_active_persistent, &n_query_active_attrib );
+	nodes_init.push_back( &n_query_active_persistent );
     
-    //store shader input data to buffers
-    gb_init.set_handle( &n_init_vbos );
-    gb_init.link_prerequisite( &n_init_vbos, &n_query_active_persistent );
-    nodes_init.push_back( &n_init_vbos );
+	//store shader input data to buffers
+	gb.set_handle( &n_init_vbos );
+	gb.link_prerequisite( &n_init_vbos, &n_query_active_persistent );
+	nodes_init.push_back( &n_init_vbos );
 
-    gb_init.set_handle( &n_bind_buffer_pos );
-    gb_init.link_prerequisite( &n_bind_buffer_pos, &n_init_vbos );
-    nodes_init.push_back( &n_bind_buffer_pos );
+	gb.set_handle( &n_bind_buffer_pos );
+	gb.link_prerequisite( &n_bind_buffer_pos, &n_init_vbos );
+	nodes_init.push_back( &n_bind_buffer_pos );
 
-    gb_init.set_handle( &n_store_buffer_pos );
-    gb_init.link_prerequisite( &n_store_buffer_pos, &n_bind_buffer_pos );
-    nodes_init.push_back( &n_store_buffer_pos );
+	gb.set_handle( &n_store_buffer_pos );
+	gb.link_prerequisite( &n_store_buffer_pos, &n_bind_buffer_pos );
+	nodes_init.push_back( &n_store_buffer_pos );
 
-    gb_init.set_handle( &n_bind_buffer_color );
-    gb_init.link_prerequisite( &n_bind_buffer_color, &n_store_buffer_pos );
-    nodes_init.push_back( &n_bind_buffer_color );
+	gb.set_handle( &n_bind_buffer_color );
+	gb.link_prerequisite( &n_bind_buffer_color, &n_store_buffer_pos );
+	nodes_init.push_back( &n_bind_buffer_color );
 
-    gb_init.set_handle( &n_store_buffer_color );
-    gb_init.link_prerequisite( &n_store_buffer_color, &n_bind_buffer_color );
-    nodes_init.push_back( &n_store_buffer_color );
+	gb.set_handle( &n_store_buffer_color );
+	gb.link_prerequisite( &n_store_buffer_color, &n_bind_buffer_color );
+	nodes_init.push_back( &n_store_buffer_color );
 
-    gb_init.set_handle( &n_init_object_va );
-    gb_init.link_prerequisite( &n_init_object_va, &n_store_buffer_color );
-    nodes_init.push_back( &n_init_object_va );
+	gb.set_handle( &n_init_object_va );
+	gb.link_prerequisite( &n_init_object_va, &n_store_buffer_color );
+	nodes_init.push_back( &n_init_object_va );
 
-    gb_init.set_handle( &n_bind_object_va );
-    gb_init.link_prerequisite( &n_bind_object_va, &n_init_object_va );
-    nodes_init.push_back( &n_bind_object_va );
+	gb.set_handle( &n_bind_object_va );
+	gb.link_prerequisite( &n_bind_object_va, &n_init_object_va );
+	nodes_init.push_back( &n_bind_object_va );
 
-    //map vertex array index for position buffer
-    gb_init.set_handle( &n_bind_buffer_pos_2 );
-    gb_init.link_prerequisite( &n_bind_buffer_pos_2, &n_bind_object_va );
-    nodes_init.push_back( &n_bind_buffer_pos_2 );
+	//map vertex array index for position buffer
+	gb.set_handle( &n_bind_buffer_pos_2 );
+	gb.link_prerequisite( &n_bind_buffer_pos_2, &n_bind_object_va );
+	nodes_init.push_back( &n_bind_buffer_pos_2 );
 
-    gb_init.set_handle( &n_enable_vaa_pos );
-    gb_init.link_prerequisite( &n_enable_vaa_pos, &n_bind_buffer_pos_2 );
-    nodes_init.push_back( &n_enable_vaa_pos );
+	gb.set_handle( &n_enable_vaa_pos );
+	gb.link_prerequisite( &n_enable_vaa_pos, &n_bind_buffer_pos_2 );
+	nodes_init.push_back( &n_enable_vaa_pos );
 
-    gb_init.set_handle( &n_defineformat_attrib_vert_pos );
-    gb_init.link_prerequisite( &n_defineformat_attrib_vert_pos, &n_enable_vaa_pos );
-    nodes_init.push_back( &n_defineformat_attrib_vert_pos );
+	gb.set_handle( &n_defineformat_attrib_vert_pos );
+	gb.link_prerequisite( &n_defineformat_attrib_vert_pos, &n_enable_vaa_pos );
+	nodes_init.push_back( &n_defineformat_attrib_vert_pos );
 
-    //map vertex array index for colour buffer
-    gb_init.set_handle( &n_bind_buffer_color_2 );
-    gb_init.link_prerequisite( &n_bind_buffer_color_2, &n_defineformat_attrib_vert_pos );
-    nodes_init.push_back( &n_bind_buffer_color_2 );
+	//map vertex array index for colour buffer
+	gb.set_handle( &n_bind_buffer_color_2 );
+	gb.link_prerequisite( &n_bind_buffer_color_2, &n_defineformat_attrib_vert_pos );
+	nodes_init.push_back( &n_bind_buffer_color_2 );
 
-    gb_init.set_handle( &n_enable_vaa_color );
-    gb_init.link_prerequisite( &n_enable_vaa_color, &n_bind_buffer_color_2 );
-    nodes_init.push_back( &n_enable_vaa_color );
+	gb.set_handle( &n_enable_vaa_color );
+	gb.link_prerequisite( &n_enable_vaa_color, &n_bind_buffer_color_2 );
+	nodes_init.push_back( &n_enable_vaa_color );
 
-    gb_init.set_handle( &n_defineformat_attrib_vert_color );
-    gb_init.link_prerequisite( &n_defineformat_attrib_vert_color, &n_enable_vaa_color );
-    nodes_init.push_back( &n_defineformat_attrib_vert_color );
+	gb.set_handle( &n_defineformat_attrib_vert_color );
+	gb.link_prerequisite( &n_defineformat_attrib_vert_color, &n_enable_vaa_color );
+	nodes_init.push_back( &n_defineformat_attrib_vert_color );
+    }
 
-    //drawing loop
-    gb_draw_loop.set_handle( &n_clear_wind_buf_color);
-    nodes_draw_loop.push_back( &n_clear_wind_buf_color );
+    {
+	//drawing loop
+	gb.set_handle( &n_clear_wind_buf_color);
+	nodes_draw_loop.push_back( &n_clear_wind_buf_color );
 
-    gb_draw_loop.set_handle( &n_disable_win_buf_depth );
-    gb_draw_loop.link_prerequisite( &n_disable_win_buf_depth, &n_clear_wind_buf_color );
-    nodes_draw_loop.push_back( &n_disable_win_buf_depth );
+	gb.set_handle( &n_disable_win_buf_depth );
+	gb.link_prerequisite( &n_disable_win_buf_depth, &n_clear_wind_buf_color );
+	nodes_draw_loop.push_back( &n_disable_win_buf_depth );
 
-    gb_draw_loop.set_handle( &n_bind_program_2 );
-    gb_draw_loop.link_prerequisite( &n_bind_program_2, &n_disable_win_buf_depth );
-    nodes_draw_loop.push_back( &n_bind_program_2 );
+	gb.set_handle( &n_bind_program_2 );
+	gb.link_prerequisite( &n_bind_program_2, &n_disable_win_buf_depth );
+	nodes_draw_loop.push_back( &n_bind_program_2 );
 
-    gb_draw_loop.set_handle( &n_bind_object_va_2 );
-    gb_draw_loop.link_prerequisite( &n_bind_object_va_2, &n_bind_program_2 );
-    nodes_draw_loop.push_back( &n_bind_object_va_2 );
+	gb.set_handle( &n_bind_object_va_2 );
+	gb.link_prerequisite( &n_bind_object_va_2, &n_bind_program_2 );
+	nodes_draw_loop.push_back( &n_bind_object_va_2 );
 
-    gb_draw_loop.set_handle( &n_exec_drawbatch );
-    gb_draw_loop.link_prerequisite( &n_exec_drawbatch, &n_bind_object_va_2 );
-    nodes_draw_loop.push_back( &n_exec_drawbatch );
+	gb.set_handle( &n_exec_drawbatch );
+	gb.link_prerequisite( &n_exec_drawbatch, &n_bind_object_va_2 );
+	nodes_draw_loop.push_back( &n_exec_drawbatch );
 
-    gb_draw_loop.set_handle( &n_swap_win );
-    gb_draw_loop.link_prerequisite( &n_swap_win, &n_exec_drawbatch );
-    nodes_draw_loop.push_back( &n_swap_win );
+	gb.set_handle( &n_swap_win );
+	gb.link_prerequisite( &n_swap_win, &n_exec_drawbatch );
+	nodes_draw_loop.push_back( &n_swap_win );
+    }
 
-    //deinit sequence
-    gb_deinit.set_handle( &n_deinit_program );
-    nodes_deinit.push_back( &n_deinit_program );
+    {
+	//deinit sequence
+	gb.set_handle( &n_deinit_program );
+	nodes_deinit.push_back( &n_deinit_program );
 
-    gb_deinit.set_handle( &n_deinit_vbos );
-    gb_draw_loop.link_prerequisite( &n_deinit_vbos, &n_deinit_program );
-    nodes_deinit.push_back( &n_deinit_vbos );
+	gb.set_handle( &n_deinit_vbos );
+	gb.link_prerequisite( &n_deinit_vbos, &n_deinit_program );
+	nodes_deinit.push_back( &n_deinit_vbos );
 
-    gb_deinit.set_handle( &n_deinit_window );
-    gb_draw_loop.link_prerequisite( &n_deinit_window, &n_deinit_program );
-    nodes_deinit.push_back( &n_deinit_window );
+	gb.set_handle( &n_deinit_window );
+	gb.link_prerequisite( &n_deinit_window, &n_deinit_program );
+	nodes_deinit.push_back( &n_deinit_window );
+    }
 
-    //create render graphs
-    //todo: implement flow control and automatic bind dependencies into render graph
-    std::list< ::e2::interface::i_rendernode * > rg_init;
-    std::list< ::e2::interface::i_rendernode * > rg_draw;
-    std::list< ::e2::interface::i_rendernode * > rg_deinit;
+    //start actual sequence using render backend
+    assert( rb.renderbackend_process_rendernodes( &nodes_init ) );
+    assert( rb.renderbackend_process_commit() );
+    assert( rb.renderbackend_process_renderpackages(1) );
 
-    ::e2::render::rendergraphscheduler0 sch;
-    assert( sch.schedule_graph( &nodes_init, &rg_init ) );
-    assert( sch.schedule_graph( &nodes_draw_loop, &rg_draw ) );
-    assert( sch.schedule_graph( &nodes_deinit, &rg_deinit ) );
-
-    assert( false == rg_init.empty() );
-    assert( false == rg_draw.empty() );
-    assert( false == rg_deinit.empty() );
-
-    //convert graph nodes into sequences of render task packages
-    std::list< ::e2::interface::i_renderpackage * > renderpackages_init;
-    std::list< ::e2::interface::i_renderpackage * > renderpackages_draw;
-    std::list< ::e2::interface::i_renderpackage * > renderpackages_deinit;
-    converter.process( &buf, &rg_init, &renderpackages_init );
-    converter.process( &buf, &rg_draw, &renderpackages_draw );
-    converter.process( &buf, &rg_deinit, &renderpackages_deinit );
-
-    //start actual sequence
-    executer.process( &rd, &renderpackages_init );
-    glfwMakeContextCurrent( rd._window );
-    glfwSetKeyCallback( rd._window, process_key_input );
-    glfwSetMouseButtonCallback( rd._window, process_mouse_button );
-    glfwSetCursorPosCallback( rd._window, process_mouse_move );
-    while( false == glfwWindowShouldClose( rd._window ) ){
-	glfwMakeContextCurrent( rd._window );
+    void * win;
+    GLFWwindow * win_glfw;
+    assert( rb.renderbackend_get_window( &win ) );
+    assert( win );
+    //todo: access window functionality through an abstracted window utility
+    win_glfw = (GLFWwindow *) win;
+    glfwMakeContextCurrent( win_glfw );
+    glfwSetKeyCallback( win_glfw, process_key_input );
+    glfwSetMouseButtonCallback( win_glfw, process_mouse_button );
+    glfwSetCursorPosCallback( win_glfw, process_mouse_move );
+    while( false == glfwWindowShouldClose( win_glfw ) ){
+	glfwMakeContextCurrent( win_glfw );
 	if( quit ){
-	    glfwSetWindowShouldClose( rd._window, GLFW_TRUE);
+	    glfwSetWindowShouldClose( win_glfw, GLFW_TRUE);
 	}
 	glClearColor( 0.0f, 0.1f, 0.3f, 1.0f );
-	executer.process( &rd, &renderpackages_draw );
+
+	assert( rb.renderbackend_process_rendernodes( &nodes_draw_loop ) );
+	assert( rb.renderbackend_process_commit() );
+	assert( rb.renderbackend_process_renderpackages(1) );
+
 	glfwPollEvents();
 	std::this_thread::sleep_for( std::chrono::milliseconds(25) );
     }
-    executer.process( &rd, &renderpackages_deinit );
-	
-    double frac_free;
-    buf.buffer_stat_fraction_free( &frac_free );
-    std::cout << "buffer fraction free: " << frac_free << std::endl;
+    assert( rb.renderbackend_process_rendernodes( &nodes_deinit ) );
+    assert( rb.renderbackend_process_commit() );
+    assert( rb.renderbackend_process_renderpackages(1) );
+
     return 0;
 }

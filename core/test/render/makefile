@@ -44,6 +44,6 @@ testcases:
 		./$$i; \
 	done \
 
-.PHONY: test_rendergraphscheduler
-test_rendergraphscheduler:
-	$(CXX) -g -std=c++14 test_rendergraphscheduler.cpp -o $(dir_build)/test_rendergraphscheduler $(object_files) $(include_flags) $(libs)
+# .PHONY: test_rendergraphscheduler
+# test_rendergraphscheduler:
+# 	$(CXX) -g -std=c++14 test_rendergraphscheduler.cpp -o $(dir_build)/test_rendergraphscheduler $(object_files) $(include_flags) $(libs)
