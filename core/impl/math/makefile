@@ -1,6 +1,6 @@
 src_files = $(wildcard *.cpp)
 
-include_dirs = ./
+include_dirs = ./../../interface/
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 

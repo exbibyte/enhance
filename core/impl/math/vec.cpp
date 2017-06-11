@@ -1,4 +1,5 @@
-#include <math.h>
+#include <cmath>
+#include <vector>
 #include <cassert>
 
 #include "vec.hpp"
@@ -7,59 +8,33 @@ namespace e2 { namespace math {
 
 vec::vec(){
     _dim = 3;
-    _vec = new float [_dim];
-    memset( _vec, 0, sizeof(float)*_dim );
+    _vec.resize(_dim, 0);
 }
 
 vec::vec(int dim){
     _dim = dim;
-    _vec = new float [_dim];
-    memset( _vec, 0, sizeof(float)*_dim );
+    _vec.resize( _dim,0 );
 }
 
 vec::vec(const vec & v){
-    _vec = new float[v._dim];
+    _vec = v._vec;
     _dim = v._dim;
-
-    //copy data
-    memcpy( _vec, v._vec, sizeof(float)*_dim );
 }
 
 vec & vec::operator=(const vec & v)
 {
-    _vec = new float[v._dim];
+    _vec = v._vec;
     _dim = v._dim;
-
-    //copy data
-    memcpy( _vec, v._vec, sizeof(float)*_dim );
 
     return *this;
 }
 
 vec::~vec(){
-    if( _dim == 1 || _dim == 0 )
-	delete _vec;
-    else if( _dim > 1 )
-	delete [] _vec;
-    
-    _vec = nullptr;
 }
 
 void vec::set_dim(int dim){
-    if( _dim != dim ){
-	float * newvec = new float[dim];
-
-	memset( newvec, 0, sizeof(float)*dim );
-	memcpy( newvec, _vec, sizeof(float)*_dim );
- 
-	//delete old vector
-	if( _dim == 1 || _dim == 0 )
-	    delete _vec;
-	else if(_dim > 1)
-	    delete [] _vec;
-    
-	_vec = newvec;
-	newvec = nullptr;
+    if( _dim != dim && dim >= 0 ){
+	_vec.resize(dim);
 	_dim = dim;
     }
 }
@@ -70,9 +45,9 @@ vec vec::operator + (const vec & v) const{
 
     vec newvec( _dim );
 
-    float * a = _vec;
-    float * b = v._vec;
-    float * c = newvec._vec;  
+    float const * a = &_vec[0];
+    float const * b = &v._vec[0];
+    float * c = &newvec._vec[0];  
 
     for( int i = 0; i < _dim; i++ ){
 	*c = *a + *b;
@@ -90,9 +65,9 @@ vec vec::operator - (const vec & v) const{
 
     vec newvec( _dim );
 
-    float * a = _vec;
-    float * b = v._vec;
-    float * c = newvec._vec;
+    float const * a = &_vec[0];
+    float const * b = &v._vec[0];
+    float * c = &newvec._vec[0];
 
     for( int i = 0; i < _dim; i++ ){
 	*c = *a - *b;
@@ -119,6 +94,15 @@ vec vec::operator / (const vec & v) const{
 
     return newvec;
 }
+vec vec::operator * (const float s) const{
+    vec newvec( _dim );
+
+    for( int i = 0; i < _dim; i++ ){
+	newvec._vec[i] = _vec[i] * s;
+    }
+
+    return newvec;
+}
 bool vec::is_equal(const vec & v, float error) const{
     if( _dim != v._dim ){
 	return false;
@@ -135,8 +119,8 @@ float vec::dot(const vec & v) const{
     if( _dim != v._dim )
 	assert( false && "vec::dot(): dimension not match" );
 
-    float * a = _vec;
-    float * b = v._vec;
+    float const * a = &_vec[0];
+    float const * b = &v._vec[0];
     float out = 0;
 
     for( int i = 0; i < _dim; i++ ){
@@ -168,7 +152,7 @@ vec vec::cross(const vec & v) const{
 
 float vec::magnitude() const{
     float out = 0;
-    const float * a = (const float *) _vec; 
+    const float * a = (const float *) &_vec[0]; 
   
     for( int i = 0; i < _dim; i++ ){
 	out += (*a)*(*a);
@@ -194,7 +178,7 @@ vec vec::normalize() const {
 	return v;
     }
 
-    float * a = v._vec;
+    float * a = &v._vec[0];
 
     for( int i = 0; i < v._dim; i++ ){
 	*a = *a/mag;
