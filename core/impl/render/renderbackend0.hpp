@@ -4,38 +4,38 @@
 #include <cstdint>
 #include <cstring>
 #include <utility>
+#include <list>
+#include <cassert>
+#include <iostream>
 
+#include "i_rendernode.hpp"
 #include "i_trait_general.hpp"
 #include "i_renderbackend.hpp"
-#include "i_renderpackage.hpp"
 
-#include "rendertaskpackager_gl.hpp"
 #include "renderdevice_gl.hpp"
-#include "rendergraphconverter_gl.hpp"
-#include "renderpkgexec0.hpp"
 #include "rendergraphscheduler0.hpp"
-#include "buffer.hpp"
+#include "memory_manager_p1t_g1_ff.hpp"
 
 namespace e2 { namespace render {
 
+template< class mem_manager >
 class renderbackend0_impl {
 public:
     renderbackend0_impl();
     bool renderbackend_process_rendernodes( std::list< ::e2::interface::i_rendernode * > * nodes  );
     bool renderbackend_process_commit();
-    bool renderbackend_process_renderpackages( int count );
+    bool renderbackend_process_batches( int count );
     bool renderbackend_get_window( void ** win );
-    ::e2::render::renderpkgexec0 _executer;
     ::e2::render::renderdevice_gl _rd;
-    ::e2::render::rendergraphconverter_gl _converter;
-    ::e2::render::rendertaskpackager_gl _packager;
     ::e2::render::rendergraphscheduler0 _sch;
-    ::e2::memory::buffer _buf;
-    std::list< ::e2::interface::i_renderpackage * > _renderpackages;
-    std::list< std::list< ::e2::interface::i_renderpackage * > > _renderpackages_committed;
+    std::list< ::e2::interface::i_rendernode * > _scheduled;
+    std::list< std::list< ::e2::interface::i_rendernode * > > _committed;
 };
 
-class renderbackend0 : public ::e2::interface::i_renderbackend< renderbackend0_impl > {};
+#include "renderbackend0.tpp"
+
+template< class mem_manager >
+class renderbackend0 : public ::e2::interface::i_renderbackend< renderbackend0_impl< mem_manager > > {};
 
 } }
 
@@ -43,8 +43,13 @@ class renderbackend0 : public ::e2::interface::i_renderbackend< renderbackend0_i
 
 namespace e2 { namespace trait {
 
+// template<>
+// struct trait_is_renderbackend< ::e2::render::renderbackend0 > {
+//     constexpr static bool _val = true;
+// };
+
 template<>
-struct trait_is_renderbackend< ::e2::render::renderbackend0 > {
+struct trait_is_renderbackend< ::e2::render::renderbackend0< ::e2::memory::memory_manager_p1t_g1_ff > > {
     constexpr static bool _val = true;
 };
 

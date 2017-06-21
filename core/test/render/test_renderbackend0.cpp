@@ -5,13 +5,13 @@
 #include <cstdint>
 
 #include "i_rendernode.hpp"
-#include "i_rendernode.hpp"
-#include "i_renderpayload.hpp"
+#include "i_renderresource.hpp"
 
 #include "gl_includes.hpp"
 #include "gl_helper.hpp"
 #include "rendergraphbuilder0.hpp"
 #include "renderbackend0.hpp"
+#include "memory_manager_p1t_g1_ff.hpp"
 
 bool quit = false;
 static void process_key_input( GLFWwindow * win, int key, int scancode, int action, int mods ){
@@ -34,108 +34,75 @@ int main(){
     std::list< ::e2::interface::i_rendernode * > nodes_draw_loop {};
     std::list< ::e2::interface::i_rendernode * > nodes_deinit {};
     ::e2::render::rendergraphbuilder0 gb;
-    ::e2::render::renderbackend0 rb;
+    ::e2::render::renderbackend0< ::e2::memory::memory_manager_p1t_g1_ff > rb;
     
     //define render tasks
     //todo: move these into render front end
 
     //init window
-    ::e2::interface::i_rendernode_init_window n_init_win;
-    n_init_win._x = 700;
-    n_init_win._y = 500;
+    ::e2::interface::i_rendernode_init_window n_init_win( 700, 500 );
 
     //init opengl program
     uint64_t program_handle;
-    ::e2::interface::i_rendernode_init_program n_init_prog;
-    n_init_prog._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_init_program n_init_prog( &program_handle );
 
     //swap window buffer
     ::e2::interface::i_rendernode_swap_window_buffer n_swap_win;
 
     //deinint opengl program
-    ::e2::interface::i_rendernode_deinit_program n_deinit_program;
-    n_deinit_program._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_deinit_program n_deinit_program( &program_handle );
 
     //deinint window
-    ::e2::interface::i_renderpackage * pkg_deinit_window;
     ::e2::interface::i_rendernode_deinit_window n_deinit_window;
 
     //load vertex shader
     uint64_t vertex_shader_handle;
     uint64_t shader_type_vertex = ::e2::render::gl::VERTEX;
     char * source_vertex_shader = "assets/Test.vert";
-    ::e2::interface::i_rendernode_load_shader n_load_shader_vert;
-    n_load_shader_vert._shader_handle = &vertex_shader_handle;
-    n_load_shader_vert._shader_type = &shader_type_vertex;
-    n_load_shader_vert._source = source_vertex_shader;
-    n_load_shader_vert._source_type = ::e2::interface::e_renderresource_subtype_shader_file;
+    ::e2::interface::i_rendernode_load_shader n_load_shader_vert( &vertex_shader_handle, &shader_type_vertex, source_vertex_shader, ::e2::interface::e_renderresource_subtype_shader_file );
 
     //load frag shader
     uint64_t frag_shader_handle;
     uint64_t shader_type_frag = ::e2::render::gl::FRAGMENT;
     char * source_frag_shader = "assets/Test.frag";
-    ::e2::interface::i_rendernode_load_shader n_load_shader_frag;
-    n_load_shader_frag._shader_handle = &frag_shader_handle;
-    n_load_shader_frag._shader_type = &shader_type_frag;
-    n_load_shader_frag._source = source_frag_shader;
-    n_load_shader_frag._source_type = ::e2::interface::e_renderresource_subtype_shader_file;
+    ::e2::interface::i_rendernode_load_shader n_load_shader_frag( &frag_shader_handle, &shader_type_frag, source_frag_shader, ::e2::interface::e_renderresource_subtype_shader_file );
 
     //bind vertex shader
-    ::e2::interface::i_rendernode_bind_shader n_bind_shader_vert;
-    n_bind_shader_vert._program_handle = &program_handle;
-    n_bind_shader_vert._shader_handle = &vertex_shader_handle;
+    ::e2::interface::i_rendernode_bind_shader n_bind_shader_vert( &program_handle, &vertex_shader_handle );
     
     //bind fragment shader
-    ::e2::interface::i_rendernode_bind_shader n_bind_shader_frag;
-    n_bind_shader_frag._program_handle = &program_handle;
-    n_bind_shader_frag._shader_handle = &frag_shader_handle;
+    ::e2::interface::i_rendernode_bind_shader n_bind_shader_frag( &program_handle, &frag_shader_handle );
     
     //todo: set up and map attributes, uniform variables, frag outputs
 
     //link program
-    ::e2::interface::i_rendernode_compute_program n_compute_program;
-    n_compute_program._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_compute_program n_compute_program( &program_handle );
 
     //compile opengl program
-    ::e2::interface::i_rendernode_bind_program n_bind_program;
-    n_bind_program._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_bind_program n_bind_program( &program_handle );
 
-    ::e2::interface::i_rendernode_bind_program n_bind_program_2 = n_bind_program;
+    ::e2::interface::i_rendernode_bind_program n_bind_program_2( &program_handle );
 
     //query active attributes
-    ::e2::interface::i_rendernode_query_attrib n_query_attrib;
-    n_query_attrib._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_query_attrib n_query_attrib( &program_handle );
         
     //query active uniforms
-    ::e2::interface::i_rendernode_query_persistent n_query_persistent;
-    n_query_persistent._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_query_persistent n_query_persistent( &program_handle );
 
     //bind attrib location, vertex position
     char * attrib_name_vert_pos = "VertexPosition";
     uint64_t attrib_index_vert_pos = 0;
-    ::e2::interface::i_rendernode_bind_attrib n_bind_attrib_vert_pos;
-    n_bind_attrib_vert_pos._program_handle = &program_handle;
-    n_bind_attrib_vert_pos._location_type = ::e2::interface::e_renderresource_subtype_attrib_attrib_location;
-    n_bind_attrib_vert_pos._index = &attrib_index_vert_pos;
-    n_bind_attrib_vert_pos._var_name = attrib_name_vert_pos;
+    ::e2::interface::i_rendernode_bind_attrib_attrib_loc n_bind_attrib_vert_pos( &program_handle, &attrib_index_vert_pos, attrib_name_vert_pos );
 
     //bind attrib location, vertex colour
     char * attrib_name_vert_color = "VertexColor";
     uint64_t attrib_index_vert_color = 1;
-    ::e2::interface::i_rendernode_bind_attrib n_bind_attrib_vert_color;
-    n_bind_attrib_vert_color._program_handle = &program_handle;
-    n_bind_attrib_vert_color._location_type = ::e2::interface::e_renderresource_subtype_attrib_attrib_location;
-    n_bind_attrib_vert_color._index = &attrib_index_vert_color;
-    n_bind_attrib_vert_color._var_name = attrib_name_vert_color;
+    ::e2::interface::i_rendernode_bind_attrib_attrib_loc n_bind_attrib_vert_color( &program_handle, &attrib_index_vert_color, attrib_name_vert_color );
 
     //bind frag location
     char * attrib_name_frag_color = "FragColor";
     uint64_t attrib_index_frag_color = 0;
-    ::e2::interface::i_rendernode_bind_attrib n_bind_attrib_frag_color;
-    n_bind_attrib_frag_color._program_handle = &program_handle;
-    n_bind_attrib_frag_color._location_type = ::e2::interface::e_renderresource_subtype_attrib_frag_location;
-    n_bind_attrib_frag_color._index = &attrib_index_frag_color;
-    n_bind_attrib_frag_color._var_name = attrib_name_frag_color;
+    ::e2::interface::i_rendernode_bind_attrib_frag_loc n_bind_attrib_frag_color( &program_handle, &attrib_index_frag_color, attrib_name_frag_color );
     
     //shader input data definition
     uint64_t vaoHandle;	
@@ -151,69 +118,42 @@ int main(){
     //vbos handle creation
     uint64_t num_buf = 2;
     uint64_t vbos[2];
-    ::e2::interface::i_rendernode_init_buffer n_init_vbos;
-    n_init_vbos._num_buffers = &num_buf;
-    n_init_vbos._buffers = vbos;
+    ::e2::interface::i_rendernode_init_buffer n_init_vbos( &num_buf, vbos );
 
-    ::e2::interface::i_rendernode_deinit_buffer n_deinit_vbos;
-    n_deinit_vbos._num_buffers = &num_buf;
-    n_deinit_vbos._buffers = vbos;
+    ::e2::interface::i_rendernode_deinit_buffer n_deinit_vbos( &num_buf, vbos );
 
     //vbos data population : vert pos
     uint64_t buf_type_array = ::e2::interface::e_renderresource_buffer_array_buffer;
-    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_pos;
-    n_bind_buffer_pos._buffer_type = &buf_type_array;
-    n_bind_buffer_pos._buffer_handle = &vbos[0];
+    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_pos( &buf_type_array, &vbos[0] );
 
-    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_pos_2 = n_bind_buffer_pos;
+    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_pos_2( &buf_type_array, &vbos[0] );
 
     uint64_t buffer_size_pos = sizeof( positionData );
     uint64_t buffer_usage = GL_STATIC_DRAW;
-    ::e2::interface::i_rendernode_store_buffer n_store_buffer_pos;
-    n_store_buffer_pos._buffer_type = &buf_type_array;
-    n_store_buffer_pos._buffer_size = &buffer_size_pos;
-    n_store_buffer_pos._buffer_data = positionData;
-    n_store_buffer_pos._buffer_usage = &buffer_usage;
+    ::e2::interface::i_rendernode_store_buffer n_store_buffer_pos( &buf_type_array, &buffer_size_pos, positionData, &buffer_usage );
 
-    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_color;
-    n_bind_buffer_color._buffer_type = &buf_type_array;
-    n_bind_buffer_color._buffer_handle = &vbos[1];
+    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_color( &buf_type_array, &vbos[1] );
 
-    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_color_2 = n_bind_buffer_color;
+    ::e2::interface::i_rendernode_bind_buffer n_bind_buffer_color_2( &buf_type_array, &vbos[1] );
 
     uint64_t buffer_size_color = sizeof( colorData );
-    ::e2::interface::i_rendernode_store_buffer n_store_buffer_color;
-    n_store_buffer_color._buffer_type = &buf_type_array;
-    n_store_buffer_color._buffer_size = &buffer_size_color;
-    n_store_buffer_color._buffer_data = colorData;
-    n_store_buffer_color._buffer_usage = &buffer_usage;
+    ::e2::interface::i_rendernode_store_buffer n_store_buffer_color( &buf_type_array, &buffer_size_color, colorData, &buffer_usage );
 
     //vertex array object creation
     uint64_t num_va = 1;
     uint64_t vao;
     uint64_t obj_type_va = ::e2::interface::e_renderresource_subtype_object_vertex_array;
-    ::e2::interface::i_rendernode_init_object n_init_object_va;
-    n_init_object_va._object_type = obj_type_va;
-    n_init_object_va._num_objects = &num_va;
-    n_init_object_va._handle_objects = &vao;
+    ::e2::interface::i_rendernode_init_object_vertex_array n_init_object_va( &num_va, &vao );
 
     //vao bind
-    ::e2::interface::i_rendernode_bind_object n_bind_object_va;
-    n_bind_object_va._object_type = obj_type_va;
-    n_bind_object_va._object_handle = &vao;
+    ::e2::interface::i_rendernode_bind_object_vertex_array n_bind_object_va( &vao );
 
-    ::e2::interface::i_rendernode_bind_object n_bind_object_va_2 = n_bind_object_va;
+    ::e2::interface::i_rendernode_bind_object_vertex_array n_bind_object_va_2( &vao );
 
     //vertex attribute arrays enable
-    uint64_t attrib_index_pos = 0;
-    ::e2::interface::i_rendernode_enable_attrib n_enable_vaa_pos;
-    n_enable_vaa_pos._attrib_type = obj_type_va;
-    n_enable_vaa_pos._attrib_handle = &attrib_index_pos;
+    ::e2::interface::i_rendernode_enable_attrib_vertex_array n_enable_vaa_pos( &attrib_index_vert_pos );
 
-    uint64_t attrib_index_color = 1;
-    ::e2::interface::i_rendernode_enable_attrib n_enable_vaa_color;
-    n_enable_vaa_color._attrib_type = obj_type_va;
-    n_enable_vaa_color._attrib_handle = &attrib_index_color;
+    ::e2::interface::i_rendernode_enable_attrib_vertex_array n_enable_vaa_color( &attrib_index_vert_color );
 
     //map data buffers to corresponding shader input variables
     uint64_t attrib_size = 3;
@@ -221,42 +161,24 @@ int main(){
     uint64_t attrib_stride = 0;
     void * attrib_pointer = 0;
     uint64_t attrib_data_type = ::e2::interface::e_renderresource_data_type_float;
-    ::e2::interface::i_rendernode_store_defineformat_vertexattrib n_defineformat_attrib_vert_pos;
-    n_defineformat_attrib_vert_pos._attrib_handle = &attrib_index_vert_pos;
-    n_defineformat_attrib_vert_pos._attrib_size = &attrib_size;
-    n_defineformat_attrib_vert_pos._attrib_data_type = &attrib_data_type;
-    n_defineformat_attrib_vert_pos._attrib_normalized = &attrib_normalized;
-    n_defineformat_attrib_vert_pos._attrib_stride = &attrib_stride;
-    n_defineformat_attrib_vert_pos._attrib_pointer = attrib_pointer;
+    ::e2::interface::i_rendernode_store_defineformat_vertexattrib n_defineformat_attrib_vert_pos( &attrib_index_vert_pos, &attrib_size, &attrib_data_type, &attrib_normalized, &attrib_stride, attrib_pointer );
 
-    ::e2::interface::i_rendernode_store_defineformat_vertexattrib n_defineformat_attrib_vert_color;
-    n_defineformat_attrib_vert_color._attrib_handle = &attrib_index_vert_color;
-    n_defineformat_attrib_vert_color._attrib_size = &attrib_size;
-    n_defineformat_attrib_vert_color._attrib_data_type = &attrib_data_type;
-    n_defineformat_attrib_vert_color._attrib_normalized = &attrib_normalized;
-    n_defineformat_attrib_vert_color._attrib_stride = &attrib_stride;
-    n_defineformat_attrib_vert_color._attrib_pointer = attrib_pointer;
+    ::e2::interface::i_rendernode_store_defineformat_vertexattrib n_defineformat_attrib_vert_color( &attrib_index_vert_color, &attrib_size, &attrib_data_type, &attrib_normalized, &attrib_stride, attrib_pointer );
 
     uint64_t primitive_type = ::e2::interface::e_renderresource_primitive_triangles;
     int64_t offset = 0;
     uint64_t count = 3;
-    ::e2::interface::i_rendernode_exec_drawbatch n_exec_drawbatch;
-    n_exec_drawbatch._primitive_type = &primitive_type;
-    n_exec_drawbatch._offset = &offset;
-    n_exec_drawbatch._count = &count;
+    ::e2::interface::i_rendernode_exec_drawbatch n_exec_drawbatch( &primitive_type, &offset, &count );
 
     ::e2::interface::i_rendernode_clear_window_buffer_colour n_clear_wind_buf_color;
     ::e2::interface::i_rendernode_clear_window_buffer_depth n_clear_wind_bud_depth;
     ::e2::interface::i_rendernode_disable_window_buffer_depth n_disable_win_buf_depth;
 
-    ::e2::interface::i_rendernode_compute_program n_link_program;
-    n_link_program._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_compute_program n_link_program( &program_handle );
 
-    ::e2::interface::i_rendernode_query_attrib n_query_active_attrib;
-    n_query_active_attrib._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_query_attrib n_query_active_attrib( &program_handle );
 
-    ::e2::interface::i_rendernode_query_persistent n_query_active_persistent;
-    n_query_active_persistent._program_handle = &program_handle;
+    ::e2::interface::i_rendernode_query_persistent n_query_active_persistent( &program_handle );
 
     //sequencing render nodes
     //todo: move these into render front end
@@ -414,7 +336,7 @@ int main(){
     //start actual sequence using render backend
     assert( rb.renderbackend_process_rendernodes( &nodes_init ) );
     assert( rb.renderbackend_process_commit() );
-    assert( rb.renderbackend_process_renderpackages(1) );
+    assert( rb.renderbackend_process_batches(1) );
 
     void * win;
     GLFWwindow * win_glfw;
@@ -435,14 +357,14 @@ int main(){
 
 	assert( rb.renderbackend_process_rendernodes( &nodes_draw_loop ) );
 	assert( rb.renderbackend_process_commit() );
-	assert( rb.renderbackend_process_renderpackages(1) );
+	assert( rb.renderbackend_process_batches(1) );
 
 	glfwPollEvents();
 	std::this_thread::sleep_for( std::chrono::milliseconds(25) );
     }
     assert( rb.renderbackend_process_rendernodes( &nodes_deinit ) );
     assert( rb.renderbackend_process_commit() );
-    assert( rb.renderbackend_process_renderpackages(1) );
+    assert( rb.renderbackend_process_batches(1) );
 
     return 0;
 }
