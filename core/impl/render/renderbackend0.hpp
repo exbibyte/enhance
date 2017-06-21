@@ -30,6 +30,7 @@ public:
     ::e2::render::rendergraphscheduler0 _sch;
     std::list< ::e2::interface::i_rendernode * > _scheduled;
     std::list< std::list< ::e2::interface::i_rendernode * > > _committed;
+    mem_manager _mem;
 };
 
 #include "renderbackend0.tpp"
@@ -42,11 +43,6 @@ class renderbackend0 : public ::e2::interface::i_renderbackend< renderbackend0_i
 //trait information
 
 namespace e2 { namespace trait {
-
-// template<>
-// struct trait_is_renderbackend< ::e2::render::renderbackend0 > {
-//     constexpr static bool _val = true;
-// };
 
 template<>
 struct trait_is_renderbackend< ::e2::render::renderbackend0< ::e2::memory::memory_manager_p1t_g1_ff > > {

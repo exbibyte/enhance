@@ -7,7 +7,6 @@
 #include "scheduler_0.hpp"
 #include "thread_0.hpp"
 #include "threadpool_0.hpp"
-#include "buffer.hpp"
 
 #include "memory_manager_p1t_g1_ff.hpp"
 
@@ -28,8 +27,6 @@ private:
     ::e2::mt::threadpool_0< ::e2::mt::thread_0 > _threadpool;
     
     std::list< ::e2::mt::thread_0 * > _threads;
-
-    std::list< ::e2::memory::buffer > _memory_buffers;
 
     // ::e2::memory::memory_manager_p1t_g1_ff _mem_manager;
 };
