@@ -1,5 +1,4 @@
-#[allow(non_camel_case_types)]
-pub trait i_pool< T > {
+pub trait IPool< T > {
     fn clear( & mut self ) -> bool;
     fn empty( & mut self ) -> bool;
     fn size( & mut self ) -> u64;

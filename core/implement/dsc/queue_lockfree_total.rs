@@ -1,11 +1,12 @@
+pub use interface::i_pool::*;
+
 #[allow(dead_code)]
-#[allow(non_camel_case_types)]
-pub struct queue < T > {
-    _head : T,
+pub struct QueueLockfreeTotal < T > {
+    pub _head : T,
 }
 
 #[allow(unused_variables)]
-impl< T > super::interface::i_pool< T > for queue< T > {
+impl< T > IPool< T > for QueueLockfreeTotal< T > {
     fn clear( & mut self ) -> bool {
         false
     }
