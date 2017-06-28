@@ -5,3 +5,4 @@ pub mod i_alloc;
 pub mod i_free;
 pub mod i_memory_partition;
 pub mod i_memory_manager;
+pub mod i_math_transform;
