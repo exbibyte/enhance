@@ -31,7 +31,6 @@ fn test_spline(){
 
 #[test]
 fn test_spline_iterator(){
-    
     use implement::math::spline::SplineBezier;
     let cp0 = Mat4x1 { _val: [ 0f64, 1f64, 2f64, 3f64 ] };
     let cp1 = Mat4x1 { _val: [ 5f64, 6f64, 7f64, 8f64 ] };
@@ -53,9 +52,41 @@ fn test_spline_iterator(){
                     assert!( val.is_equal( &cp3, 0.00001f64 ).expect("is_equal invalid") );
                 },
                 _ => panic!("unexpected index")
-                    
             }
         }
         
     }
 }
+
+#[test]
+fn test_spline_piecewise_bezier(){
+    use implement::math::spline::SplineBezier;
+    use implement::math::spline::SplinePiecewise;
+    let mut splines = SplinePiecewise::init();
+    let cp0 = Mat4x1 { _val: [ 0f64, 1f64, 2f64, 3f64 ] };
+    let cp1 = Mat4x1 { _val: [ 5f64, 6f64, 7f64, 8f64 ] };
+    let cp2 = Mat4x1 { _val: [ 10f64, 16f64, 17f64, 18f64 ] };
+    let cp3 = Mat4x1 { _val: [ 0f64, 1f64, -2f64, -3f64 ] };
+    for x in 0..4 {
+        let spline = SplineBezier::init( 10 * (x+1) , cp0, cp1, cp2, cp3 );
+        splines.add( spline );
+    }
+    assert!(splines._splines.len() == 4 );
+    let mut max_index = 0usize;
+    for (i, x) in splines.enumerate() {
+        max_index = i;
+        match i {
+            0 => assert!( x.is_equal( &cp0, 0.00001f64 ).expect("is_equal invalid") ),
+            9 => assert!( x.is_equal( &cp3, 0.00001f64 ).expect("is_equal invalid") ),
+            10 => assert!( x.is_equal( &cp0, 0.00001f64 ).expect("is_equal invalid") ),
+            29 => assert!( x.is_equal( &cp3, 0.00001f64 ).expect("is_equal invalid") ),
+            30 => assert!( x.is_equal( &cp0, 0.00001f64 ).expect("is_equal invalid") ),
+            59 => assert!( x.is_equal( &cp3, 0.00001f64 ).expect("is_equal invalid") ),
+            60 => assert!( x.is_equal( &cp0, 0.00001f64 ).expect("is_equal invalid") ),
+            99 => assert!( x.is_equal( &cp3, 0.00001f64 ).expect("is_equal invalid") ),
+            _ => ()
+        }
+    }
+    assert!( max_index == 99 );
+}
+

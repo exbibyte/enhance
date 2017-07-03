@@ -102,3 +102,39 @@ impl Iterator for SplineBezier { //required by IInterpolateMat4x1f64
         }
     }
 }
+
+pub struct SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
+    pub _splines: Vec< T >,
+    _current_spline: u64,
+}
+
+impl < T > SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
+    pub fn init() -> SplinePiecewise< T > {
+        SplinePiecewise { _splines: Vec::new(), _current_spline: 0u64 }
+    }
+    pub fn add( & mut self, s: T ){
+        self._splines.push( s );
+    }
+}
+
+impl < T > Iterator for SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
+    type Item = T::Item;
+    fn next( & mut self ) -> Option< Self::Item > {
+        if self._current_spline as usize >= self._splines.len() {
+            return None;
+        } else {
+            let n = self._splines[ self._current_spline as usize ].next();
+            match n {
+                Some(s) => return Some(s),
+                _ => {
+                    if (self._current_spline + 1) as usize >= self._splines.len() {
+                        return None;
+                    } else {
+                        self._current_spline = self._current_spline + 1;
+                        return self.next();
+                    }
+                }
+            }
+        }
+    }
+}
