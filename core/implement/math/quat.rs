@@ -13,24 +13,31 @@ use implement::math::mat::Mat3x1;
 use implement::math::mat::Mat4;
 
 #[derive(Debug, Copy, Clone)]
-struct Quat {
+pub struct Quat {
     pub _x: f64,
     pub _y: f64,
     pub _z: f64,
     pub _w: f64,
 }
+impl Default for Quat {
+    fn default() -> Quat {
+        Quat { _x: 0f64, _y: 0f64, _z: 0f64, _w: 1f64 }
+    }
+}
+
 impl Quat {
     #[allow(dead_code)]
     pub fn init() -> Quat {
-        Quat { _x: 0f64, _y: 0f64, _z: 0f64, _w: 0f64 }
+        Quat { _x: 0f64, _y: 0f64, _z: 0f64, _w: 1f64 }
     }
     #[allow(dead_code)]
     pub fn init_from_vals( x: f64, y:f64, z:f64, w: f64 ) -> Quat {
-        Quat { _x: x, _y: y, _z: z, _w: w }
+        let q = Quat { _x: x, _y: y, _z: z, _w: w };
+        q.normalize()
     }
     #[allow(dead_code)]
     pub fn init_from_vals_auto_w( x: f64, y:f64, z:f64 ) -> Quat {
-        let w = 1f64 - x*x - y*y - z*z;
+        let w = 1f64 - x * x - y * y - z * z;
         if w < 0f64 {
             return Quat { _x: x, _y: y, _z: z, _w: w }
         } else {
@@ -118,20 +125,37 @@ impl Quat {
         }
     }
     #[allow(dead_code)]
-    pub fn mul_vector( & self, v: Mat3x1< f64 > ) -> Quat {
-        Quat { _x: ( self._w * v[0] + self._y * v[2] + self._z * v[1] ),
-               _y: ( self._w * v[1] + self._z * v[0] + self._x * v[2] ),
-               _z: ( self._w * v[2] + self._x * v[1] + self._y * v[0] ),
-               _w: ( -self._x * v[0] - self._y * v[1] - self._z * v[2] )
-        }
+    pub fn rotate_vector( & self, p: Mat3x1< f64 > ) -> Mat3x1< f64 > {
+        let conj = self.conjugate();
+        let quat_p = Quat { _x: p._val[0], _y: p._val[1], _z: p._val[2], _w: 0f64 };
+        let temp = self.mul( quat_p );
+        let temp2 = temp.mul( conj );
+        Mat3x1 { _val: [ temp2._x, temp2._y, temp2._z ] }
     }
     #[allow(dead_code)]
-    pub fn rotate_point( & self, p: Mat3x1< f64 > ) -> Mat3x1< f64 > {
-        let inv = self.inverse();
-        let inv_normalized = inv.normalize();
-        let temp = self.mul_vector( p );
-        let temp2 = temp.mul( inv_normalized );
+    pub fn reflection_in_plane( & self, p: Mat3x1< f64 > ) -> Mat3x1< f64 > {
+        let quat_p = Quat { _x: p._val[0], _y: p._val[1], _z: p._val[2], _w: 0f64 };
+        let temp = self.mul( quat_p );
+        let temp2 = temp.mul( *self );
         Mat3x1 { _val: [ temp2._x, temp2._y, temp2._z ] }
+    }
+    #[allow(dead_code)]
+    pub fn parallel_component_of_plane( & self, p: Mat3x1< f64 > ) -> Mat3x1< f64 > {
+        let quat_p = Quat { _x: p._val[0], _y: p._val[1], _z: p._val[2], _w: 0f64 };
+        let temp = self.mul( quat_p );
+        let temp2 = temp.mul( *self );
+        let temp3 = quat_p.add( temp2 );
+        let temp4 = temp3.scale( 0.5f64 );
+        Mat3x1 { _val: [ temp4._x, temp4._y, temp4._z ] }
+    }
+    #[allow(dead_code)]
+    pub fn orthogonal_component_of_plane( & self, p: Mat3x1< f64 > ) -> Mat3x1< f64 > {
+        let quat_p = Quat { _x: p._val[0], _y: p._val[1], _z: p._val[2], _w: 0f64 };
+        let temp = self.mul( quat_p );
+        let temp2 = temp.mul( *self );
+        let temp3 = quat_p.minus( temp2 );
+        let temp4 = temp3.scale( 0.5f64 );
+        Mat3x1 { _val: [ temp4._x, temp4._y, temp4._z ] }
     }
     #[allow(dead_code)]
     pub fn add( & self, other: Self ) -> Quat {

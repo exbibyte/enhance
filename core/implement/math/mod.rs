@@ -3,3 +3,4 @@
 pub mod spline;
 pub mod mat;
 pub mod quat;
+pub mod dualquat;
