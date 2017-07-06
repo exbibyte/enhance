@@ -336,11 +336,11 @@ quat quat::inverse() const {
     if( norm == 0.0f )
 	throw("quat::inverse(): can't divide by length 0");
 
-    quat inv = Scale( 1.0/norm, conj );
+    quat inv = quat::scale( 1.0/norm, conj );
     return inv;
 }
 
-quat InterpolateBasic( const quat q1, const quat q2, float r ){
+quat quat::interpolate_linear( const quat q1, const quat q2, float r ){
     quat q;
 
     for( int i = 0 ; i < 4; i++) {
@@ -350,15 +350,15 @@ quat InterpolateBasic( const quat q1, const quat q2, float r ){
     return q;
 }
  
-quat Scale( float s, const quat q ){
+quat quat::scale( float s, const quat q ){
     return quat( s * q._quat[0], s * q._quat[1], s * q._quat[2], s * q._quat[3] );
 }
 
-quat ScaleAdd( float s, const quat q1, const quat q2 ){
+quat quat::scale_add( float s, const quat q1, const quat q2 ){
     return quat( s * q1._quat[0] + q2._quat[0], s * q1._quat[1] + q2._quat[1], s * q1._quat[2] + q2._quat[2], s * q1._quat[3] + q2._quat[3] );
 }
 
-quat InterpolateSlerp( const quat & q1, const quat & q2, float t ){
+quat quat::interpolate_slerp( const quat & q1, const quat & q2, float t ){
     quat result, p2 = q2;
 
     //q2 = q1 * result

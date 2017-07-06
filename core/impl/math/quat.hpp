@@ -48,12 +48,12 @@ class quat{
   void              RotatePoint( float in [], float out[] ) const;
   quat              MultVec( float in [] ) const;
   quat              inverse() const;
-};
 
-quat                Scale( float s, const quat q); // s*q
-quat                ScaleAdd( float s, const quat q1, const quat q2 ); //s*q1 + q2
-quat                InterpolateSlerp(const quat & q1, const quat & q2, float t); //spherical linear interpolation
-quat                InterpolateBasic( const quat q1, const quat q2, float r ); // (1-r) * q1 + r * q2              
+  static quat       scale( float s, const quat q); // s*q
+  static quat       scale_add( float s, const quat q1, const quat q2 ); //s*q1 + q2
+  static quat       interpolate_slerp(const quat & q1, const quat & q2, float t); //spherical linear interpolation
+  static quat       interpolate_linear( const quat q1, const quat q2, float r ); // (1-r) * q1 + r * q2              
+};
 
 } }
 
