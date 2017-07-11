@@ -76,7 +76,7 @@ pub fn tokenize < KeywordVal > ( input: &str, idx: usize, hm: & mut HashMap< &st
         while let Some(x) = iter.next() {
             if x == '"' {
                 return ( Token::Str, idxcurrent_start, idxcurrent, idxcurrent + 1 )
-            }else if !x.is_alphanumeric() && x != '_' {
+            }else if !x.is_alphanumeric() && x != '_' && x != '/'{
                 println!("unexpected character in string: {}", x);
                 return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent )
             }
