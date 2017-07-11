@@ -12,219 +12,63 @@ use std::iter::Peekable;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-enum Token {
-    Undetermined,
-    Comment,
-    Keyword,
-    Str,
-    Int,
-    Float,
-    Parenl,
-    Parenr,
-    Bracel,
-    Bracer,
-    Invalid,
-    End,
-}
-
-fn tokenize( input: &str, idx: usize ) -> ( Token, usize, usize, usize ) {
-    let mut is_float_signed = false;
-    let mut idxcurrent = idx;
-    let mut idxcurrent_start = idx;
-    let mut iter = (&input[ idx.. ]).chars().peekable(); //create peekable iterator
-    {
-        let count_skip = skip_white_space( & mut iter );
-        idxcurrent += count_skip;
-        idxcurrent_start += count_skip;
-    }
-
-    let c = match iter.next() {
-        None => return ( Token::End, idxcurrent_start, idxcurrent, idxcurrent ),
-        Some(x) => x
-    };
-    
-    // println!("index:.. {}", idxcurrent );
-    
-    if c == '{' { //process groupings
-        return ( Token::Bracel, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 )
-    }else if c == '}' {
-        return ( Token::Bracer, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 )
-    }else if c == '(' {
-        return ( Token::Parenl, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 )
-    }else if c == ')' {
-        return ( Token::Parenr, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 )
-    }else if c == '/' { //process comments
-        let c_2 = match iter.next() {
-            None => return ( Token::Invalid, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 ),
-            Some(x) => x
-        };
-        idxcurrent += 1;
-        if c_2 == '/' {
-            while let Some(x) = iter.next() {
-                if x == '\n' {
-                    // println!("new line detected.");
-                    return ( Token::Comment, idxcurrent_start + 2, idxcurrent + 1, idxcurrent + 1 )
-                }
-                idxcurrent += 1;
-            }
-            return ( Token::Comment, idxcurrent_start + 2, idxcurrent, idxcurrent + 1 )
-        }else{
-            return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent + 1 )
-        }
-    }
-    else if c == '"' { //process strings
-        idxcurrent += 1;
-        idxcurrent_start += 1;
-        while let Some(x) = iter.next() {
-            if x == '"' {
-                return ( Token::Str, idxcurrent_start, idxcurrent, idxcurrent + 1 )
-            }else if !x.is_alphanumeric() && x != '_' {
-                println!("unexpected character in string: {}", x);
-                return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent )
-            }
-            idxcurrent += 1;
-        }
-        return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent )
-    }
-    else if c.is_alphabetic() || c == '_' { //process keywords and strings
-        idxcurrent += 1;
-        while let Some(x) = iter.next() {
-            if !x.is_alphanumeric() && x != '_' {
-                return ( Token::Str, idxcurrent_start, idxcurrent, idxcurrent )
-            }
-            idxcurrent += 1;
-        }
-        return ( Token::Str, idxcurrent_start, idxcurrent, idxcurrent )
-    }
-
-    if c == '-' || c == '+' { //process optional signedness of a number
-        idxcurrent += 1;
-        is_float_signed = true;
-        let next_c = iter.peek();
-        match next_c { //expect a decimal or digit after
-            None => return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent ),
-            Some(x) => {
-                if !x.is_numeric() || *x == '.' {
-                    return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent )
-                }
-            }
-        }
-    }
-
-    let c2 = if is_float_signed { //eat a character if the current character is +/-
-        match iter.next() {
-            None => return ( Token::Invalid, idxcurrent_start, idxcurrent, idxcurrent ),
-            Some(x) => x
-        }
-    }else{
-        c
-    };
-    
-
-    if c2 == '.' { //process float
-        idxcurrent += 1;
-        while let Some(x) = iter.next() {
-            if !x.is_numeric() {
-                // println!("number detected.");
-                return ( Token::Float, idxcurrent_start, idxcurrent, idxcurrent )
-            }
-            idxcurrent += 1;
-        }
-        return ( Token::Str, idxcurrent_start, idxcurrent, idxcurrent )
-    }else if c2.is_numeric() { //process int or float
-        idxcurrent += 1;
-        loop { //process digits
-            {
-                let x = match iter.peek() {
-                    None => return ( Token::Int, idxcurrent_start, idxcurrent, idxcurrent ),
-                    Some(x) => x
-                };
-                if !x.is_numeric() {
-                    break;
-                }
-            }
-            iter.next();
-            idxcurrent += 1;
-        }
-        { //process decimal
-            {
-                if *iter.peek().expect("character invalid") != '.' { //int
-                    return ( Token::Int, idxcurrent_start, idxcurrent, idxcurrent )
-                }else{
-                    { //consume decimal
-                        idxcurrent += 1; 
-                        iter.next();
-                    }
-                    loop { //digits
-                        if let Some(y) = iter.peek() {
-                            if !y.is_numeric() {
-                                return ( Token::Float, idxcurrent_start, idxcurrent, idxcurrent )
-                            }   
-                        }
-                        iter.next();
-                        idxcurrent += 1;
-                    }
-                    return ( Token::Float, idxcurrent_start, idxcurrent, idxcurrent )
-                }
-            }
-        }
-    }
-    //skip unrecognized character
-    ( Token::Undetermined, idxcurrent_start, idxcurrent + 1, idxcurrent + 1 )
-}
-
-fn skip_white_space( iter: & mut Peekable<Chars> ) -> usize {
-    let mut skip_count = 0;
-    loop { //skip whitespace
-        let is_white_space = match iter.peek() {
-            Some(x) => {
-                let result = if *x == ' ' || *x == '\n' || *x == '\t' || *x == '\r' {
-                    skip_count += 1;
-                    true
-                }else{
-                    false
-                };
-                result
-            },
-            None => return skip_count
-        };
-        if is_white_space {
-            iter.next();
-        }else{
-            break;
-        }
-    }
-    return skip_count
-}
-
-fn file_open( file_path: & str ) -> Option<String> {
-    let path = File::open( file_path ).expect("file path open invalid");
-    let mut buf_reader = BufReader::new(path);
-    let mut contents = String::new();
-    buf_reader.read_to_string( & mut contents );
-    Some(contents)
+enum MD5MeshToken {
+    Version,
+    Commandline,
+    Numjoints,
+    Nummeshes,
+    Joints,
+    Mesh,
+    Shader,
+    Numverts,
+    Verts,
+    Numtris,
+    Tri,
+    Numweights,
+    Weight,
 }
 
 #[test]
 fn test_parse_common(){
 
-    let mut keywords = HashMap::new();
-    keywords.insert("weight", 0u32 );
-    let file_content = file_open( "core/asset/md5/qshambler.md5mesh" ).expect("file open invalid");
+    let file_content = md5common::file_open( "core/asset/md5/qshambler.md5mesh" ).expect("file open invalid");
     println!("file content length: {}", file_content.len() );
     // skip_white_space( &file_content[0..], &keywords );
 
+    let mut hm_keywords = HashMap::new();
+
+    hm_keywords.insert( "MD5Version", MD5MeshToken::Version );
+    hm_keywords.insert( "commandline", MD5MeshToken::Commandline );
+    hm_keywords.insert( "numJoints", MD5MeshToken::Numjoints );
+    hm_keywords.insert( "numMeshes", MD5MeshToken::Nummeshes );
+    hm_keywords.insert( "joints", MD5MeshToken::Joints );
+    hm_keywords.insert( "mesh", MD5MeshToken::Mesh );
+    hm_keywords.insert( "shader", MD5MeshToken::Shader );
+    hm_keywords.insert( "numverts", MD5MeshToken::Numverts );
+    hm_keywords.insert( "verts", MD5MeshToken::Verts );
+    hm_keywords.insert( "numtris", MD5MeshToken::Numtris );
+    hm_keywords.insert( "tri", MD5MeshToken::Tri );
+    hm_keywords.insert( "numweights", MD5MeshToken::Numweights );
+    hm_keywords.insert( "weight", MD5MeshToken::Weight );
+    
     let mut count = 0;
     let mut idx = 0usize;
-    while count < 150 {
+    // while count < 1000 {
+    loop {
         let idx_prev = idx;
-        let ( tok, idx_s, idx_e, idx_next ) = tokenize( &file_content[0..], idx );
+        let ( tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx, & mut hm_keywords );
         match tok {
-            Token::Str => println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] ),
-            Token::Int => println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] ),
-            _ => println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] )
+            md5common::Token::End => {
+                println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] );
+                break;
+            },
+            md5common::Token::Keyword =>
+                println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] ),
+            // _ => println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] )
+            _ => ()
         }
         idx = idx_next;
         count += 1;
     }
+    
 }
