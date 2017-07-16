@@ -30,16 +30,6 @@ pub enum Token {
 }
 
 #[derive(Debug)]
-pub struct Md5MeshRoot {
-    pub _md5ver: u64,
-    pub _cmdline: String,
-    pub _numjoints: u64,
-    pub _nummeshes: u64,
-    pub _joints: Vec< Md5Joint >,
-    pub _meshes: Vec< Md5Mesh >,
-}
-
-#[derive(Debug)]
 pub struct Md5Mesh {
     pub _shader: String,
     pub _numverts: u64,
@@ -81,6 +71,29 @@ pub struct Md5Weight {
     pub _joint_index: u64,
     pub _weight_bias: f64,
     pub _pos: [f64;3],
+}
+
+#[derive(Debug)]
+pub struct Md5MeshRoot {
+    pub _md5ver: u64,
+    pub _cmdline: String,
+    pub _numjoints: u64,
+    pub _nummeshes: u64,
+    pub _joints: Vec< Md5Joint >,
+    pub _meshes: Vec< Md5Mesh >,
+}
+
+impl Md5MeshRoot {
+    pub fn init() -> Md5MeshRoot {
+        Md5MeshRoot {
+            _md5ver: 0u64,
+            _cmdline: String::from(""),
+            _numjoints: 0u64,
+            _nummeshes: 0u64,
+            _joints: vec![],
+            _meshes: vec![],
+        }
+    }
 }
 
 pub fn process_joint( file_content: &str, idx: usize, hm: & HashMap< &str, Token > ) -> Result< ( usize, Md5Joint ), & 'static str > {
@@ -432,17 +445,8 @@ pub fn parse( file_content: &str ) -> Result< Md5MeshRoot, & 'static str > {
     hm_keywords.insert( "numweights", Token::Numweights );
     hm_keywords.insert( "weight", Token::Weight );
     
-    let mut count = 0;
     let mut idx = 0usize;
-
-    let mut mesh_root = Md5MeshRoot {
-        _md5ver: 0u64,
-        _cmdline: String::from(""),
-        _numjoints: 0u64,
-        _nummeshes: 0u64,
-        _joints: vec![],
-        _meshes: vec![],
-    };
+    let mut mesh_root = Md5MeshRoot::init();
 
     loop {
         let ( tok, kw_tok, idx_s, idx_e, mut idx_next ) = md5common::tokenize( &file_content[0..], idx, & mut hm_keywords );
@@ -521,7 +525,6 @@ pub fn parse( file_content: &str ) -> Result< Md5MeshRoot, & 'static str > {
             _ => ()
         }
         idx = idx_next;
-        count += 1;
     }
     assert!( mesh_root._numjoints ==  mesh_root._joints.len() as u64 );
     assert!( mesh_root._nummeshes ==  mesh_root._meshes.len() as u64 );

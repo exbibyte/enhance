@@ -63,10 +63,12 @@ pub fn tokenize < KeywordTok > ( input: &str, idx: usize, hm: & HashMap< &str, K
                 if x == '\n' {
                     // println!("new line detected.");
                     // return ( Token::Comment, None, idxcurrent_start + 2, idxcurrent + 1, idxcurrent + 1 )
+                    //ignore the commnent and tokenize more
                     return tokenize( input, idxcurrent, hm )
                 }
                 idxcurrent += 1;
             }
+            //ignore the commnet and tokenize more
              // return ( Token::Comment, None, idxcurrent_start + 2, idxcurrent, idxcurrent + 1 )
             return tokenize( input, idxcurrent, hm )
         }else{
