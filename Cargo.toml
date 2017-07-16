@@ -14,3 +14,12 @@ path = "core/core.rs"
 # [[bin]]
 # name = "e2r_sandbox"
 # path = "sandbox/src/sandbox0.rs"
+
+[dependencies]
+gl = ">=0.6.3"
+libc = ">=0.2.26"
+glutin = ">=0.9.1"
+
+[[bin]]
+name = "e2r_test_window"
+path = "sandbox/window/test_window.rs"
