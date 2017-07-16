@@ -26,5 +26,5 @@ fn test_parse_md5rig(){
     };
     assert!( rig._frames.len() as u64 == anim._numframes );
     assert!( rig._framerate as u64 == anim._framerate );
-    println!( "rig frames: {:?}", rig._frames );
+    // println!( "rig frames: {:?}", rig._frames );
 }

@@ -60,6 +60,8 @@ pub struct Md5Vert {
 }
 
 #[derive(Debug)]
+#[derive(Copy)]
+#[derive(Clone)]
 pub struct Md5Tri {
     pub _index: u64,
     pub _vert_indices: [u64;3],
