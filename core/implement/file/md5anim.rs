@@ -36,21 +36,21 @@ pub struct JointHierarchy {
 
 #[derive(Debug)]
 pub struct Bound {
-    _min: [f64;3],
-    _max: [f64;3],
+    pub _min: [f64;3],
+    pub _max: [f64;3],
 }
 
 #[derive(Debug)]
 pub struct FrameJoint {
-    _index: u64,
-    _pos: [f64;3],
-    _orient: [f64;3],
+    pub _index: u64,
+    pub _pos: [f64;3],
+    pub _orient: [f64;3],
 }
 
 #[derive(Debug)]
 pub struct Frame {
-    _index: u64,
-    _data: Vec< f64 >,
+    pub _index: u64,
+    pub _data: Vec< f64 >,
 }
 
 #[derive(Debug)]
@@ -95,7 +95,7 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
     hm.insert( "hierarchy", Token::Hierarchy );
     hm.insert( "bounds", Token::Bounds );
     hm.insert( "baseframe", Token::Baseframe );
-    hm.insert( "Frame", Token::Frame );
+    hm.insert( "frame", Token::Frame );
 
     let mut idx = 0usize;
     let mut anim_root = Md5AnimRoot::init();
@@ -183,7 +183,6 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
                             },
                             Err(e) => assert!( false, e )
                         }
-                        println!("baseframe joint count: {:?}.", anim_root._baseframe.len() );
                     },
                     _ => panic!("unexpected token detected at index {:?}. input: {:?}", idx_next, &file_content[idx_s..idx_e] ),
                 }
@@ -195,6 +194,7 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
     //verify parsed data
     assert!( anim_root._numjoints ==  anim_root._hierarchy.len() as u64 );
     assert!( anim_root._numjoints ==  anim_root._baseframe.len() as u64 );
+    assert!( anim_root._frames.len() ==  anim_root._bounds.len() );
     let mut unique_frames = vec![false; anim_root._frames.len()];
     for i in 0..anim_root._frames.len() {
         assert!( anim_root._frames[i]._index >= 0 && anim_root._frames[i]._index < anim_root._numframes );
