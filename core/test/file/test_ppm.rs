@@ -11,7 +11,10 @@ use std::str::Chars;
 use std::iter::Peekable;
 
 #[test]
-fn test_parse_md5mesh(){
-    let img_bytes = ppm::read( "core/asset/md5/qshambler.md5mesh" ).expect("ppm file read invalid");
-    println!("image bytes length: {}", img_bytes.len() );
+fn test_parse_ppm(){
+    let ( w, h, img_bytes ) = ppm::read( "core/test_asset/sample_ppm/boxes_1.ppm" ).expect("ppm file read invalid");
+    println!("w: {}, h: {}, image bytes length: {}", w, h, img_bytes.len() );
+    assert!( w == 63 );
+    assert!( h == 63 );
+    assert!( img_bytes.len() == 63 * 63 * 3 );
 }
