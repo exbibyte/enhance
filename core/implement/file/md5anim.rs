@@ -36,21 +36,21 @@ pub struct JointHierarchy {
 
 #[derive(Debug)]
 pub struct Bound {
-    pub _min: [f64;3],
-    pub _max: [f64;3],
+    pub _min: [f32;3],
+    pub _max: [f32;3],
 }
 
 #[derive(Debug)]
 pub struct FrameJoint {
     pub _index: u64,
-    pub _pos: [f64;3],
-    pub _orient: [f64;3],
+    pub _pos: [f32;3],
+    pub _orient: [f32;3],
 }
 
 #[derive(Debug)]
 pub struct Frame {
     pub _index: u64,
-    pub _data: Vec< f64 >,
+    pub _data: Vec< f32 >,
 }
 
 #[derive(Debug)]
@@ -272,8 +272,8 @@ pub fn process_bounds( file_content: &str, idx: usize, hm: & HashMap< &str, Toke
     }
     for n in 0..numframes {
         let mut b = Bound {
-            _min: [0f64;3],
-            _max: [0f64;3],
+            _min: [0f32;3],
+            _max: [0f32;3],
         };
         match md5common::expect_parenl( &file_content[..], idx_current ) {
             Ok(v) => idx_current = v,
@@ -317,8 +317,8 @@ pub fn process_baseframe( file_content: &str, idx: usize, hm: & HashMap< &str, T
     for n in 0..numframes {
         let mut b = FrameJoint {
             _index: n,
-            _pos: [0f64;3],
-            _orient: [0f64;3],
+            _pos: [0f32;3],
+            _orient: [0f32;3],
         };
         match md5common::expect_parenl( &file_content[..], idx_current ) {
             Ok(v) => idx_current = v,
@@ -356,7 +356,7 @@ pub fn process_frame( file_content: &str, idx: usize, hm: & HashMap< &str, Token
     let mut idx_current = idx;
     let mut f = Frame {
         _index: 0u64,
-        _data: vec![0f64; num_animated_components as usize ],
+        _data: vec![0f32; num_animated_components as usize ],
     };
     let mut arr = [0i64;1];
     match md5common::expect_int_array( &file_content[..], idx_current, 1usize, & mut arr ) {

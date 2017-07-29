@@ -16,6 +16,10 @@ glutin = ">=0.9.1"
 name = "e2r_test_winglutin"
 path = "core/example/window/test_winglutin.rs"
 
+[[bin]]
+name = "e2r_test_deferred"
+path = "core/example/shading/test_deferred.rs"
+
 # [[bin]]
 # name = "e2r_core_bin"
 # path = "core/src/driver.rs"
@@ -23,3 +27,4 @@ path = "core/example/window/test_winglutin.rs"
 # [[bin]]
 # name = "e2r_sandbox"
 # path = "sandbox/src/sandbox0.rs"
+

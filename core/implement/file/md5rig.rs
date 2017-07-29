@@ -13,15 +13,15 @@ use implement::file::md5anim;
 pub struct RigJoint {
     pub _name: String,
     pub _parent: i64,
-    pub _pos: [f64;3],
-    pub _orient: Quat,
+    pub _pos: [f32;3],
+    pub _orient: Quat<f32>,
 }
 
 #[derive(Debug)]
 pub struct PoseJoints {
     pub _joints: Vec< RigJoint >,
-    // pub _bbox_lower: [f64;3], //todo
-    // pub _bbox_upper: [f64;3],
+    // pub _bbox_lower: [f32;3], //todo
+    // pub _bbox_upper: [f32;3],
 }
 
 #[derive(Debug)]
@@ -50,8 +50,8 @@ fn process_posejoints( f: & md5anim::Frame, bbox: & md5anim::Bound, hier: & Vec<
     //hierarchy and baseframe length should be equal
     let mut pj = PoseJoints {
         _joints: vec![],
-        // _bbox_lower: [0f64;3],
-        // _bbox_upper: [0f64;3],
+        // _bbox_lower: [0f32;3],
+        // _bbox_upper: [0f32;3],
     };
     let mut index_current_joint = 0;
     for i in 0..hier.len() {
@@ -76,13 +76,13 @@ fn process_posejoints( f: & md5anim::Frame, bbox: & md5anim::Bound, hier: & Vec<
             }
         }
         //compute rotation quaternion
-        let bf_orient = Quat::init_from_vals_auto_w( bf_rot[0], bf_rot[1], bf_rot[2] ).normalize();
+        let bf_orient = Quat::<f32>::init_from_vals_auto_w( bf_rot[0], bf_rot[1], bf_rot[2] ).normalize();
         let parent_joint_index = hier[i]._parent;
         let rj = if parent_joint_index >= 0 { //need to chain transformation from parent joint
             assert!( parent_joint_index < pj._joints.len() as i64 ); //the referenced parent joint is required to be alrady processed
             let parent_joint_frame = & pj._joints[ parent_joint_index as usize ];
             //update position and rotation
-            let pos_quat = Quat::init_from_vals( bf_pos[0], bf_pos[1], bf_pos[2], 0f64 );
+            let pos_quat = Quat::<f32>::init_from_vals( bf_pos[0], bf_pos[1], bf_pos[2], 0f32 );
             let orient_inv = parent_joint_frame._orient.inverse().normalize();
             let res = parent_joint_frame._orient.mul( pos_quat ).mul( orient_inv );
             RigJoint {

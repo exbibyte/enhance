@@ -52,7 +52,7 @@ fn test_mat1x4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat4::init( arr, is_row_major );
+        let v1 = Mat4::<f64>::init( arr, is_row_major );
         let v3 = v2.mul_mat4x4( &v1 ).expect("mat1x4 mul mat4x4 invalid");
         assert!( v3.is_equal( &Mat1x4{ _val: [36f64, 40f64, 44f64, 48f64] }, 0.00001f64 ).expect("mat1x4 is_equal invalid") );   
     }

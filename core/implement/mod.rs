@@ -6,5 +6,5 @@ pub mod window;
 // pub mod ds;
 // pub mod math;                   
 // pub mod mt;
-// pub mod render;
+pub mod render;
 

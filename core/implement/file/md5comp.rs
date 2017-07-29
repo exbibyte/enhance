@@ -14,8 +14,8 @@ use implement::file::md5mesh;
 
 #[derive(Debug)]
 pub struct VertCompute {
-    pub _pos: [f64;3],
-    pub _normal: [f64;3],
+    pub _pos: [f32;3],
+    pub _normal: [f32;3],
 }
 
 type Tri = md5mesh::Md5Tri;
@@ -29,21 +29,21 @@ pub struct MeshCompute {
 #[derive(Debug)]
 pub struct ComputeCollection {
     pub _meshcomputes: Vec< MeshCompute >,
-    pub _bbox_lower: [f64;3],
-    pub _bbox_upper: [f64;3],
+    pub _bbox_lower: [f32;3],
+    pub _bbox_upper: [f32;3],
 }
 
-pub fn process( pc: & md5rig::PoseCollection, m: & md5mesh::Md5MeshRoot, pose_index_start: u64, pose_index_end: u64, interp: f64 ) -> Result< ComputeCollection, & 'static str > {
+pub fn process( pc: & md5rig::PoseCollection, m: & md5mesh::Md5MeshRoot, pose_index_start: u64, pose_index_end: u64, interp: f32 ) -> Result< ComputeCollection, & 'static str > {
     if pose_index_start > pc._frames.len() as u64 {
         return Err( "pose_index_start out of bounds." )
     }
     if pose_index_end > pc._frames.len() as u64 {
         return Err( "pose_index_start out of bounds." )
     }
-    let interp_clamped = if 0f64 > interp {
-                             0f64
-                         } else { if 1f64 < interp {
-                             1f64
+    let interp_clamped = if 0f32 > interp {
+                             0f32
+                         } else { if 1f32 < interp {
+                             1f32
                          }else{
                              interp
                          } };
@@ -52,11 +52,11 @@ pub fn process( pc: & md5rig::PoseCollection, m: & md5mesh::Md5MeshRoot, pose_in
     interpolate( m, start, end, interp_clamped )
 }
 
-pub fn interpolate( m: & md5mesh::Md5MeshRoot, pose_start: & md5rig::PoseJoints, pose_end: & md5rig::PoseJoints, interp: f64 ) -> Result< ComputeCollection, & 'static str > {
+pub fn interpolate( m: & md5mesh::Md5MeshRoot, pose_start: & md5rig::PoseJoints, pose_end: & md5rig::PoseJoints, interp: f32 ) -> Result< ComputeCollection, & 'static str > {
     let mut cc = ComputeCollection {
         _meshcomputes: vec![],
-        _bbox_lower: [0f64;3],
-        _bbox_upper: [0f64;3],
+        _bbox_lower: [0f32;3],
+        _bbox_upper: [0f32;3],
     };
     for i in &m._meshes {
         let mut mc = MeshCompute {
@@ -65,8 +65,8 @@ pub fn interpolate( m: & md5mesh::Md5MeshRoot, pose_start: & md5rig::PoseJoints,
         };
         for j in &i._verts {
             let mut vc = VertCompute {
-                _pos: [0f64;3],
-                _normal: [0f64;3],
+                _pos: [0f32;3],
+                _normal: [0f32;3],
             };
             for k in 0..j._weight_count {
                 let weight_index = j._weight_start + k;
@@ -81,8 +81,8 @@ pub fn interpolate( m: & md5mesh::Md5MeshRoot, pose_start: & md5rig::PoseJoints,
                 let pose_start_rigjoint = & pose_start._joints[ joint_index as usize ];
                 let pose_end_rigjoint = & pose_end._joints[ joint_index as usize ];
                 //get position of the weight after transformation with joint orientation
-                let pos_quat = Quat::init_from_vals( w._pos[0], w._pos[1], w._pos[2], 0f64 );
-                let orient_interp = Quat::interpolate_slerp( pose_start_rigjoint._orient, pose_end_rigjoint._orient, interp );
+                let pos_quat = Quat::<f32>::init_from_vals( w._pos[0], w._pos[1], w._pos[2], 0f32 );
+                let orient_interp = Quat::<f32>::interpolate_slerp( pose_start_rigjoint._orient, pose_end_rigjoint._orient, interp );
                 let orient_inv = orient_interp.inverse().normalize();
                 let pos_transform = pose_start_rigjoint._orient.mul( pos_quat ).mul( orient_inv );
                 //sum comtribution of weights for vertex position and vertex normal

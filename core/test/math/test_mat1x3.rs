@@ -51,7 +51,7 @@ fn test_mat1x3(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat3::init( arr, is_row_major );
+        let v1 = Mat3::<f64>::init( arr, is_row_major );
         let v3 = v2.mul_mat3x3( &v1 ).expect("mat1x3 mul mat3x3 invalid");
         assert!( v3.is_equal( &Mat1x3{ _val: [-18f64, -19f64, -20f64] }, 0.00001f64 ).expect("mat1x4 is_equal invalid") );   
     }

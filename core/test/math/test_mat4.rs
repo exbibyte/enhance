@@ -95,7 +95,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat4::init( arr, is_row_major );
+        let v1 = Mat4::<f64>::init( arr, is_row_major );
         let v2 = v1.mul_mat4x1( &v0 ).expect("mat4x4 mul mat4x1 invalid");
         assert!( v2.is_equal( &Mat4x1{ _val: [ 20f64, 60f64, 100f64, 140f64 ] }, 0.0001f64 ).expect("mat4x1 is_equal invalid") );
     }
@@ -121,7 +121,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = false;
-        let v1 = Mat4::init( arr, is_row_major );
+        let v1 = Mat4::<f64>::init( arr, is_row_major );
         let v2 = v1.mul_mat4x1( &v0 ).expect("mat4x4 mul mat4x1 invalid");
         assert!( v2.is_equal( &Mat4x1{ _val: [ 20f64, 60f64, 100f64, 140f64 ] }, 0.0001f64 ).expect("mat4x1 is_equal invalid") );
     }
@@ -132,7 +132,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat4::init( arr, is_row_major );
+        let v1 = Mat4::<f64>::init( arr, is_row_major );
         let v2 = v1.transpose();
         assert!( v2.is_equal( &Mat4{ _val: [0f64, 4f64, 8f64, 12f64,
                                             1f64, 5f64, 9f64, 13f64,
@@ -146,7 +146,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let mut v1 = Mat4::init( arr, is_row_major );
+        let mut v1 = Mat4::<f64>::init( arr, is_row_major );
         v1.transpose_self();
         assert!( v1.is_equal( &Mat4{ _val: [0f64, 4f64, 8f64, 12f64,
                                             1f64, 5f64, 9f64, 13f64,
@@ -160,7 +160,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = false;
-        let mut v1 = Mat4::init( arr, is_row_major );
+        let mut v1 = Mat4::<f64>::init( arr, is_row_major );
         assert!( v1.is_equal( &Mat4{ _val: [0f64, 4f64, 8f64, 12f64,
                                             1f64, 5f64, 9f64, 13f64,
                                             2f64, 6f64, 10f64, 14f64,
@@ -175,7 +175,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat4::init( arr, is_row_major );
+        let v1 = Mat4::<f64>::init( arr, is_row_major );
         let extract = v1.submat_mat3();
         assert!( extract.is_equal( &Mat3{ _val: [0f64, 1f64, 2f64,
                                                  4f64, 5f64, 6f64,

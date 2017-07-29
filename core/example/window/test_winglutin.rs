@@ -12,6 +12,7 @@ use self::e2rcore::implement::window::winglutin::WinGlutin;
 fn main() {
     let mut window : WinGlutin = IWindow::init( 500, 500 );
     window.make_current().expect("window make_current failed");
+    
     let mut running = true;
     while running {
         let mut new_win_dim = None;
@@ -29,6 +30,7 @@ fn main() {
             window._win._wingl.resize(w, h);
         }
         unsafe {
+            gl::ClearColor( 0.3, 0.3, 0.3, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
         window.swap_buf();

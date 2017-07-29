@@ -44,19 +44,19 @@ pub struct Md5Mesh {
 pub struct Md5Joint {
     pub _name: String,
     pub _parent_index: i64,
-    pub _pos: [f64;3],
-    pub _orient: [f64;3],
-    pub _rot: Quat,
+    pub _pos: [f32;3],
+    pub _orient: [f32;3],
+    pub _rot: Quat<f32>,
 }
 
 #[derive(Debug)]
 pub struct Md5Vert {
     pub _index: u64,
-    pub _tex_coords: [f64;2],
+    pub _tex_coords: [f32;2],
     pub _weight_start: u64,
     pub _weight_count: u64,
-    pub _normal: [f64;3],
-    pub _pos: [f64;3],
+    pub _normal: [f32;3],
+    pub _pos: [f32;3],
 }
 
 #[derive(Debug)]
@@ -71,8 +71,8 @@ pub struct Md5Tri {
 pub struct Md5Weight {
     pub _index: u64,
     pub _joint_index: u64,
-    pub _weight_bias: f64,
-    pub _pos: [f64;3],
+    pub _weight_bias: f32,
+    pub _pos: [f32;3],
 }
 
 #[derive(Debug)]
@@ -102,9 +102,9 @@ pub fn process_joint( file_content: &str, idx: usize, hm: & HashMap< &str, Token
     let mut j = Md5Joint {
         _name: String::from(""),
         _parent_index: -1i64,
-        _pos: [0f64;3],
-        _orient: [0f64;3],
-        _rot: Quat::init()
+        _pos: [0f32;3],
+        _orient: [0f32;3],
+        _rot: Quat::<f32>::init()
     };
     let mut idx_current = idx;
     let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
@@ -272,11 +272,11 @@ pub fn process_vert( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
     let mut idx_current = idx;
     let mut vert = Md5Vert {
         _index: 0u64,
-        _tex_coords: [0f64;2],
+        _tex_coords: [0f32;2],
         _weight_start: 0u64,
         _weight_count: 0u64,
-        _normal: [0f64;3],
-        _pos: [0f64;3],
+        _normal: [0f32;3],
+        _pos: [0f32;3],
     };
     let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
@@ -375,8 +375,8 @@ pub fn process_weight( file_content: &str, idx: usize, hm: & HashMap< &str, Toke
     let mut weight = Md5Weight {
         _index: 0u64,
         _joint_index: 0u64,
-        _weight_bias: 0f64,
-        _pos: [0f64;3],
+        _weight_bias: 0f32,
+        _pos: [0f32;3],
     };
     let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
@@ -407,7 +407,7 @@ pub fn process_weight( file_content: &str, idx: usize, hm: & HashMap< &str, Toke
         },
         Err(e) => assert!(false, e )
     }
-    let mut arr2 : [f64;1] = [0f64;1];
+    let mut arr2 : [f32;1] = [0f32;1];
     match md5common::expect_float_array( &file_content[0..], idx_current, 1usize, & mut arr2 ) {
         Ok(v) => {
             idx_current = v;

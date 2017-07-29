@@ -231,14 +231,14 @@ pub fn expect_int_array( input: &str, idx: usize, count: usize, arr: & mut [i64]
     Ok( idx_current )
 }
 
-pub fn expect_float_array( input: &str, idx: usize, count: usize, arr: & mut [f64] ) -> Result< usize, & 'static str > {
+pub fn expect_float_array( input: &str, idx: usize, count: usize, arr: & mut [f32] ) -> Result< usize, & 'static str > {
     let mut idx_current = idx;
     let mut hm : HashMap< &str, bool > = HashMap::new();
     for i in 0..count {
         let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
         match tok {
             Token::Float => {
-                arr[i] = f64::from_str( &input[idx_s..idx_e] ).expect("md5common parse int array invalid");
+                arr[i] = f32::from_str( &input[idx_s..idx_e] ).expect("md5common parse int array invalid");
                 idx_current = idx_next;
             },
             _ => return Err("unexpected token. float not found.")

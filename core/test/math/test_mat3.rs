@@ -83,7 +83,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat3::init( arr, is_row_major );
+        let v1 = Mat3::<f64>::init( arr, is_row_major );
         let v2 = v1.mul_mat3x1( &v0 ).expect("mat3x3 mul mat3x1 invalid");
         assert!( v2.is_equal( &Mat3x1{ _val: [ 8f64, 26f64, 44f64 ] }, 0.0001f64 ).expect("mat3x1 is_equal invalid") );
     }
@@ -95,7 +95,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = false;
-        let v1 = Mat3::init( arr, is_row_major );
+        let v1 = Mat3::<f64>::init( arr, is_row_major );
         let v2 = v1.mul_mat3x1( &v0 ).expect("mat3x3 mul mat3x1 invalid");
         assert!( v2.is_equal( &Mat3x1{ _val: [ 8f64, 26f64, 44f64 ] }, 0.0001f64 ).expect("mat3x1 is_equal invalid") );
     }
@@ -106,7 +106,7 @@ fn test_mat4(){
             arr[x] = x as f64;
         }
         let is_row_major = true;
-        let v1 = Mat3::init( arr, is_row_major );
+        let v1 = Mat3::<f64>::init( arr, is_row_major );
         let v2 = v1.transpose();
         assert!( v2.is_equal( &Mat3{ _val: [0f64, 3f64, 6f64,
                                             1f64, 4f64, 7f64,

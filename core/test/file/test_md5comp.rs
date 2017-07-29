@@ -31,7 +31,7 @@ fn test_parse_md5comp(){
         Err( e ) => panic!( e ),
     };
     assert!( 5 < posecollection._frames.len() );
-    let comp = match md5comp::process( & posecollection, & mesh, 0, 5, 0.5f64 ){
+    let comp = match md5comp::process( & posecollection, & mesh, 0, 5, 0.5f32 ){
         Ok( o ) => o,
         Err( e ) => panic!( e ),
     };
