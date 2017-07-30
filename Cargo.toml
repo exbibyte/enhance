@@ -20,6 +20,10 @@ path = "core/example/window/test_winglutin.rs"
 name = "e2r_test_deferred"
 path = "core/example/shading/test_deferred.rs"
 
+[[bin]]
+name = "e2r_test_ads"
+path = "core/example/shading/test_ads.rs"
+
 # [[bin]]
 # name = "e2r_core_bin"
 # path = "core/src/driver.rs"

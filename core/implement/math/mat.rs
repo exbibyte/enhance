@@ -656,11 +656,23 @@ macro_rules! define_mat3 {
 
             }
             #[allow(dead_code)]
-            pub fn index( & self, m: u64, n: u64 ) -> Option< $v_type > {
+            pub fn trace( & self ) -> $v_type {
+                self._val[ 0 ] + self._val[ 5 ] + self._val[ 10 ]
+            }
+            #[allow(dead_code)]
+            pub fn index( & self, m: u64, n: u64 ) -> $v_type {
                 if self._is_row_major {
-                    Some( self._val[ ( m as usize ) * 3 + n as usize ] )
+                    self._val[ ( m as usize ) * 3 + n as usize ]
                 } else {
-                    Some( self._val[ ( m as usize ) + ( n as usize ) * 3 ] )
+                    self._val[ ( m as usize ) + ( n as usize ) * 3 ]
+                }
+            }
+            #[allow(dead_code)]
+            pub fn index_mut( & mut self, m: u64, n: u64 ) -> & mut $v_type {
+                if self._is_row_major {
+                    & mut self._val[ ( m as usize ) * 3 + n as usize ]
+                } else {
+                    & mut self._val[ ( m as usize ) + ( n as usize ) * 3 ]
                 }
             }
             #[allow(unused_variables)]
@@ -826,6 +838,27 @@ macro_rules! define_mat3 {
                 }
                 copy
             }
+            pub fn invert( &self ) -> Option< Mat3< $v_type > > {
+                let determinant = self.index(0,0)*(self.index(1,1)*self.index(2,2)-self.index(2,1)*self.index(1,2))
+                    - self.index(1,0)*(self.index(0,1)*self.index(2,2)-self.index(2,1)*self.index(0,2))
+                    + self.index(2,0)*(self.index(0,1)*self.index(1,2)-self.index(1,1)*self.index(0,2));
+                if ( determinant < 0.0000000001 ) && ( determinant > -0.00000000001 ){
+                    return None
+                }
+                let t = self.transpose();
+                let mut out = *self;
+                *out.index_mut(0,0) = t.index(1,1)*t.index(2,2)-t.index(2,1)*t.index(1,2) / determinant;
+                *out.index_mut(1,0) = -(t.index(0,1)*t.index(2,2)-t.index(2,1)*t.index(0,2)) / determinant;
+                *out.index_mut(2,0) = t.index(0,1)*t.index(1,2)-t.index(1,1)*t.index(0,2) / determinant;
+                *out.index_mut(0,1) = t.index(1,0)*t.index(2,2)-t.index(2,0)*t.index(1,2) / determinant;
+                *out.index_mut(1,1) = -(t.index(0,0)*t.index(2,2)-t.index(2,0)*t.index(0,2)) / determinant;
+                *out.index_mut(2,1) = t.index(0,0)*t.index(1,2)-t.index(1,0)*t.index(0,2) / determinant;
+                *out.index_mut(0,2) = t.index(1,0)*t.index(2,1)-t.index(2,0)*t.index(1,1) / determinant;
+                *out.index_mut(1,2) = -(t.index(0,0)*t.index(2,1)-t.index(2,0)*t.index(0,1)) / determinant;
+                *out.index_mut(2,2) = t.index(0,0)*t.index(1,1)-t.index(1,0)*t.index(0,1) / determinant;
+                
+                Some(out)
+            }
         }
     }
 }
@@ -863,11 +896,23 @@ macro_rules! define_mat4 {
 
             }
             #[allow(dead_code)]
-            pub fn index( & self, m: u64, n: u64 ) -> Option< $v_type > {
+            pub fn trace( & self ) -> $v_type {
+                self._val[ 0 ] + self._val[ 5 ] + self._val[ 10 ] + self._val[ 15 ]
+            }
+            #[allow(dead_code)]
+            pub fn index( & self, m: u64, n: u64 ) -> $v_type {
                 if self._is_row_major {
-                    Some( self._val[ ( m as usize ) * 4 + n as usize ] )
+                    self._val[ ( m as usize ) * 4 + n as usize ]
                 } else {
-                    Some( self._val[ ( m as usize ) + ( n as usize ) * 4 ] )
+                    self._val[ ( m as usize ) + ( n as usize ) * 4 ]
+                }
+            }
+            #[allow(dead_code)]
+            pub fn index_mut( & mut self, m: u64, n: u64 ) -> & mut $v_type {
+                if self._is_row_major {
+                    & mut self._val[ ( m as usize ) * 4 + n as usize ]
+                } else {
+                    & mut self._val[ ( m as usize ) + ( n as usize ) * 4 ]
                 }
             }
             #[allow(unused_variables)]

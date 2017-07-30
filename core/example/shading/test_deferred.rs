@@ -5,13 +5,31 @@ extern crate libc;
 extern crate e2rcore;
 
 use std::mem;
+use std::fs::File;
+use std::io::BufReader;
+use std::str::FromStr;
+use std::io::Read;
 
 use self::glutin::GlContext;
 
 use self::e2rcore::interface::i_window::IWindow;
 use self::e2rcore::implement::window::winglutin::WinGlutin;
 
+pub fn file_open( file_path: & str ) -> Option<String> {
+    let path = File::open( file_path ).expect("file path open invalid");
+    let mut buf_reader = BufReader::new(path);
+    let mut contents = String::new();
+    buf_reader.read_to_string( & mut contents );
+    Some(contents)
+}
+
 fn main() {
+
+    let vs = file_open( "core/example/shading/shader_vert.vs" ).expect("vertex shader not retrieved");
+    let fs = file_open( "core/example/shading/shader_frag.fs" ).expect("fragment shader not retrieved");
+
+    // println!( "{}", vs );
+    // println!( "{}", fs );
     
     let mut window : WinGlutin = IWindow::init( 500, 500 );
     window.make_current().expect("window make_current failed");
@@ -66,30 +84,38 @@ fn main() {
         gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT1, gl::TEXTURE_2D, defer_normal, 0 );
         gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT2, gl::TEXTURE_2D, defer_color, 0 );
         let drawbuffers = [ gl::NONE, gl::COLOR_ATTACHMENT0, gl::COLOR_ATTACHMENT1, gl::COLOR_ATTACHMENT2 ];
-        gl::DrawBuffers( drawbuffers.len() as i32, & drawbuffers[0] );
-        
+        // gl::DrawBuffers( drawbuffers.len() as i32, & drawbuffers[0] );
+        gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
     }
 
-    // let mut running = true;
-    // while running {
-    //     let mut new_win_dim = None;
-    //     window.handle_events( |event| {
-    //         match event {
-    //             glutin::Event::WindowEvent{ event, .. } => match event {
-    //                 glutin::WindowEvent::Closed => running = false,
-    //                 glutin::WindowEvent::Resized(w, h) => new_win_dim = Some( (w,h) ),
-    //                 _ => (),
-    //             },
-    //             _ => ()
-    //         }
-    //     } );
-    //     if let Some( ( w, h ) ) = new_win_dim {
-    //         window._win._wingl.resize(w, h);
-    //     }
-    //     unsafe {
-    //         gl::ClearColor( 0.3, 0.3, 0.3, 1.0 );
-    //         gl::Clear(gl::COLOR_BUFFER_BIT);
-    //     }
-    //     window.swap_buf();
-    // }
+
+    let mut running = true;
+    while running {
+        let mut new_win_dim = None;
+        window.handle_events( |event| {
+            match event {
+                glutin::Event::WindowEvent{ event, .. } => match event {
+                    glutin::WindowEvent::Closed => running = false,
+                    glutin::WindowEvent::Resized(w, h) => new_win_dim = Some( (w,h) ),
+                    glutin::WindowEvent::KeyboardInput {
+                        input: glutin::KeyboardInput {
+                            state: glutin::ElementState::Pressed,
+                            virtual_keycode: Some( glutin::VirtualKeyCode::Q ),
+                            ..
+                        }, ..
+                    } => running = false,
+                    _ => (),
+                },
+                _ => ()
+            }
+        } );
+        if let Some( ( w, h ) ) = new_win_dim {
+            window._win._wingl.resize(w, h);
+        }
+        unsafe {
+            gl::ClearColor( 0.3, 0.3, 0.3, 1.0 );
+            gl::Clear(gl::COLOR_BUFFER_BIT);
+        }
+        window.swap_buf();
+    }
 }

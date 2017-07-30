@@ -7,4 +7,5 @@ pub mod window;
 // pub mod math;                   
 // pub mod mt;
 pub mod render;
+pub mod capability;
 
