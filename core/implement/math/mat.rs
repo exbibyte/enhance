@@ -1,4 +1,8 @@
 #[allow(unused_imports)]
+use std::f32;
+use std::f64;
+
+#[allow(unused_imports)]
 use std::ops::Index;
 #[allow(unused_imports)]
 use std::ops::IndexMut;
@@ -657,7 +661,7 @@ macro_rules! define_mat3 {
             }
             #[allow(dead_code)]
             pub fn trace( & self ) -> $v_type {
-                self._val[ 0 ] + self._val[ 5 ] + self._val[ 10 ]
+                self._val[ 0 ] + self._val[ 4 ] + self._val[ 8 ]
             }
             #[allow(dead_code)]
             pub fn index( & self, m: u64, n: u64 ) -> $v_type {
@@ -838,7 +842,7 @@ macro_rules! define_mat3 {
                 }
                 copy
             }
-            pub fn invert( &self ) -> Option< Mat3< $v_type > > {
+            pub fn inverse( &self ) -> Option< Mat3< $v_type > > {
                 let determinant = self.index(0,0)*(self.index(1,1)*self.index(2,2)-self.index(2,1)*self.index(1,2))
                     - self.index(1,0)*(self.index(0,1)*self.index(2,2)-self.index(2,1)*self.index(0,2))
                     + self.index(2,0)*(self.index(0,1)*self.index(1,2)-self.index(1,1)*self.index(0,2));
@@ -1129,6 +1133,136 @@ macro_rules! define_mat4 {
                                self._val[4], self._val[5], self._val[6],
                                self._val[8], self._val[9], self._val[10] ],
                         _is_row_major: self._is_row_major }
+            }
+            pub fn inverse( &self ) -> Option< Mat4< $v_type > > {
+                
+                let mut inv : Mat4< $v_type > = Default::default();
+                
+                *inv.index_mut(0,0) = self.index(1,1)  * self.index(2,2) * self.index(3,3) - 
+                    self.index(1,1)  * self.index(3,2) * self.index(2,3) - 
+                    self.index(1,2)  * self.index(2,1)  * self.index(3,3) + 
+                    self.index(1,2)  * self.index(3,1)  * self.index(2,3) +
+                    self.index(1,3) * self.index(2,1)  * self.index(3,2) - 
+                    self.index(1,3) * self.index(3,1)  * self.index(2,2);
+
+                *inv.index_mut(0,1) = -self.index(0,1)  * self.index(2,2) * self.index(3,3) + 
+                    self.index(0,1)  * self.index(3,2) * self.index(2,3) + 
+                    self.index(0,2)  * self.index(2,1)  * self.index(3,3) - 
+                    self.index(0,2)  * self.index(3,1)  * self.index(2,3) - 
+                    self.index(0,3) * self.index(2,1)  * self.index(3,2) + 
+                    self.index(0,3) * self.index(3,1)  * self.index(2,2);
+
+                *inv.index_mut(0,2) = self.index(0,1)  * self.index(1,2) * self.index(3,3) - 
+                    self.index(0,1)  * self.index(3,2) * self.index(1,3) - 
+                    self.index(0,2)  * self.index(1,1) * self.index(3,3) + 
+                    self.index(0,2)  * self.index(3,1) * self.index(1,3) + 
+                    self.index(0,3) * self.index(1,1) * self.index(3,2) - 
+                    self.index(0,3) * self.index(3,1) * self.index(1,2);
+
+                *inv.index_mut(0,3) = -self.index(0,1)  * self.index(1,2) * self.index(2,3) + 
+                    self.index(0,1)  * self.index(2,2) * self.index(1,3) +
+                    self.index(0,2)  * self.index(1,1) * self.index(2,3) - 
+                    self.index(0,2)  * self.index(2,1) * self.index(1,3) - 
+                    self.index(0,3) * self.index(1,1) * self.index(2,2) + 
+                    self.index(0,3) * self.index(2,1) * self.index(1,2);
+
+                *inv.index_mut(1,0) = -self.index(1,0)  * self.index(2,2) * self.index(3,3) + 
+                    self.index(1,0)  * self.index(3,2) * self.index(2,3) + 
+                    self.index(1,2)  * self.index(2,0) * self.index(3,3) - 
+                    self.index(1,2)  * self.index(3,0) * self.index(2,3) - 
+                    self.index(1,3) * self.index(2,0) * self.index(3,2) + 
+                    self.index(1,3) * self.index(3,0) * self.index(2,2);
+
+                *inv.index_mut(1,1) = self.index(0,0)  * self.index(2,2) * self.index(3,3) - 
+                    self.index(0,0)  * self.index(3,2) * self.index(2,3) - 
+                    self.index(0,2)  * self.index(2,0) * self.index(3,3) + 
+                    self.index(0,2)  * self.index(3,0) * self.index(2,3) + 
+                    self.index(0,3) * self.index(2,0) * self.index(3,2) - 
+                    self.index(0,3) * self.index(3,0) * self.index(2,2);
+
+                *inv.index_mut(1,2) = -self.index(0,0)  * self.index(1,2) * self.index(3,3) + 
+                    self.index(0,0)  * self.index(3,2) * self.index(1,3) + 
+                    self.index(0,2)  * self.index(1,0) * self.index(3,3) - 
+                    self.index(0,2)  * self.index(3,0) * self.index(1,3) - 
+                    self.index(0,3) * self.index(1,0) * self.index(3,2) + 
+                    self.index(0,3) * self.index(3,0) * self.index(1,2);
+
+                *inv.index_mut(1,3) = self.index(0,0)  * self.index(1,2) * self.index(2,3) - 
+                    self.index(0,0)  * self.index(2,2) * self.index(1,3) - 
+                    self.index(0,2)  * self.index(1,0) * self.index(2,3) + 
+                    self.index(0,2)  * self.index(2,0) * self.index(1,3) + 
+                    self.index(0,3) * self.index(1,0) * self.index(2,2) - 
+                    self.index(0,3) * self.index(2,0) * self.index(1,2);
+
+                *inv.index_mut(2,0) = self.index(1,0)  * self.index(2,1) * self.index(3,3) - 
+                    self.index(1,0)  * self.index(3,1) * self.index(2,3) - 
+                    self.index(1,1)  * self.index(2,0) * self.index(3,3) + 
+                    self.index(1,1)  * self.index(3,0) * self.index(2,3) + 
+                    self.index(1,3) * self.index(2,0) * self.index(3,1) - 
+                    self.index(1,3) * self.index(3,0) * self.index(2,1);
+
+                *inv.index_mut(2,1) = -self.index(0,0)  * self.index(2,1) * self.index(3,3) + 
+                    self.index(0,0)  * self.index(3,1) * self.index(2,3) + 
+                    self.index(0,1)  * self.index(2,0) * self.index(3,3) - 
+                    self.index(0,1)  * self.index(3,0) * self.index(2,3) - 
+                    self.index(0,3) * self.index(2,0) * self.index(3,1) + 
+                    self.index(0,3) * self.index(3,0) * self.index(2,1);
+
+                *inv.index_mut(2,2) = self.index(0,0)  * self.index(1,1) * self.index(3,3) - 
+                    self.index(0,0)  * self.index(3,1) * self.index(1,3) - 
+                    self.index(0,1)  * self.index(1,0) * self.index(3,3) + 
+                    self.index(0,1)  * self.index(3,0) * self.index(1,3) + 
+                    self.index(0,3) * self.index(1,0) * self.index(3,1) - 
+                    self.index(0,3) * self.index(3,0) * self.index(1,1);
+
+                *inv.index_mut(2,3) = -self.index(0,0)  * self.index(1,1) * self.index(2,3) + 
+                    self.index(0,0)  * self.index(2,1) * self.index(1,3) + 
+                    self.index(0,1)  * self.index(1,0) * self.index(2,3) - 
+                    self.index(0,1)  * self.index(2,0) * self.index(1,3) - 
+                    self.index(0,3) * self.index(1,0) * self.index(2,1) + 
+                    self.index(0,3) * self.index(2,0) * self.index(1,1);
+
+                *inv.index_mut(3,0) = -self.index(1,0) * self.index(2,1) * self.index(3,2) + 
+                    self.index(1,0) * self.index(3,1) * self.index(2,2) + 
+                    self.index(1,1) * self.index(2,0) * self.index(3,2) - 
+                    self.index(1,1) * self.index(3,0) * self.index(2,2) - 
+                    self.index(1,2) * self.index(2,0) * self.index(3,1) + 
+                    self.index(1,2) * self.index(3,0) * self.index(2,1);
+
+                *inv.index_mut(3,1) = self.index(0,0) * self.index(2,1) * self.index(3,2) - 
+                    self.index(0,0) * self.index(3,1) * self.index(2,2) - 
+                    self.index(0,1) * self.index(2,0) * self.index(3,2) + 
+                    self.index(0,1) * self.index(3,0) * self.index(2,2) + 
+                    self.index(0,2) * self.index(2,0) * self.index(3,1) - 
+                    self.index(0,2) * self.index(3,0) * self.index(2,1);
+
+                *inv.index_mut(3,2) = -self.index(0,0) * self.index(1,1) * self.index(3,2) + 
+                    self.index(0,0) * self.index(3,1) * self.index(1,2) + 
+                    self.index(0,1) * self.index(1,0) * self.index(3,2) - 
+                    self.index(0,1) * self.index(3,0) * self.index(1,2) - 
+                    self.index(0,2) * self.index(1,0) * self.index(3,1) + 
+                    self.index(0,2) * self.index(3,0) * self.index(1,1);
+
+                *inv.index_mut(3,3) = self.index(0,0) * self.index(1,1) * self.index(2,2) - 
+                    self.index(0,0) * self.index(2,1) * self.index(1,2) - 
+                    self.index(0,1) * self.index(1,0) * self.index(2,2) + 
+                    self.index(0,1) * self.index(2,0) * self.index(1,2) + 
+                    self.index(0,2) * self.index(1,0) * self.index(2,1) - 
+                    self.index(0,2) * self.index(2,0) * self.index(1,1);
+
+                let det = self.index(0,0) * inv.index(0,0) + self.index(1,0) * inv.index(0,1) + self.index(2,0) * inv.index(0,2) + self.index(3,0) * inv.index(0,3);
+
+                if det.abs() < $v_type::EPSILON {
+                    return None
+                }
+
+                let det_inv = 1.0 as $v_type / det;
+                
+                for i in 0..16 {
+                    inv._val[i] = inv._val[i] * det_inv;
+                }
+
+                Some( inv.transpose() )
             }
         }
     }
