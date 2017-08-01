@@ -9,11 +9,18 @@ use std::fs::File;
 use std::io::BufReader;
 use std::str::FromStr;
 use std::io::Read;
+use std::ffi::CStr;
+use std::os::raw::c_char;
+use std::fmt;
+use std::str;
 
 use self::glutin::GlContext;
 
 use self::e2rcore::interface::i_window::IWindow;
 use self::e2rcore::implement::window::winglutin::WinGlutin;
+
+use self::e2rcore::implement::capability::capability_gl;
+use self::e2rcore::implement::render::util_gl;
 
 pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
@@ -24,71 +31,86 @@ pub fn file_open( file_path: & str ) -> Option<String> {
 }
 
 fn main() {
-
-    let vs = file_open( "core/example/shading/shader_vert.vs" ).expect("vertex shader not retrieved");
-    let fs = file_open( "core/example/shading/shader_frag.fs" ).expect("fragment shader not retrieved");
-
-    // println!( "{}", vs );
-    // println!( "{}", fs );
+    
+    let vs_src = file_open( "core/example/shading/ads.vs" ).expect("vertex shader not retrieved");
+    let fs_src = file_open( "core/example/shading/ads.fs" ).expect("fragment shader not retrieved");
     
     let mut window : WinGlutin = IWindow::init( 500, 500 );
     window.make_current().expect("window make_current failed");
 
-    //create g buffers for deferred shading
-    let mut defer_fbo : gl::types::GLuint = 0;
-    let mut defer_depth: gl::types::GLuint = 0;
-    let mut defer_pos: gl::types::GLuint = 0;
-    let mut defer_normal: gl::types::GLuint = 0;
-    let mut defer_color: gl::types::GLuint = 0;
+    let cap = capability_gl::query_gl();
+    println!( "{}", cap );
 
-    let width = 500;
-    let height = 500;
-    
+    let vs = match util_gl::load_and_compile_shader( vs_src.as_str(), util_gl::ShaderType::VERTEX ) { Ok( o ) => o, Err( o ) => { panic!( "{}", o ); } };
+    let fs = match util_gl::load_and_compile_shader( fs_src.as_str(), util_gl::ShaderType::FRAGMENT ) { Ok( o ) => o, Err( o ) => { panic!( "{}", o ); } };
+
+    let mut gl_program = 0;
+    //render buffers
+    let mut gBuffer = 0;
+    let mut gPosition = 0;
+    let mut gNormal = 0;
+    let mut gAlbedoSpec = 0;
     unsafe {
-        //create and bind fbo
-        gl::GenFramebuffers( 1, & mut defer_fbo );
-        gl::BindFramebuffer( gl::FRAMEBUFFER, defer_fbo );
-
-        //bind depth buffer
-        gl::GenFramebuffers( 1, & mut defer_depth );
-        gl::BindRenderbuffer( gl::RENDERBUFFER, defer_depth );
-        gl::RenderbufferStorage( gl::RENDERBUFFER, gl::DEPTH_COMPONENT, width, height );
-
-        //create position buffer, assign index 0 as texture unit
-        gl::ActiveTexture( gl::TEXTURE0 );
-        gl::GenTextures( 1, & mut defer_pos );
-        gl::BindTexture( gl::TEXTURE_2D, defer_pos );
-        let pixels_ptr : * const std::os::raw::c_void = std::ptr::null();
-        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB32F as gl::types::GLint, width, height, 0, gl::RGB, gl::UNSIGNED_BYTE, pixels_ptr );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as gl::types::GLint );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as gl::types::GLint );
-
-        //create normal buffer, assign index 1 as texture unit
-        gl::ActiveTexture( gl::TEXTURE1 );
-        gl::GenTextures( 1, & mut defer_normal );
-        gl::BindTexture( gl::TEXTURE_2D, defer_normal );
-        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB32F as gl::types::GLint, width, height, 0, gl::RGB, gl::UNSIGNED_BYTE, pixels_ptr );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as gl::types::GLint );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as gl::types::GLint );
-
-        //create diffuse buffer, assign index 2 for texture unit
-        gl::ActiveTexture( gl::TEXTURE2 );
-        gl::GenTextures( 1, & mut defer_color );
-        gl::BindTexture( gl::TEXTURE_2D, defer_color );
-        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB as gl::types::GLint, width, height, 0, gl::RGB, gl::UNSIGNED_BYTE, pixels_ptr );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as gl::types::GLint );
-        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as gl::types::GLint );
-        //attach images to frame buffer
-        gl::FramebufferRenderbuffer( gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, defer_depth );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, gl::TEXTURE_2D, defer_pos, 0 );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT1, gl::TEXTURE_2D, defer_normal, 0 );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT2, gl::TEXTURE_2D, defer_color, 0 );
-        let drawbuffers = [ gl::NONE, gl::COLOR_ATTACHMENT0, gl::COLOR_ATTACHMENT1, gl::COLOR_ATTACHMENT2 ];
-        // gl::DrawBuffers( drawbuffers.len() as i32, & drawbuffers[0] );
+        gl_program = gl::CreateProgram();
+        if gl_program == 0 {
+            panic!("gl program creation failed");
+        }
+        gl::AttachShader( gl_program, vs );
+        gl::AttachShader( gl_program, fs );
+        gl::LinkProgram( gl_program );
+        match util_gl::check_program_link( gl_program ) {
+            Err( o ) => panic!( "{}", o ),
+            _ => ()
+        }
+        gl::UseProgram( gl_program );
+        util_gl::check_last_op();
         gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
+
+        
+        //todo: deferred shading
+        gl::GenFramebuffers(1, & mut gBuffer);
+        gl::BindFramebuffer(gl::FRAMEBUFFER, gBuffer);
+        // unsigned int gPosition, gNormal, gColorSpec;
+
+        // - position color buffer
+        gl::GenTextures( 1, & mut gPosition );
+        gl::BindTexture( gl::TEXTURE_2D, gPosition );
+        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB16F as i32, 500, 500, 0, gl::RGB, gl::FLOAT, std::ptr::null() );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, gl::TEXTURE_2D, gPosition, 0 );
+
+        // - normal color buffer
+        gl::GenTextures( 1, & mut gNormal );
+        gl::BindTexture( gl::TEXTURE_2D, gNormal );
+        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB16F as i32, 500, 500, 0, gl::RGB, gl::FLOAT, std::ptr::null() );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT1, gl::TEXTURE_2D, gNormal, 0);
+
+
+        // - color + specular color buffer
+        gl::GenTextures( 1, & mut gAlbedoSpec );
+        gl::BindTexture( gl::TEXTURE_2D, gAlbedoSpec );
+        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGBA as i32, 500, 500, 0, gl::RGBA, gl::UNSIGNED_BYTE, std::ptr::null() );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT2, gl::TEXTURE_2D, gAlbedoSpec, 0 );
+
+        // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
+        let attachments : [u32;3] = [ gl::COLOR_ATTACHMENT0, gl::COLOR_ATTACHMENT1, gl::COLOR_ATTACHMENT2 ];
+        gl::DrawBuffers( 3, &attachments[0] );
+
+        let mut rboDepthStencil = 0;
+        gl::GenRenderbuffers( 1, & mut rboDepthStencil );
+        gl::BindRenderbuffer( gl::RENDERBUFFER, rboDepthStencil );
+        gl::RenderbufferStorage( gl::RENDERBUFFER, gl::DEPTH_COMPONENT32F, 500, 500 );
+
+        gl::FramebufferRenderbuffer( gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, rboDepthStencil );
     }
 
-
+    
+    
     let mut running = true;
     while running {
         let mut new_win_dim = None;
@@ -113,8 +135,39 @@ fn main() {
             window._win._wingl.resize(w, h);
         }
         unsafe {
-            gl::ClearColor( 0.3, 0.3, 0.3, 1.0 );
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            // gl::ClearColor( 0.3, 0.3, 0.3, 1.0 );
+            // gl::Clear(gl::COLOR_BUFFER_BIT);
+
+            // 1. geometry pass: render all geometric/color data to g-buffer
+            gl::BindFramebuffer(gl::FRAMEBUFFER, gBuffer);
+            gl::Enable( gl::DEPTH_TEST );
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+            //todo: bind vertext array object
+            
+            //gBufferShader.use();
+            // for(Object obj : Objects)
+            // {
+            //     ConfigureShaderTransformsAndUniforms();
+            //     obj.Draw();
+            // }
+            // 2. lighting pass: use g-buffer to calculate the scene's lighting
+            gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
+            //gl::BindVertexArray( vao_quad );
+            gl::Disable( gl::DEPTH_TEST );
+            gl::Clear( gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT );
+            // Bind AllbGBuffer Textures
+            gl::ActiveTexture( gl::TEXTURE0 );
+            gl::BindTexture( gl::TEXTURE_2D, gPosition );
+            gl::ActiveTexture( gl::TEXTURE1 );
+            gl::BindTexture( gl::TEXTURE_2D, gNormal );
+            gl::ActiveTexture( gl::TEXTURE2 );
+            gl::BindTexture( gl::TEXTURE_2D, gAlbedoSpec );
+            // Set Lighting Uniforms
+            //shaderLightingPass.use();
+            //SendAllLightUniformsToShader( shaderLightingPass );
+            //shaderLightingPass.setVec3( "viewPos", camera.Position );
+            //Render texture Quad
+            //gl::DrawArrays( gl::TRIANGLES, 0, 6 );
         }
         window.swap_buf();
     }
