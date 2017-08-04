@@ -5,6 +5,7 @@ dependencies = [
  "gl 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.26 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

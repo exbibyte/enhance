@@ -95,3 +95,21 @@ pub fn check_last_op() {
         }
     }
 }
+
+pub fn create_program_from_shaders( shader_handles: Vec<gl::types::GLuint> ) -> gl::types::GLuint {
+    unsafe {
+        let gl_program = gl::CreateProgram();
+        if gl_program == 0 {
+            panic!("gl_program creation failed");
+        }
+        for i in shader_handles {
+            gl::AttachShader( gl_program, i );
+        }
+        gl::LinkProgram( gl_program );
+        match check_program_link( gl_program ) {
+            Err( o ) => panic!( "{}", o ),
+            _ => ()
+        }
+        return gl_program
+    }
+}
