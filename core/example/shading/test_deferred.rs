@@ -142,27 +142,39 @@ fn main() {
         gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "gAlbedoSpec".as_ptr() as * const i8 ), 2 );
     }
 
+    
     //todo: create renderable objects; put this in a reusable module
     //create or load model object with data for vert pos, vert normal, vert tex coord, vert tangent, vert bitangent
-    //create vertex array object and vertex  buffer objects to store model data
-    //gl::GenVertexArrays( 1, &obj_vao );
-    //gl::GenBuffers( 1, &obj_vbo );
-    //gl::GenBuffers( 1, &obj_ebo ); //optional
-    //gl::BindVertexArray( obj_vao );
-    //gl::BindBuffer( gl::ARRAY_BUFFER, obj_vbo );
-    //gl::BufferData( gl::ARRAY_BUFFER, data_length, data_ptr, gl::STATIC_DRAW );
-    //EBO stuff //optional
-    //gl::EnableVertexAttribArray( 0 );
-    //gl::VertexAttribPointer( 0, 3, gl::FLOAT, gl::FALSE, stride, offset_position ); //position
-    //gl::EnableVertexAttribArray( 1 );
-    //gl::VertexAttribPointer( 1, 3, gl::FLOAT, gl::FALSE, stride, offset_normal ); //normal
-    //gl::EnableVertexAttribArray( 2 );
-    //gl::VertexAttribPointer( 2, 2, gl::FLOAT, gl::FALSE, stride, offset_tc ); //texture coordinates
-    //gl::EnableVertexAttribArray( 3 );
-    //gl::VertexAttribPointer( 3, 3, gl::FLOAT, gl::FALSE, stride, offset_tangent ); //tangent
-    //gl::EnableVertexAttribArray( 4 );
-    //gl::VertexAttribPointer( 4, 3, gl::FLOAT, gl::FALSE, stride, offset_bitangent ); //bitangent
-    //gl::BindVertexArray( 0 );
+    unsafe {
+        //create vertex array object and vertex  buffer objects to store model data
+        let mut obj_vao = 0;
+        let mut obj_vbo = 0;
+        gl::GenVertexArrays( 1, & mut obj_vao );
+        gl::GenBuffers( 1, & mut obj_vbo );
+        //gl::GenBuffers( 1, &obj_ebo ); //optional
+        gl::BindVertexArray( obj_vao );
+        gl::BindBuffer( gl::ARRAY_BUFFER, obj_vbo );
+
+        let data_ptr = [ -1f32, -1f32, -1f32, 1f32, -1f32, -1f32, -1f32, 1f32, -1f32,
+                          1f32,  1f32, -1f32, -1f32, 1f32, -1f32, 1f32, -1f32, -1f32 ];
+        
+        let data_length =  data_ptr.len() * std::mem::size_of::<f32>();
+                          
+        gl::BufferData( gl::ARRAY_BUFFER, data_length as isize, data_ptr.as_ptr() as _, gl::STATIC_DRAW );
+        //EBO stuff //optional
+        gl::EnableVertexAttribArray( 0 );
+        
+        // gl::VertexAttribPointer( 0, 3, gl::FLOAT, gl::FALSE, stride, offset_position ); //position
+        // gl::EnableVertexAttribArray( 1 );
+        // gl::VertexAttribPointer( 1, 3, gl::FLOAT, gl::FALSE, stride, offset_normal ); //normal
+        // gl::EnableVertexAttribArray( 2 );
+        //gl::VertexAttribPointer( 2, 2, gl::FLOAT, gl::FALSE, stride, offset_tc ); //texture coordinates
+        //gl::EnableVertexAttribArray( 3 );
+        //gl::VertexAttribPointer( 3, 3, gl::FLOAT, gl::FALSE, stride, offset_tangent ); //tangent
+        //gl::EnableVertexAttribArray( 4 );
+        //gl::VertexAttribPointer( 4, 3, gl::FLOAT, gl::FALSE, stride, offset_bitangent ); //bitangent
+        gl::BindVertexArray( 0 );
+    }
 
     //create multiple model instances with positional offset
     let mut obj_pos : Vec<[f32;3]> = vec![];

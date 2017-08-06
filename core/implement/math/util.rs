@@ -8,10 +8,9 @@ pub fn perspective( fov: f32, aspect: f32, near: f32, far: f32 ) -> mat::Mat4< f
     let mut out : mat::Mat4<f32> = Default::default();
     *out.index_mut(0, 0) = 1.0/(aspect*half_tan);
     *out.index_mut(1, 1) = 1.0/half_tan;
-    *out.index_mut(2, 2) = (-far+near)/(far-near);
+    *out.index_mut(2, 2) = (far+near)/(near-far);
     *out.index_mut(3, 2) = -1f32;
-    *out.index_mut(2, 3) = (-2.0f32*far*near)/(far-near);
-
+    *out.index_mut(2, 3) = (2.0f32*far*near)/(near-far);
     out
 }
 
@@ -22,7 +21,7 @@ pub fn look_at( eye: mat::Mat3x1< f32 >, center: mat::Mat3x1< f32 >, up: mat::Ma
     for i in 0..3{
 	n[i] = eye[i] - center[i];
     }
-    n.normalize().unwrap();
+    n = n.normalize().unwrap();
 
     //compute 1 orthogonal vector to plane's normal vector
     let up_vec = up.normalize().unwrap();

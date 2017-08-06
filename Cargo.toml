@@ -12,6 +12,7 @@ gl = ">=0.6.3"
 libc = ">=0.2.26"
 glutin = ">=0.9.1"
 rand = "0.3"
+image = "*"
 
 [[bin]]
 name = "e2r_test_winglutin"
