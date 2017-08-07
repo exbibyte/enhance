@@ -21,12 +21,19 @@ use rand::Rng;
 use self::glutin::GlContext;
 
 use self::e2rcore::interface::i_window::IWindow;
+use self::e2rcore::interface::i_renderobj::IRenderBuffer;
+use self::e2rcore::interface::i_renderobj::RenderDevice;
+
 use self::e2rcore::implement::window::winglutin::WinGlutin;
 use self::e2rcore::implement::capability::capability_gl;
 use self::e2rcore::implement::render::util_gl;
 use self::e2rcore::implement::math;
-
-use self::e2rcore::implement::commonutil::util_str;
+use self::e2rcore::implement::render::camera;
+use self::e2rcore::implement::render::light;
+use self::e2rcore::implement::render::shader_collection;
+use self::e2rcore::implement::render::router;
+use self::e2rcore::implement::render::mesh;
+use self::e2rcore::implement::render::renderdevice_gl;
 
 pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
@@ -37,11 +44,11 @@ pub fn file_open( file_path: & str ) -> Option<String> {
 }
 
 fn main() {
+
+    let mut shader_collect : shader_collection::ShaderCollection = Default::default();
     
     let vs_src = file_open( "core/example/shading/ads.vs" ).expect("vertex shader not retrieved");
     let fs_src = file_open( "core/example/shading/ads.fs" ).expect("fragment shader not retrieved");
-    // let vs_src = file_open( "core/example/shading/simple.vs" ).expect("vertex shader not retrieved");
-    // let fs_src = file_open( "core/example/shading/simple.fs" ).expect("fragment shader not retrieved");
 
     let mut window : WinGlutin = IWindow::init( 500, 500 );
     window.make_current().expect("window make_current failed");
@@ -49,111 +56,101 @@ fn main() {
     let cap = capability_gl::query_gl();
     println!( "{}", cap );
 
-    // unsafe {
-    //     gl::Enable( gl::DEPTH_TEST );
-    // }
-
     let vs = match util_gl::load_and_compile_shader( vs_src.as_str(), util_gl::ShaderType::VERTEX ) { Ok( o ) => o, Err( o ) => { panic!( "{}", o ); } };
     let fs = match util_gl::load_and_compile_shader( fs_src.as_str(), util_gl::ShaderType::FRAGMENT ) { Ok( o ) => o, Err( o ) => { panic!( "{}", o ); } };
 
-    //camera
-    let mut cam_pos : math::mat::Mat3x1<f32> = Default::default();
-    cam_pos[0] = 5f32;
-    cam_pos[1] = 5f32;
-    cam_pos[2] = 20f32;
-    
-    let mut gl_program = 0;
-    //render buffers
     unsafe {
-        gl_program = util_gl::create_program_from_shaders( vec![ vs, fs ] );
-        gl::UseProgram( gl_program );
         util_gl::check_last_op();
+        shader_collect.put( 0, router::ShaderType::GLSL, util_gl::create_program_from_shaders( vec![ vs, fs ] ) as _, String::from("ads_program") ).is_ok();
+        let shader_program = shader_collect.get( 0 ).unwrap();
+        gl::UseProgram( shader_program as _ );
         gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
     }
-
-    // //create lights
-    // let mut light_position_colour : Vec<[f32;6]> = vec![];
-    // let mut rng = rand::thread_rng();
-    // for i in 0..50 {
-    //     let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
-    //     let pos_y = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
-    //     let pos_z = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
-    //     let colour_r = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
-    //     let colour_g = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
-    //     let colour_b = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
-    //     light_position_colour.push( [ pos_x, pos_y, pos_z, colour_r, colour_g, colour_b ] );
-    // }
+    let shader_program = shader_collect.get( 0 ).unwrap();
     
-    //todo: create renderable objects; put this in a reusable module
-    //create or load model object with data for vert pos, vert normal, vert tex coord, vert tangent, vert bitangent
-    let mut obj_vao = 0;
-    let mut obj_vbo = 0;
-    unsafe {
-        //create vertex array object and vertex  buffer objects to store model data
-
-        // gl::FrontFace( gl::CW );
-        
-        gl::GenVertexArrays( 1, & mut obj_vao );
-        gl::BindVertexArray( obj_vao );
-        gl::GenBuffers( 1, & mut obj_vbo );
-        gl::BindBuffer( gl::ARRAY_BUFFER, obj_vbo );
-
-        //triangle vert positions and normals
-        let data_ptr = [ -1f32, -1f32, -1f32, 0f32, 0f32, 1f32,
-                          5f32, -1f32, -1f32, 0f32, 0f32, 1f32,
-                         -1f32,  1f32, -1f32, 0f32, 0f32, 1f32,
-                          4f32, -1f32, 15f32, 0f32, 0f32, 1f32,
-                          6f32, -1f32,  15f32, 0f32, 0f32, 1f32,
-                          4f32, 1f32,  15f32, 0f32, 0f32, 1f32 ];
-        
-        let data_length = data_ptr.len() * std::mem::size_of::<f32>();
-                          
-        gl::BufferData( gl::ARRAY_BUFFER, data_length as isize, data_ptr.as_ptr() as _, gl::STATIC_DRAW );
-        util_gl::check_last_op();
-        gl::VertexAttribPointer( 0, 3, gl::FLOAT, gl::FALSE, (6*std::mem::size_of::<f32>()) as i32, 0 as _ ); //position
-        gl::EnableVertexAttribArray( 0 );
-        util_gl::check_last_op();
-        gl::VertexAttribPointer( 1, 3, gl::FLOAT, gl::FALSE, (6*std::mem::size_of::<f32>()) as i32, (3*std::mem::size_of::<f32>()) as _ ); //normal
-        util_gl::check_last_op();
-        gl::EnableVertexAttribArray( 1 );
-        util_gl::check_last_op();
-        gl::BindVertexArray( 0 );
-    }
-
-    //configure shader parameters for lights
-    unsafe {
-        gl::UseProgram( gl_program );
-        util_gl::check_last_op();
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Material.Ka\0".as_ptr() as * const i8 ), 1, [0.2f32,0.2f32,0.2f32].as_ptr() as _ );
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Material.Kd\0".as_ptr() as * const i8 ), 1, [0.1f32,0.1f32,0.9f32].as_ptr() as _ );
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Material.Ks\0".as_ptr() as * const i8 ), 1, [0.95f32,0.1f32,0.1f32].as_ptr() as _ );
-        gl::Uniform1f( gl::GetUniformLocation( gl_program, b"Material.Shininess\0".as_ptr() as * const i8 ), 3f32 );
-
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Light.Position\0".as_ptr() as * const i8 ), 1, [-5f32,-5f32,20.0f32].as_ptr() as _ );
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Light.La\0".as_ptr() as * const i8 ), 1, [0.0f32,0.0f32,0.0f32].as_ptr() as _ );
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Light.Ld\0".as_ptr() as * const i8 ), 1, [0.8f32,0.8f32,0.8f32].as_ptr() as _ );
-        gl::Uniform3fv( gl::GetUniformLocation( gl_program, b"Light.Ls\0".as_ptr() as * const i8 ), 1, [0.8f32,0.8f32,0.8f32].as_ptr() as _ );
-
-        util_gl::check_last_op();
-    }
-
+    //camera
     let fov = 120f32;
     let aspect = 1f32;
     let near = 0.001f32;
     let far = 1000f32;
-    let persp_transform = math::util::perspective( fov, aspect, near, far );
-
-    let mut cam_foc_pos : math::mat::Mat3x1<f32> = Default::default();
-    cam_foc_pos[0] = 0f32;
-    cam_foc_pos[1] = 0f32;
-    cam_foc_pos[2] = 5f32;
-
-    let mut cam_up : math::mat::Mat3x1<f32> = Default::default();
-    cam_up[0] = 0f32;
-    cam_up[1] = 1f32;
-    cam_up[2] = 0f32;
+    let cam_foc_pos = math::mat::Mat3x1 { _val: [0f32, 0f32, 5f32] };
+    let cam_up = math::mat::Mat3x1 { _val: [0f32, 1f32, 0f32] };
+    let cam_pos = math::mat::Mat3x1 { _val: [5f32, 5f32, 20f32] };
+    let cam_id = 0;
+    let cam = camera::Cam::init( cam_id, fov, aspect, near, far, cam_pos, cam_foc_pos, cam_up );
     
-    let cam_view = math::util::look_at( cam_pos, cam_foc_pos, cam_up );
+    //create lights
+    let mut lights : Vec< light::LightAdsPoint > = vec![];
+    let mut rng = rand::thread_rng();
+    for i in 0..50 {
+        let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
+        let pos_y = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
+        let pos_z = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 + 10f32;
+        let colour_r = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+        let colour_g = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+        let colour_b = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+        let l = light::LightAdsPoint {
+            _id: i as u64,
+            _pos: math::mat::Mat3x1 { _val: [ pos_x, pos_y, pos_z ] },
+            _ads_val_spec: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+            _ads_val_diff: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+            _ads_val_amb: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+        };
+        lights.push( l );
+    }
+    
+    let mut obj_vao = 0;
+    let mut obj_vbo = 0;
+    unsafe {
+        gl::GenVertexArrays( 1, & mut obj_vao );
+        gl::GenBuffers( 1, & mut obj_vbo );
+    }
+    
+    let mut rd = renderdevice_gl::RenderDrawGroup::init_with_default_format( obj_vao as _, obj_vbo as _ );
+    
+    //set triangle vert positions and normals
+    let mut mesh = mesh::Mesh::init( 0 );
+    mesh._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32, -1f32, -1f32 ] },
+                                    math::mat::Mat3x1 { _val: [ 5f32, -1f32, -1f32 ] },
+                                    math::mat::Mat3x1 { _val: [-1f32,  1f32, -1f32 ] },
+                                    math::mat::Mat3x1 { _val: [ 4f32, -1f32, 15f32 ] },
+                                    math::mat::Mat3x1 { _val: [ 6f32, -1f32, 15f32 ] },
+                                    math::mat::Mat3x1 { _val: [ 4f32,  1f32, 15f32 ] }, ] );
+
+    mesh._normal.extend_from_slice( &[ math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] },
+                                       math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] },
+                                       math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] },
+                                       math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] },
+                                       math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] },
+                                       math::mat::Mat3x1 { _val: [ 0f32, 0f32, 1f32 ] }, ] );
+    
+    mesh._tc.extend_from_slice( &[ math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
+                                   math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
+                                   math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
+                                   math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
+                                   math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
+                                   math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] }, ] );
+
+    mesh.load_into_buffer( & mut rd ).is_ok();
+    rd.bind_buffer().is_ok();
+
+    //configure uniform variables
+    let mut uniform_collection : renderdevice_gl::RenderUniformCollection = Default::default();
+
+    util_gl::check_last_op();
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Material.Ka\0"), renderdevice_gl::UniformType::VEC, vec![ 0.2f32, 0.2f32, 0.2f32 ] );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Material.Kd\0"), renderdevice_gl::UniformType::VEC, vec![ 0.1f32, 0.1f32, 0.9f32 ] );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Material.Ks\0"), renderdevice_gl::UniformType::VEC, vec![ 0.9f32, 0.1f32, 0.1f32 ] );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Material.Shininess\0"), renderdevice_gl::UniformType::VEC, vec![ 3f32 ] );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Position\0"), renderdevice_gl::UniformType::VEC, lights[0]._pos._val.to_vec() );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Light.La\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_amb._val.to_vec() );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ld\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_diff._val.to_vec() );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ls\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_spec._val.to_vec() );
+    uniform_collection.set_group( shader_program as _, 0, [ "Material.Ka\0", "Material.Kd\0", "Material.Ks\0", "Material.Shininess\0",
+                                                         "Light.Position\0", "Light.La\0", "Light.Ld\0", "Light.Ls\0" ].into_iter().map(|&x| x.into() ).collect() ).is_ok();
+    uniform_collection.send_uniform_group( 0 ).is_ok();
+    
+    util_gl::check_last_op();
     
     let model_transform = math::mat::Mat4::<f32> { _val: [ 1f32, 0f32, 0f32, 0f32,
                                                            0f32, 1f32, 0f32, 0f32,
@@ -162,31 +159,21 @@ fn main() {
                                                     _is_row_major: true };
 
 
-    let mvp_transform = persp_transform.mul( &cam_view ).unwrap().mul( &model_transform ).unwrap();
-    let model_view_transform = cam_view.mul( &model_transform ).unwrap();
+    let mvp_transform = cam._proj_xform.mul( &cam._view_xform ).unwrap().mul( &model_transform ).unwrap();
+    let model_view_transform = cam._view_xform.mul( &model_transform ).unwrap();
     let normal_inv_transpose = model_view_transform.submat_mat3().inverse().unwrap().transpose();
 
     println!( "mv: {:?}", model_view_transform );
     println!( "mv submat: {:?}", model_view_transform.submat_mat3() );
     println!( "mvp: {:?}", mvp_transform );
     println!( "normal matrix: {:?}", normal_inv_transpose );
-    
-    unsafe {
-        gl::UniformMatrix4fv( gl::GetUniformLocation( gl_program, b"ModelViewMatrix\0".as_ptr() as * const i8 ), 1, gl::TRUE, model_view_transform._val.as_ptr() );
-        util_gl::check_last_op();
-        gl::UniformMatrix3fv( gl::GetUniformLocation( gl_program, b"NormalMatrix\0".as_ptr() as * const i8 ), 1, gl::TRUE, normal_inv_transpose._val.as_ptr() );
-        util_gl::check_last_op();
-        gl::UniformMatrix4fv( gl::GetUniformLocation( gl_program, b"ProjectionMatrix\0".as_ptr() as * const i8 ), 1, gl::TRUE, persp_transform._val.as_ptr() );
-        util_gl::check_last_op();
-        gl::UniformMatrix4fv( gl::GetUniformLocation( gl_program, b"MVP\0".as_ptr() as * const i8 ), 1, gl::TRUE, mvp_transform._val.as_ptr() );
-        util_gl::check_last_op();
-        // let loc = gl::GetUniformLocation( gl_program, b"MVP\0".as_ptr() as * const i8 );
-        // println!("uniform location: {:?}", loc );
-        // let mut query_val = [0f32;32];
-        // gl::GetUniformfv( gl_program, gl::GetUniformLocation( gl_program, b"MVP\0".as_ptr() as * const i8 ), query_val.as_mut_ptr() );
-        // util_gl::check_last_op();
-        // println!("query MVP: {:?}", query_val );
-    }
+
+    uniform_collection.set_uniform_f( shader_program as _, String::from("ModelViewMatrix\0"), renderdevice_gl::UniformType::MAT4, model_view_transform._val.to_vec() );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("NormalMatrix\0"), renderdevice_gl::UniformType::MAT3, normal_inv_transpose._val.to_vec() );
+    uniform_collection.set_uniform_f( shader_program as _, String::from("ProjectionMatrix\0"), renderdevice_gl::UniformType::MAT4, cam._proj_xform._val.to_vec() );        
+    uniform_collection.set_uniform_f( shader_program as _, String::from("MVP\0"), renderdevice_gl::UniformType::MAT4, mvp_transform._val.to_vec() );
+    uniform_collection.set_group( shader_program as _, 1, [ "ModelViewMatrix\0", "NormalMatrix\0", "ProjectionMatrix\0", "MVP\0" ].into_iter().map(|&x| x.into() ).collect() ).is_ok();
+    uniform_collection.send_uniform_group( 1 ).is_ok();
     
     let mut running = true;
     while running {
@@ -215,10 +202,34 @@ fn main() {
             gl::ClearColor( 0.1, 0.1, 0.1, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             {
-                gl::BindVertexArray( obj_vao );
-                gl::DrawArrays(gl::TRIANGLES, 0, 6 );
+
+                let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
+                let pos_y = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
+                let pos_z = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 + 10f32;
+                let colour_r = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                let colour_g = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                let colour_b = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                let l = light::LightAdsPoint {
+                    _id: 0 as u64,
+                    _pos: math::mat::Mat3x1 { _val: [ pos_x, pos_y, pos_z ] },
+                    _ads_val_spec: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                    _ads_val_diff: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                    _ads_val_amb: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                };
+                lights[0] = l;
+                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Position\0"), renderdevice_gl::UniformType::VEC, lights[0]._pos._val.to_vec() );
+                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.La\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_amb._val.to_vec() );
+                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ld\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_diff._val.to_vec() );
+                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ls\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_spec._val.to_vec() );
+                uniform_collection.send_uniform_group( 0 ).is_ok();
+
+                rd.draw_buffer_all();
             }
         }
         window.swap_buf();
     }
+    unsafe {
+        gl::DeleteBuffers( 1, & mut obj_vbo );
+    }
+    shader_collect.clear().is_ok();
 }

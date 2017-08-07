@@ -97,14 +97,20 @@ pub fn check_last_op() {
 }
 
 pub fn create_program_from_shaders( shader_handles: Vec<gl::types::GLuint> ) -> gl::types::GLuint {
+    create_program_from_shaders_with( shader_handles, | program, shader_handles |() ) //insert dummy lambda
+}
+    
+pub fn create_program_from_shaders_with< F >( shader_handles: Vec<gl::types::GLuint>, f: F ) -> gl::types::GLuint  where F: Fn( gl::types::GLuint, & Vec<gl::types::GLuint> )->() {
     unsafe {
         let gl_program = gl::CreateProgram();
         if gl_program == 0 {
             panic!("gl_program creation failed");
         }
-        for i in shader_handles {
-            gl::AttachShader( gl_program, i );
+        for i in shader_handles.iter() {
+            gl::AttachShader( gl_program, *i );
         }
+        // additional operation before linking program
+        f( gl_program, & shader_handles );
         gl::LinkProgram( gl_program );
         match check_program_link( gl_program ) {
             Err( o ) => panic!( "{}", o ),
@@ -113,3 +119,21 @@ pub fn create_program_from_shaders( shader_handles: Vec<gl::types::GLuint> ) -> 
         return gl_program
     }
 }
+
+pub fn delete_shader_program( handle: i64 ){
+    unsafe {
+        gl::DeleteProgram( handle as gl::types::GLuint );
+    }
+}
+pub fn query_uniform_float_array( program: gl::types::GLuint, name: String, num_elem: usize ){
+    unsafe {
+        let loc = gl::GetUniformLocation( program, name.as_ptr() as * const i8 );
+        println!("uniform location: {:?}", loc );
+        let mut query_val = vec![0f32;32];
+        gl::GetUniformfv( program, gl::GetUniformLocation( program, b"MVP\0".as_ptr() as * const i8 ), query_val.as_mut_ptr() );
+        check_last_op();
+        println!("query MVP: {:?}", query_val );
+    }
+}
+
+

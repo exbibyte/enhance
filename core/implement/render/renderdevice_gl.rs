@@ -1,34 +1,186 @@
-// use std::any::Any;
+use implement::math::mat::Mat4;
+use implement::math::mat::Mat3x1;
+use implement::math::mat::Mat2x1;
+use implement::render::camera;
+use std::collections::HashMap;
+use std::vec::Vec;
 
-// // #[derive(Debug)]
-// // pub struct Set {
-// //     pub _target: u64,
-// //     pub _val: u64,
-// // }
+extern crate gl;
 
-// struct RenderDevice {
+use interface::i_renderobj;
+use implement::render::util_gl;
 
-// }
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
+pub struct BufferFormat {
+    pub _index: u64,
+    pub _num_data: u64,
+    pub _stride_bytes: u64,
+    pub _offset_bytes: u64,
+}
 
-// impl RenderDevice {
-//     fn bind( n: & IBind ) -> Result< (), & 'static str > {
-//         unimplemented!();
-//     }
-//     fn compute( n: & ICompute ) -> Result< (), & 'static str > {
-//         unimplemented!();
-//     }
-//     fn query( n: & IQuery ) -> Result< (), & 'static str > {
-//         unimplemented!();
-//     }
-//     fn store( n: & IStore ) -> Result< (), & 'static str > {
-//         unimplemented!();
-//     }
-// }
+/// # the following is analogous to vertex array object in opengl
+#[derive(Debug)]
+pub struct RenderDrawGroup {
+    pub _group_handle: u64,// <=> vao handle
+    pub _buffer_handle: u64, // <-> vbo handle
+    pub _buffer_draw: Vec< f32 >,
+    pub _format: Vec< BufferFormat >,
+    pub _stride: u64,
+}
 
-// impl <T> IProcessNode<T> for RenderDevice {
-//     fn process( n : &T ) -> Result< (), & 'static str > where
-//         T : IRenderNode + Any
-//     {
-//         unimplemented!();
-//     }
-// }
+impl RenderDrawGroup {
+    pub fn init( internal_group_handle: u64, buffer_handle: u64, format: Vec< BufferFormat >, stride: u64 ) -> RenderDrawGroup {
+        RenderDrawGroup {
+            _group_handle: internal_group_handle,
+            _buffer_handle: buffer_handle,
+            _buffer_draw: vec![],
+            _format: format,
+            _stride: stride,
+        }
+    }
+    pub fn init_with_default_format( internal_group_handle: u64, buffer_handle: u64 ) -> RenderDrawGroup {
+        let stride = 8 * ::std::mem::size_of::<f32>();
+        let format = vec![ BufferFormat { _index: 0, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: 0 },
+                           BufferFormat { _index: 1, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: (3 * ::std::mem::size_of::<f32>()) as _ },
+                           BufferFormat { _index: 2, _num_data: 2, _stride_bytes: stride as _, _offset_bytes: (6 * ::std::mem::size_of::<f32>()) as _ },
+        ];
+        RenderDrawGroup {
+            _group_handle: internal_group_handle,
+            _buffer_handle: buffer_handle,
+            _buffer_draw: vec![],
+            _format: format,
+            _stride: stride as _,
+        }
+    }
+}
+
+impl i_renderobj::RenderDevice for RenderDrawGroup{
+    fn bind_buffer( & mut self ) -> Result< (), & 'static str > {
+        let data_len = self._buffer_draw.len() * ::std::mem::size_of::<f32>();
+        unsafe {
+            gl::BindVertexArray( self._group_handle as _ );
+            gl::BindBuffer( gl::ARRAY_BUFFER, self._buffer_handle as _ );
+            gl::BufferData( gl::ARRAY_BUFFER, data_len as isize, self._buffer_draw.as_ptr() as _, gl::STATIC_DRAW );
+            util_gl::check_last_op();
+
+            for &i in self._format.iter() {
+                gl::VertexAttribPointer( i._index as _, i._num_data as _, gl::FLOAT, gl::FALSE, i._stride_bytes as i32, i._offset_bytes as _ );
+                gl::EnableVertexAttribArray( i._index as _ );
+                util_gl::check_last_op();
+            }
+            gl::BindBuffer( gl::ARRAY_BUFFER, 0 );
+            gl::BindVertexArray( 0 );
+        }
+        Ok( () )
+    }
+    fn draw_buffer_all( & mut self) -> Result< (), & 'static str > {
+        unsafe {
+            gl::BindVertexArray( self._group_handle as _ );
+            let num_vert = self._buffer_draw.len() / (self._stride as usize / ::std::mem::size_of::<f32>());
+            gl::DrawArrays(gl::TRIANGLES, 0, num_vert as _ );
+            gl::BindVertexArray( 0 );
+        }
+        Ok( () )
+    }
+    fn draw_buffer_range( & mut self) -> Result< (), & 'static str > {
+        unimplemented!();
+    }
+}
+
+pub enum UniformType {
+    VEC,
+    MAT4,
+    MAT4X1,
+    MAT4X2,
+    MAT4X3,
+    MAT3,
+    MAT3X1,
+    MAT3X2,
+    MAT2,
+    MAT2X1,
+}
+
+// #[derive(Debug)]
+pub struct RenderUniformCollection {
+    /// # key: (shader_program_handle, uniform_name), val: uniform_vals
+    pub _uniforms_f: HashMap< (u64, String), ( UniformType, Vec<f32> ) >,
+    /// # key: (group_id), val: (shader_program_handle, Vec<uniform_names>)
+    pub _uniforms_groups: HashMap< u64, (u64, Vec<String>) >,
+}
+
+impl Default for RenderUniformCollection {
+    fn default() -> RenderUniformCollection {
+        RenderUniformCollection {
+            _uniforms_f: HashMap::new(),
+            _uniforms_groups: HashMap::new(),
+        }
+    }
+}
+
+impl RenderUniformCollection {
+    /// # set uniform values to be sent to shader later
+    pub fn set_uniform_f( & mut self, shader_program: u64, name: String, val_type: UniformType, vals: Vec<f32> ) {
+        self._uniforms_f.insert( (shader_program, name), ( val_type, vals ) );
+    }
+    /// # group uniforms together
+    pub fn set_group( & mut self, shader_program: u64, group_id: u64, names: Vec<String> ) -> Result< (), & 'static str > {
+        for i in names.iter() {
+            match self._uniforms_f.get( &( shader_program, i.clone() ) ) {
+                Some(v) => (),
+                None => return Err( &"unfound uniform name" )
+            }
+        }
+        self._uniforms_groups.insert( group_id, ( shader_program, names ) );
+        Ok( () )
+    }
+    /// # send the uniform values belonging to the uniform group to the shader
+    pub fn send_uniform_group( & self, group_id: u64 ) -> Result< (), & 'static str > {
+        match self._uniforms_groups.get( &group_id ) {
+            None => return Err( &"unfound uniform group id" ),
+            Some( &( ref program, ref v ) ) => {
+                for name in v.iter() {
+                    match self._uniforms_f.get( &( *program, name.clone()) ) {
+                        None => return Err( &"unfound uniform name" ),
+                        Some( &( ref uniform_type , ref vals) ) => {
+                            match *uniform_type {
+                                UniformType::VEC => {
+                                    unsafe {
+                                        match vals.len() {
+                                            1 => gl::Uniform1f( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), vals[0] ),
+                                            2 => gl::Uniform2fv( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), 1, vals.as_ptr() as _ ),
+                                            3 => gl::Uniform3fv( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), 1, vals.as_ptr() as _ ),
+                                            4 => gl::Uniform4fv( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), 1, vals.as_ptr() as _ ),
+                                            _ => return Err( &"unsupported uniform data length" ),
+                                        }
+                                    }
+                                },
+                                UniformType::MAT4 => {
+                                    if vals.len() != 16 {
+                                        return Err( &"unmatched uniform length for MAT4" )
+                                    }
+                                    unsafe {
+                                        //assumes matrix is row major
+                                        gl::UniformMatrix4fv( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), 1, gl::TRUE, vals.as_ptr() as _ );
+                                    }
+                                },
+                                UniformType::MAT3 => {
+                                    if vals.len() != 9 {
+                                        return Err( &"unmatched uniform length for MAT3" )
+                                    }
+                                    unsafe {
+                                        //assumes matrix is row major
+                                        gl::UniformMatrix3fv( gl::GetUniformLocation( *program as _, name.as_ptr() as * const i8 ), 1, gl::TRUE, vals.as_ptr() as _ );
+                                    }
+                                },
+                                _ => { unimplemented!(); },
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok( () )
+    }
+}
