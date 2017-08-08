@@ -4,7 +4,7 @@ A very experimental minimalistic 3D rendering and game engine implementing in Ru
 
 # To be supported:
 
-3D Model Formats: md5mesh, md5anim, obj
+3D Model Formats: md5mesh, md5anim, obj, gltf
 
 Rendering backend: OpenGL 3.3+
 
@@ -14,8 +14,8 @@ Implementation of render backend and frontend
 
 Rendering acceleration structures
 
-Rendering resource management by render back end
-
-Entity instance management by render front end
+Asset management
 
 Multithreading support for front end and some of the back end pipelines
+
+Debugging and console input facilities
