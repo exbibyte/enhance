@@ -13,6 +13,17 @@ use implement::render::util_gl;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
+pub enum RenderObjType {
+    TRI,
+    //todo
+    QUAD,
+    POINT,
+    LINE,
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
 #[derive(Eq)]
 #[derive(Hash)]
 #[derive(PartialEq)]
@@ -67,7 +78,7 @@ impl RenderDrawGroup {
             _stride: stride as _,
         }
     }
-    pub fn store_buff_data( & mut self, data: & HashMap< BuffDataType, &[f32] > ) -> Result< (), & 'static str > {
+    pub fn store_buff_data( & mut self, obj_type: RenderObjType, data: & HashMap< BuffDataType, &[f32] > ) -> Result< (), & 'static str > {
         let mut data_pos : &[f32] = &[0f32];
         let mut data_normal : &[f32] = &[0f32];
         let mut data_tc : &[f32] = &[0f32];
@@ -112,17 +123,28 @@ impl RenderDrawGroup {
         if count_data != data_tc.len() / 2 {
             return Err( "render buffer data length not equal" )
         }
-        for i in 0..count_data {
-            self._buffer_draw.push( data_pos[i*3] );
-            self._buffer_draw.push( data_pos[i*3+1] );
-            self._buffer_draw.push( data_pos[i*3+2] );
-            
-            self._buffer_draw.push( data_normal[i*3] );
-            self._buffer_draw.push( data_normal[i*3+1] );
-            self._buffer_draw.push( data_normal[i*3+2] );
+        match obj_type {
+            RenderObjType::TRI => {
+                for i in 0..count_data {
+                    self._buffer_draw.push( data_pos[i*3] );
+                    self._buffer_draw.push( data_pos[i*3+1] );
+                    self._buffer_draw.push( data_pos[i*3+2] );
+                    
+                    self._buffer_draw.push( data_normal[i*3] );
+                    self._buffer_draw.push( data_normal[i*3+1] );
+                    self._buffer_draw.push( data_normal[i*3+2] );
 
-            self._buffer_draw.push( data_tc[i*2] );
-            self._buffer_draw.push( data_tc[i*2+1] );
+                    self._buffer_draw.push( data_tc[i*2] );
+                    self._buffer_draw.push( data_tc[i*2+1] );
+                }
+            },
+            RenderObjType::POINT => {
+                //todo
+            }
+            RenderObjType::LINE => {
+                //todo
+            },
+            _ => { unimplemented!(); }
         }
         Ok( () )
     }

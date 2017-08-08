@@ -197,7 +197,7 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Poly6 {
         let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( & data_map );
+        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: primitive (box): vertex count:{}", pos.len() / 3 );
 
@@ -348,7 +348,7 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for SphereIc
         let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( & data_map );
+        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: primitive (sphere(isocahedron)): vertex count:{}", pos.len() / 3 );
 

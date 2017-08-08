@@ -54,7 +54,7 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Mesh {
         let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
                                                                              ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( & data_map );
+        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: mesh: vertex count:{}", pos.len() / 3 );
         Ok( () )
