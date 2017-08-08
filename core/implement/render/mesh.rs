@@ -31,32 +31,32 @@ impl Mesh {
 }
 
 impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Mesh {
-    fn load_into_buffer( & self, rd: & mut renderdevice_gl::RenderDrawGroup ) -> Result< (), & 'static str > {
+    fn load_into_buffer( & mut self, rd: & mut renderdevice_gl::RenderDrawGroup ) -> Result< (), & 'static str > {
         if self._pos.len() != self._normal.len() ||
            self._pos.len() != self._tc.len()
         {
             return Err( &"unequal length for position, normal, tc data" )
         }
-        let stride = ( 3 + 3 + 2 ) * ::std::mem::size_of::<f32>();
-        if stride != rd._stride as _ {
-            return Err( &"unequal length stride bytes" )
-        }
-        let data_len = self._pos.len() * stride;
 
+        let mut pos = vec![];
+        let mut normal = vec![];
+        let mut tc = vec![];
         for i in 0..self._pos.len() {
-            rd._buffer_draw.push( self._pos[i][0] );
-            rd._buffer_draw.push( self._pos[i][1] );
-            rd._buffer_draw.push( self._pos[i][2] );
-            
-            rd._buffer_draw.push( self._normal[i][0] );
-            rd._buffer_draw.push( self._normal[i][1] );
-            rd._buffer_draw.push( self._normal[i][2] );
-
-            rd._buffer_draw.push( self._tc[i][0] );
-            rd._buffer_draw.push( self._tc[i][1] );
+            pos.extend_from_slice( &self._pos[i]._val[..] );
+        }
+        for i in 0..self._normal.len() {
+            normal.extend_from_slice( &self._normal[i]._val[..] );
+        }
+        for i in 0..self._tc.len() {
+            tc.extend_from_slice( &self._tc[i]._val[..] );
         }
 
-        println!( "rd._buffer_draw.len(): {}", rd._buffer_draw.len() );
+        let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
+                                                                             ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
+                                                                             ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
+        rd.store_buff_data( & data_map );
+
+        println!( "load into render buffer: mesh: vertex count:{}", pos.len() / 3 );
         Ok( () )
     }
 }

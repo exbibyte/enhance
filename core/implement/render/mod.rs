@@ -8,3 +8,4 @@ pub mod light;
 pub mod shader_collection;
 pub mod router;
 pub mod mesh;
+pub mod primitive;

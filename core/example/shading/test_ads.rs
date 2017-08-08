@@ -34,6 +34,7 @@ use self::e2rcore::implement::render::shader_collection;
 use self::e2rcore::implement::render::router;
 use self::e2rcore::implement::render::mesh;
 use self::e2rcore::implement::render::renderdevice_gl;
+use self::e2rcore::implement::render::primitive;
 
 pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
@@ -65,6 +66,7 @@ fn main() {
         let shader_program = shader_collect.get( 0 ).unwrap();
         gl::UseProgram( shader_program as _ );
         gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
+        gl::Enable( gl::DEPTH_TEST );
     }
     let shader_program = shader_collect.get( 0 ).unwrap();
     
@@ -132,6 +134,17 @@ fn main() {
                                    math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] }, ] );
 
     mesh.load_into_buffer( & mut rd ).is_ok();
+
+
+    //primitives
+    let mut prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
+                                      _radius: 5f32 };
+    prim_box.load_into_buffer( & mut rd ).is_ok();
+
+    let mut prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
+    prim_sphere.load_into_buffer( & mut rd ).is_ok();
+    
+    
     rd.bind_buffer().is_ok();
 
     //configure uniform variables
@@ -199,29 +212,29 @@ fn main() {
             window._win._wingl.resize(w, h);
         }
         unsafe {
-            gl::ClearColor( 0.1, 0.1, 0.1, 1.0 );
+            gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             {
 
-                let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
-                let pos_y = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
-                let pos_z = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 + 10f32;
-                let colour_r = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
-                let colour_g = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
-                let colour_b = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
-                let l = light::LightAdsPoint {
-                    _id: 0 as u64,
-                    _pos: math::mat::Mat3x1 { _val: [ pos_x, pos_y, pos_z ] },
-                    _ads_val_spec: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
-                    _ads_val_diff: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
-                    _ads_val_amb: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
-                };
-                lights[0] = l;
-                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Position\0"), renderdevice_gl::UniformType::VEC, lights[0]._pos._val.to_vec() );
-                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.La\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_amb._val.to_vec() );
-                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ld\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_diff._val.to_vec() );
-                uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ls\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_spec._val.to_vec() );
-                uniform_collection.send_uniform_group( 0 ).is_ok();
+                // let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
+                // let pos_y = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 4f32;
+                // let pos_z = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 + 10f32;
+                // let colour_r = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                // let colour_g = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                // let colour_b = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 1f32;
+                // let l = light::LightAdsPoint {
+                //     _id: 0 as u64,
+                //     _pos: math::mat::Mat3x1 { _val: [ pos_x, pos_y, pos_z ] },
+                //     _ads_val_spec: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                //     _ads_val_diff: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                //     _ads_val_amb: math::mat::Mat3x1 { _val: [ colour_r, colour_g, colour_b ] },
+                // };
+                // lights[0] = l;
+                // uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Position\0"), renderdevice_gl::UniformType::VEC, lights[0]._pos._val.to_vec() );
+                // uniform_collection.set_uniform_f( shader_program as _, String::from("Light.La\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_amb._val.to_vec() );
+                // uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ld\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_diff._val.to_vec() );
+                // uniform_collection.set_uniform_f( shader_program as _, String::from("Light.Ls\0"), renderdevice_gl::UniformType::VEC, lights[0]._ads_val_spec._val.to_vec() );
+                // uniform_collection.send_uniform_group( 0 ).is_ok();
 
                 rd.draw_buffer_all();
             }

@@ -2,6 +2,7 @@ use implement::math::mat::*;
 use interface::i_interpolate::*;
 
 #[allow(unused_variables)]
+#[derive(Debug)]
 pub struct SplineBezier {
     pub _ctl: [ Mat4x1< f64 > ; 4 ],
     pub _point: Mat4x1< f64 >,

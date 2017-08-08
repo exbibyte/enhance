@@ -15,5 +15,5 @@ pub trait RenderDevice {
 }
 
 pub trait IRenderBuffer< T > where T : RenderDevice {
-    fn load_into_buffer( & self, rd: & mut T ) -> Result< (), & 'static str >;
+    fn load_into_buffer( & mut self, rd: & mut T ) -> Result< (), & 'static str >;
 }

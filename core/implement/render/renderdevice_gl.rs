@@ -13,7 +13,20 @@ use implement::render::util_gl;
 #[derive(Debug)]
 #[derive(Clone)]
 #[derive(Copy)]
+#[derive(Eq)]
+#[derive(Hash)]
+#[derive(PartialEq)]
+pub enum BuffDataType {
+    POS,
+    NORMAL,
+    TC,
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub struct BufferFormat {
+    pub _buff_data_type: BuffDataType,
     pub _index: u64,
     pub _num_data: u64,
     pub _stride_bytes: u64,
@@ -42,9 +55,9 @@ impl RenderDrawGroup {
     }
     pub fn init_with_default_format( internal_group_handle: u64, buffer_handle: u64 ) -> RenderDrawGroup {
         let stride = 8 * ::std::mem::size_of::<f32>();
-        let format = vec![ BufferFormat { _index: 0, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: 0 },
-                           BufferFormat { _index: 1, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: (3 * ::std::mem::size_of::<f32>()) as _ },
-                           BufferFormat { _index: 2, _num_data: 2, _stride_bytes: stride as _, _offset_bytes: (6 * ::std::mem::size_of::<f32>()) as _ },
+        let format = vec![ BufferFormat { _buff_data_type: BuffDataType::POS, _index: 0, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: 0 },
+                           BufferFormat { _buff_data_type: BuffDataType::NORMAL, _index: 1, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: (3 * ::std::mem::size_of::<f32>()) as _ },
+                           BufferFormat { _buff_data_type: BuffDataType::TC, _index: 2, _num_data: 2, _stride_bytes: stride as _, _offset_bytes: (6 * ::std::mem::size_of::<f32>()) as _ },
         ];
         RenderDrawGroup {
             _group_handle: internal_group_handle,
@@ -53,6 +66,65 @@ impl RenderDrawGroup {
             _format: format,
             _stride: stride as _,
         }
+    }
+    pub fn store_buff_data( & mut self, data: & HashMap< BuffDataType, &[f32] > ) -> Result< (), & 'static str > {
+        let mut data_pos : &[f32] = &[0f32];
+        let mut data_normal : &[f32] = &[0f32];
+        let mut data_tc : &[f32] = &[0f32];
+        for i in self._format.iter() {
+            match i._buff_data_type {
+                BuffDataType::POS => {
+                    match data.get( &BuffDataType::POS ) {
+                        None => return Err( "render buffer data expected data not found: pos" ),
+                        Some( & pos ) => {
+                            data_pos = &pos[..];
+                        }
+                    }
+                },
+                BuffDataType::NORMAL => {
+                    match data.get( &BuffDataType::NORMAL ) {
+                        None => return Err( "render buffer data expected data not found: normal" ),
+                        Some( & normal ) => {
+                            data_normal = &normal[..];
+                        }
+                    }
+                },
+                BuffDataType::TC => {
+                    match data.get( &BuffDataType::TC ) {
+                        None => return Err( "render buffer data expected data not found: tc" ),
+                        Some( & tc ) => {
+                            data_tc = &tc[..];
+                        }
+                    }
+                },
+            }
+        }
+        if data_pos.len() != data_normal.len() {
+            return Err( "render buffer data length not equal" )
+        }
+        if data_pos.len() % 3 != 0 {
+            return Err( "render buffer data length not divisible by 3" )
+        }
+        if data_tc.len() % 2 != 0 {
+            return Err( "render buffer data length not divisible by 2" )
+        }
+        let count_data = data_pos.len() / 3;
+        if count_data != data_tc.len() / 2 {
+            return Err( "render buffer data length not equal" )
+        }
+        for i in 0..count_data {
+            self._buffer_draw.push( data_pos[i*3] );
+            self._buffer_draw.push( data_pos[i*3+1] );
+            self._buffer_draw.push( data_pos[i*3+2] );
+            
+            self._buffer_draw.push( data_normal[i*3] );
+            self._buffer_draw.push( data_normal[i*3+1] );
+            self._buffer_draw.push( data_normal[i*3+2] );
+
+            self._buffer_draw.push( data_tc[i*2] );
+            self._buffer_draw.push( data_tc[i*2+1] );
+        }
+        Ok( () )
     }
 }
 
