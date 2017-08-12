@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 // use std::cell::RefCell;
 
+use interface::i_ele;
 use interface::i_renderobj;
 
 use implement::math::mat;
@@ -23,8 +24,18 @@ pub struct Poly6 {
 //     }
 // }
 
-impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Poly6 {
-    fn load_into_buffer( & mut self, rd: & mut renderdevice_gl::RenderDrawGroup ) -> Result< (), & 'static str > {       
+impl i_ele::Facility for Poly6 {
+    // type Concrete = Poly6;
+}
+
+impl i_renderobj::IRenderable for Poly6 {
+    fn get_render_method( & self ) -> i_renderobj::RenderMethod {
+        i_renderobj::RenderMethod::ADS
+    }
+}
+
+impl i_renderobj::IRenderBuffer for Poly6 {
+    fn load_into_buffer( & mut self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {       
         let x0 = self._pos[0] - self._radius/2.0;
         let x1 = self._pos[0] + self._radius/2.0;
 
@@ -194,10 +205,10 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Poly6 {
         normal.extend_from_slice( &[ 0.0, -1.0, 0.0 ] );
         tc.extend_from_slice( &[ 0.0, 0.0 ] );
 
-        let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
+        let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::NORMAL, normal.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
+        rd.store_buff_data( i_renderobj::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: primitive (box): vertex count:{}", pos.len() / 3 );
 
@@ -257,8 +268,19 @@ impl SphereIcosahedron {
         i
     }
 }
-impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for SphereIcosahedron {
-    fn load_into_buffer( & mut self, rd: & mut renderdevice_gl::RenderDrawGroup ) -> Result< (), & 'static str > {
+
+impl i_ele::Facility for SphereIcosahedron {
+    // type Concrete = SphereIcosahedron;
+}
+
+impl i_renderobj::IRenderable for SphereIcosahedron {
+    fn get_render_method( & self ) -> i_renderobj::RenderMethod {
+        i_renderobj::RenderMethod::ADS
+    }
+}
+
+impl i_renderobj::IRenderBuffer for SphereIcosahedron {
+    fn load_into_buffer( & mut self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
         //starting icosahedron
         let t = ( 1f32 + 5f32.sqrt() ) / 2f32;
 
@@ -345,10 +367,10 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for SphereIc
             tc.extend_from_slice( &[ 0f32; 6 ] );            
         }
 
-        let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
+        let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::NORMAL, normal.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
+        rd.store_buff_data( i_renderobj::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: primitive (sphere(isocahedron)): vertex count:{}", pos.len() / 3 );
 

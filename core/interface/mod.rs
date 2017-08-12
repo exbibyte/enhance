@@ -15,3 +15,4 @@ pub mod i_window;
 
 pub mod i_renderobj;
 pub mod i_ads;
+pub mod i_ele;

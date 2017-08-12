@@ -17,9 +17,13 @@ use std::os::raw::c_char;
 use std::fmt;
 use std::str;
 use rand::Rng;
+use std::any::Any;
+use std::borrow::BorrowMut;
+use std::ops::{ Deref, DerefMut };
 
 use self::glutin::GlContext;
 
+use self::e2rcore::interface::i_ele;
 use self::e2rcore::interface::i_window::IWindow;
 use self::e2rcore::interface::i_renderobj::IRenderBuffer;
 use self::e2rcore::interface::i_renderobj::RenderDevice;
@@ -133,18 +137,25 @@ fn main() {
                                    math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
                                    math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] }, ] );
 
-    mesh.load_into_buffer( & mut rd ).is_ok();
 
-
+    let mut objs : Vec< i_ele::Ele > = vec![];
+    
+    objs.push( i_ele::Ele::init( mesh ) );
+    
     //primitives
     let mut prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
-                                      _radius: 5f32 };
-    prim_box.load_into_buffer( & mut rd ).is_ok();
+                                           _radius: 5f32 };
+
+    objs.push( i_ele::Ele::init( prim_box ) );
 
     let mut prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
-    prim_sphere.load_into_buffer( & mut rd ).is_ok();
-    
-    
+
+    objs.push( i_ele::Ele::init( prim_sphere ) );    
+
+    for i in objs.iter_mut() {
+        ( (**i).borrow_mut() as & mut i_ele::Facility ).load_into_buffer( & mut rd ).is_ok();
+    }
+
     rd.bind_buffer().is_ok();
 
     //configure uniform variables

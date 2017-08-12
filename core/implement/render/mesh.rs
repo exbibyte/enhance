@@ -7,6 +7,7 @@ use std::vec::Vec;
 
 extern crate gl;
 
+use interface::i_ele;
 use interface::i_renderobj;
 use implement::render::renderdevice_gl;
 use implement::render::util_gl;
@@ -30,8 +31,18 @@ impl Mesh {
     }
 }
 
-impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Mesh {
-    fn load_into_buffer( & mut self, rd: & mut renderdevice_gl::RenderDrawGroup ) -> Result< (), & 'static str > {
+impl i_ele::Facility for Mesh {
+    // type Concrete = Mesh;
+}
+
+impl i_renderobj::IRenderable for Mesh {
+    fn get_render_method( & self ) -> i_renderobj::RenderMethod {
+        i_renderobj::RenderMethod::ADS
+    }
+}
+
+impl i_renderobj::IRenderBuffer for Mesh {
+    fn load_into_buffer( & mut self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
         if self._pos.len() != self._normal.len() ||
            self._pos.len() != self._tc.len()
         {
@@ -51,10 +62,10 @@ impl i_renderobj::IRenderBuffer< renderdevice_gl::RenderDrawGroup > for Mesh {
             tc.extend_from_slice( &self._tc[i]._val[..] );
         }
 
-        let data_map : HashMap< renderdevice_gl::BuffDataType, &[f32] > =  [ ( renderdevice_gl::BuffDataType::POS, pos.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::NORMAL, normal.as_slice() ),
-                                                                             ( renderdevice_gl::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
-        rd.store_buff_data( renderdevice_gl::RenderObjType::TRI, & data_map );
+        let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::NORMAL, normal.as_slice() ),
+                                                                             ( i_renderobj::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
+        rd.store_buff_data( i_renderobj::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: mesh: vertex count:{}", pos.len() / 3 );
         Ok( () )
