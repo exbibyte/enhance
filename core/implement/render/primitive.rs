@@ -217,6 +217,12 @@ impl i_renderobj::IRenderBuffer for Poly6 {
     }
 }
 
+impl i_renderobj::IRenderUniform for Poly6 {
+    fn load_into_uniform( & mut self, uniforms: & mut renderdevice_gl::RenderUniformCollection ) -> Result< (), & 'static str > {
+        Ok( () )
+    }
+}
+
 #[derive(Clone)]
 pub struct SphereIcosahedron {
     pub _pos: mat::Mat3x1< f32 >,
@@ -376,6 +382,12 @@ impl i_renderobj::IRenderBuffer for SphereIcosahedron {
 
         println!( "load into render buffer: primitive (sphere(isocahedron)): vertex count:{}", pos.len() / 3 );
 
+        Ok( () )
+    }
+}
+
+impl i_renderobj::IRenderUniform for SphereIcosahedron {
+    fn load_into_uniform( & mut self, uniforms: & mut renderdevice_gl::RenderUniformCollection ) -> Result< (), & 'static str > {
         Ok( () )
     }
 }

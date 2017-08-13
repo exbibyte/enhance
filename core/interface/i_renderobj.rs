@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use implement::math::mat;
+use implement::render::renderdevice_gl::RenderUniformCollection;
 
 pub trait Xform {
     fn get_xform() -> mat::Mat4< f32 >;
@@ -45,7 +46,6 @@ pub trait IRenderBuffer {
     fn load_into_buffer( & mut self, rd: & mut RenderDevice ) -> Result< (), & 'static str >;
 }
 
-
 pub enum RenderMethod {
     ADS,
     PBR,
@@ -53,4 +53,8 @@ pub enum RenderMethod {
 }
 pub trait IRenderable : IRenderBuffer {
     fn get_render_method( & self ) -> RenderMethod;
+}
+
+pub trait IRenderUniform {
+    fn load_into_uniform( & mut self, uniforms: & mut RenderUniformCollection ) -> Result< (), & 'static str >;
 }

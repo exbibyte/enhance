@@ -3,7 +3,7 @@ use std::ops::{ Deref, DerefMut };
 use interface::i_renderobj;
 
 /// # all available functionalities for an object
-pub trait Facility : i_renderobj::IRenderable + i_renderobj::IRenderBuffer + 'static {}
+pub trait Facility : i_renderobj::IRenderable + i_renderobj::IRenderBuffer + i_renderobj::IRenderUniform + 'static {}
 
 /// # generic encapsulation for various types of objects
 pub struct Ele {

@@ -9,8 +9,7 @@ use interface::i_renderpass;
 use interface::i_ele;
 use interface::i_renderobj;
 
-// use implement::render::rendercommon::PipelineArgRequire;
-// use implement::render::rendercommon::Scene;
+use implement::kernel::kernel_render::Renderer;
 use implement::render::renderdevice_gl;
 
 pub struct RenderPassDefault {}
@@ -31,11 +30,7 @@ impl RenderPassDefault {
 }
 
 impl i_renderpass::IRenderPass for RenderPassDefault {
-    fn process( & self, pass_type: i_renderpass::eRenderPassType, rd: & mut i_renderobj::RenderDevice, objs: & mut Vec< i_ele::Ele >, uniform: & mut renderdevice_gl::RenderUniformCollection, uniform_group: u64 ) -> Result< (), & 'static str > {
-        match pass_type {
-            i_renderpass::eRenderPassType::DEFAULT => { self.process_default( rd, objs, uniform, uniform_group ); },
-            _ => { unimplemented!(); }
-        }
-        Ok( () )
-    }
+    fn process( & self, renderer: & mut Renderer ) -> Result< (), & 'static str > {
+        unimplemented!();
+    }    
 }

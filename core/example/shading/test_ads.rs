@@ -169,6 +169,7 @@ fn main() {
     kr.uniforms_ref().set_uniform_f( shader_program as _, &"MVP\0", renderdevice_gl::UniformType::MAT4, &mvp_transform._val[..] );
     kr.uniforms_ref().set_group( shader_program as _, 1, [ "ModelViewMatrix\0", "NormalMatrix\0", "ProjectionMatrix\0", "MVP\0" ].into_iter().map(|&x| x.into() ).collect() ).is_ok();
 
+    //todo: move any manipulation of draw groups, binding actions into specific render pass routine (eg: renderpass_default::RenderPassDefault)
     kr.load_objs_to_draw_group( &[ obj_triangle, obj_box, obj_sphere ], draw_group ).is_ok();
     kr.bind_draw_group_data( &[ draw_group ] ).is_ok();
     kr.add_draw_group_uniforms( draw_group, &[0u64,1u64] ).is_ok();

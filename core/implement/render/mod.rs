@@ -9,3 +9,4 @@ pub mod shader_collection;
 pub mod router;
 pub mod mesh;
 pub mod primitive;
+pub mod renderpass_collection;

@@ -73,4 +73,8 @@ impl i_renderobj::IRenderBuffer for Mesh {
     }
 }
 
-
+impl i_renderobj::IRenderUniform for Mesh {
+    fn load_into_uniform( & mut self, uniforms: & mut renderdevice_gl::RenderUniformCollection ) -> Result< (), & 'static str > {
+        Ok( () )
+    }
+}
