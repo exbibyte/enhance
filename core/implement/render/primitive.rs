@@ -8,6 +8,7 @@ use implement::math::mat;
 use implement::render::renderdevice_gl;
 
 /// # 6 sided polyhedral / box
+#[derive(Clone)]
 pub struct Poly6 {
     /// # _pos := center of the box
     pub _pos: mat::Mat3x1< f32 >,
@@ -216,6 +217,7 @@ impl i_renderobj::IRenderBuffer for Poly6 {
     }
 }
 
+#[derive(Clone)]
 pub struct SphereIcosahedron {
     pub _pos: mat::Mat3x1< f32 >,
     pub _radius: f32,

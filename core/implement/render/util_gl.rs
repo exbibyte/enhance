@@ -12,6 +12,8 @@ use std::fmt;
 use std::str;
 use std::ptr;
 
+#[derive(Clone)]
+#[derive(Copy)]
 pub enum ShaderType {
     VERTEX,
     FRAGMENT,
@@ -24,7 +26,7 @@ pub fn load_and_compile_shader( shader_src : &str, shader_type: ShaderType ) -> 
         let handle = match shader_type {
             ShaderType::VERTEX => gl::CreateShader( gl::VERTEX_SHADER ),
             ShaderType::FRAGMENT =>  gl::CreateShader( gl::FRAGMENT_SHADER ),
-            _ => return Err( String::from("unknown shader type" ) ),
+            _ => return Err( String::from( "unknown shader type" ) ),
         };
         assert!( handle != 0 );
         let shader_src_arr = [ shader_src.as_ptr() as * const i8 ];
@@ -44,7 +46,7 @@ pub fn load_and_compile_shader( shader_src : &str, shader_type: ShaderType ) -> 
                 let log_str = str::from_utf8( &log_u8[..] ).unwrap();
                 return Err( String::from( log_str ) )
             }else{
-                return Err( String::from("unknown error during shader compilation") )
+                return Err( String::from( "unknown error during shader compilation" ) )
             }
         }
         return Ok( handle )
@@ -96,21 +98,21 @@ pub fn check_last_op() {
     }
 }
 
-pub fn create_program_from_shaders( shader_handles: Vec<gl::types::GLuint> ) -> gl::types::GLuint {
+pub fn create_program_from_shaders( shader_handles: &[ gl::types::GLuint ] ) -> gl::types::GLuint {
     create_program_from_shaders_with( shader_handles, | program, shader_handles |() ) //insert dummy lambda
 }
     
-pub fn create_program_from_shaders_with< F >( shader_handles: Vec<gl::types::GLuint>, f: F ) -> gl::types::GLuint  where F: Fn( gl::types::GLuint, & Vec<gl::types::GLuint> )->() {
+pub fn create_program_from_shaders_with< F >( shader_handles: &[ gl::types::GLuint ], f: F ) -> gl::types::GLuint  where F: Fn( gl::types::GLuint, &[ gl::types::GLuint ] )->() {
     unsafe {
         let gl_program = gl::CreateProgram();
         if gl_program == 0 {
             panic!("gl_program creation failed");
         }
-        for i in shader_handles.iter() {
+        for i in shader_handles.into_iter() {
             gl::AttachShader( gl_program, *i );
         }
         // additional operation before linking program
-        f( gl_program, & shader_handles );
+        f( gl_program, shader_handles );
         gl::LinkProgram( gl_program );
         match check_program_link( gl_program ) {
             Err( o ) => panic!( "{}", o ),

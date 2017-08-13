@@ -71,8 +71,8 @@ fn main() {
     let mut gNormal = 0;
     let mut gAlbedoSpec = 0;
     unsafe {
-        gl_program_geom = util_gl::create_program_from_shaders( vec![ geom_vs, geom_fs ] );
-        gl_program_light = util_gl::create_program_from_shaders( vec![ light_vs, light_fs ] );
+        gl_program_geom = util_gl::create_program_from_shaders( &[ geom_vs, geom_fs ] );
+        gl_program_light = util_gl::create_program_from_shaders( &[ light_vs, light_fs ] );
 
         gl::UseProgram( gl_program_geom );
         util_gl::check_last_op();

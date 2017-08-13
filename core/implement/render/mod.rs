@@ -1,7 +1,7 @@
 // pub mod rendernode;
 pub mod renderdevice_gl;
 pub mod rendercommon;
-// pub mod renderpass_ads;
+pub mod renderpass_default;
 pub mod util_gl;
 pub mod camera;
 pub mod light;

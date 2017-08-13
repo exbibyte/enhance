@@ -12,6 +12,7 @@ use interface::i_renderobj;
 use implement::render::renderdevice_gl;
 use implement::render::util_gl;
 
+#[derive(Clone)]
 pub struct Mesh {
     pub _id: u64,
     pub _pos: Vec< Mat3x1< f32 > >,
@@ -63,8 +64,8 @@ impl i_renderobj::IRenderBuffer for Mesh {
         }
 
         let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos.as_slice() ),
-                                                                             ( i_renderobj::BuffDataType::NORMAL, normal.as_slice() ),
-                                                                             ( i_renderobj::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
+                                                                         ( i_renderobj::BuffDataType::NORMAL, normal.as_slice() ),
+                                                                         ( i_renderobj::BuffDataType::TC, tc.as_slice() ) ].iter().cloned().collect();
         rd.store_buff_data( i_renderobj::RenderObjType::TRI, & data_map );
 
         println!( "load into render buffer: mesh: vertex count:{}", pos.len() / 3 );

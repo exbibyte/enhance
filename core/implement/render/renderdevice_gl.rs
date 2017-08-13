@@ -88,6 +88,9 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
     fn draw_buffer_range( & mut self) -> Result< (), & 'static str > {
         unimplemented!();
     }
+    fn clear_buff_data( & mut self ){
+        self._buffer_draw.clear();
+    }
     fn store_buff_data( & mut self, obj_type: i_renderobj::RenderObjType, data: & HashMap< i_renderobj::BuffDataType, &[f32] > ) -> Result< (), & 'static str > {
         let mut data_pos : &[f32] = &[0f32];
         let mut data_normal : &[f32] = &[0f32];
@@ -160,6 +163,9 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
     }
 }
 
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(Copy)]
 pub enum UniformType {
     VEC,
     MAT4,
@@ -192,11 +198,11 @@ impl Default for RenderUniformCollection {
 
 impl RenderUniformCollection {
     /// # set uniform values to be sent to shader later
-    pub fn set_uniform_f( & mut self, shader_program: u64, name: String, val_type: UniformType, vals: Vec<f32> ) {
-        self._uniforms_f.insert( (shader_program, name), ( val_type, vals ) );
+    pub fn set_uniform_f( & mut self, shader_program: u64, name: &str, val_type: UniformType, vals: &[f32] ) {
+        self._uniforms_f.insert( (shader_program, String::from( name ) ), ( val_type, vals.to_vec() ) );
     }
     /// # group uniforms together
-    pub fn set_group( & mut self, shader_program: u64, group_id: u64, names: Vec<String> ) -> Result< (), & 'static str > {
+    pub fn set_group( & mut self, shader_program: u64, group_id: u64, names: Vec< String > ) -> Result< (), & 'static str > {
         for i in names.iter() {
             match self._uniforms_f.get( &( shader_program, i.clone() ) ) {
                 Some(v) => (),
@@ -205,6 +211,23 @@ impl RenderUniformCollection {
         }
         self._uniforms_groups.insert( group_id, ( shader_program, names ) );
         Ok( () )
+    }
+    pub fn get_group( & self, group_id: u64 ) -> Result< Vec< (String, UniformType, Vec<f32> )>, & 'static str > {
+        let mut ret = vec![];
+        match self._uniforms_groups.get( &group_id ) {
+            None => return Err( &"unfound uniform group id" ),
+            Some( &( ref program, ref v ) ) => {
+                for name in v.iter() {
+                    match self._uniforms_f.get( &( *program, name.clone()) ) {
+                        None => return Err( &"unfound uniform name" ),
+                        Some( &( ref uniform_type , ref vals) ) => {
+                            ret.push( ( name.clone(), uniform_type.clone(), vals.clone() ) );
+                        }
+                    }
+                }
+            }
+        }
+        Ok( ret )
     }
     /// # send the uniform values belonging to the uniform group to the shader
     pub fn send_uniform_group( & self, group_id: u64 ) -> Result< (), & 'static str > {
