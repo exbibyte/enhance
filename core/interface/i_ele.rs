@@ -9,7 +9,7 @@ use interface::i_component;
 /// # all available functionalities for an object
 pub trait IObjImpl: 'static {
     fn as_any( & self ) -> & Any;
-    fn update_components( & self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str >;
+    fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str >;
 }
 
 /// # generic encapsulation for a create object
@@ -25,7 +25,8 @@ impl Ele {
             _components: vec![],
         }
     }
-    pub fn set_components_from_impl( & mut self ) -> Result< (), & 'static str > {
+    pub fn update_components_from_impl( & mut self ) -> Result< (), & 'static str > {
+        self._components.clear();
         self._impl.update_components( & mut self._components )
     }
     // pub fn apply_component< T >( & mut self, comp: T ) -> Result< (), & 'static str >
@@ -44,14 +45,14 @@ impl Ele {
 }
 
 // impl Deref for Ele {
-//     type Target = Box< IObjImpl >;
+//     type Target = Ele;
 //     fn deref( & self ) -> & Self::Target {
-//         & self._impl
+//         & self
 //     }
 // }
 
 // impl DerefMut for Ele {
-//     fn deref_mut( & mut self ) -> & mut Box< IObjImpl > {
-//         & mut self._impl
+//     fn deref_mut( & mut self ) -> & mut Ele {
+//         & mut self
 //     }
 // }

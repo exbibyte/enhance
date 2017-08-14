@@ -21,7 +21,8 @@ impl IComponent for ComponentRenderBuffer {
 
 impl ComponentRenderBuffer {
     /// # this dumps the data to render device
-    fn flush_into_render_device( components: & mut Vec< Box< IComponent > >, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
+    pub fn flush_into_render_device( components: & mut Vec< Box< IComponent > >, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
+        println!("flushing...: {}", components.len() );
         for i in components.iter() {
             //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
             let current_component : &ComponentRenderBuffer = match i.as_any().downcast_ref::< ComponentRenderBuffer >() {

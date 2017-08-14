@@ -1,8 +1,9 @@
 use std::collections::HashMap;
-// use std::cell::RefCell;
+use std::any::Any;
 
 use interface::i_ele;
 use interface::i_renderobj;
+use interface::i_component;
 
 use implement::math::mat;
 use implement::render::renderdevice_gl;
@@ -20,7 +21,7 @@ impl i_ele::IObjImpl for Poly6 {
     fn as_any( & self ) -> & Any {
         self
     }
-    fn update_components( & self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
+    fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
 
         //store vertex data
         {
@@ -195,9 +196,9 @@ impl i_ele::IObjImpl for Poly6 {
 
             let ele_len = pos.len();
 
-            let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos ),
-                                                                               ( i_renderobj::BuffDataType::NORMAL, normal ),
-                                                                               ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
+            let data_map : HashMap< i_renderobj::BuffDataType, Vec< f32 > > =  [ ( i_renderobj::BuffDataType::POS, pos ),
+                                                                                 ( i_renderobj::BuffDataType::NORMAL, normal ),
+                                                                                 ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
 
             let c = i_component::ComponentRenderBuffer {
                 _data_dict: data_map,
@@ -272,7 +273,7 @@ impl i_ele::IObjImpl for SphereIcosahedron {
     fn as_any( & self ) -> & Any {
         self
     }
-    fn update_components( & self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
+    fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
 
         //store vertex data
         {
@@ -364,9 +365,9 @@ impl i_ele::IObjImpl for SphereIcosahedron {
 
             let ele_len = pos.len();
             
-            let data_map : HashMap< i_renderobj::BuffDataType, &[f32] > =  [ ( i_renderobj::BuffDataType::POS, pos ),
-                                                                               ( i_renderobj::BuffDataType::NORMAL, normal ),
-                                                                               ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
+            let data_map : HashMap< i_renderobj::BuffDataType, Vec< f32 > > =  [ ( i_renderobj::BuffDataType::POS, pos ),
+                                                                                 ( i_renderobj::BuffDataType::NORMAL, normal ),
+                                                                                 ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
             
             let c = i_component::ComponentRenderBuffer {
                 _data_dict: data_map,

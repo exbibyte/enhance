@@ -26,6 +26,7 @@ use interface::i_renderobj::IRenderBuffer;
 use interface::i_renderobj::RenderDevice;
 use interface::i_renderpass::IRenderPass;
 use interface::i_renderpass;
+use interface::i_component;
 
 use implement::window::winglutin::WinGlutin;
 use implement::capability::capability_gl;
@@ -38,7 +39,7 @@ use implement::render::router;
 use implement::render::mesh;
 use implement::render::renderdevice_gl;
 use implement::render::primitive;
-use implement::render::renderpass_default;
+// use implement::render::renderpass_default;
 
 pub struct Renderer {
     _win: WinGlutin,
@@ -149,8 +150,8 @@ impl Renderer {
         self._map_string_to_objs.insert( String::from(name), index );
         index
     }
-    pub fn get_obj( & mut self, name: String ) -> Option< ( usize, &i_ele::Ele ) > {
-        match self._map_string_to_objs.get( &name ){
+    pub fn get_obj( & mut self, name: &str ) -> Option< ( usize, &i_ele::Ele ) > {
+        match self._map_string_to_objs.get( & String::from( name ) ){
             None => return None,
             Some( index ) => {
                 let n = &self._objs[ *index ];
@@ -158,8 +159,8 @@ impl Renderer {
             }
         }
     }
-    pub fn set_obj( & mut self, name: String, e: i_ele::Ele ) -> Option< usize > {
-        match self._map_string_to_objs.get( &name ){
+    pub fn set_obj( & mut self, name: &str, e: i_ele::Ele ) -> Option< usize > {
+        match self._map_string_to_objs.get( & String::from( name ) ){
             None => return None,
             Some( index ) => {
                 self._objs[ *index ] = Box::new( e );
@@ -174,13 +175,19 @@ impl Renderer {
         }
         for &i in obj_indices {
             if i >= self._objs.len() {
-                return Err( "object index out of range" )
+                return Err( "object index out o
+f range" )
             }
-            let obj_render_facility = (*self._objs[i]).deref_mut().borrow_mut() as & mut i_ele::Facility;
-            match obj_render_facility.load_into_buffer( & mut self._draw_groups[ group_index ] ) {
-                Err( e ) => Err( e ),
-                _ => Ok( () )
-            };
+            //compute component data
+            match self._objs[i].update_components_from_impl() {
+                Err( e ) => return Err( e ),
+                _ => (),
+            }
+            //dispatch component specialization
+            match i_component::ComponentRenderBuffer::flush_into_render_device( & mut self._objs[i]._components, & mut self._draw_groups[ group_index ] ) {
+                Err( e ) => return Err( e ),
+                _ => (),
+            }
         }
         Ok( () )
     }

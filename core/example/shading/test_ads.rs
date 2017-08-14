@@ -41,7 +41,7 @@ use self::e2rcore::implement::render::router;
 use self::e2rcore::implement::render::mesh;
 use self::e2rcore::implement::render::renderdevice_gl;
 use self::e2rcore::implement::render::primitive;
-use self::e2rcore::implement::render::renderpass_default;
+// use self::e2rcore::implement::render::renderpass_default;
 
 use self::e2rcore::implement::kernel::kernel_render;
 
@@ -63,7 +63,7 @@ fn main() {
     let mut shader_program = kr.load_shader( &[ ( vs_src.as_str(), util_gl::ShaderType::VERTEX ),
                                                 ( fs_src.as_str(), util_gl::ShaderType::FRAGMENT ) ] ).unwrap();
     
-    let rp_index = kr.add_renderpass( String::from("ads_pass"), renderpass_default::RenderPassDefault{} );
+    // let rp_index = kr.add_renderpass( String::from("ads_pass"), renderpass_default::RenderPassDefault{} );
     
     //camera
     let fov = 120f32;
@@ -121,6 +121,7 @@ fn main() {
                                    math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] },
                                    math::mat::Mat2x1 { _val: [ 0f32, 0f32 ] }, ] );
 
+    let mesh_copy = mesh.clone();
     
     let obj_triangle = kr.add_obj( "mesh_triangles", i_ele::Ele::init( mesh ) );
     
@@ -135,6 +136,7 @@ fn main() {
     let obj_sphere = kr.add_obj( "sphere", i_ele::Ele::init( prim_sphere ) );
 
     //configure uniform variables
+    //todo: move uniform binding into a i_ele::Ele object with specialized IComponent for handling uniform
     kr.uniforms_ref().set_uniform_f( shader_program as _, &"Material.Ka\0", renderdevice_gl::UniformType::VEC, &[ 0.2f32, 0.2f32, 0.2f32 ] );
     kr.uniforms_ref().set_uniform_f( shader_program as _, &"Material.Kd\0", renderdevice_gl::UniformType::VEC, &[ 0.1f32, 0.1f32, 0.9f32 ] );
     kr.uniforms_ref().set_uniform_f( shader_program as _, &"Material.Ks\0", renderdevice_gl::UniformType::VEC, &[ 0.9f32, 0.1f32, 0.1f32 ] );
@@ -170,11 +172,12 @@ fn main() {
     kr.uniforms_ref().set_group( shader_program as _, 1, [ "ModelViewMatrix\0", "NormalMatrix\0", "ProjectionMatrix\0", "MVP\0" ].into_iter().map(|&x| x.into() ).collect() ).is_ok();
 
     //todo: move any manipulation of draw groups, binding actions into specific render pass routine (eg: renderpass_default::RenderPassDefault)
-    kr.load_objs_to_draw_group( &[ obj_triangle, obj_box, obj_sphere ], draw_group ).is_ok();
-    kr.bind_draw_group_data( &[ draw_group ] ).is_ok();
+    // kr.load_objs_to_draw_group( &[ obj_triangle, obj_box, obj_sphere ], draw_group ).is_ok();
+    // kr.bind_draw_group_data( &[ draw_group ] ).is_ok();
     kr.add_draw_group_uniforms( draw_group, &[0u64,1u64] ).is_ok();
         
     let mut running = true;
+    let mut delta = 0f32;
     while running {
         let mut new_win_dim = None;
         kr.win_ref().handle_events( |event| {
@@ -201,10 +204,26 @@ fn main() {
             gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             {
-                kr.drawcall_draw_group( &[ draw_group ] ).is_ok();
+                
+                let mut mesh2 = mesh_copy.clone();
+                mesh2._pos.clear();
+                mesh2._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32+delta, -1f32, -1f32 ] },
+                                                 math::mat::Mat3x1 { _val: [ 5f32+delta, -1f32, -1f32 ] },
+                                                 math::mat::Mat3x1 { _val: [-1f32+delta,  1f32, -1f32 ] },
+                                                 math::mat::Mat3x1 { _val: [ 4f32+delta, -1f32, 15f32 ] },
+                                                 math::mat::Mat3x1 { _val: [ 6f32+delta, -1f32, 15f32 ] },
+                                                 math::mat::Mat3x1 { _val: [ 4f32+delta,  1f32, 15f32 ] }, ] );
+
+                let obj_triangle = match kr.set_obj( "mesh_triangles", i_ele::Ele::init( mesh2 ) ){
+                    Some( o ) => o,
+                    None => panic!(),
+                };
+                
                 kr.reset_draw_group_data( &[ draw_group ] ).is_ok();
                 kr.load_objs_to_draw_group( &[ obj_triangle, obj_box, obj_sphere ], draw_group ).is_ok();
                 kr.bind_draw_group_data( &[ draw_group ] ).is_ok();
+                kr.drawcall_draw_group( &[ draw_group ] ).is_ok();
+                delta -= 0.01f32;
             }
         }
         kr.win_ref().swap_buf();

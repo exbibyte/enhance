@@ -38,7 +38,7 @@ impl i_ele::IObjImpl for Mesh {
     fn as_any( & self ) -> & Any {
         self
     }
-    fn update_components( & self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
+    fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
 
         //store vertex data
         {
@@ -60,7 +60,6 @@ impl i_ele::IObjImpl for Mesh {
             for i in 0..self._tc.len() {
                 tc.extend_from_slice( &self._tc[i]._val[..] );
             }
-
             let data_map : HashMap< i_renderobj::BuffDataType, Vec<f32> > =  [ ( i_renderobj::BuffDataType::POS, pos ),
                                                                                  ( i_renderobj::BuffDataType::NORMAL, normal ),
                                                                                  ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
