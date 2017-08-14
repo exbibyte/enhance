@@ -91,33 +91,33 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
     fn clear_buff_data( & mut self ){
         self._buffer_draw.clear();
     }
-    fn store_buff_data( & mut self, obj_type: i_renderobj::RenderObjType, data: & HashMap< i_renderobj::BuffDataType, &[f32] > ) -> Result< (), & 'static str > {
-        let mut data_pos : &[f32] = &[0f32];
-        let mut data_normal : &[f32] = &[0f32];
-        let mut data_tc : &[f32] = &[0f32];
+    fn store_buff_data( & mut self, obj_type: i_renderobj::RenderObjType, data: & HashMap< i_renderobj::BuffDataType, Vec< f32 > > ) -> Result< (), & 'static str > {
+        let mut data_pos : Vec< f32 > = vec![];
+        let mut data_normal : Vec< f32 > = vec![];
+        let mut data_tc : Vec< f32 > = vec![];
         for i in self._format.iter() {
             match i._buff_data_type {
                 i_renderobj::BuffDataType::POS => {
                     match data.get( &i_renderobj::BuffDataType::POS ) {
                         None => return Err( "render buffer data expected data not found: pos" ),
-                        Some( & pos ) => {
-                            data_pos = &pos[..];
+                        Some( ref pos ) => {
+                            data_pos.extend_from_slice( &pos[..] );
                         }
                     }
                 },
                 i_renderobj::BuffDataType::NORMAL => {
                     match data.get( &i_renderobj::BuffDataType::NORMAL ) {
                         None => return Err( "render buffer data expected data not found: normal" ),
-                        Some( & normal ) => {
-                            data_normal = &normal[..];
+                        Some( ref normal ) => {
+                            data_normal.extend_from_slice( &normal[..] );
                         }
                     }
                 },
                 i_renderobj::BuffDataType::TC => {
                     match data.get( &i_renderobj::BuffDataType::TC ) {
                         None => return Err( "render buffer data expected data not found: tc" ),
-                        Some( & tc ) => {
-                            data_tc = &tc[..];
+                        Some( ref tc ) => {
+                            data_tc.extend_from_slice( &tc[..] );
                         }
                     }
                 },

@@ -11,8 +11,9 @@ pub mod i_interpolate;
 
 pub mod i_window;
 // pub mod i_rendernode;
-pub mod i_renderpass;
+// pub mod i_renderpass;
 
 pub mod i_renderobj;
 pub mod i_ads;
 pub mod i_ele;
+pub mod i_component;

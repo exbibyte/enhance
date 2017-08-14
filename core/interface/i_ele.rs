@@ -1,32 +1,57 @@
 use std::ops::{ Deref, DerefMut };
+use std::any::Any;
+use std::iter::Filter;
+use std::ops::FnMut;
 
-use interface::i_renderobj;
+// use interface::i_renderobj;
+use interface::i_component;
 
 /// # all available functionalities for an object
-pub trait Facility : i_renderobj::IRenderable + i_renderobj::IRenderBuffer + i_renderobj::IRenderUniform + 'static {}
+pub trait IObjImpl: 'static {
+    fn as_any( & self ) -> & Any;
+    fn update_components( & self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str >;
+}
 
-/// # generic encapsulation for various types of objects
+/// # generic encapsulation for a create object
 pub struct Ele {
-    pub _comp: Box< Facility >,
+    pub _impl: Box< IObjImpl >,
+    pub _components: Vec< Box< i_component::IComponent > >,
 }
 
 impl Ele {
-    pub fn init< T >( c: T ) -> Ele where T : Facility {
+    pub fn init< T >( c: T ) -> Ele where T : IObjImpl {
         Ele {
-            _comp: Box::new(c),
+            _impl: Box::new(c),
+            _components: vec![],
         }
     }
+    pub fn set_components_from_impl( & mut self ) -> Result< (), & 'static str > {
+        self._impl.update_components( & mut self._components )
+    }
+    // pub fn apply_component< T >( & mut self, comp: T ) -> Result< (), & 'static str >
+    //     where T: i_component::IComponent
+    // {
+    //     self._components.push( Box::new( comp ) );
+    //     Ok( () )
+    // }
+    // pub fn get_components( & mut self ) -> Result< &[ Box< i_component::IComponent > ], & 'static str > {
+    //     Ok( &self._components[..] )
+    // }
+
+    // pub fn get_impl( & mut self ) -> &IObjImpl {
+    //     self._impl.deref_mut()
+    // }
 }
 
-impl Deref for Ele {
-    type Target = Box< Facility >;
-    fn deref( & self ) -> & Self::Target {
-        & self._comp
-    }
-}
+// impl Deref for Ele {
+//     type Target = Box< IObjImpl >;
+//     fn deref( & self ) -> & Self::Target {
+//         & self._impl
+//     }
+// }
 
-impl DerefMut for Ele {
-    fn deref_mut( & mut self ) -> & mut Box< Facility > {
-        & mut self._comp
-    }
-}
+// impl DerefMut for Ele {
+//     fn deref_mut( & mut self ) -> & mut Box< IObjImpl > {
+//         & mut self._impl
+//     }
+// }
