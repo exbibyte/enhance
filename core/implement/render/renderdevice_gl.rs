@@ -179,6 +179,7 @@ pub enum UniformType {
     MAT2X1,
 }
 
+//todo: move uniform related functionalities into render device
 // #[derive(Debug)]
 pub struct RenderUniformCollection {
     /// # key: (shader_program_handle, uniform_name), val: uniform_vals

@@ -4,6 +4,7 @@ use std::ops::FnMut;
 use std::collections::HashMap;
 
 use interface::i_renderobj;
+use implement::render::renderdevice_gl;
 
 pub trait IComponent: 'static {
     fn as_any( & self ) -> & Any;
@@ -21,20 +22,26 @@ impl IComponent for ComponentRenderBuffer {
 
 impl ComponentRenderBuffer {
     /// # this dumps the data to render device
-    pub fn flush_into_render_device( components: & mut Vec< Box< IComponent > >, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
-        println!("flushing...: {}", components.len() );
-        for i in components.iter() {
-            //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
-            let current_component : &ComponentRenderBuffer = match i.as_any().downcast_ref::< ComponentRenderBuffer >() {
-                Some( o ) => o,
-                None => { continue; }
-            };
-            rd.store_buff_data( i_renderobj::RenderObjType::TRI, &current_component._data_dict );            
-        }
+    pub fn flush_into_render_device( & self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
+        println!("flushing into render device" );
+        rd.store_buff_data( i_renderobj::RenderObjType::TRI, & self._data_dict );
         Ok( () )
     }
 }
 
+pub struct ComponentRenderUniform {}
 
+impl IComponent for ComponentRenderUniform {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+}
 
-
+impl ComponentRenderUniform {
+    /// # this dumps the data to render device
+    pub fn flush_into_uniform_collection( & self, rd: & mut renderdevice_gl::RenderUniformCollection ) -> Result< (), & 'static str > {
+        println!("flushing into uniform collection" );
+        //todo
+        unimplemented!();
+    }
+}

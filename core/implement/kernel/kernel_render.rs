@@ -184,9 +184,28 @@ f range" )
                 _ => (),
             }
             //dispatch component specialization
-            match i_component::ComponentRenderBuffer::flush_into_render_device( & mut self._objs[i]._components, & mut self._draw_groups[ group_index ] ) {
-                Err( e ) => return Err( e ),
-                _ => (),
+            for j in self._objs[i]._components.iter() {
+                //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
+                match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
+                    Some( o ) => {
+                        match o.flush_into_render_device( & mut self._draw_groups[ group_index ] ) {
+                            Err( e ) => return Err( e ),
+                            _ => { continue; },
+                        }
+                        ()
+                    },
+                    None => (),
+                }
+                match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
+                    Some( o ) => {
+                        match o.flush_into_uniform_collection( & mut self._uniforms ) {
+                            Err( e ) => return Err( e ),
+                            _ => { continue; },
+                        }
+                        ()
+                    },
+                    None => (),
+                }
             }
         }
         Ok( () )
