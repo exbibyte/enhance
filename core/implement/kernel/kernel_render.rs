@@ -45,7 +45,7 @@ pub struct Renderer {
     _win: WinGlutin,
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
     _map_string_to_rp: HashMap< String, usize >,
-    _shader_collection: shader_collection::ShaderCollection,
+    pub _shader_collection: shader_collection::ShaderCollection,
     _shader_programs: Vec< u64 >,
     _draw_groups: Vec< renderdevice_gl::RenderDrawGroup >,
     _vaos: Vec< gl::types::GLuint >,
@@ -55,6 +55,8 @@ pub struct Renderer {
     _uniforms: renderdevice_gl::RenderUniformCollection,
     _draw_group_uniforms: Vec< Vec< u64 > >,
     _shaders_compiled: Vec< gl::types::GLuint >,
+    //todo: to be removed
+    _current_shader_program: u64,
 }
 
 impl Drop for Renderer {
@@ -89,6 +91,7 @@ impl Renderer {
             _uniforms: Default::default(),
             _draw_group_uniforms: vec![],
             _shaders_compiled: vec![],
+            _current_shader_program: 0,
         };
         match rk._win.make_current() {
             Err( e ) => return Err( e ),
@@ -121,6 +124,7 @@ impl Renderer {
             let shader_program = self._shader_collection.get( i as u64 ).unwrap();
             unsafe {
                 gl::UseProgram( shader_program as _ );
+                self._current_shader_program = i as u64;
                 gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
                 gl::Enable( gl::DEPTH_TEST );
             }
@@ -128,7 +132,7 @@ impl Renderer {
             {
                 self._shaders_compiled.append( & mut compiled_shaders );
             }
-            Ok( ( shader_program as u64 ) )
+            Ok( i as u64 )
         }
     }
     pub fn create_draw_group( & mut self ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
@@ -188,6 +192,7 @@ f range" )
                 //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
                 match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
                     Some( o ) => {
+                        // println!("buffer flushed");
                         match o.flush_into_render_device( & mut self._draw_groups[ group_index ] ) {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
@@ -198,7 +203,9 @@ f range" )
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
                     Some( o ) => {
-                        match o.flush_into_uniform_collection( & mut self._uniforms ) {
+                        // println!("uniform flushed");
+                        let shader_program = self._shader_collection.get( self._current_shader_program ).unwrap();
+                        match o.flush_into_uniform_collection( shader_program, & mut self._uniforms ) {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
                         }
@@ -206,6 +213,7 @@ f range" )
                     },
                     None => (),
                 }
+                panic!("unexpected type found");
             }
         }
         Ok( () )
@@ -271,6 +279,14 @@ f range" )
         if self._draw_group_uniforms.len() <= draw_group {
             self._draw_group_uniforms.resize( draw_group + 1, vec![] );
         }
+        self._draw_group_uniforms[ draw_group ].extend_from_slice( uniform_group );
+        Ok( () )
+    }
+    pub fn set_draw_group_uniforms( & mut self, draw_group: usize, uniform_group: &[u64] ) -> Result< (), & 'static str > {
+        if self._draw_group_uniforms.len() <= draw_group {
+            self._draw_group_uniforms.resize( draw_group + 1, vec![] );
+        }
+        self._draw_group_uniforms[ draw_group ].clear();
         self._draw_group_uniforms[ draw_group ].extend_from_slice( uniform_group );
         Ok( () )
     }
