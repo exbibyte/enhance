@@ -17,7 +17,8 @@ use ::std::any::Any;
 use ::std::borrow::BorrowMut;
 use ::std::ops::{ Deref, DerefMut };
 use std::collections::HashMap;
-
+use std::cell::RefCell;
+    
 use self::glutin::GlContext;
 
 use interface::i_ele;
@@ -41,19 +42,34 @@ use implement::render::renderdevice_gl;
 use implement::render::primitive;
 // use implement::render::renderpass_default;
 
+
+// pub struct RendererWrap {
+//     pub _renderer: RefCell< Renderer >,
+// }
+
+// impl RendererWrap {
+//     pub fn init() -> RendererWrap {
+//         RendererWrap {
+//             _renderer: RefCell::new( Renderer::init().unwrap() ),
+//         }
+//     }
+// }
+
+
+
 pub struct Renderer {
     _win: WinGlutin,
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
     _map_string_to_rp: HashMap< String, usize >,
-    pub _shader_collection: shader_collection::ShaderCollection,
+    pub _shader_collection: RefCell< shader_collection::ShaderCollection >,
     _shader_programs: Vec< u64 >,
-    _draw_groups: Vec< renderdevice_gl::RenderDrawGroup >,
+    _draw_groups: RefCell< Vec< renderdevice_gl::RenderDrawGroup > >,
     _vaos: Vec< gl::types::GLuint >,
     _vbos: Vec< gl::types::GLuint >,
-    _objs: Vec< Box< i_ele::Ele > >,
+    _objs: RefCell< Vec< Box< i_ele::Ele > > >,
     _map_string_to_objs: HashMap< String, usize >,
-    _uniforms: renderdevice_gl::RenderUniformCollection,
-    _draw_group_uniforms: Vec< Vec< u64 > >,
+    _uniforms: RefCell< renderdevice_gl::RenderUniformCollection >,
+    _draw_group_uniforms: RefCell< Vec< Vec< u64 > > >,
     _shaders_compiled: Vec< gl::types::GLuint >,
     //todo: to be removed
     _current_shader_program: u64,
@@ -66,7 +82,7 @@ impl Drop for Renderer {
 
             gl::DeleteBuffers( self._vbos.len() as _, self._vbos.as_ptr(), );
         }
-        self._shader_collection.clear(); //does DeleteProgram
+        self._shader_collection.borrow_mut().clear(); //does DeleteProgram
         unsafe {
             for i in self._shaders_compiled.iter() {
                 gl::DeleteShader( *i );
@@ -75,21 +91,22 @@ impl Drop for Renderer {
     }
 }
 
+
 impl Renderer {
     pub fn init() -> Result< Renderer, & 'static str > {
         let mut rk = Renderer {
             _win: IWindow::init( 500, 500 ),
             _rp: vec![],
             _map_string_to_rp: HashMap::new(),
-            _shader_collection: Default::default(),
+            _shader_collection: RefCell::new( Default::default() ),
             _shader_programs: vec![],
-            _draw_groups: vec![],
+            _draw_groups: RefCell::new( vec![] ),
             _vaos: vec![],
             _vbos: vec![],
-            _objs: vec![],
+            _objs: RefCell::new( vec![] ),
             _map_string_to_objs: HashMap::new(),
-            _uniforms: Default::default(),
-            _draw_group_uniforms: vec![],
+            _uniforms: RefCell::new( Default::default() ),
+            _draw_group_uniforms: RefCell::new( vec![] ),
             _shaders_compiled: vec![],
             _current_shader_program: 0,
         };
@@ -119,9 +136,9 @@ impl Renderer {
         {
             let i = self._shader_programs.len();
             {
-                self._shader_collection.put( i as u64, router::ShaderType::GLSL, util_gl::create_program_from_shaders( compiled_shaders.as_slice() ) as _, String::from("ads_program") ).is_ok();
+                self._shader_collection.borrow_mut().put( i as u64, router::ShaderType::GLSL, util_gl::create_program_from_shaders( compiled_shaders.as_slice() ) as _, String::from("ads_program") ).is_ok();
             }
-            let shader_program = self._shader_collection.get( i as u64 ).unwrap();
+            let shader_program = self._shader_collection.borrow_mut().get( i as u64 ).unwrap();
             unsafe {
                 gl::UseProgram( shader_program as _ );
                 self._current_shader_program = i as u64;
@@ -145,55 +162,62 @@ impl Renderer {
             util_gl::check_last_op();
         }
         let mut draw_group = renderdevice_gl::RenderDrawGroup::init_with_default_format( obj_vao as _, obj_vbo as _ );
-        self._draw_groups.push( draw_group );
-        Ok( ( obj_vao, obj_vbo, self._draw_groups.len() - 1) )
+        self._draw_groups.borrow_mut().push( draw_group );
+        Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }
-    pub fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> usize {
-        let index = self._objs.len();
-        self._objs.push( Box::new( e ) );
-        self._map_string_to_objs.insert( String::from(name), index );
+    pub fn add_obj( renderer: & mut Renderer, name: &str, e: i_ele::Ele ) -> usize {
+        let index = renderer._objs.borrow_mut().len();
+        renderer._objs.borrow_mut().push( Box::new( e ) );
+        renderer._map_string_to_objs.insert( String::from(name), index );
         index
     }
-    pub fn get_obj( & mut self, name: &str ) -> Option< ( usize, &i_ele::Ele ) > {
-        match self._map_string_to_objs.get( & String::from( name ) ){
-            None => return None,
-            Some( index ) => {
-                let n = &self._objs[ *index ];
-                return Some( ( *index, n ) )
-            }
-        }
-    }
+    // pub fn get_obj( & mut self, name: &str ) -> Option< ( usize, &i_ele::Ele ) > {
+    //     match self._map_string_to_objs.get( & String::from( name ) ){
+    //         None => return None,
+    //         Some( index ) => {
+    //             let n = &self._objs.borrow_mut()[ *index ];
+    //             return Some( ( *index, n ) )
+    //         }
+    //     }
+    // }
     pub fn set_obj( & mut self, name: &str, e: i_ele::Ele ) -> Option< usize > {
         match self._map_string_to_objs.get( & String::from( name ) ){
             None => return None,
             Some( index ) => {
-                self._objs[ *index ] = Box::new( e );
+                self._objs.borrow_mut()[ *index ] = Box::new( e );
                 Some( *index )
             }
         }
     }
-    pub fn load_objs_to_draw_group( & mut self, obj_indices: &[ usize], target_draw_group: usize ) -> Result< (), & 'static str > {
-        let group_index = target_draw_group;
-        if group_index >= self._draw_groups.len() {
-            return Err( "target draw group out of range" )
-        }
-        for &i in obj_indices {
-            if i >= self._objs.len() {
-                return Err( "object index out o
-f range" )
-            }
-            //compute component data
-            match self._objs[i].update_components_from_impl() {
+    pub fn process_objs( renderer: & mut Renderer ) -> Result< (), & 'static str > {
+        let mut index = 0;
+        //test only
+        let group_index = 0;
+        
+        println!("objects size: {}", renderer._objs.borrow_mut().len() );
+
+        //compute component data
+        let l = renderer._objs.borrow().len();
+        for i in 0..l {
+            match renderer._objs.borrow_mut()[i].update_components_from_impl() {
                 Err( e ) => return Err( e ),
                 _ => (),
-            }
-            //dispatch component specialization
-            for j in self._objs[i]._components.iter() {
+            }            
+        }
+        
+        for i in renderer._objs.borrow_mut().iter() {
+            
+            println!("here 1!");
+
+            for j in i._components.iter() {
+
+                println!("here!");
+
                 //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
                 match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
                     Some( o ) => {
-                        // println!("buffer flushed");
-                        match o.flush_into_render_device( & mut self._draw_groups[ group_index ] ) {
+                        println!("buffer flushed");
+                        match o.flush_into_render_device( & mut renderer._draw_groups.get_mut()[ group_index ] ) {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
                         }
@@ -203,9 +227,105 @@ f range" )
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
                     Some( o ) => {
-                        // println!("uniform flushed");
-                        let shader_program = self._shader_collection.get( self._current_shader_program ).unwrap();
-                        match o.flush_into_uniform_collection( shader_program, & mut self._uniforms ) {
+                        println!("uniform flushed");
+                        let shader_program = renderer._shader_collection.borrow_mut().get( renderer._current_shader_program ).unwrap();
+                        match o.flush_into_uniform_collection( shader_program, & mut renderer._uniforms.borrow_mut() ) {
+                            Err( e ) => return Err( e ),
+                            _ => { continue; },
+                        }
+                        ()
+                    },
+                    None => (),
+                }
+                match j.as_any().downcast_ref::< i_component::ComponentDrawGroupClear >() {
+                    Some( o ) => {
+                        println!("draw group clear");
+                        renderer.reset_draw_group_data( &[ o._group_id ] ).is_ok();
+                        continue;
+                    },
+                    None => (),
+                }
+                // match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDependentObjects >() {
+                //     Some( o ) => {
+                //         println!("draw group dependent objects");
+                //         renderer.load_objs_to_draw_group( &o._obj_ids[..], o._group_id ).is_ok();
+                //         continue;
+                //     },
+                //     None => (),
+                // }
+                match j.as_any().downcast_ref::< i_component::ComponentDrawGroupBind >() {
+                    Some( o ) => {
+                        println!("draw group bind");
+                        renderer.bind_draw_group_data( &[ o._group_id ] ).is_ok();
+                        continue;
+                    },
+                    None => (),
+                }
+                match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDependentUniforms >() {
+                    Some( o ) => {
+                        println!("draw group dependent uniforms");
+                        renderer.set_draw_group_uniforms( o._group_id, &o._uniform_ids[..] ).is_ok();
+                        continue;
+                    },
+                    None => (),
+                }
+                match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDispatch >() {
+                    Some( o ) => {
+                        println!("draw group dispatch");
+                        let renderer_immut : & Renderer = & * renderer;
+                        Renderer::drawcall_draw_group( renderer_immut, &[ o._group_id ] ).is_ok();
+                        continue;
+                    },
+                    None => (),
+                }
+                println!("umatched cmd");
+            }
+        }
+        renderer._objs.borrow_mut().clear();
+        Ok( () )
+    }
+    pub fn load_objs_to_draw_group( & self, obj_indices: &[ usize], target_draw_group: usize ) -> Result< (), & 'static str > {
+        let group_index = target_draw_group;
+        if group_index >= (*self._draw_groups.borrow_mut()).len() {
+            return Err( "target draw group out of range" )
+        }
+        for &i in obj_indices {
+//             if i >= self._objs.borrow_mut().len() {
+//                 return Err( "object index out o
+// f range" )
+//             }
+            //compute component data
+            match self._objs.borrow_mut()[i].update_components_from_impl() {
+                Err( e ) => return Err( e ),
+                _ => (),
+            }
+            //dispatch component specialization
+            //let mut k = self._objs[i]._components.iter();
+            // while let Some( j ) = k.next() {
+            // let mut index = 0;
+            for j in self._objs.borrow_mut()[i]._components.iter() {
+            // loop {
+                // if index >= self._objs.borrow_mut()[i]._components.len() {
+                //     break;
+                // }
+                // let mut j = & self._objs.borrow_mut()[i]._components[index];
+                //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
+                match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
+                    Some( o ) => {
+                        println!("buffer flushed into group {}", group_index );
+                        match o.flush_into_render_device( & mut self._draw_groups.borrow_mut()[ group_index ] ) {
+                            Err( e ) => return Err( e ),
+                            _ => { continue; },
+                        }
+                        ()
+                    },
+                    None => (),
+                }
+                match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
+                    Some( o ) => {
+                        println!("uniform flushed into group {}", group_index );
+                        let shader_program = self._shader_collection.borrow_mut().get( self._current_shader_program ).unwrap();
+                        match o.flush_into_uniform_collection( shader_program, & mut self._uniforms.borrow_mut() ) {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
                         }
@@ -214,45 +334,50 @@ f range" )
                     None => (),
                 }
                 panic!("unexpected type found");
+                // index += 1;
             }
         }
         Ok( () )
     }
-    pub fn reset_draw_group_data( & mut self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
+    pub fn reset_draw_group_data( & self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
         for &i in group_indices {
-            if i >= self._draw_groups.len() {
+            if i >= self._draw_groups.borrow_mut().len() {
                 return Err( "object index out of range" )
             }
-            self._draw_groups[ i ].clear_buff_data();
+            let mut dg = self._draw_groups.borrow_mut();
+            dg[ i ].clear_buff_data();
         }
         Ok( () )
     }
-    pub fn bind_draw_group_data( & mut self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
+    pub fn bind_draw_group_data( & self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
         for &i in group_indices {
-            if i >= self._draw_groups.len() {
+            if i >= self._draw_groups.borrow_mut().len() {
                 return Err( "object index out of range" )
             }
-            match self._draw_groups[ i ].bind_buffer() {
+            match self._draw_groups.borrow_mut()[ i ].bind_buffer() {
                 Err( e ) => return Err( e ),
                 _ => (),
             }
         }
         Ok( () )
     }
-    pub fn drawcall_draw_group( & mut self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
+    pub fn drawcall_draw_group( renderer: & Renderer, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
         for &i in group_indices {
-            for uniform_group in & self._draw_group_uniforms[i] {
-                if i >= self._draw_groups.len() {
+            let l = renderer._draw_group_uniforms.borrow()[i].len();
+            for uniform_group in renderer._draw_group_uniforms.borrow()[i].iter() {
+                println!("dispatching uniform group: {}", *uniform_group );
+                if i >= renderer._draw_groups.borrow().len() {
                     return Err( "object index out of range" )
                 }
-                match self._uniforms.send_uniform_group( *uniform_group ){
+                match renderer._uniforms.borrow_mut().send_uniform_group( *uniform_group ){
                     Err(e) => return Err(e),
                     _ => ()
                 }
-                match self._draw_groups[ i ].draw_buffer_all() {
+                match renderer._draw_groups.borrow_mut()[ i ].draw_buffer_all() {
                     Err( e ) => return Err( e ),
                     _ => (),
-                }
+                }                
+                // index += 1;
             }
         }
         Ok( () )
@@ -272,29 +397,29 @@ f range" )
             }
         }
     }
-    pub fn uniforms_ref( & mut self ) -> & mut renderdevice_gl::RenderUniformCollection {
-        & mut self._uniforms
-    }
-    pub fn add_draw_group_uniforms( & mut self, draw_group: usize, uniform_group: &[u64] ) -> Result< (), & 'static str > {
-        if self._draw_group_uniforms.len() <= draw_group {
-            self._draw_group_uniforms.resize( draw_group + 1, vec![] );
+    // pub fn uniforms_ref( & mut self ) -> & mut renderdevice_gl::RenderUniformCollection {
+    //     & mut self._uniforms.get_mut()
+    // }
+    pub fn add_draw_group_uniforms( & self, draw_group: usize, uniform_group: &[u64] ) -> Result< (), & 'static str > {
+        if self._draw_group_uniforms.borrow_mut().len() <= draw_group {
+            self._draw_group_uniforms.borrow_mut().resize( draw_group + 1, vec![] );
         }
-        self._draw_group_uniforms[ draw_group ].extend_from_slice( uniform_group );
+        self._draw_group_uniforms.borrow_mut()[ draw_group ].extend_from_slice( uniform_group );
         Ok( () )
     }
-    pub fn set_draw_group_uniforms( & mut self, draw_group: usize, uniform_group: &[u64] ) -> Result< (), & 'static str > {
-        if self._draw_group_uniforms.len() <= draw_group {
-            self._draw_group_uniforms.resize( draw_group + 1, vec![] );
+    pub fn set_draw_group_uniforms( & self, draw_group: usize, uniform_group: &[u64] ) -> Result< (), & 'static str > {
+        if self._draw_group_uniforms.borrow_mut().len() <= draw_group {
+            self._draw_group_uniforms.borrow_mut().resize( draw_group + 1, vec![] );
         }
-        self._draw_group_uniforms[ draw_group ].clear();
-        self._draw_group_uniforms[ draw_group ].extend_from_slice( uniform_group );
+        self._draw_group_uniforms.borrow_mut()[ draw_group ].clear();
+        self._draw_group_uniforms.borrow_mut()[ draw_group ].extend_from_slice( uniform_group );
         Ok( () )
     }
-    pub fn clear_draw_group_uniforms( & mut self, draw_group: usize ) -> Result< (), & 'static str > {
-        if self._draw_group_uniforms.len() <= draw_group {
+    pub fn clear_draw_group_uniforms( & self, draw_group: usize ) -> Result< (), & 'static str > {
+        if self._draw_group_uniforms.borrow_mut().len() <= draw_group {
             return Err( "draw group out of range" )
         }
-        self._draw_group_uniforms[ draw_group ].clear();
+        self._draw_group_uniforms.borrow_mut()[ draw_group ].clear();
         Ok( () )
     }
     pub fn win_ref( & mut self ) -> & mut WinGlutin {

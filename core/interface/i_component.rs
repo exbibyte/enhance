@@ -50,6 +50,7 @@ impl Default for ComponentRenderUniform {
         }
     }
 }
+
 impl IComponent for ComponentRenderUniform {
     fn as_any( & self ) -> & Any {
         self
@@ -76,5 +77,63 @@ impl ComponentRenderUniform {
         }
 
         Ok( () )
+    }
+}
+
+/// # command for resetting draw group content
+#[derive(Clone)]
+pub struct ComponentDrawGroupClear {
+    pub _group_id: usize,
+}
+
+impl IComponent for ComponentDrawGroupClear {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+}
+
+#[derive(Clone)]
+pub struct ComponentDrawGroupDependentObjects {
+    pub _group_id: usize,
+    pub _obj_ids: Vec< usize >,
+}
+
+impl IComponent for ComponentDrawGroupDependentObjects {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+}
+
+#[derive(Clone)]
+pub struct ComponentDrawGroupBind {
+    pub _group_id: usize,
+}
+
+impl IComponent for ComponentDrawGroupBind {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+}
+
+#[derive(Clone)]
+pub struct ComponentDrawGroupDependentUniforms {
+    pub _group_id: usize,
+    pub _uniform_ids: Vec< u64 >,
+}
+
+impl IComponent for ComponentDrawGroupDependentUniforms {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+}
+
+#[derive(Clone)]
+pub struct ComponentDrawGroupDispatch {
+    pub _group_id: usize,
+}
+
+impl IComponent for ComponentDrawGroupDispatch {
+    fn as_any( & self ) -> & Any {
+        self
     }
 }

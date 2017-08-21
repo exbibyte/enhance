@@ -644,7 +644,6 @@ macro_rules! define_mat3 {
                 }
             }
         }
-        
         impl Mat3 < $v_type > {
             #[allow(dead_code)]
             pub fn init( arr: [ $v_type; 9 ], row_major: bool ) -> Mat3 < $v_type > {
@@ -658,6 +657,15 @@ macro_rules! define_mat3 {
                                     _is_row_major: false }
                 }
 
+            }
+            pub fn iden() -> Mat3< $v_type > {
+                let mut m = Mat3 { _val: [ 0 as $v_type; 9 ],
+                                    _is_row_major: true,
+                };
+                for i in 0..3 {
+                    m._val[i*3 + i] = 1 as $v_type;
+                }
+                m
             }
             #[allow(dead_code)]
             pub fn trace( & self ) -> $v_type {
@@ -879,7 +887,7 @@ macro_rules! define_mat4 {
         impl Default for Mat4 < $v_type > {
             fn default() -> Mat4< $v_type > {
                 Mat4 { _val: [ 0 as $v_type; 16 ],
-                        _is_row_major: true,
+                       _is_row_major: true,
                 }
             }
         }
@@ -898,6 +906,15 @@ macro_rules! define_mat4 {
                                     _is_row_major: false }
                 }
 
+            }
+            pub fn iden() -> Mat4< $v_type > {
+                let mut m = Mat4 { _val: [ 0 as $v_type; 16 ],
+                                   _is_row_major: true,
+                };
+                for i in 0..4 {
+                    m._val[i*4 + i] = 1 as $v_type;
+                }
+                m
             }
             #[allow(dead_code)]
             pub fn trace( & self ) -> $v_type {

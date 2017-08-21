@@ -12,6 +12,7 @@ use implement::math;
 use implement::math::mat::Mat4;
 use implement::math::mat::Mat3x1;
 
+#[derive(Clone)]
 pub struct Cam {
     /// # helper id for the camera
     pub _id: u64,

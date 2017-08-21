@@ -80,6 +80,7 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
         unsafe {
             gl::BindVertexArray( self._group_handle as _ );
             let num_vert = self._buffer_draw.len() / (self._stride as usize / ::std::mem::size_of::<f32>());
+            println!("draw buffer all: num verts: {}", num_vert );
             gl::DrawArrays(gl::TRIANGLES, 0, num_vert as _ );
             gl::BindVertexArray( 0 );
         }

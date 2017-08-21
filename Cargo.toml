@@ -34,3 +34,6 @@ path = "core/example/shading/test_ads.rs"
 # name = "e2r_sandbox"
 # path = "sandbox/src/sandbox0.rs"
 
+[[bin]]
+name = "e2r_test_recurse"
+path = "core/example/recursive/main.rs"

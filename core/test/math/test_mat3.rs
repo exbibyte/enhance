@@ -112,4 +112,11 @@ fn test_mat4(){
                                             1f64, 4f64, 7f64,
                                             2f64, 5f64, 8f64], _is_row_major: true }, 0.0001f64 ).expect("mat3 is_equal invalid" ) );
     }
+    {
+        //identity
+        let v1 = Mat3::<f64>::iden();
+        assert!( v1.is_equal( &Mat3{ _val: [1f64, 0f64, 0f64,
+                                            0f64, 1f64, 0f64,
+                                            0f64, 0f64, 1f64], _is_row_major: true }, 0.0001f64 ).expect("mat3 is_equal invalid" ) );
+    }
 }

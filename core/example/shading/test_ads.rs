@@ -20,6 +20,7 @@ use rand::Rng;
 use std::any::Any;
 use std::borrow::BorrowMut;
 use std::ops::{ Deref, DerefMut };
+use std::{thread, time};
 
 use self::glutin::GlContext;
 
@@ -29,6 +30,7 @@ use self::e2rcore::interface::i_renderobj::IRenderBuffer;
 use self::e2rcore::interface::i_renderobj::RenderDevice;
 use self::e2rcore::interface::i_renderpass::IRenderPass;
 use self::e2rcore::interface::i_renderpass;
+use self::e2rcore::interface::i_component;
 
 use self::e2rcore::implement::window::winglutin::WinGlutin;
 use self::e2rcore::implement::capability::capability_gl;
@@ -43,7 +45,9 @@ use self::e2rcore::implement::render::renderdevice_gl;
 use self::e2rcore::implement::render::primitive;
 // use self::e2rcore::implement::render::renderpass_default;
 
-use self::e2rcore::implement::kernel::kernel_render;
+
+use self::e2rcore::implement::kernel::kernel_render::Renderer;
+use self::e2rcore::implement::render::render_commands;
 
 pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
@@ -54,8 +58,8 @@ pub fn file_open( file_path: & str ) -> Option<String> {
 }
 
 fn main() {
-
-    let mut kr = kernel_render::Renderer::init().unwrap();
+    
+    let mut kr = Renderer::init().unwrap();
     
     let vs_src = file_open( "core/example/shading/ads.vs" ).expect("vertex shader not retrieved");
     let fs_src = file_open( "core/example/shading/ads.fs" ).expect("fragment shader not retrieved");
@@ -122,26 +126,9 @@ fn main() {
 
     let mesh_copy = mesh.clone();
     
-    let obj_triangle = kr.add_obj( "mesh_triangles", i_ele::Ele::init( mesh ) );
-    
-    //primitives
-    let mut prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
-                                           _radius: 5f32 };
-
-    let obj_box = kr.add_obj( "box", i_ele::Ele::init( prim_box ) );
-
-    let mut prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
-
-    let obj_sphere = kr.add_obj( "sphere", i_ele::Ele::init( prim_sphere ) );
-
-    let l = &lights[0];
-    let obj_light = kr.add_obj( "light_ads", i_ele::Ele::init( l.clone() ) );
-
-    let obj_camera = kr.add_obj( "camera", i_ele::Ele::init( cam ) );
-    
     util_gl::check_last_op();
 
-    let shader_program = kr._shader_collection.get( shader_program_external ).unwrap();
+    let shader_program = kr._shader_collection.borrow_mut().get( shader_program_external ).unwrap();
         
     let mut running = true;
     let mut delta = 0f32;
@@ -171,6 +158,10 @@ fn main() {
             gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             {
+
+                let obj_clear_draw_group = Renderer::add_obj( & mut kr, "cmd_clear_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupClear::init( draw_group ) ) );
+
+                // primitives and objects start
                 
                 let mut mesh2 = mesh_copy.clone();
                 mesh2._pos.clear();
@@ -180,20 +171,45 @@ fn main() {
                                                  math::mat::Mat3x1 { _val: [ 4f32+delta, -1f32, 15f32 ] },
                                                  math::mat::Mat3x1 { _val: [ 6f32+delta, -1f32, 15f32 ] },
                                                  math::mat::Mat3x1 { _val: [ 4f32+delta,  1f32, 15f32 ] }, ] );
-
-                let obj_triangle = match kr.set_obj( "mesh_triangles", i_ele::Ele::init( mesh2 ) ){
-                    Some( o ) => o,
-                    None => panic!(),
-                };
+                let obj_triangle = Renderer::add_obj( & mut kr, "mesh_triangles", i_ele::Ele::init( mesh2 ) );
                 
-                kr.reset_draw_group_data( &[ draw_group ] ).is_ok();
-                kr.load_objs_to_draw_group( &[ obj_triangle, obj_box, obj_sphere, obj_light, obj_camera ], draw_group ).is_ok();
-                kr.bind_draw_group_data( &[ draw_group ] ).is_ok();
-                kr.set_draw_group_uniforms( draw_group, &[0u64,1u64] ).is_ok();
-                kr.drawcall_draw_group( &[ draw_group ] ).is_ok();
+                // let obj_triangle = Renderer::add_obj( & mut kr, "mesh_triangles", i_ele::Ele::init( mesh.clone() ) );
+
+                let mut prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
+                                                      _radius: 5f32 };
+
+                let obj_box = Renderer::add_obj( & mut kr, "box", i_ele::Ele::init( prim_box ) );
+
+                let mut prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
+
+                let obj_sphere = Renderer::add_obj( & mut kr, "sphere", i_ele::Ele::init( prim_sphere ) );
+
+                let l = &lights[0];
+                let obj_light = Renderer::add_obj( & mut kr, "light_ads", i_ele::Ele::init( l.clone() ) );
+                
+                let obj_camera = Renderer::add_obj( & mut kr, "camera", i_ele::Ele::init( cam.clone() ) );
+                //primitives and objects end
+
+                //todo: remove this function from renderer
+                // let obj_set_draw_group_objs = Renderer::add_obj( & mut kr, "cmd_set_draw_group_dependent_objs", i_ele::Ele::init( render_commands::CmdDrawGroupDependentObjects::init( draw_group, &[ obj_triangle, obj_box, obj_sphere, obj_light, obj_camera ] ) ) );
+
+                let obj_bind_draw_group = Renderer::add_obj( & mut kr, "cmd_bind_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupBind::init( draw_group ) ) );
+
+                let obj_set_draw_group_uniforms = Renderer::add_obj( & mut kr, "cmd_set_draw_group_dependent_uniforms", i_ele::Ele::init( render_commands::CmdDrawGroupDependentUniforms::init( draw_group, &[0u64,1u64] ) ) );                
+
+                println!("dispatch draw group: {}", draw_group );
+                
+                let obj_dispatch_draw_group = Renderer::add_obj( & mut kr, "cmd_dispatch_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupDispatch::init( draw_group ) ) );
+                
+                Renderer::process_objs( & mut kr );
                 delta -= 0.01f32;
             }
         }
         kr.win_ref().swap_buf();
+
+        println!("swapped buffer");
+
+        // std::thread::sleep( time::Duration::from_millis(1000) );
+        // unsafe { libc::getchar(); }
     }
 }

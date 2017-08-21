@@ -182,4 +182,12 @@ fn test_mat4(){
                                                  8f64, 9f64, 10f64, ],
                                            _is_row_major: true }, 0.00001f64 ).expect("mat4 submat failed" ) );
     }
+    {
+        //identity
+        let v1 = Mat4::<f64>::iden();
+        assert!( v1.is_equal( &Mat4{ _val: [1f64, 0f64, 0f64, 0f64,
+                                            0f64, 1f64, 0f64, 0f64,
+                                            0f64, 0f64, 1f64, 0f64,
+                                            0f64, 0f64, 0f64, 1f64], _is_row_major: true }, 0.0001f64 ).expect("mat4 is_equal invalid" ) );
+    }
 }
