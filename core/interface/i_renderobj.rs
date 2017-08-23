@@ -38,7 +38,7 @@ pub trait RenderDevice {
     fn bind_buffer( & mut self ) -> Result< (), & 'static str >;
     fn draw_buffer_all( & mut self ) -> Result< (), & 'static str >;
     fn draw_buffer_range( & mut self ) -> Result< (), & 'static str >;
-    fn store_buff_data( & mut self, obj_type: RenderObjType, data: & HashMap< BuffDataType, Vec< f32 > > ) -> Result< (), & 'static str >;
+    fn store_buff_data( & mut self, data: & HashMap< BuffDataType, Vec< f32 > > ) -> Result< (), & 'static str >;
     fn clear_buff_data( & mut self );
 }
 

@@ -14,6 +14,7 @@ pub trait IComponent: 'static {
 
 pub struct ComponentRenderBuffer {
     pub _data_dict: HashMap< i_renderobj::BuffDataType, Vec<f32> >,
+    // pub _render_prim_type: i_renderobj::RenderObjType,
 }
 
 impl IComponent for ComponentRenderBuffer {
@@ -26,7 +27,7 @@ impl ComponentRenderBuffer {
     /// # this dumps the data to render device
     pub fn flush_into_render_device( & self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
         println!("flushing into render device" );
-        rd.store_buff_data( i_renderobj::RenderObjType::TRI, & self._data_dict );
+        rd.store_buff_data( & self._data_dict );
         Ok( () )
     }
 }

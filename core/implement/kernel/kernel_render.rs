@@ -25,6 +25,7 @@ use interface::i_ele;
 use interface::i_window::IWindow;
 use interface::i_renderobj::IRenderBuffer;
 use interface::i_renderobj::RenderDevice;
+use interface::i_renderobj;
 use interface::i_renderpass::IRenderPass;
 use interface::i_renderpass;
 use interface::i_component;
@@ -150,7 +151,7 @@ impl Renderer {
             Ok( i as u64 )
         }
     }
-    pub fn create_draw_group( & mut self ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
+    pub fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
         let mut obj_vao = 0;
         let mut obj_vbo = 0;
         unsafe {
@@ -159,7 +160,13 @@ impl Renderer {
             gl::GenBuffers( 1, & mut obj_vbo );
             util_gl::check_last_op();
         }
-        let mut draw_group = renderdevice_gl::RenderDrawGroup::init_with_default_format( obj_vao as _, obj_vbo as _ );
+        
+        let mut draw_group = match prim_type {
+            i_renderobj::RenderObjType::TRI => renderdevice_gl::RenderDrawGroup::init_with_default_format_triangle( obj_vao as _, obj_vbo as _ ),
+            i_renderobj::RenderObjType::POINT => renderdevice_gl::RenderDrawGroup::init_with_default_format_point( obj_vao as _, obj_vbo as _ ),
+            _ => return Err("unsupported primitive type for draw group detected")
+        };
+        // let mut draw_group = renderdevice_gl::RenderDrawGroup::init_with_default_format( obj_vao as _, obj_vbo as _ );
         self._draw_groups.borrow_mut().push( draw_group );
         Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }

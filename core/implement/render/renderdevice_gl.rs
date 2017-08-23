@@ -29,19 +29,21 @@ pub struct RenderDrawGroup {
     pub _buffer_draw: Vec< f32 >,
     pub _format: Vec< BufferFormat >,
     pub _stride: u64,
+    pub _primitive_type: i_renderobj::RenderObjType,
 }
 
 impl RenderDrawGroup {
-    pub fn init( internal_group_handle: u64, buffer_handle: u64, format: Vec< BufferFormat >, stride: u64 ) -> RenderDrawGroup {
+    pub fn init( internal_group_handle: u64, buffer_handle: u64, format: Vec< BufferFormat >, stride: u64, primitive_type: i_renderobj::RenderObjType ) -> RenderDrawGroup {
         RenderDrawGroup {
             _group_handle: internal_group_handle,
             _buffer_handle: buffer_handle,
             _buffer_draw: vec![],
             _format: format,
             _stride: stride,
+            _primitive_type: primitive_type,
         }
     }
-    pub fn init_with_default_format( internal_group_handle: u64, buffer_handle: u64 ) -> RenderDrawGroup {
+    pub fn init_with_default_format_triangle( internal_group_handle: u64, buffer_handle: u64 ) -> RenderDrawGroup {
         let stride = 8 * ::std::mem::size_of::<f32>();
         let format = vec![ BufferFormat { _buff_data_type: i_renderobj::BuffDataType::POS, _index: 0, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: 0 },
                            BufferFormat { _buff_data_type: i_renderobj::BuffDataType::NORMAL, _index: 1, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: (3 * ::std::mem::size_of::<f32>()) as _ },
@@ -53,6 +55,23 @@ impl RenderDrawGroup {
             _buffer_draw: vec![],
             _format: format,
             _stride: stride as _,
+            _primitive_type: i_renderobj::RenderObjType::TRI,
+        }
+    }
+    pub fn init_with_default_format_point( internal_group_handle: u64, buffer_handle: u64 ) -> RenderDrawGroup {
+        //todo: remove normal and tc
+        let stride = 8 * ::std::mem::size_of::<f32>();
+        let format = vec![ BufferFormat { _buff_data_type: i_renderobj::BuffDataType::POS, _index: 0, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: 0 },
+                           BufferFormat { _buff_data_type: i_renderobj::BuffDataType::NORMAL, _index: 1, _num_data: 3, _stride_bytes: stride as _, _offset_bytes: (3 * ::std::mem::size_of::<f32>()) as _ },
+                           BufferFormat { _buff_data_type: i_renderobj::BuffDataType::TC, _index: 2, _num_data: 2, _stride_bytes: stride as _, _offset_bytes: (6 * ::std::mem::size_of::<f32>()) as _ },
+        ];
+        RenderDrawGroup {
+            _group_handle: internal_group_handle,
+            _buffer_handle: buffer_handle,
+            _buffer_draw: vec![],
+            _format: format,
+            _stride: stride as _,
+            _primitive_type: i_renderobj::RenderObjType::POINT,
         }
     }
 }
@@ -79,9 +98,20 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
     fn draw_buffer_all( & mut self) -> Result< (), & 'static str > {
         unsafe {
             gl::BindVertexArray( self._group_handle as _ );
-            let num_vert = self._buffer_draw.len() / (self._stride as usize / ::std::mem::size_of::<f32>());
-            println!("draw buffer all: num verts: {}", num_vert );
-            gl::DrawArrays(gl::TRIANGLES, 0, num_vert as _ );
+            let num_elements = self._buffer_draw.len() / (self._stride as usize / ::std::mem::size_of::<f32>());
+            match self._primitive_type {
+                i_renderobj::RenderObjType::TRI => {
+                    println!("draw buffer all: num verts: {}", num_elements );
+                    gl::DrawArrays(gl::TRIANGLES, 0, num_elements as _ );
+                },
+                i_renderobj::RenderObjType::POINT => {
+                    println!("draw buffer all: num points: {}", num_elements );
+                    //todo: add configurable point size
+                    gl::PointSize(3f32);
+                    gl::DrawArrays(gl::POINTS, 0, num_elements as _ );
+                },
+                _=> return Err( "unsupported primite type for drawing detected" )
+            }
             gl::BindVertexArray( 0 );
         }
         Ok( () )
@@ -92,7 +122,7 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
     fn clear_buff_data( & mut self ){
         self._buffer_draw.clear();
     }
-    fn store_buff_data( & mut self, obj_type: i_renderobj::RenderObjType, data: & HashMap< i_renderobj::BuffDataType, Vec< f32 > > ) -> Result< (), & 'static str > {
+    fn store_buff_data( & mut self, data: & HashMap< i_renderobj::BuffDataType, Vec< f32 > > ) -> Result< (), & 'static str > {
         let mut data_pos : Vec< f32 > = vec![];
         let mut data_normal : Vec< f32 > = vec![];
         let mut data_tc : Vec< f32 > = vec![];
@@ -124,21 +154,21 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
                 },
             }
         }
-        if data_pos.len() != data_normal.len() {
-            return Err( "render buffer data length not equal" )
-        }
-        if data_pos.len() % 3 != 0 {
-            return Err( "render buffer data length not divisible by 3" )
-        }
-        if data_tc.len() % 2 != 0 {
-            return Err( "render buffer data length not divisible by 2" )
-        }
-        let count_data = data_pos.len() / 3;
-        if count_data != data_tc.len() / 2 {
-            return Err( "render buffer data length not equal" )
-        }
-        match obj_type {
+        match self._primitive_type {
             i_renderobj::RenderObjType::TRI => {
+                if data_pos.len() != data_normal.len() {
+                    return Err( "render buffer data length not equal" )
+                }
+                if data_pos.len() % 3 != 0 {
+                    return Err( "render buffer data length not divisible by 3" )
+                }
+                if data_tc.len() % 2 != 0 {
+                    return Err( "render buffer data length not divisible by 2" )
+                }
+                let count_data = data_pos.len() / 3;
+                if count_data != data_tc.len() / 2 {
+                    return Err( "render buffer data length not equal" )
+                }
                 for i in 0..count_data {
                     self._buffer_draw.push( data_pos[i*3] );
                     self._buffer_draw.push( data_pos[i*3+1] );
@@ -153,8 +183,33 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
                 }
             },
             i_renderobj::RenderObjType::POINT => {
-                //todo
-            }
+                //todo: remove normal and texture coordinate
+                if data_pos.len() != data_normal.len() {
+                    return Err( "render buffer data length not equal" )
+                }
+                if data_pos.len() % 3 != 0 {
+                    return Err( "render buffer data length not divisible by 3" )
+                }
+                if data_tc.len() % 2 != 0 {
+                    return Err( "render buffer data length not divisible by 2" )
+                }
+                let count_data = data_pos.len() / 3;
+                if count_data != data_tc.len() / 2 {
+                    return Err( "render buffer data length not equal" )
+                }
+                for i in 0..count_data {
+                    self._buffer_draw.push( data_pos[i*3] );
+                    self._buffer_draw.push( data_pos[i*3+1] );
+                    self._buffer_draw.push( data_pos[i*3+2] );
+                    
+                    self._buffer_draw.push( data_normal[i*3] );
+                    self._buffer_draw.push( data_normal[i*3+1] );
+                    self._buffer_draw.push( data_normal[i*3+2] );
+
+                    self._buffer_draw.push( data_tc[i*2] );
+                    self._buffer_draw.push( data_tc[i*2+1] );
+                }
+            },
             i_renderobj::RenderObjType::LINE => {
                 //todo
             },

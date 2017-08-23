@@ -385,13 +385,52 @@ impl i_ele::IObjImpl for SphereIcosahedron {
 
 //todo
 pub struct Point {
-    pub pos: mat::Mat3x1< f32 >,
-    pub radius: f32,
+    pub _pos: mat::Mat3x1< f32 >,
+    pub _radius: f32,
+}
+
+impl i_ele::IObjImpl for Point {
+    fn as_any( & self ) -> & Any {
+        self
+    }
+    fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
+
+        //store vertex data
+        {
+            let mut pos = vec![];
+            let mut normal = vec![];
+            let mut tc = vec![];
+
+            pos.extend_from_slice( &self._pos._val[..] );
+            //todo: remove dummy noromal and texture coordinate
+            for i in 0..self._pos._val.len() {
+                if i % 3 == 2 {
+                    normal.push( 1f32 );
+                }else{
+                    normal.push( 0f32 );
+                }
+                tc.push( 0f32 );
+            }
+
+            let ele_len = pos.len();
+
+            let data_map : HashMap< i_renderobj::BuffDataType, Vec< f32 > > =  [ ( i_renderobj::BuffDataType::POS, pos ),
+                                                                                 ( i_renderobj::BuffDataType::NORMAL, normal ),
+                                                                                 ( i_renderobj::BuffDataType::TC, tc ) ].iter().cloned().collect();
+
+            let c = i_component::ComponentRenderBuffer {
+                _data_dict: data_map,
+            };
+            components.push( Box::new(c) );
+            println!( "load into ComponentRenderBuffer: Point: vertex count:{}", ele_len / 3 );
+        }
+        Ok( () )
+    }
 }
 
 //todo
 pub struct Line {
-    pub pos_start: mat::Mat3x1< f32 >,
-    pub pos_end: mat::Mat3x1< f32 >,
+    pub _pos_start: mat::Mat3x1< f32 >,
+    pub _pos_end: mat::Mat3x1< f32 >,
 }
 
