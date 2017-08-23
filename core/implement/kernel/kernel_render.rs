@@ -67,7 +67,6 @@ pub struct Renderer {
     _vaos: Vec< gl::types::GLuint >,
     _vbos: Vec< gl::types::GLuint >,
     _objs: RefCell< Vec< Box< i_ele::Ele > > >,
-    _map_string_to_objs: HashMap< String, usize >,
     _uniforms: RefCell< renderdevice_gl::RenderUniformCollection >,
     _draw_group_uniforms: RefCell< Vec< Vec< u64 > > >,
     _shaders_compiled: Vec< gl::types::GLuint >,
@@ -104,7 +103,6 @@ impl Renderer {
             _vaos: vec![],
             _vbos: vec![],
             _objs: RefCell::new( vec![] ),
-            _map_string_to_objs: HashMap::new(),
             _uniforms: RefCell::new( Default::default() ),
             _draw_group_uniforms: RefCell::new( vec![] ),
             _shaders_compiled: vec![],
@@ -165,53 +163,45 @@ impl Renderer {
         self._draw_groups.borrow_mut().push( draw_group );
         Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }
-    pub fn add_obj( renderer: & mut Renderer, name: &str, e: i_ele::Ele ) -> usize {
+    pub fn add_obj( renderer: & mut Renderer, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
+
         let index = renderer._objs.borrow_mut().len();
         renderer._objs.borrow_mut().push( Box::new( e ) );
-        renderer._map_string_to_objs.insert( String::from(name), index );
-        index
-    }
-    // pub fn get_obj( & mut self, name: &str ) -> Option< ( usize, &i_ele::Ele ) > {
-    //     match self._map_string_to_objs.get( & String::from( name ) ){
-    //         None => return None,
-    //         Some( index ) => {
-    //             let n = &self._objs.borrow_mut()[ *index ];
-    //             return Some( ( *index, n ) )
-    //         }
-    //     }
-    // }
-    pub fn set_obj( & mut self, name: &str, e: i_ele::Ele ) -> Option< usize > {
-        match self._map_string_to_objs.get( & String::from( name ) ){
-            None => return None,
-            Some( index ) => {
-                self._objs.borrow_mut()[ *index ] = Box::new( e );
-                Some( *index )
+
+        //load component data
+        match renderer._objs.borrow_mut()[index].update_components_from_impl() {
+            Err( e ) => { return Err( e ) },
+            _ => (),
+        }
+
+        //detect command to flush and process all data in buffer
+        let mut trigger_to_process_objs = false;
+        let mut group_id = 0;
+        for j in renderer._objs.borrow_mut()[index]._components.iter() {
+            match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDispatch >() {
+                Some( o ) => {
+                    println!("detected trigger for draw group dispatch");
+                    trigger_to_process_objs = true;
+                    group_id = o._group_id;
+                },
+                None => {},
             }
         }
+
+        if trigger_to_process_objs {
+            Renderer::process_objs( renderer, group_id );
+        }
+
+        Ok( renderer._objs.borrow_mut().len() )  
     }
-    pub fn process_objs( renderer: & mut Renderer ) -> Result< (), & 'static str > {
+    pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {
         let mut index = 0;
-        //test only
-        let group_index = 0;
         
         println!("objects size: {}", renderer._objs.borrow_mut().len() );
-
-        //compute component data
-        let l = renderer._objs.borrow().len();
-        for i in 0..l {
-            match renderer._objs.borrow_mut()[i].update_components_from_impl() {
-                Err( e ) => return Err( e ),
-                _ => (),
-            }            
-        }
         
         for i in renderer._objs.borrow_mut().iter() {
-            
-            println!("here 1!");
 
             for j in i._components.iter() {
-
-                println!("here!");
 
                 //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
                 match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
@@ -245,14 +235,6 @@ impl Renderer {
                     },
                     None => (),
                 }
-                // match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDependentObjects >() {
-                //     Some( o ) => {
-                //         println!("draw group dependent objects");
-                //         renderer.load_objs_to_draw_group( &o._obj_ids[..], o._group_id ).is_ok();
-                //         continue;
-                //     },
-                //     None => (),
-                // }
                 match j.as_any().downcast_ref::< i_component::ComponentDrawGroupBind >() {
                     Some( o ) => {
                         println!("draw group bind");
@@ -278,65 +260,10 @@ impl Renderer {
                     },
                     None => (),
                 }
-                println!("umatched cmd");
+                return Err( &"unmatching render command" )
             }
         }
         renderer._objs.borrow_mut().clear();
-        Ok( () )
-    }
-    pub fn load_objs_to_draw_group( & self, obj_indices: &[ usize], target_draw_group: usize ) -> Result< (), & 'static str > {
-        let group_index = target_draw_group;
-        if group_index >= (*self._draw_groups.borrow_mut()).len() {
-            return Err( "target draw group out of range" )
-        }
-        for &i in obj_indices {
-//             if i >= self._objs.borrow_mut().len() {
-//                 return Err( "object index out o
-// f range" )
-//             }
-            //compute component data
-            match self._objs.borrow_mut()[i].update_components_from_impl() {
-                Err( e ) => return Err( e ),
-                _ => (),
-            }
-            //dispatch component specialization
-            //let mut k = self._objs[i]._components.iter();
-            // while let Some( j ) = k.next() {
-            // let mut index = 0;
-            for j in self._objs.borrow_mut()[i]._components.iter() {
-            // loop {
-                // if index >= self._objs.borrow_mut()[i]._components.len() {
-                //     break;
-                // }
-                // let mut j = & self._objs.borrow_mut()[i]._components[index];
-                //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
-                match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
-                    Some( o ) => {
-                        println!("buffer flushed into group {}", group_index );
-                        match o.flush_into_render_device( & mut self._draw_groups.borrow_mut()[ group_index ] ) {
-                            Err( e ) => return Err( e ),
-                            _ => { continue; },
-                        }
-                        ()
-                    },
-                    None => (),
-                }
-                match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
-                    Some( o ) => {
-                        println!("uniform flushed into group {}", group_index );
-                        let shader_program = self._shader_collection.borrow_mut().get( self._current_shader_program ).unwrap();
-                        match o.flush_into_uniform_collection( shader_program, & mut self._uniforms.borrow_mut() ) {
-                            Err( e ) => return Err( e ),
-                            _ => { continue; },
-                        }
-                        ()
-                    },
-                    None => (),
-                }
-                panic!("unexpected type found");
-                // index += 1;
-            }
-        }
         Ok( () )
     }
     pub fn reset_draw_group_data( & self, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
