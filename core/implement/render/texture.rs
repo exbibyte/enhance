@@ -2,6 +2,11 @@ use std::collections::HashMap;
 use std::cmp::Eq;
 use std::cmp::PartialEq;
 
+extern crate image;
+extern crate num;
+
+use self::image::Pixel;
+
 #[derive(Clone)]
 pub struct TextureNormalized {
     _data: Vec<(Channel,f32)>,
@@ -47,7 +52,28 @@ impl Index<(usize, Channel)> for Texture {
         &self._data[ i.0 * self._channels.len() + tuple_index ].1
     }
 }
-        
+
+// impl From< image::GenericImage< image::Rgb > > for Texture {
+fn from< T: image::GenericImage >( img_buffer: &T ) -> Texture
+{
+    let mut buf = vec![];
+    for (x,y,p) in img_buffer.pixels() {
+        let rgb = p.to_rgb();
+        let r: u32 = num::cast(rgb.data[0]).unwrap();
+        let g: u32 = num::cast(rgb.data[1]).unwrap();
+        let b: u32 = num::cast(rgb.data[2]).unwrap();
+        buf.push( ( Channel::R, r ) );
+        buf.push( ( Channel::G, g ) );
+        buf.push( ( Channel::B, b ) );
+    }
+    Texture {
+        _data: buf,
+        _dim: vec![ img_buffer.dimensions().0 as _, img_buffer.dimensions().1 as _ ],
+        _channels: [ (Channel::R, 0usize), (Channel::G, 1usize), (Channel::B, 2usize) ].iter().cloned().collect(),
+    }
+}
+// }
+
 impl TextureNormalized {
     pub fn init_builtin( builtin: TextureBuiltin ) -> TextureNormalized {
         match builtin {
