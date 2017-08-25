@@ -37,6 +37,7 @@ use implement::math;
 use implement::render::camera;
 use implement::render::light;
 use implement::render::shader_collection;
+use implement::render::texture_collection;
 use implement::render::router;
 use implement::render::mesh;
 use implement::render::renderdevice_gl;
@@ -63,6 +64,7 @@ pub struct Renderer {
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
     _map_string_to_rp: HashMap< String, usize >,
     pub _shader_collection: RefCell< shader_collection::ShaderCollection >,
+    _texture_collection: texture_collection::TextureCollection,
     _shader_programs: Vec< u64 >,
     _draw_groups: RefCell< Vec< renderdevice_gl::RenderDrawGroup > >,
     _vaos: Vec< gl::types::GLuint >,
@@ -99,6 +101,7 @@ impl Renderer {
             _rp: vec![],
             _map_string_to_rp: HashMap::new(),
             _shader_collection: RefCell::new( Default::default() ),
+            _texture_collection: Default::default(),
             _shader_programs: vec![],
             _draw_groups: RefCell::new( vec![] ),
             _vaos: vec![],
@@ -150,6 +153,18 @@ impl Renderer {
             }
             Ok( i as u64 )
         }
+    }
+    pub fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str > {
+        let shader_program_internal = self._shader_collection.borrow_mut().get( self._current_shader_program ).unwrap();
+        let handle = match util_gl::load_texture( shader_program_internal as _, 0, image, w, h ) {
+            Ok( h ) => h,
+            _ => return Err( "loading texture failed" )
+        };
+        let h = match self._texture_collection.add( router::ShaderType::GLSL, handle as _, description ) {
+            Ok( h ) => h,
+            Err( e ) => return Err( e ),
+        };
+        Ok( h )
     }
     pub fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
         let mut obj_vao = 0;

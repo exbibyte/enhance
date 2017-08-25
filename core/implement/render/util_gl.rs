@@ -138,4 +138,26 @@ pub fn query_uniform_float_array( program: gl::types::GLuint, name: String, num_
     }
 }
 
+pub fn load_texture( program: gl::types::GLuint, texture_number: gl::types::GLuint, image: &[u8], w: usize, h: usize ) -> Result< gl::types::GLuint, String > {
+    let mut tex : gl::types::GLuint = 0;
+    //todo: mipmap
+    unsafe {
+        gl::GenTextures(1, & mut tex);
+        gl::ActiveTexture(gl::TEXTURE0 + texture_number);
+        gl::BindTexture( gl::TEXTURE_2D, tex );
+        gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB as _, w as _, h as _, 0, gl::RGB, gl::UNSIGNED_BYTE, image.as_ptr() as _ );
+        gl::Uniform1i( gl::GetUniformLocation( program, b"tex\0".as_ptr() as _ ), 0 );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as _ );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as _ );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as _ );
+        gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as _ );
+    }
+    Ok( tex )
+}
 
+pub fn delete_texture( handle: gl::types::GLuint ) -> Result< (), String > {
+    unsafe {
+        gl::DeleteTextures(1, &handle);
+    }
+    Ok( () )
+}

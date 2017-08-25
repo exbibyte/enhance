@@ -11,3 +11,5 @@ pub mod mesh;
 pub mod primitive;
 // pub mod renderpass_collection;
 pub mod render_commands;
+pub mod texture;
+pub mod texture_collection;
