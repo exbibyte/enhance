@@ -4,11 +4,12 @@ extern crate gl;
 extern crate glutin;
 extern crate libc;
 extern crate rand;
-
+extern crate image;
 extern crate e2rcore;
 
 use std::mem;
 use std::fs::File;
+use std::path::Path;
 use std::io::BufReader;
 use std::str::FromStr;
 use std::io::Read;
@@ -21,6 +22,8 @@ use std::any::Any;
 use std::borrow::BorrowMut;
 use std::ops::{ Deref, DerefMut };
 use std::{thread, time};
+
+use self::image::GenericImage;
 
 use self::glutin::GlContext;
 
@@ -41,6 +44,7 @@ use self::e2rcore::implement::render::router;
 use self::e2rcore::implement::render::mesh;
 use self::e2rcore::implement::render::renderdevice_gl;
 use self::e2rcore::implement::render::primitive;
+use self::e2rcore::implement::render::texture;
 // use self::e2rcore::implement::render::renderpass_default;
 
 
@@ -56,6 +60,12 @@ pub fn file_open( file_path: & str ) -> Option<String> {
 }
 
 fn main() {
+
+    let img = image::open( &Path::new( "core/asset/images/texture0.jpg" ) ).unwrap();
+    println!( "image dimension: {:?}", img.dimensions() );
+    println!( "image type: {:?}", img.color() );
+
+    let texture0 = texture::Texture::from( &img );
     
     let mut kr = Renderer::init().unwrap();
     
@@ -67,9 +77,12 @@ fn main() {
     util_gl::check_last_op();
 
     let image = vec![200, 200, 150, 0, 0, 255 ];
-    let w = 2;
-    let h = 2;
-    let texture = match kr.load_texture( String::from("texture0"), &image[..], w, h ) {
+    // let w = 2;
+    // let h = 2;
+    // let texture = match kr.load_texture( String::from("texture0"), &image[..], w, h ) {
+    let texture_data = Vec::from( texture0 );
+    let ( w, h ) = img.dimensions();
+    let texture = match kr.load_texture( String::from("texture0"), &texture_data[..], w as _, h as _ ) {
         Ok( t ) => t,
         Err( e ) => panic!( e ),
     };
