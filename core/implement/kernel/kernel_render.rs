@@ -96,7 +96,7 @@ impl Drop for Renderer {
 
 impl Renderer {
     pub fn init() -> Result< Renderer, & 'static str > {
-        let mut rk = Renderer {
+        let rk = Renderer {
             _win: IWindow::init( 500, 500 ),
             _rp: vec![],
             _map_string_to_rp: HashMap::new(),
@@ -130,9 +130,7 @@ impl Renderer {
                     return Err( "error loading shader" )
                 }
             };
-            unsafe {
-                util_gl::check_last_op();
-            }
+            util_gl::check_last_op();
             compiled_shaders.push( s );
         }
         {
@@ -176,7 +174,7 @@ impl Renderer {
             util_gl::check_last_op();
         }
         
-        let mut draw_group = match prim_type {
+        let draw_group = match prim_type {
             i_renderobj::RenderObjType::TRI => renderdevice_gl::RenderDrawGroup::init_with_default_format_triangle( obj_vao as _, obj_vbo as _ ),
             i_renderobj::RenderObjType::POINT => renderdevice_gl::RenderDrawGroup::init_with_default_format_point( obj_vao as _, obj_vbo as _ ),
             _ => return Err("unsupported primitive type for draw group detected")

@@ -42,9 +42,7 @@ impl IWindow< Event > for WinGlutin {
         unsafe {
             self._win._wingl.make_current().unwrap();
         }
-        unsafe {
-            gl::load_with( |symbol| self._win._wingl.get_proc_address(symbol) as * const _ );
-        }
+        gl::load_with( |symbol| self._win._wingl.get_proc_address(symbol) as * const _ );
         Ok( () )
     }
     fn handle_events < F > ( & mut self, mut cb: F ) -> ()
