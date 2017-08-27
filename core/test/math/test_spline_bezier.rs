@@ -18,15 +18,39 @@ fn test_spline(){
     
     let mut spline = SplineBezier::init( 10, cp0, cp1, cp2, cp3 );
     #[allow(unused_variables)]
-    while !spline.interp_done() {
-        let p = spline.interp_increment( 1 );
+    while !spline.interp_is_end() {
+        let p = spline.interp_delta( 1 ).expect("forward interpolation result unexpected");
         println!("interp: {:?}", p );
     }
+    //iteration end value check
+    {
+        let p = spline.interp_current();
+        assert!( p.is_equal( &cp3, 0.00001f64 ).expect( "iteration end value unexpected" ) );
+    }
+    //iteration stop condition check
     #[allow(unused_variables)]
     for x in 0..3 {
-        let p = spline.interp_increment( 1 );
+        let p = spline.interp_delta( 1 ).expect("forward interpolation result unexpected");
         println!("{:?}", p );
+        assert!( p.is_equal( &cp3, 0.00001f64 ).expect( "iteration stop behaviour unexpected" ) );
     }
+    // //backward iteration
+    // while !spline.interp_is_start() {
+    //     let p = spline.interp_decrement( 1 );
+    //     println!("interp: {:?}", p );
+    // }
+    // //iteration start value check
+    // {
+    //     let p = spline.interp_current();
+    //     assert!( p.is_equal( &cp0, 0.00001f64 ).expect( "iteration start value unexpected" ) );
+    // }
+    // //iteration stop condition check for back iteration
+    // #[allow(unused_variables)]
+    // for x in 0..3 {
+    //     let p = spline.interp_decrement( 1 );
+    //     println!("{:?}", p );
+    //     assert!( p.is_equal( &cp0, 0.00001f64 ).expect( "iteration stop behaviour unexpected" ) );
+    // }
 }
 
 #[test]

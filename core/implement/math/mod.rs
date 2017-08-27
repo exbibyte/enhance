@@ -5,3 +5,4 @@ pub mod quat;
 pub mod dualquat;
 pub mod util;
 pub mod intersect_gjk;
+pub mod linearinterp;

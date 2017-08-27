@@ -4,6 +4,7 @@ pub mod test_mat4x1;
 pub mod test_mat1x4;
 pub mod test_mat4;
 pub mod test_mat3;
-pub mod test_spline_bezier;
 pub mod test_quat;
 pub mod test_util;
+pub mod test_spline_bezier;
+pub mod test_linearinterp;
