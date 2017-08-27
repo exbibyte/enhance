@@ -26,6 +26,7 @@ impl LinearInterp {
 
 #[allow(unused_variables)]
 impl IInterpolateMat4x1f64 for LinearInterp {
+    type InterpVal = Mat4x1< f64 >;
     fn num_steps( & self ) -> u64 {
         self._steps as u64
     }
@@ -54,6 +55,9 @@ impl IInterpolateMat4x1f64 for LinearInterp {
     }
     fn interp_is_start( & self ) -> bool {
         self._step_current == -1
+    }
+    fn reset( & mut self ){
+        self._step_current = -1i64;
     }
 }
 

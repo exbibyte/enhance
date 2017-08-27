@@ -1,8 +1,11 @@
+use std::cmp;
+
 use implement::math::mat::*;
 use interface::i_interpolate::*;
 
 #[allow(unused_variables)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct SplineBezier {
     pub _ctl: [ Mat4x1< f64 > ; 4 ],
     pub _point: Mat4x1< f64 >,
@@ -10,8 +13,8 @@ pub struct SplineBezier {
     pub _point_dd: Mat4x1< f64 >,
     pub _point_ddd: Mat4x1< f64 >,
     pub _basis: Mat4< f64 >,
-    pub _steps: u64,
-    pub _step_current: u64,
+    pub _steps: i64,
+    pub _step_current: i64,
 }
 
 impl SplineBezier {
@@ -59,30 +62,37 @@ impl SplineBezier {
                         _point_dd: ddq,
                         _point_ddd: dddq,
                         _basis: basis,
-                        _steps: s,
-                        _step_current: 0u64,
+                        _steps: s as _,
+                        _step_current: -1i64,
         }
     }
 }
 #[allow(unused_variables)]
 impl IInterpolateMat4x1f64 for SplineBezier {
+    type InterpVal = Mat4x1< f64 >;
     fn num_steps( & self ) -> u64 {
-        self._steps
+        self._steps as u64
     }
     fn interp_delta( & mut self, steps: i64 ) -> Option< Mat4x1< f64 > > {
         if steps >= 0 {
-            let ret = self._point.clone();
             for x in 0..steps {
-                if self._step_current == self._steps - 1 {
+                
+                self._step_current = cmp::min( self._step_current + 1, self._steps );
+                
+                if self._step_current == self._steps {
                     self._point = self._ctl[3];
-                    return Some( ret )
+                    return Some( self._point )
                 }
+                
+                if self._step_current == 0 {
+                    continue;
+                }
+
                 self._point = self._point.plus( & self._point_d ).expect("point plus invalid");
                 self._point_d = self._point_d.plus( & self._point_dd ).expect("point d plus invalid");
                 self._point_dd = self._point_dd.plus( & self._point_ddd ).expect("point dd plus invalid");
-                self._step_current = self._step_current + 1;
             }
-            return Some( ret )
+            return Some( self._point )
         } else {
             unimplemented!();
         }
@@ -91,10 +101,13 @@ impl IInterpolateMat4x1f64 for SplineBezier {
         self._point
     }
     fn interp_is_end( & self ) -> bool {
-        self._step_current == self._steps - 1
+        self._step_current == self._steps
     }
     fn interp_is_start( & self ) -> bool {
-        self._step_current == 0
+        self._step_current == -1
+    }
+    fn reset( & mut self ){
+        *self = SplineBezier::init( self._steps as _, self._ctl[0], self._ctl[1], self._ctl[2], self._ctl[3] );
     }
 }
 
@@ -102,15 +115,19 @@ impl IInterpolateMat4x1f64 for SplineBezier {
 impl Iterator for SplineBezier {
     type Item = Mat4x1< f64 >;
     fn next( & mut self ) -> Option< Mat4x1< f64 > > {
-        if self._step_current >= self._steps {
+        self._step_current = cmp::min( self._step_current + 1, self._steps );
+        if self._step_current == self._steps {
             return None
         } else {
-            let ret = self._point.clone();
-            self._point = self._point.plus( & self._point_d ).expect("point plus invalid");
-            self._point_d = self._point_d.plus( & self._point_dd ).expect("point d plus invalid");
-            self._point_dd = self._point_dd.plus( & self._point_ddd ).expect("point dd plus invalid");
-            self._step_current = self._step_current + 1;
-            return Some( ret )
+            if self._step_current == 0 {
+                self._point = self._ctl[0];
+                return Some( self._point )
+            } else {
+                self._point = self._point.plus( & self._point_d ).expect("point plus invalid");
+                self._point_d = self._point_d.plus( & self._point_dd ).expect("point d plus invalid");
+                self._point_dd = self._point_dd.plus( & self._point_ddd ).expect("point dd plus invalid");
+                return Some( self._point )
+            }
         }
     }
 }
@@ -123,6 +140,8 @@ impl DoubleEndedIterator for SplineBezier {
 }
 
 
+#[derive(Debug)]
+#[derive(Clone)]
 pub struct SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
     pub _splines: Vec< T >,
     _current_spline: u64,
@@ -138,28 +157,95 @@ impl < T > SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
         self._splines.push( s );
     }
     pub fn interp_current( & self ) -> Mat4x1< f64 > {
-        self._splines[ self._current_spline as usize ].interp_current()
+        if self._current_spline as usize >= self._splines.len() {
+            self._splines[ self._splines.len() - 1 ].interp_current()
+        } else {
+            self._splines[ self._current_spline as usize ].interp_current()
+        }
+    }
+    pub fn reset( & mut self ) {
+        for i in 0..self._splines.len() {
+            self._splines[i].reset();
+        }
+        self._current_spline = 0u64;
     }
 }
 
+#[allow(unused_variables)]
+impl < T > IInterpolateMat4x1f64 for SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
+    type InterpVal = Mat4x1< f64 >;
+    fn num_steps( & self ) -> u64 {
+        self._total_steps
+    }
+    fn interp_delta( & mut self, steps: i64 ) -> Option< Mat4x1< f64 > > {
+        let mut ret = None;
+        for i in 0..steps {
+            match self.next() {
+                Some(x) => {
+                    ret = Some( self.interp_current() );
+                },
+                None => {
+                    return ret
+                },
+            }
+        }
+        ret
+    }
+    fn interp_current( & self ) -> Mat4x1< f64 > {
+        if self._current_spline as usize >= self._splines.len() {
+            self._splines[ self._splines.len() - 1 ].interp_current()
+        } else {
+            self._splines[ self._current_spline as usize ].interp_current()
+        }
+    }
+    fn interp_is_end( & self ) -> bool {
+        (self._current_spline as usize) >= self._splines.len() ||
+            ( ( self._current_spline as usize == ( self._splines.len() - 1 ) ) && 
+                self._splines[ self._current_spline as usize ].interp_is_end() )
+    }
+    fn interp_is_start( & self ) -> bool {
+        self._current_spline == 0 && self._splines[ self._current_spline as usize ].interp_is_start()        
+    }
+    fn reset( & mut self ){
+        for i in 0..self._splines.len() {
+            self._splines[i].reset();
+        }
+    }
+}
+
+/// required trait for IInterpolateMat4x1f64
 impl < T > Iterator for SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
     type Item = T::Item;
-    fn next( & mut self ) -> Option< Self::Item > {
+    fn next( & mut self ) -> Option< T::Item > {
         if self._current_spline as usize >= self._splines.len() {
-            return None;
+            return None
         } else {
             let n = self._splines[ self._current_spline as usize ].next();
             match n {
                 Some(s) => return Some(s),
-                _ => {
-                    if (self._current_spline + 1) as usize >= self._splines.len() {
-                        return None;
+                None => {
+                    self._current_spline = cmp::min( self._current_spline + 1, self._splines.len() as _ );
+                    if self._current_spline as usize >= self._splines.len() {
+                        return None
                     } else {
-                        self._current_spline = self._current_spline + 1;
-                        return self.next();
+                        match self.next() {
+                            Some( o ) => Some( o ),
+                            None => {
+                                if self._current_spline as usize == self._splines.len() - 1 {
+                                    self._current_spline += 1;
+                                }
+                                None
+                            },
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+impl < T > DoubleEndedIterator for SplinePiecewise< T > where T : IInterpolateMat4x1f64 {
+    fn next_back( & mut self ) -> Option< T::Item > {
+        unimplemented!();
     }
 }
