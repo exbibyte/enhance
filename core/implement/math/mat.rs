@@ -11,6 +11,8 @@ use std::ops::Div;
 #[allow(unused_imports)]
 use std::ops::Mul;
 
+use interface::i_comparable;
+
 #[derive(Debug, Copy, Clone)]
 pub struct Mat2x1 < T > where T: Copy + Clone {
     pub _val: [ T; 2 ],
@@ -165,14 +167,16 @@ macro_rules! define_mat2x1 {
                     ( self._val[0] as $v_type ).mul( s ) as $v_type,
                     ( self._val[1] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            pub fn transpose( self ) -> Mat1x2< $v_type > {
+                Mat1x2 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat2x1 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
                         ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat1x2< $v_type > {
-                Mat1x2 { _val: self._val }
             }
         }
     }
@@ -234,14 +238,22 @@ macro_rules! define_mat1x2 {
                     ( self._val[0] as $v_type ).mul( s ) as $v_type,
                     ( self._val[1] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
+            //             ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
+            //             ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
+            //             ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) )
+            // }
+            pub fn transpose( self ) -> Mat2x1< $v_type > {
+                Mat2x1 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat1x2 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
                         ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat2x1< $v_type > {
-                Mat2x1 { _val: self._val }
             }
         }
     }
@@ -316,16 +328,26 @@ macro_rules! define_mat3x1 {
                     ( self._val[1] as $v_type ).mul( s ) as $v_type,
                     ( self._val[2] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
+            //             ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
+            //             ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
+            //             ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
+            //             ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
+            //             ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) )
+            // }
+            pub fn transpose( self ) -> Mat1x3< $v_type > {
+                Mat1x3 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat3x1 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
                         ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
                         ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
                         ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat1x3< $v_type > {
-                Mat1x3 { _val: self._val }
             }
         }
     }
@@ -417,16 +439,26 @@ macro_rules! define_mat1x3 {
                     ( self._val[1] as $v_type ).mul( s ) as $v_type,
                     ( self._val[2] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
+            //             ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
+            //             ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
+            //             ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
+            //             ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
+            //             ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) )
+            // }
+            pub fn transpose( self ) -> Mat3x1< $v_type > {
+                Mat3x1 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat1x3 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
                         ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
                         ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
                         ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat3x1< $v_type > {
-                Mat3x1 { _val: self._val }
             }
         }
     }
@@ -503,7 +535,22 @@ macro_rules! define_mat4x1 {
                     ( self._val[2] as $v_type ).mul( s ) as $v_type,
                     ( self._val[3] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
+            //             ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
+            //             ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
+            //             ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
+            //             ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
+            //             ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) &&
+            //             ( self._val[3] as $v_type >= other._val[3] as $v_type - error ) &&
+            //             ( self._val[3] as $v_type <= other._val[3] as $v_type + error ) )
+            // }
+            pub fn transpose( self ) -> Mat1x4< $v_type > {
+                Mat1x4 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat4x1 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
@@ -512,9 +559,6 @@ macro_rules! define_mat4x1 {
                         ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) &&
                         ( self._val[3] as $v_type >= other._val[3] as $v_type - error ) &&
                         ( self._val[3] as $v_type <= other._val[3] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat1x4< $v_type > {
-                Mat1x4 { _val: self._val }
             }
         }
     }
@@ -611,7 +655,22 @@ macro_rules! define_mat1x4 {
                     ( self._val[2] as $v_type ).mul( s ) as $v_type,
                     ( self._val[3] as $v_type ).mul( s ) as $v_type ] } )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
+            //             ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
+            //             ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
+            //             ( self._val[1] as $v_type <= other._val[1] as $v_type + error ) &&
+            //             ( self._val[2] as $v_type >= other._val[2] as $v_type - error ) &&
+            //             ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) &&
+            //             ( self._val[3] as $v_type >= other._val[3] as $v_type - error ) &&
+            //             ( self._val[3] as $v_type <= other._val[3] as $v_type + error ) )
+            // }
+            pub fn transpose( self ) -> Mat4x1< $v_type > {
+                Mat4x1 { _val: self._val }
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat1x4 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
                 Some( ( self._val[0] as $v_type >= other._val[0] as $v_type - error ) &&
                         ( self._val[0] as $v_type <= other._val[0] as $v_type + error ) &&
                         ( self._val[1] as $v_type >= other._val[1] as $v_type - error ) &&
@@ -620,9 +679,6 @@ macro_rules! define_mat1x4 {
                         ( self._val[2] as $v_type <= other._val[2] as $v_type + error ) &&
                         ( self._val[3] as $v_type >= other._val[3] as $v_type - error ) &&
                         ( self._val[3] as $v_type <= other._val[3] as $v_type + error ) )
-            }
-            pub fn transpose( self ) -> Mat4x1< $v_type > {
-                Mat4x1 { _val: self._val }
             }
         }
     }
@@ -812,19 +868,19 @@ macro_rules! define_mat3 {
                 }
                 Some( m )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
-                if self._is_row_major != other._is_row_major {
-                    return Some( false )
-                }
-                for x in 0..self._val.len() {
-                    let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
-                        ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
-                    if !e {
-                        return Some( false )
-                    }
-                }
-                Some( true )
-            }
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     if self._is_row_major != other._is_row_major {
+            //         return Some( false )
+            //     }
+            //     for x in 0..self._val.len() {
+            //         let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
+            //             ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
+            //         if !e {
+            //             return Some( false )
+            //         }
+            //     }
+            //     Some( true )
+            // }
             pub fn transpose_self( & mut self ) {
                 let copy = self._val.clone();
                 for i in 0..9 {
@@ -870,6 +926,21 @@ macro_rules! define_mat3 {
                 *out.index_mut(2,2) = t.index(0,0)*t.index(1,1)-t.index(1,0)*t.index(0,1) / determinant;
                 
                 Some(out)
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat3 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+                if self._is_row_major != other._is_row_major {
+                    return Some( false )
+                }
+                for x in 0..self._val.len() {
+                    let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
+                        ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
+                    if !e {
+                        return Some( false )
+                    }
+                }
+                Some( true )
             }
         }
     }
@@ -1093,19 +1164,19 @@ macro_rules! define_mat4 {
                 }
                 Some( m )
             }
-            pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
-                if self._is_row_major != other._is_row_major {
-                    return Some( false )
-                }
-                for x in 0..self._val.len() {
-                    let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
-                        ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
-                    if !e {
-                        return Some( false )
-                    }
-                }
-                Some( true )
-            }
+            // pub fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+            //     if self._is_row_major != other._is_row_major {
+            //         return Some( false )
+            //     }
+            //     for x in 0..self._val.len() {
+            //         let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
+            //             ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
+            //         if !e {
+            //             return Some( false )
+            //         }
+            //     }
+            //     Some( true )
+            // }
             pub fn transpose_self( & mut self ) {
                 let copy = self._val.clone();
                 for i in 0..16 {
@@ -1280,6 +1351,21 @@ macro_rules! define_mat4 {
                 }
 
                 Some( inv.transpose() )
+            }
+        }
+        impl i_comparable::IComparableError< $v_type > for Mat4 < $v_type > {
+            fn is_equal( & self, other: & Self, error: $v_type ) -> Option< bool > {
+                if self._is_row_major != other._is_row_major {
+                    return Some( false )
+                }
+                for x in 0..self._val.len() {
+                    let e = ( self._val[x] as $v_type >= (other._val[x] as $v_type - error) ) &&
+                        ( self._val[x] as $v_type <= (other._val[x] as $v_type + error) );
+                    if !e {
+                        return Some( false )
+                    }
+                }
+                Some( true )
             }
         }
     }

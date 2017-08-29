@@ -3,6 +3,8 @@ use std::ops::Div;
 #[allow(unused_imports)]
 use std::cmp::Ordering;
 
+use interface::i_comparable::IComparableError;
+
 #[test]
 fn test_mat1x4(){
     use implement::math::mat::Mat1x4;

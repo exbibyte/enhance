@@ -25,23 +25,22 @@ impl LinearInterp {
 }
 
 #[allow(unused_variables)]
-impl IInterpolateMat4x1f64 for LinearInterp {
-    type InterpVal = Mat4x1< f64 >;
+impl IInterpolate< Mat4x1< f64 > > for LinearInterp {
     fn num_steps( & self ) -> u64 {
         self._steps as u64
     }
     fn interp_delta( & mut self, steps: i64 ) -> Option< Mat4x1< f64 > > {
-        self._step_current = cmp::min( self._step_current + steps, self._steps + 1);
+        self._step_current = cmp::min( self._step_current + steps, self._steps );
         self._step_current = cmp::max( self._step_current, -1 );
 
         let clamp = if self._step_current < 0 {
             0
-        } else if self._step_current > self._steps {
-            self._steps
+        } else if self._step_current >= self._steps {
+            self._steps - 1
         } else {
             self._step_current
         };
-        let fraction = clamp as f64 / self._steps as f64;
+        let fraction = clamp as f64 / ( self._steps - 1 ) as f64;
         let d = self._ctl[1].minus( &self._ctl[0] ).unwrap();
         let offset = d.scale( fraction ).unwrap();
         self._point = self._ctl[0].plus( &offset ).unwrap();
@@ -51,7 +50,7 @@ impl IInterpolateMat4x1f64 for LinearInterp {
         self._point
     }
     fn interp_is_end( & self ) -> bool {
-        self._step_current == self._steps + 1
+        self._step_current == self._steps
     }
     fn interp_is_start( & self ) -> bool {
         self._step_current == -1
@@ -61,23 +60,22 @@ impl IInterpolateMat4x1f64 for LinearInterp {
     }
 }
 
-impl Iterator for LinearInterp { //required by IInterpolateMat4x1f64
+impl Iterator for LinearInterp { //required by IInterpolate
     type Item = Mat4x1< f64 >;
     fn next( & mut self ) -> Option< Mat4x1< f64 > > {
-        if self._step_current == self._steps + 1 {
+        self._step_current = cmp::min( self._step_current + 1, self._steps );
+        if self._step_current == self._steps {
             None
         } else {
-            self._step_current = cmp::min( self._step_current + 1, self._steps + 1);
-
             let clamp = if self._step_current < 0 {
                 0
-            } else if self._step_current > self._steps {
+            } else if self._step_current >= self._steps {
                 self._steps
             } else {
                 self._step_current
             };
             
-            let fraction = clamp as f64 / self._steps as f64;
+            let fraction = clamp as f64 / ( self._steps - 1 ) as f64;
             let d = self._ctl[1].minus( &self._ctl[0] ).unwrap();
             let offset = d.scale( fraction ).unwrap();
             self._point = self._ctl[0].plus( &offset ).unwrap();
@@ -88,20 +86,19 @@ impl Iterator for LinearInterp { //required by IInterpolateMat4x1f64
 
 impl DoubleEndedIterator for LinearInterp {
     fn next_back( & mut self ) -> Option< Mat4x1< f64 > > {
+        self._step_current = cmp::max( self._step_current - 1, -1 );
         if self._step_current == -1 {
             None 
         } else {
-            self._step_current = cmp::max( self._step_current - 1, -1 );
-
             let clamp = if self._step_current < 0 {
                 0
-            } else if self._step_current > self._steps {
+            } else if self._step_current >= self._steps {
                 self._steps
             } else {
                 self._step_current
             };
             
-            let fraction = clamp as f64 / self._steps as f64;
+            let fraction = clamp as f64 / ( self._steps - 1 ) as f64;
             let d = self._ctl[1].minus( &self._ctl[0] ).unwrap();
             let offset = d.scale( fraction ).unwrap();
             self._point = self._ctl[0].plus( &offset ).unwrap();
