@@ -10,7 +10,6 @@ use implement::math::mat::Mat4x1;
 use interface::i_interpolate::IInterpolate;
 use interface::i_comparable::IComparableError;
 
-use implement::math::linearinterp::LinearInterp;
 use implement::math::piecewise::Piecewise;
 
 #[cfg(test)]

@@ -10,7 +10,7 @@ impl IBound for AxisAlignedBBox {
     fn get_type( & self ) -> BoundType {
         BoundType::AxisAlignBox
     }
-    fn intersect( & self, other: & Self ) -> bool {
+    fn intersect( & self, other: & IBound ) -> bool {
         match other.get_type(){
             BoundType::AxisAlignBox => {
                 let a_bounds = self.get_bound_data();
@@ -24,16 +24,18 @@ impl IBound for AxisAlignedBBox {
                 for i in 0..3 {
                     if a_lower[i] > b_upper[i] ||
                        a_upper[i] < b_lower[i] {
+                           println!("not intersect");
                            return false
                     }
                 }
                 return true
                 
             },
-            _ => { unimplemented!(); return false },
+            _ => { unimplemented!(); },
         }
+        true
     }
-    fn get_shortest_separation( & self, other: & Self ) -> f64 {
+    fn get_shortest_separation( & self, other: & IBound ) -> f64 {
         unimplemented!{};
     }
     fn get_bound_data( &self ) -> [f64;32] {

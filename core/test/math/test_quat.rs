@@ -3,16 +3,18 @@ use std::ops::Div;
 #[allow(unused_imports)]
 use std::cmp::Ordering;
 
+use std::f32::consts::PI;
+
 use interface::i_comparable::IComparableError;
+
+use implement::math::mat::Mat3x1;
+use implement::math::mat::Mat4;
+use implement::math::mat::Mat4x1;
+use implement::math::quat::Quat;
+
 
 #[test]
 fn test_quat(){
-    use implement::math::mat::Mat3;
-    use implement::math::mat::Mat3x1;
-    use implement::math::mat::Mat4;
-    use implement::math::mat::Mat4x1;
-    use implement::math::quat::Quat;
-    use std::f32::consts::PI;
     {
         //convert axis angle to quaternion representation and back
         let axis = Mat3x1 { _val: [ 1f32, 2f32, 3f32 ] };

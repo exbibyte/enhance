@@ -7,7 +7,6 @@ use std::cmp::Ordering;
 use implement::math::mat::Mat4x1;
 #[allow(unused_imports)]
 use interface::i_interpolate::IInterpolate;
-use interface::i_comparable::IComparableError;
 
 use implement::math::linearinterp::LinearInterp;
 use implement::math::piecewise::Piecewise;

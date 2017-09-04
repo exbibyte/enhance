@@ -19,7 +19,7 @@ pub fn test_texture() {
     println!( "image dimension: {:?}", img.dimensions() );
     println!( "image type: {:?}", img.color() );
     let texture0 = texture::Texture::from( &img );
-    let texture_data = Vec::from( texture0 ); //todo: verify content
+    //let texture_data = Vec::from( texture0 ); //todo: verify content
 
 
     //test for loading builtin textures

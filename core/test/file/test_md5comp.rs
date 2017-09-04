@@ -4,15 +4,7 @@ use implement::file::md5anim;
 use implement::file::md5rig;
 use implement::file::md5comp;
 
-use std::io;
-use std::io::prelude::*;
-use std::fs::File;
-use std::io::BufReader;
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
 
 #[test]
 fn test_parse_md5comp(){
@@ -31,7 +23,7 @@ fn test_parse_md5comp(){
         Err( e ) => panic!( e ),
     };
     assert!( 5 < posecollection._frames.len() );
-    let comp = match md5comp::process( & posecollection, & mesh, 0, 5, 0.5f32 ){
+    let _comp = match md5comp::process( & posecollection, & mesh, 0, 5, 0.5f32 ){
         Ok( o ) => o,
         Err( e ) => panic!( e ),
     };

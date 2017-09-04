@@ -1,14 +1,6 @@
 use implement::file::ppm;
 
-use std::io;
-use std::io::prelude::*;
-use std::fs::File;
-use std::io::BufReader;
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
 
 #[test]
 fn test_parse_ppm(){

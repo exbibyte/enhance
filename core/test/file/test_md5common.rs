@@ -47,7 +47,7 @@ fn test_parse_common(){
     let mut count = 0;
     let mut idx = 0usize;
     loop {
-        let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx, & mut hm_keywords );
+        let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx, & mut hm_keywords );
         match tok {
             md5common::Token::End => {
                 println!("token: {:?}, index: {:?}, content: {:?}.", tok, idx_next, &file_content[idx_s..idx_e] );
