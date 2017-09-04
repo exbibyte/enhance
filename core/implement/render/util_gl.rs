@@ -1,16 +1,6 @@
 extern crate gl;
-extern crate libc;
 
-use std::mem;
-use std::fs::File;
-use std::io::BufReader;
-use std::str::FromStr;
-use std::io::Read;
-use std::ffi::CStr;
-use std::os::raw::c_char;
-use std::fmt;
 use std::str;
-use std::ptr;
 
 #[derive(Clone)]
 #[derive(Copy)]
@@ -26,7 +16,6 @@ pub fn load_and_compile_shader( shader_src : &str, shader_type: ShaderType ) -> 
         let handle = match shader_type {
             ShaderType::VERTEX => gl::CreateShader( gl::VERTEX_SHADER ),
             ShaderType::FRAGMENT =>  gl::CreateShader( gl::FRAGMENT_SHADER ),
-            _ => return Err( String::from( "unknown shader type" ) ),
         };
         assert!( handle != 0 );
         let shader_src_arr = [ shader_src.as_ptr() as * const i8 ];
@@ -38,7 +27,7 @@ pub fn load_and_compile_shader( shader_src : &str, shader_type: ShaderType ) -> 
         if 0 == result {
             let mut log_len = 0;
             gl::GetShaderiv( handle, gl::INFO_LOG_LENGTH, & mut log_len );
-            let mut log = vec![ 0i8; log_len as usize ];
+            let log = vec![ 0i8; log_len as usize ];
             if log_len > 0 {
                 let mut written = 0;
                 gl::GetShaderInfoLog( handle, log_len, & mut written, log.as_ptr() as * mut i8 );
@@ -63,7 +52,7 @@ pub fn check_program_link( handle: gl::types::GLuint ) -> Result< (), String > {
             gl::GetProgramiv( handle, gl::INFO_LOG_LENGTH, & mut log_len );
             println!( "log length: {}", log_len );
             check_last_op();
-            let mut log = vec![ 0i8; log_len as usize ];
+            let log = vec![ 0i8; log_len as usize ];
             if log_len > 0 {
                 let mut written = 0;
                 println!("get link status log");
@@ -91,7 +80,6 @@ pub fn check_last_op() {
             gl::INVALID_OPERATION => panic!("invalid_operation"),
             gl::INVALID_FRAMEBUFFER_OPERATION => panic!("invalid_framebuffer_operation"),
             gl::OUT_OF_MEMORY => panic!("out_of_memory"),
-            gl::INVALID_ENUM => panic!("invalid_enum"),
             gl::STACK_OVERFLOW => panic!("stack_overflow"),
             _ => panic!("unknown"),
         }
@@ -99,7 +87,7 @@ pub fn check_last_op() {
 }
 
 pub fn create_program_from_shaders( shader_handles: &[ gl::types::GLuint ] ) -> gl::types::GLuint {
-    create_program_from_shaders_with( shader_handles, | program, shader_handles |() ) //insert dummy lambda
+    create_program_from_shaders_with( shader_handles, | _program, _shader_handles | () ) //insert dummy lambda
 }
     
 pub fn create_program_from_shaders_with< F >( shader_handles: &[ gl::types::GLuint ], f: F ) -> gl::types::GLuint  where F: Fn( gl::types::GLuint, &[ gl::types::GLuint ] )->() {
@@ -127,14 +115,14 @@ pub fn delete_shader_program( handle: i64 ){
         gl::DeleteProgram( handle as gl::types::GLuint );
     }
 }
-pub fn query_uniform_float_array( program: gl::types::GLuint, name: String, num_elem: usize ){
+pub fn query_uniform_float_array( program: gl::types::GLuint, name: String ){
     unsafe {
         let loc = gl::GetUniformLocation( program, name.as_ptr() as * const i8 );
         println!("uniform location: {:?}", loc );
         let mut query_val = vec![0f32;32];
-        gl::GetUniformfv( program, gl::GetUniformLocation( program, b"MVP\0".as_ptr() as * const i8 ), query_val.as_mut_ptr() );
+        gl::GetUniformfv( program, loc, query_val.as_mut_ptr() );
         check_last_op();
-        println!("query MVP: {:?}", query_val );
+        println!("query uniform float array: {:?}", query_val );
     }
 }
 

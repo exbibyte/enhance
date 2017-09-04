@@ -1,11 +1,4 @@
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
-use std::str::FromStr;
-use std::clone::Clone;
-use std::io;
 use std::io::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
@@ -13,7 +6,6 @@ use std::io::BufReader;
 pub fn read( file_path: & str ) -> Result< ( u64, u64, Vec< u8 > ), & 'static str > {
     let path = File::open( file_path ).expect("file path open invalid");
     let mut buf_reader = BufReader::new( path );
-    let mut file_content = String::new();
     let mut content = vec![];
     buf_reader.read_to_end( & mut content ).is_ok();
     println!("file content len: {:?}", content.len() );
@@ -23,10 +15,6 @@ pub fn read( file_path: & str ) -> Result< ( u64, u64, Vec< u8 > ), & 'static st
        content[1] != '6' as u8 {
            return Err( "invalid PPM file header" )
     }
-
-    // for &i in &content[0..20] {
-    //     println!("{}", i );
-    // }
     
     let mut i = 0;
     let mut index = 2;
@@ -54,8 +42,8 @@ pub fn read( file_path: & str ) -> Result< ( u64, u64, Vec< u8 > ), & 'static st
                 if index >= content.len() {
                     break;
                 }
-                while ( content[index] >= '0' as u8 &&
-                        content[index] <= '9' as u8 )
+                while content[index] >= '0' as u8 &&
+                      content[index] <= '9' as u8
                 {
                     index += 1;
                     if index >= content.len() {
@@ -105,7 +93,7 @@ pub fn write( file_path: & str, w: u64, h: u64, img: & Vec < u8 > ) -> Result< (
     file.write( header_bytes ).expect("writing file header unsuccessful");
     //write data
     match file.write( &img[..] ) {
-        Err(e) => return Err( "image write unsuccessful" ),
+        Err(_) => return Err( "image write unsuccessful" ),
         _ => ()
     }
     Ok(())

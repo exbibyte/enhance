@@ -1,6 +1,5 @@
 extern crate gl;
 extern crate glutin;
-extern crate libc;
 
 extern crate e2rcore;
 

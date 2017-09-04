@@ -1,13 +1,9 @@
-use interface::i_renderobj;
-use interface::i_ele;
-
-use implement::render::renderdevice_gl;
 use implement::kernel::kernel_render::Renderer;
 
 #[derive(PartialEq)]
 #[derive(Eq)]
 #[derive(Hash)]
-pub enum eRenderPassType {
+pub enum RenderPassType {
     DEFAULT,
 }
 

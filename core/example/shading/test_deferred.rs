@@ -1,18 +1,13 @@
 extern crate gl;
 extern crate glutin;
-extern crate libc;
 extern crate rand;
 
 extern crate e2rcore;
 
-use std::mem;
 use std::fs::File;
 use std::io::BufReader;
 use std::str::FromStr;
 use std::io::Read;
-use std::ffi::CStr;
-use std::os::raw::c_char;
-use std::fmt;
 use std::str;
 use rand::Rng;
 
@@ -28,10 +23,14 @@ pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
     let mut buf_reader = BufReader::new(path);
     let mut contents = String::new();
-    buf_reader.read_to_string( & mut contents );
+    match buf_reader.read_to_string( & mut contents ) {
+        Err( e ) => { println!("{}", e ); return None },
+        _ => (),
+    }
     Some(contents)
 }
 
+#[allow(unused)]
 fn main() {
     
     let geom_vs_src = file_open( "core/example/shading/deferred_geometry_pass.vs" ).expect("geometry vertex shader not retrieved");
@@ -60,16 +59,16 @@ fn main() {
     let cam_pos = [ 0f32, 0f32, 5f32 ];
 
     //rendering quad
-    let mut quadVAO : u32 = 0;
-    let mut quadVBO : u32 = 0;
+    let mut quad_vao : u32 = 0;
+    let mut quad_vbo : u32 = 0;
     
     let mut gl_program_geom = 0;
     let mut gl_program_light = 0;
     //render buffers
-    let mut gBuffer = 0;
-    let mut gPosition = 0;
-    let mut gNormal = 0;
-    let mut gAlbedoSpec = 0;
+    let mut g_buffer = 0;
+    let mut g_position = 0;
+    let mut g_normal = 0;
+    let mut g_albedo_spec = 0;
     unsafe {
         gl_program_geom = util_gl::create_program_from_shaders( &[ geom_vs, geom_fs ] );
         gl_program_light = util_gl::create_program_from_shaders( &[ light_vs, light_fs ] );
@@ -79,44 +78,44 @@ fn main() {
         gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
         
         //todo: deferred shading
-        gl::GenFramebuffers(1, & mut gBuffer);
-        gl::BindFramebuffer(gl::FRAMEBUFFER, gBuffer);
-        // unsigned int gPosition, gNormal, gColorSpec;
+        gl::GenFramebuffers(1, & mut g_buffer);
+        gl::BindFramebuffer(gl::FRAMEBUFFER, g_buffer);
+        // unsigned int g_position, g_normal, gColorSpec;
 
         // - position color buffer
-        gl::GenTextures( 1, & mut gPosition );
-        gl::BindTexture( gl::TEXTURE_2D, gPosition );
+        gl::GenTextures( 1, & mut g_position );
+        gl::BindTexture( gl::TEXTURE_2D, g_position );
         gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB16F as i32, 500, 500, 0, gl::RGB, gl::FLOAT, std::ptr::null() );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, gl::TEXTURE_2D, gPosition, 0 );
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, gl::TEXTURE_2D, g_position, 0 );
 
         // - normal color buffer
-        gl::GenTextures( 1, & mut gNormal );
-        gl::BindTexture( gl::TEXTURE_2D, gNormal );
+        gl::GenTextures( 1, & mut g_normal );
+        gl::BindTexture( gl::TEXTURE_2D, g_normal );
         gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGB16F as i32, 500, 500, 0, gl::RGB, gl::FLOAT, std::ptr::null() );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT1, gl::TEXTURE_2D, gNormal, 0);
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT1, gl::TEXTURE_2D, g_normal, 0);
 
         // - color + specular color buffer
-        gl::GenTextures( 1, & mut gAlbedoSpec );
-        gl::BindTexture( gl::TEXTURE_2D, gAlbedoSpec );
+        gl::GenTextures( 1, & mut g_albedo_spec );
+        gl::BindTexture( gl::TEXTURE_2D, g_albedo_spec );
         gl::TexImage2D( gl::TEXTURE_2D, 0, gl::RGBA as i32, 500, 500, 0, gl::RGBA, gl::UNSIGNED_BYTE, std::ptr::null() );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32 );
         gl::TexParameteri( gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32 );
-        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT2, gl::TEXTURE_2D, gAlbedoSpec, 0 );
+        gl::FramebufferTexture2D( gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT2, gl::TEXTURE_2D, g_albedo_spec, 0 );
 
         // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
         let attachments : [u32;3] = [ gl::COLOR_ATTACHMENT0, gl::COLOR_ATTACHMENT1, gl::COLOR_ATTACHMENT2 ];
         gl::DrawBuffers( 3, &attachments[0] );
 
         //create depth buffer
-        let mut rboDepthStencil = 0;
-        gl::GenRenderbuffers( 1, & mut rboDepthStencil );
-        gl::BindRenderbuffer( gl::RENDERBUFFER, rboDepthStencil );
+        let mut rbo_depth_stencil = 0;
+        gl::GenRenderbuffers( 1, & mut rbo_depth_stencil );
+        gl::BindRenderbuffer( gl::RENDERBUFFER, rbo_depth_stencil );
         gl::RenderbufferStorage( gl::RENDERBUFFER, gl::DEPTH_COMPONENT32F, 500, 500 );
-        gl::FramebufferRenderbuffer( gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, rboDepthStencil );
+        gl::FramebufferRenderbuffer( gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, rbo_depth_stencil );
         if gl::FRAMEBUFFER_COMPLETE != gl::CheckFramebufferStatus( gl::FRAMEBUFFER ) {
             panic!("frambuffer incomplete");
         }
@@ -137,9 +136,9 @@ fn main() {
     //configure shader parameters for lights
     unsafe {
         gl::UseProgram( gl_program_light );
-        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "gPosition".as_ptr() as * const i8 ), 0 );
-        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "gNormal".as_ptr() as * const i8 ), 1 );
-        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "gAlbedoSpec".as_ptr() as * const i8 ), 2 );
+        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "g_position".as_ptr() as * const i8 ), 0 );
+        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "g_normal".as_ptr() as * const i8 ), 1 );
+        gl::Uniform1i( gl::GetUniformLocation( gl_program_light, "g_albedo_spec".as_ptr() as * const i8 ), 2 );
     }
 
     
@@ -216,7 +215,7 @@ fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             // 1. geometry pass
-            gl::BindFramebuffer( gl::FRAMEBUFFER, gBuffer );
+            gl::BindFramebuffer( gl::FRAMEBUFFER, g_buffer );
             {
                 gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
                 //todo: calculate projection matrix
@@ -247,11 +246,11 @@ fn main() {
                 
                 // Bind AllbGBuffer Textures
                 gl::ActiveTexture( gl::TEXTURE0 );
-                gl::BindTexture( gl::TEXTURE_2D, gPosition );
+                gl::BindTexture( gl::TEXTURE_2D, g_position );
                 gl::ActiveTexture( gl::TEXTURE1 );
-                gl::BindTexture( gl::TEXTURE_2D, gNormal );
+                gl::BindTexture( gl::TEXTURE_2D, g_normal );
                 gl::ActiveTexture( gl::TEXTURE2 );
-                gl::BindTexture( gl::TEXTURE_2D, gAlbedoSpec );
+                gl::BindTexture( gl::TEXTURE_2D, g_albedo_spec );
 
                 //set light uniforms
                 for ( i, v ) in light_position_colour.iter().enumerate() {
@@ -283,22 +282,22 @@ fn main() {
             }
             //render quad
             {
-                if quadVAO == 0 {
-                    let quadVertices = [ -1f32, 1f32, 0f32, 0f32, 1f32,
+                if quad_vao == 0 {
+                    let quad_vertices = [ -1f32, 1f32, 0f32, 0f32, 1f32,
                                          -1f32, -1f32, 0f32, 0f32, 0f32,
                                           1f32, 1f32, 0f32, 1f32, 1f32,
                                           1f32, -1f32, 0f32, 1f32, 0f32, ];
-                    gl::GenVertexArrays( 1, & mut quadVAO );
-                    gl::GenBuffers( 1, & mut quadVBO );
-                    gl::BindVertexArray( quadVAO );
-                    gl::BindBuffer( gl::ARRAY_BUFFER, quadVBO );
-                    gl::BufferData( gl::ARRAY_BUFFER, ( quadVertices.len() * std::mem::size_of::<f32>() ) as isize, quadVertices[..].as_ptr().offset(0) as _, gl::STATIC_DRAW );
+                    gl::GenVertexArrays( 1, & mut quad_vao );
+                    gl::GenBuffers( 1, & mut quad_vbo );
+                    gl::BindVertexArray( quad_vao );
+                    gl::BindBuffer( gl::ARRAY_BUFFER, quad_vbo );
+                    gl::BufferData( gl::ARRAY_BUFFER, ( quad_vertices.len() * std::mem::size_of::<f32>() ) as isize, quad_vertices[..].as_ptr().offset(0) as _, gl::STATIC_DRAW );
                     gl::EnableVertexAttribArray( 0 );
                     gl::VertexAttribPointer( 0, 3, gl::FLOAT, gl::FALSE, ( 5 * std::mem::size_of::<f32>() ) as i32, std::ptr::null() );
             gl::EnableVertexAttribArray( 1 );
                     gl::VertexAttribPointer( 1, 2, gl::FLOAT, gl::FALSE, ( 5 * std::mem::size_of::<f32>() ) as i32, ( 3 * std::mem::size_of::<f32>() ) as * const std::os::raw::c_void );
                 }
-                gl::BindVertexArray( quadVAO );
+                gl::BindVertexArray( quad_vao );
                 gl::DrawArrays( gl::TRIANGLE_STRIP, 0, 4 );
                 gl::BindVertexArray( 0 );
             }
@@ -306,9 +305,9 @@ fn main() {
             let buf_width = 500;
             let buf_height = 500;
             //copy content of geometry depth buffer to default framebuffer's depth buffer
-            gl::BindFramebuffer( gl::READ_FRAMEBUFFER, gBuffer );
+            gl::BindFramebuffer( gl::READ_FRAMEBUFFER, g_buffer );
             gl::BindFramebuffer( gl::DRAW_FRAMEBUFFER, 0 );
-            //blit from gBuffer to default framebuffer
+            //blit from g_buffer to default framebuffer
             gl::BlitFramebuffer( 0, 0, buf_width, buf_height, 0, 0, buf_width, buf_height, gl::DEPTH_BUFFER_BIT, gl::NEAREST );
             gl::BindFramebuffer( gl::FRAMEBUFFER, 0 );
             

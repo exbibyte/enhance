@@ -1,12 +1,7 @@
 use std::str;
-use std::os;
 use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
 use std::str::FromStr;
-use std::clone::Clone;
 
-use implement::math::quat::Quat;
 use implement::file::md5common;
 
 #[derive(Debug)]
@@ -110,37 +105,37 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
             md5common::Token::Keyword => {
                 match kw_tok {
                     Some(Token::Version) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._md5ver = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse version failed");
                         idx_next = idx_next2;
                         println!("version: {:?}.", anim_root._md5ver );
                     },
                     Some(Token::Commandline) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._cmdline = String::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse cmdline failed");
                         idx_next = idx_next2;
                         println!("cmdline: {:?}.", anim_root._cmdline );
                     },
                     Some(Token::Numframes) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._numframes = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse numframes failed");
                         idx_next = idx_next2;
                         println!("numframes: {:?}.", anim_root._numframes );
                     },
                     Some(Token::Numjoints) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._numjoints = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse cmdline failed");
                         idx_next = idx_next2;
                         println!("numjoints: {:?}.", anim_root._numjoints );
                     },
                     Some(Token::Framerate) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._framerate = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse framerate failed");
                         idx_next = idx_next2;
                         println!("framerate: {:?}.", anim_root._framerate );
                     },
                     Some(Token::Numanimatedcomponents) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm );
                         anim_root._num_animated_components = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse numanimatedcomponents failed");
                         idx_next = idx_next2;
                         println!("numanimatedcomponents: {:?}.", anim_root._num_animated_components );
@@ -197,7 +192,7 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
     assert!( anim_root._frames.len() ==  anim_root._bounds.len() );
     let mut unique_frames = vec![false; anim_root._frames.len()];
     for i in 0..anim_root._frames.len() {
-        assert!( anim_root._frames[i]._index >= 0 && anim_root._frames[i]._index < anim_root._numframes );
+        assert!( anim_root._frames[i]._index < anim_root._numframes );
         assert!( unique_frames[ anim_root._frames[i]._index as usize ] == false );
         unique_frames[ anim_root._frames[i]._index as usize ] = true;
     }
@@ -225,6 +220,7 @@ pub fn parse( file_content: &str ) -> Result< Md5AnimRoot, & 'static str > {
     Ok( anim_root )
 }
 
+#[allow(unused)]
 pub fn process_hierarchy( file_content: &str, idx: usize, hm: & HashMap< &str, Token >, numjoints: u64 ) -> Result< ( usize, Vec< JointHierarchy > ), & 'static str > {
     let mut vec_h : Vec< JointHierarchy > = vec![];
     let mut idx_current = idx;
@@ -263,6 +259,7 @@ pub fn process_hierarchy( file_content: &str, idx: usize, hm: & HashMap< &str, T
     }
     Ok( ( idx_current, vec_h ) )
 }
+#[allow(unused)]
 pub fn process_bounds( file_content: &str, idx: usize, hm: & HashMap< &str, Token >, numframes: u64 ) -> Result< ( usize, Vec< Bound > ), & 'static str > {
     let mut vec_b : Vec< Bound > = vec![];
     let mut idx_current = idx;
@@ -307,6 +304,7 @@ pub fn process_bounds( file_content: &str, idx: usize, hm: & HashMap< &str, Toke
     }
     Ok( ( idx_current, vec_b ) )
 }
+#[allow(unused)]
 pub fn process_baseframe( file_content: &str, idx: usize, hm: & HashMap< &str, Token >, numframes: u64 ) -> Result< ( usize, Vec< FrameJoint > ), & 'static str > {
     let mut vec_b : Vec< FrameJoint > = vec![];
     let mut idx_current = idx;
@@ -352,6 +350,7 @@ pub fn process_baseframe( file_content: &str, idx: usize, hm: & HashMap< &str, T
     }
     Ok( ( idx_current, vec_b ) )
 }
+#[allow(unused)]
 pub fn process_frame( file_content: &str, idx: usize, hm: & HashMap< &str, Token >, num_animated_components: u64 ) -> Result< ( usize, Frame ), & 'static str > {
     let mut idx_current = idx;
     let mut f = Frame {

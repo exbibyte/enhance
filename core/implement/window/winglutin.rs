@@ -1,6 +1,5 @@
 extern crate gl;
 extern crate glutin;
-extern crate libc;
 
 use std::ops::FnMut;
 
@@ -45,7 +44,7 @@ impl IWindow< Event > for WinGlutin {
         gl::load_with( |symbol| self._win._wingl.get_proc_address(symbol) as * const _ );
         Ok( () )
     }
-    fn handle_events < F > ( & mut self, mut cb: F ) -> ()
+    fn handle_events < F > ( & mut self, cb: F ) -> ()
         where F : FnMut( Event ) -> () {
         self._base._eventsloop.poll_events( cb );
         ()

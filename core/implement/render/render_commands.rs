@@ -1,17 +1,7 @@
-use implement::math::mat::Mat4;
-use implement::math::mat::Mat3x1;
-use implement::math::mat::Mat2x1;
-use implement::render::camera;
-use std::collections::HashMap;
 use std::vec::Vec;
 use std::any::Any;
 
-extern crate gl;
-
 use interface::i_ele;
-use interface::i_renderobj;
-use implement::render::renderdevice_gl;
-use implement::render::util_gl;
 use interface::i_component;
 
 /// # command for resetting draw group content

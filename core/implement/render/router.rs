@@ -1,5 +1,3 @@
-extern crate gl;
-
 use implement::render::util_gl;
 
 #[derive(Copy)]
@@ -11,15 +9,20 @@ pub enum ShaderType {
 
 pub fn delete_shader_program( internal_handle: i64, shader_type: ShaderType ) -> Result< (), & 'static str > {
     match shader_type {
-        ShaderType::GLSL => util_gl::delete_shader_program( internal_handle ),
-        _ => ()
+        ShaderType::GLSL => { util_gl::delete_shader_program( internal_handle ); () },
+        _ => (),
     }
     Ok( () )
 }
 
 pub fn delete_texture( internal_handle: i64, shader_type: ShaderType ) -> Result< (), & 'static str > {
     match shader_type {
-        ShaderType::GLSL => { util_gl::delete_texture( internal_handle as _ ); },
+        ShaderType::GLSL => {
+            match util_gl::delete_texture( internal_handle as _ ) {
+                Err( e ) => { println!( "{}", e ); return Err( &"deleting texture failed" ) },
+                _ => (),
+            }
+        },
         _ => (),
     }
     Ok( () )

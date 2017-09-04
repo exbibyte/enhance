@@ -2,26 +2,16 @@
 
 extern crate gl;
 extern crate glutin;
-extern crate libc;
 extern crate rand;
 extern crate image;
 extern crate e2rcore;
 
-use std::mem;
 use std::fs::File;
 use std::path::Path;
 use std::io::BufReader;
-use std::str::FromStr;
 use std::io::Read;
-use std::ffi::CStr;
-use std::os::raw::c_char;
-use std::fmt;
 use std::str;
 use rand::Rng;
-use std::any::Any;
-use std::borrow::BorrowMut;
-use std::ops::{ Deref, DerefMut };
-use std::{thread, time};
 
 use self::image::GenericImage;
 
@@ -30,19 +20,12 @@ use self::glutin::GlContext;
 use self::e2rcore::interface::i_ele;
 use self::e2rcore::interface::i_window::IWindow;
 use self::e2rcore::interface::i_renderobj;
-use self::e2rcore::interface::i_renderpass;
-use self::e2rcore::interface::i_component;
 
-use self::e2rcore::implement::window::winglutin::WinGlutin;
-use self::e2rcore::implement::capability::capability_gl;
 use self::e2rcore::implement::render::util_gl;
 use self::e2rcore::implement::math;
 use self::e2rcore::implement::render::camera;
 use self::e2rcore::implement::render::light;
-use self::e2rcore::implement::render::shader_collection;
-use self::e2rcore::implement::render::router;
 use self::e2rcore::implement::render::mesh;
-use self::e2rcore::implement::render::renderdevice_gl;
 use self::e2rcore::implement::render::primitive;
 use self::e2rcore::implement::render::texture;
 // use self::e2rcore::implement::render::renderpass_default;
@@ -55,10 +38,14 @@ pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
     let mut buf_reader = BufReader::new(path);
     let mut contents = String::new();
-    buf_reader.read_to_string( & mut contents );
+    match buf_reader.read_to_string( & mut contents ){
+        Err( e ) => { println!("{}", e ); return None },
+        _ => (),
+    }
     Some(contents)
 }
 
+#[allow(unused)]
 fn main() {
 
     let img = image::open( &Path::new( "core/asset/images/texture0.jpg" ) ).unwrap();
@@ -72,7 +59,7 @@ fn main() {
     let vs_src = file_open( "core/example/shading/ads.vs" ).expect("vertex shader not retrieved");
     let fs_src = file_open( "core/example/shading/ads.fs" ).expect("fragment shader not retrieved");
     
-    let mut shader_program_external = kr.load_shader( &[ ( vs_src.as_str(), util_gl::ShaderType::VERTEX ),
+    let shader_program_external = kr.load_shader( &[ ( vs_src.as_str(), util_gl::ShaderType::VERTEX ),
                                                 ( fs_src.as_str(), util_gl::ShaderType::FRAGMENT ) ] ).unwrap();
     util_gl::check_last_op();
 
@@ -194,12 +181,12 @@ fn main() {
                                                  math::mat::Mat3x1 { _val: [ 4f32+delta,  1f32, 15f32 ] }, ] );
                 Renderer::add_obj( & mut kr, "mesh_triangles", i_ele::Ele::init( mesh2 ) ).is_ok();
 
-                let mut prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
+                let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
                                                       _radius: 5f32 };
 
                 Renderer::add_obj( & mut kr, "box", i_ele::Ele::init( prim_box ) ).is_ok();
 
-                let mut prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
+                let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
 
                 Renderer::add_obj( & mut kr, "sphere", i_ele::Ele::init( prim_sphere ) ).is_ok();
 

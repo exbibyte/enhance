@@ -1,11 +1,4 @@
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
-use std::str::FromStr;
-use std::clone::Clone;
-use std::cmp;
 
 use implement::math::mat::Mat3x1;
 use implement::math::quat::Quat;

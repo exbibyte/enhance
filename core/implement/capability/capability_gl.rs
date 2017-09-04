@@ -1,12 +1,6 @@
 extern crate gl;
-extern crate glutin;
-extern crate libc;
 
 use ::std::mem;
-use ::std::fs::File;
-use ::std::io::BufReader;
-use ::std::str::FromStr;
-use ::std::io::Read;
 use ::std::ffi::CStr;
 use ::std::os::raw::c_char;
 use ::std::fmt;

@@ -1,7 +1,4 @@
-use std::ops::{ Deref, DerefMut };
 use std::any::Any;
-use std::iter::Filter;
-use std::ops::FnMut;
 
 // use interface::i_renderobj;
 use interface::i_component;

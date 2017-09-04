@@ -1,10 +1,6 @@
 use std::str;
-use std::os;
 use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
 use std::str::FromStr;
-use std::clone::Clone;
 
 use implement::math::quat::Quat;
 use implement::file::md5common;
@@ -107,7 +103,7 @@ pub fn process_joint( file_content: &str, idx: usize, hm: & HashMap< &str, Token
         _rot: Quat::<f32>::init()
     };
     let mut idx_current = idx;
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
+    let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
         md5common::Token::Str => {
             j._name = String::from_str( &file_content[idx_s..idx_e] ).expect("md5mesh parse joint name failed");
@@ -115,7 +111,7 @@ pub fn process_joint( file_content: &str, idx: usize, hm: & HashMap< &str, Token
         },
         _ => panic!("unexpected token. string not found.")
     }
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
+    let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
         md5common::Token::Int => {
             j._parent_index = i64::from_str( &file_content[idx_s..idx_e] ).expect("md5mesh parse joint parent index failed");
@@ -174,8 +170,8 @@ pub fn process_mesh( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
     };
     let mut idx_current = idx;
     match md5common::expect_bracel( &file_content[0..], idx_current ) {
-        Ok(v) => { idx_current = v },
-        Err(e) => { assert!( false, "unexpected token. bracel not present." ); }
+        Ok( v ) => { idx_current = v },
+        Err( _ ) => { return Err( "unexpected token. bracel not present") }
     }
     loop {
         let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
@@ -201,7 +197,7 @@ pub fn process_mesh( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
                             Err(e) => assert!(false, e )
                         }
                         j._numverts = arr[0] as u64;
-                        for i in 0.. j._numverts {
+                        for _ in 0.. j._numverts {
                             //expect: keyword: vert
                             match process_vert( &file_content[0..], idx_current, & hm ) {
                                 Ok( ( index, vert ) ) => {
@@ -223,7 +219,7 @@ pub fn process_mesh( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
                             Err(e) => assert!(false, e )
                         }
                         j._numtris = arr[0] as u64;
-                        for i in 0.. j._numtris {
+                        for _ in 0.. j._numtris {
                             //expect: keyword: tri
                             match process_tri( &file_content[0..], idx_current, & hm ) {
                                 Ok( ( index, tri ) ) => {
@@ -245,7 +241,7 @@ pub fn process_mesh( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
                             Err(e) => assert!(false, e )
                         }
                         j._numweights = arr[0] as u64;
-                        for i in 0.. j._numweights {
+                        for _ in 0.. j._numweights {
                             //expect: keyword: weight
                             match process_weight( &file_content[0..], idx_current, & hm ) {
                                 Ok( ( index, weight ) ) => {
@@ -278,7 +274,7 @@ pub fn process_vert( file_content: &str, idx: usize, hm: & HashMap< &str, Token 
         _normal: [0f32;3],
         _pos: [0f32;3],
     };
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
+    let ( tok, kw_tok, _idx_s, _idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
         md5common::Token::Keyword => {
             match kw_tok {
@@ -336,7 +332,7 @@ pub fn process_tri( file_content: &str, idx: usize, hm: & HashMap< &str, Token >
         _index: 0u64,
         _vert_indices: [0u64;3],
     };
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
+    let ( tok, kw_tok, _idx_s, _idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
         md5common::Token::Keyword => {
             match kw_tok {
@@ -378,7 +374,7 @@ pub fn process_weight( file_content: &str, idx: usize, hm: & HashMap< &str, Toke
         _weight_bias: 0f32,
         _pos: [0f32;3],
     };
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
+    let ( tok, kw_tok, _idx_s, _idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx_current, & hm );
     match tok {
         md5common::Token::Keyword => {
             match kw_tok {
@@ -460,31 +456,31 @@ pub fn parse( file_content: &str ) -> Result< Md5MeshRoot, & 'static str > {
             md5common::Token::Keyword => {
                 match kw_tok {
                     Some(Token::Version) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                         mesh_root._md5ver = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse version failed");
                         idx_next = idx_next2;
                     },
                     Some(Token::Commandline) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                         mesh_root._cmdline = String::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse cmdline failed");
                         idx_next = idx_next2;
                         println!("cmdline: {:?}.", mesh_root._cmdline );
                     },
                     Some(Token::Numjoints) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                         mesh_root._numjoints = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse cmdline failed");
                         idx_next = idx_next2;
                         println!("numjoints: {:?}.", mesh_root._numjoints );
                     },
                     Some(Token::Nummeshes) => {
-                        let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                        let ( _tok2, _kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                         mesh_root._nummeshes = u64::from_str( &file_content[idx_s2..idx_e2] ).expect("md5mesh parse cmdline failed");
                         idx_next = idx_next2;
                         println!("nummeshes: {:?}.", mesh_root._nummeshes );
                     },
                     Some(Token::Joints) => {
                         {
-                            let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                            let ( tok2, _kw_tok2, _idx_s2, _idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                             match tok2 {
                                 md5common::Token::Bracel => (),
                                 _ => panic!("invalid token. expected bracel.")
@@ -492,7 +488,7 @@ pub fn parse( file_content: &str ) -> Result< Md5MeshRoot, & 'static str > {
                             idx_next = idx_next2;
                         }
                         {
-                            for i in 0..mesh_root._numjoints {
+                            for _ in 0..mesh_root._numjoints {
                                 match process_joint( &file_content[0..], idx_next, & mut hm_keywords ) {
                                     Ok( ( v, joint ) ) => {
                                         idx_next = v;
@@ -503,7 +499,7 @@ pub fn parse( file_content: &str ) -> Result< Md5MeshRoot, & 'static str > {
                             }
                         }
                         {
-                            let ( tok2, kw_tok2, idx_s2, idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
+                            let ( tok2, _kw_tok2, _idx_s2, _idx_e2, idx_next2 ) = md5common::tokenize( &file_content[0..], idx_next, & mut hm_keywords );
                             match tok2 {
                                 md5common::Token::Bracer => (),
                                 _ => panic!("invalid token. expected bracel.")

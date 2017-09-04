@@ -6,7 +6,6 @@ use interface::i_renderobj;
 use interface::i_component;
 
 use implement::math::mat;
-use implement::render::renderdevice_gl;
 
 /// # 6 sided polyhedral / box
 #[derive(Clone)]
@@ -241,10 +240,10 @@ impl SphereIcosahedron {
     /// # return index of point in the middle of p1 and p2
     pub fn get_middle_point( & mut self, p1: usize, p2: usize ) -> usize {
         // first check if we have it already
-        let firstIsSmaller : bool = p1 < p2;
-        let smallerIndex = if firstIsSmaller { p1 } else { p2 };
-        let greaterIndex = if firstIsSmaller { p2 } else { p1 };
-        let key = (smallerIndex << 32) + greaterIndex;
+        let first_is_smaller : bool = p1 < p2;
+        let smaller_index = if first_is_smaller { p1 } else { p2 };
+        let greater_index = if first_is_smaller { p2 } else { p1 };
+        let _key = (smaller_index << 32) + greater_index;
         
         // int ret;
         // if (this.middlePointIndexCache.TryGetValue(key, out ret))
@@ -328,7 +327,7 @@ impl i_ele::IObjImpl for SphereIcosahedron {
 
             let iterations = 2;
             // refine triangles
-            for i in 0..iterations {
+            for _ in 0..iterations {
                 let mut faces2 = vec![];
                 for tri in faces.iter() {
                     // subdivide triangle into 4

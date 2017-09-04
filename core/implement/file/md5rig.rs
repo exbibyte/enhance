@@ -1,9 +1,4 @@
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
-use std::iter::Peekable;
-use std::str::FromStr;
 use std::clone::Clone;
 
 use implement::math::quat::Quat;
@@ -53,7 +48,6 @@ fn process_posejoints( f: & md5anim::Frame, bbox: & md5anim::Bound, hier: & Vec<
         // _bbox_lower: [0f32;3],
         // _bbox_upper: [0f32;3],
     };
-    let mut index_current_joint = 0;
     for i in 0..hier.len() {
         let start = hier[i]._start_index;
         let flag = hier[i]._flags;

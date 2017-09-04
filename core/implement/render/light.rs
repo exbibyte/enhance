@@ -9,7 +9,6 @@ use interface::i_component;
 
 use implement::math::mat::Mat4;
 use implement::math::mat::Mat3x1;
-use implement::render::camera;
 
 #[derive(Clone)]
 pub struct LightAdsPoint {

@@ -6,11 +6,7 @@ use interface::i_renderobj;
 use interface::i_ele;
 use interface::i_component;
 
-use implement::render::rendercommon;
-use implement::render::camera;
 use implement::math;
-use implement::math::mat::Mat4;
-use implement::math::mat::Mat3x1;
 
 #[derive(Clone)]
 pub struct Cam {

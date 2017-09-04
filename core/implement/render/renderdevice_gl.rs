@@ -1,7 +1,3 @@
-use implement::math::mat::Mat4;
-use implement::math::mat::Mat3x1;
-use implement::math::mat::Mat2x1;
-use implement::render::camera;
 use std::collections::HashMap;
 use std::vec::Vec;
 
@@ -262,8 +258,8 @@ impl RenderUniformCollection {
     pub fn set_group( & mut self, shader_program: u64, group_id: u64, names: Vec< String > ) -> Result< (), & 'static str > {
         for i in names.iter() {
             match self._uniforms_f.get( &( shader_program, i.clone() ) ) {
-                Some(v) => (),
-                None => return Err( &"unfound uniform name" )
+                None => return Err( &"unfound uniform name" ),
+                _ => (),
             }
         }
         self._uniforms_groups.insert( group_id, ( shader_program, names ) );

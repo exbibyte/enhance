@@ -1,8 +1,6 @@
 use std::collections::HashMap;
-use std::vec::Vec;
 use std::string::String;
 
-extern crate gl;
 
 use implement::render::router;
 
@@ -39,7 +37,7 @@ impl TextureCollection {
         }
         match self._textures.insert( handle, ( shader_type, internal_handle ) ) {
             None => (),
-            Some( ( shader_type, old_handle ) ) => {
+            Some( ( _shader_type, _old_handle ) ) => {
                 return Err( &"adding texture handle failed")
             }
         }
@@ -52,7 +50,7 @@ impl TextureCollection {
         match self._textures.insert( id, ( shader_type, internal_handle ) ) {
             None => (),
             Some( ( shader_type, old_handle ) ) => {
-                router::delete_texture( old_handle, shader_type );
+                router::delete_texture( old_handle, shader_type )?;
                 println!( "removed old texture( {} ).", old_handle );
             }
         }
@@ -61,8 +59,8 @@ impl TextureCollection {
         Ok( () )
     }
     pub fn clear( & mut self ) -> Result< (), & 'static str > {
-        for ( &k, &( ref shader_type, ref handle ) ) in self._textures.iter() {
-            router::delete_texture( *handle, (*shader_type).clone() );
+        for ( &_k, &( ref shader_type, ref handle ) ) in self._textures.iter() {
+            router::delete_texture( *handle, (*shader_type).clone() )?
         }
         self._id_to_descrip.clear();
         self._descrip_to_id.clear();
@@ -71,7 +69,7 @@ impl TextureCollection {
     pub fn remove( & mut self, id: u64 ) -> Result< (), & 'static str > {
         match self._textures.remove( &id ) {
             Some( ( shader_type, handle ) ) => {
-                router::delete_texture( handle, shader_type );
+                router::delete_texture( handle, shader_type )?;
                 if let Some( descrip ) = self._id_to_descrip.remove( &id ) {
                     self._descrip_to_id.remove( &descrip );
                 }
@@ -82,7 +80,7 @@ impl TextureCollection {
     }
     pub fn get( & mut self, id: u64 ) -> Option< i64 > {
         match self._textures.get( &id ) {
-            Some( &( ref shader_type, ref handle ) ) => {
+            Some( &( ref _shader_type, ref handle ) ) => {
                 return Some( *handle )
             },
             None => return None

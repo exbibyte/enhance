@@ -1,8 +1,5 @@
 use std::collections::HashMap;
-use std::vec::Vec;
 use std::string::String;
-
-extern crate gl;
 
 use implement::render::router;
 
@@ -28,7 +25,7 @@ impl ShaderCollection {
         match self._programs.insert( id, ( shader_type, internal_handle ) ) {
             None => (),
             Some( ( shader_type, old_handle ) ) => {
-                router::delete_shader_program( old_handle, shader_type );
+                router::delete_shader_program( old_handle, shader_type )?;
                 println!( "removed old shader program( {} ).", old_handle );
             }
         }
@@ -37,8 +34,8 @@ impl ShaderCollection {
         Ok( () )
     }
     pub fn clear( & mut self ) -> Result< (), & 'static str > {
-        for ( &k, &( ref shader_type, ref handle ) ) in self._programs.iter() {
-            router::delete_shader_program( *handle, (*shader_type).clone() );
+        for ( _, &( ref shader_type, ref handle ) ) in self._programs.iter() {
+            router::delete_shader_program( *handle, (*shader_type).clone() )?;
         }
         self._id_to_descrip.clear();
         self._descrip_to_id.clear();
@@ -47,10 +44,11 @@ impl ShaderCollection {
     pub fn remove( & mut self, id: u64 ) -> Result< (), & 'static str > {
         match self._programs.remove( &id ) {
             Some( ( shader_type, handle ) ) => {
-                router::delete_shader_program( handle, shader_type );
+                router::delete_shader_program( handle, shader_type )?;
                 if let Some( descrip ) = self._id_to_descrip.remove( &id ) {
                     self._descrip_to_id.remove( &descrip );
-                }
+                };
+                ()
             },
             None => (),
         }
@@ -58,7 +56,7 @@ impl ShaderCollection {
     }
     pub fn get( & mut self, id: u64 ) -> Option< i64 > {
         match self._programs.get( &id ) {
-            Some( &( ref shader_type, ref handle ) ) => {
+            Some( &( ref _shader_type, ref handle ) ) => {
                 return Some( *handle )
             },
             None => return None

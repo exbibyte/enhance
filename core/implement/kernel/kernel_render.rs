@@ -1,47 +1,24 @@
 extern crate gl;
-extern crate glutin;
-extern crate libc;
-extern crate rand;
 
-use ::std::mem;
-use ::std::fs::File;
-use ::std::io::BufReader;
-use ::std::str::FromStr;
-use ::std::io::Read;
-use ::std::ffi::CStr;
-use ::std::os::raw::c_char;
-use ::std::fmt;
 use ::std::str;
-use self::rand::Rng;
-use ::std::any::Any;
-use ::std::borrow::BorrowMut;
-use ::std::ops::{ Deref, DerefMut };
+use ::std::ops::DerefMut;
 use std::collections::HashMap;
-use std::cell::RefCell;
-    
-use self::glutin::GlContext;
+use std::cell::RefCell;   
 
 use interface::i_ele;
 use interface::i_window::IWindow;
-use interface::i_renderobj::IRenderBuffer;
 use interface::i_renderobj::RenderDevice;
 use interface::i_renderobj;
-use interface::i_renderpass::IRenderPass;
 use interface::i_renderpass;
 use interface::i_component;
 
 use implement::window::winglutin::WinGlutin;
 use implement::capability::capability_gl;
 use implement::render::util_gl;
-use implement::math;
-use implement::render::camera;
-use implement::render::light;
 use implement::render::shader_collection;
 use implement::render::texture_collection;
 use implement::render::router;
-use implement::render::mesh;
 use implement::render::renderdevice_gl;
-use implement::render::primitive;
 // use implement::render::renderpass_default;
 
 
@@ -84,7 +61,7 @@ impl Drop for Renderer {
 
             gl::DeleteBuffers( self._vbos.len() as _, self._vbos.as_ptr(), );
         }
-        self._shader_collection.borrow_mut().clear(); //does DeleteProgram
+        self._shader_collection.borrow_mut().clear().is_ok(); //does DeleteProgram
         unsafe {
             for i in self._shaders_compiled.iter() {
                 gl::DeleteShader( *i );
@@ -183,6 +160,7 @@ impl Renderer {
         self._draw_groups.borrow_mut().push( draw_group );
         Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }
+    #[allow(unused)]
     pub fn add_obj( renderer: & mut Renderer, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
 
         let index = renderer._objs.borrow_mut().len();
@@ -209,14 +187,12 @@ impl Renderer {
         }
 
         if trigger_to_process_objs {
-            Renderer::process_objs( renderer, group_id );
+            Renderer::process_objs( renderer, group_id )?
         }
 
         Ok( renderer._objs.borrow_mut().len() )  
     }
-    pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {
-        let mut index = 0;
-        
+    pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {       
         println!("objects size: {}", renderer._objs.borrow_mut().len() );
         
         for i in renderer._objs.borrow_mut().iter() {
@@ -231,7 +207,6 @@ impl Renderer {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
                         }
-                        ()
                     },
                     None => (),
                 }
@@ -243,7 +218,6 @@ impl Renderer {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
                         }
-                        ()
                     },
                     None => (),
                 }
@@ -310,7 +284,6 @@ impl Renderer {
     }
     pub fn drawcall_draw_group( renderer: & Renderer, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
         for &i in group_indices {
-            let l = renderer._draw_group_uniforms.borrow()[i].len();
             for uniform_group in renderer._draw_group_uniforms.borrow()[i].iter() {
                 println!("dispatching uniform group: {}", *uniform_group );
                 if i >= renderer._draw_groups.borrow().len() {

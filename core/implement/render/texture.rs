@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::cmp::Eq;
-use std::cmp::PartialEq;
 
 extern crate image;
 extern crate num;
@@ -30,10 +28,10 @@ pub enum Channel {
 pub enum TextureBuiltin {
     SOLID,
     CHECKER,
+    UNKNOWN,
 }
 
 use std::ops::Index;
-use std::ops::IndexMut;
 
 #[derive(Clone)]
 pub struct Texture {
@@ -47,7 +45,7 @@ impl Index<(usize, Channel)> for Texture {
     fn index( &self, i: (usize, Channel) ) -> &u8 {
         let tuple_index = match self._channels.get( &i.1 ) {
             Some( &v ) => v,
-            _ => { panic!("unmatching channel detected"); 0usize },
+            _ => { panic!("unmatching channel detected"); },
         };
         &self._data[ i.0 * self._channels.len() + tuple_index ].1
     }
@@ -57,7 +55,7 @@ impl Texture {
     pub fn from< T: image::GenericImage >( img_buffer: &T ) -> Texture
     {
         let mut buf = vec![];
-        for (x,y,p) in img_buffer.pixels() {
+        for (_x,_y,p) in img_buffer.pixels() {
             let rgb = p.to_rgb();
             let r: u8 = num::cast(rgb.data[0]).unwrap();
             let g: u8 = num::cast(rgb.data[1]).unwrap();

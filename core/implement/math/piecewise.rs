@@ -3,8 +3,6 @@ use std::marker;
 
 use interface::i_interpolate::*;
 
-use implement::math::mat::*;
-
 // #[derive(Debug)]
 #[derive(Clone)]
 pub struct Piecewise< T, V > where T: IInterpolate< V > {

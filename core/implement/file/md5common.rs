@@ -1,12 +1,10 @@
-use std::io;
 use std::io::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
 use std::str;
-use std::os;
-use std::collections::HashMap;
-use std::str::Chars;
 use std::iter::Peekable;
+use std::str::Chars;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -170,6 +168,8 @@ pub fn tokenize < KeywordTok > ( input: &str, idx: usize, hm: & HashMap< &str, K
                             if !y.is_numeric() {
                                 return ( Token::Float, None, idxcurrent_start, idxcurrent, idxcurrent )
                             }   
+                        } else {
+                            break;
                         }
                         iter.next();
                         idxcurrent += 1;
@@ -211,15 +211,18 @@ pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
     let mut buf_reader = BufReader::new(path);
     let mut contents = String::new();
-    buf_reader.read_to_string( & mut contents );
+    match buf_reader.read_to_string( & mut contents ) {
+        Err( e ) => { println!("{}", e ); return None },
+        _ => (),
+    }
     Some(contents)
 }
 
 pub fn expect_int_array( input: &str, idx: usize, count: usize, arr: & mut [i64] ) -> Result< usize, & 'static str > {
     let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
+    let hm : HashMap< &str, bool > = HashMap::new();
     for i in 0..count {
-        let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+        let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
         match tok {
             Token::Int => {
                 arr[i] = i64::from_str( &input[idx_s..idx_e] ).expect("md5common parse int array invalid");
@@ -233,9 +236,9 @@ pub fn expect_int_array( input: &str, idx: usize, count: usize, arr: & mut [i64]
 
 pub fn expect_float_array( input: &str, idx: usize, count: usize, arr: & mut [f32] ) -> Result< usize, & 'static str > {
     let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
+    let hm : HashMap< &str, bool > = HashMap::new();
     for i in 0..count {
-        let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+        let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
         match tok {
             Token::Float => {
                 arr[i] = f32::from_str( &input[idx_s..idx_e] ).expect("md5common parse int array invalid");
@@ -248,9 +251,9 @@ pub fn expect_float_array( input: &str, idx: usize, count: usize, arr: & mut [f3
 }
 
 pub fn expect_parenl( input: &str, idx: usize ) -> Result< usize, & 'static str > {
-    let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+    let idx_current = idx;
+    let hm : HashMap< &str, bool > = HashMap::new();
+    let ( tok, _kw_tok, _idx_s, _idx_e, idx_next ) = tokenize( input, idx_current, & hm );
     match tok {
         Token::Parenl => return Ok( idx_next ),
         _ => return Err("unexpected token. parenl not found.")
@@ -258,9 +261,9 @@ pub fn expect_parenl( input: &str, idx: usize ) -> Result< usize, & 'static str 
 }
 
 pub fn expect_parenr( input: &str, idx: usize ) -> Result< usize, & 'static str > {
-    let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+    let idx_current = idx;
+    let hm : HashMap< &str, bool > = HashMap::new();
+    let ( tok, _kw_tok, _idx_s, _idx_e, idx_next ) = tokenize( input, idx_current, & hm );
     match tok {
         Token::Parenr => return Ok( idx_next ),
         _ => return Err("unexpected token. parenr not found.")
@@ -268,9 +271,9 @@ pub fn expect_parenr( input: &str, idx: usize ) -> Result< usize, & 'static str 
 }
 
 pub fn expect_bracel( input: &str, idx: usize ) -> Result< usize, & 'static str > {
-    let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+    let idx_current = idx;
+    let hm : HashMap< &str, bool > = HashMap::new();
+    let ( tok, _kw_tok, _idx_s, _idx_e, idx_next ) = tokenize( input, idx_current, & hm );
     match tok {
         Token::Bracel => return Ok( idx_next ),
         _ => return Err("unexpected token. bracel not found.")
@@ -278,9 +281,9 @@ pub fn expect_bracel( input: &str, idx: usize ) -> Result< usize, & 'static str 
 }
 
 pub fn expect_bracer( input: &str, idx: usize ) -> Result< usize, & 'static str > {
-    let mut idx_current = idx;
-    let mut hm : HashMap< &str, bool > = HashMap::new();
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+    let idx_current = idx;
+    let hm : HashMap< &str, bool > = HashMap::new();
+    let ( tok, _kw_tok, _idx_s, _idx_e, idx_next ) = tokenize( input, idx_current, & hm );
     match tok {
         Token::Bracer => return Ok( idx_next ),
         _ => return Err("unexpected token. bracer not found.")
@@ -288,14 +291,13 @@ pub fn expect_bracer( input: &str, idx: usize ) -> Result< usize, & 'static str 
 }
 
 pub fn expect_str< KeywordTok >( input: &str, idx: usize, hm: & HashMap< &str, KeywordTok >, ret_str: & mut String ) -> Result< usize, & 'static str > where KeywordTok : Copy {
-    let mut idx_current = idx;
-    let ( tok, kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
+    let idx_current = idx;
+    let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = tokenize( input, idx_current, & hm );
     match tok {
         Token::Str => {
             *ret_str = input[idx_s..idx_e].to_string();
-            return Ok( idx_next )
+            Ok( idx_next )
         },
-        _ => { return Err("unexpected token. string not found."); }
+        _ => { Err("unexpected token. string not found.") }
     }
-    return Err("unexpected token. string not found.")
 }
