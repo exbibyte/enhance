@@ -18,55 +18,82 @@ pub fn read( file_path: & str ) -> Result< ( u64, u64, Vec< u8 > ), & 'static st
     buf_reader.read_to_end( & mut content ).is_ok();
     println!("file content len: {:?}", content.len() );
 
-    // let mut header = [0u64;3]; // width, height, maxval
-    // if content[0..2].iter().cloned().collect::<String>().as_str() != "P6" {
-    //     return Err( "invalid PPM file header" )
+    let mut header = [0u64;4]; // width, height, maxval
+    if content[0] != 'P' as u8 ||
+       content[1] != '6' as u8 {
+           return Err( "invalid PPM file header" )
+    }
+
+    // for &i in &content[0..20] {
+    //     println!("{}", i );
     // }
-    // let mut i = 0;
-    // let mut index = 2;
-    // while index < content.len() {
-    //     if i >= 3 {
-    //         break;
-    //     }
-    //     if content[index] == '#' {
-    //         //ignore comment
-    //         index += 1;
-    //         while content[index] != '\n' {
-    //             index +=1;
-    //         }
-    //     } else {
-    //         //read a number to header array
-    //         if content[index] == ' ' ||
-    //            content[index] == '\n' {
-    //             index += 1;
-    //             continue;
-    //         }else if content[index].is_digit(10) {
-    //             let begin = index;
-    //             index += 1;
-    //             while content[index].is_digit(10) {
-    //                 index += 1;
-    //             }
-    //             let val = u64::from_str( &file_content.as_str()[begin..index] ).unwrap();
-    //             header[i] = val;
-    //             i += 1;
-    //         }else{
-    //             return Err( "unexpected character" )
-    //         }
-    //     }
-    // }
-    // //read to newline
-    // while content[index] != '\n' {
-    //     index +=1;
-    // }
-    // let width = header[0];
-    // let height = header[1];
-    // //read remaining file as bytes of rgb
-    // let img_bytes = content[index..].to_vec().into_iter().map(|x| x as u8).collect::<Vec<u8>>();
-    // if img_bytes.len() != ( width * height * 3 ) as usize {
-    //     return Err( "read image byte length not match expected" )
-    // }
-    // Ok( ( width, height, img_bytes ) )
-    Ok( ( 0, 0, vec![] ) )
+    
+    let mut i = 0;
+    let mut index = 2;
+    while index < content.len() {
+        if i >= 3 {
+            break;
+        }
+        if content[index] == '#' as u8 {
+            //ignore comment
+            index += 1;
+            while content[index] != '\n' as u8 {
+                index +=1;
+            }
+        } else {
+            //read a number to header array
+            if content[index] == ' ' as u8 ||
+               content[index] == '\n' as u8 {
+                index += 1;
+                continue;
+            }else if content[index] >= '0' as u8 &&
+                     content[index] <= '9' as u8
+            {
+                let begin = index;
+                index += 1;
+                if index >= content.len() {
+                    break;
+                }
+                while ( content[index] >= '0' as u8 &&
+                        content[index] <= '9' as u8 )
+                {
+                    index += 1;
+                    if index >= content.len() {
+                        break;
+                    }
+                }
+                let num = &content[begin..index];
+                let mut base = 1;
+                let mut v = 0;
+                for j in 0..num.len() {
+                    v += ( num[num.len()-1-j] - ('0' as u8 ) ) as u64 * base;
+                    base *= 10;
+                }
+                // let val = u64::from_str( num.into() ).unwrap();
+                header[i] = v;
+                i += 1;
+            }else{
+                return Err( "unexpected character" )
+            }
+        }
+    }
+    //read a number to header array
+    while content[index] == ' ' as u8 ||
+          content[index] == '\n' as u8 {
+            index += 1;
+    }
+            
+    // println!( "index: {}", index );
+    let width = header[0];
+    let height = header[1];
+    // println!( "w,h: {}, {}", header[0], header[1] );
+
+    //read remaining file as bytes of rgb
+    let img_bytes = content[index..].to_vec();
+    if img_bytes.len() != ( width * height * 3 ) as usize {
+        return Err( "read image byte length not match expected" )
+    }
+    Ok( ( width, height, img_bytes ) )
 }
 
 pub fn write( file_path: & str, w: u64, h: u64, img: & Vec < u8 > ) -> Result< (), & 'static str >

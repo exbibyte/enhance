@@ -11,7 +11,7 @@ use interface::i_interpolate::IInterpolate;
 use interface::i_comparable::IComparableError;
 
 use implement::math::piecewise;
-use implement::math::spline::SplineBezier;
+use implement::math::spline_bezier::SplineBezier;
 use implement::math::piecewise::Piecewise;
 
 use test::math::test_interpolate;

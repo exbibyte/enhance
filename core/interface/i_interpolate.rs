@@ -1,4 +1,3 @@
-use implement::math::mat::*;
 
 pub trait IInterpolate < T > : DoubleEndedIterator< Item = T > {
     fn interp_delta( & mut self, steps: i64 ) -> Option< T >;

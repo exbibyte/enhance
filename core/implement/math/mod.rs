@@ -1,5 +1,5 @@
 // pub mod point;
-pub mod spline;
+pub mod spline_bezier;
 pub mod mat;
 pub mod quat;
 pub mod dualquat;
