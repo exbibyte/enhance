@@ -8,5 +8,6 @@ pub mod piecewise;
 pub mod bound;
 ///shape implementations
 pub mod ray;
+pub mod point;
 ///todo
 pub mod intersect_gjk;

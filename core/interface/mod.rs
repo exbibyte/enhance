@@ -10,6 +10,7 @@ pub mod i_shape;
 pub mod i_bound;
 pub mod i_interpolate;
 pub mod i_intersect;
+pub mod i_vicinity;
 
 pub mod i_window;
 // pub mod i_rendernode;

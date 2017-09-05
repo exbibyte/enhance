@@ -1,11 +1,47 @@
+use std::f64;
+
 use interface::i_bound::BoundType;
 use interface::i_bound::IBound;
+use interface::i_shape::ShapeType;
 
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct AxisAlignedBBox {
     pub _bound_lower: [ f64; 3 ],
     pub _bound_upper: [ f64; 3 ],
+}
+
+impl AxisAlignedBBox {
+    pub fn init( shape_type: ShapeType, vals: &[f64] ) -> AxisAlignedBBox {
+        match shape_type {
+            ShapeType::RAY => {
+                assert!( vals.len() == 6 );
+                let mut bounds = [ (0f64,0f64); 3 ];
+                for i in 0..3 {
+                    let b = if vals[3+i] > 0f64 {
+                        ( vals[i], f64::INFINITY )
+                    } else if vals[3+i] < 0f64 {
+                        ( f64::NEG_INFINITY, vals[i] )
+                    } else {
+                        ( vals[i], vals[i] )
+                    };
+                    bounds[i] = b;
+                }
+                AxisAlignedBBox {
+                    _bound_lower: [ bounds[0].0, bounds[1].0, bounds[2].0 ],
+                    _bound_upper: [ bounds[0].1, bounds[1].1, bounds[2].1 ],
+                }
+            },
+            ShapeType::POINT => {
+                assert!( vals.len() == 3 );
+                AxisAlignedBBox {
+                    _bound_lower: [ vals[0], vals[1], vals[2] ],
+                    _bound_upper: [ vals[0], vals[1], vals[2] ],
+                }
+            },
+            _ => { unimplemented!(); },
+        }
+    }
 }
 
 impl IBound for AxisAlignedBBox {
@@ -26,8 +62,7 @@ impl IBound for AxisAlignedBBox {
                 for i in 0..3 {
                     if a_lower[i] > b_upper[i] ||
                        a_upper[i] < b_lower[i] {
-                           println!("not intersect");
-                           return false
+                        return false
                     }
                 }
                 return true

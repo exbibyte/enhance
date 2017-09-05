@@ -1,4 +1,5 @@
 use interface::i_bound::IBound;
+use interface::i_vicinity::IVicinity;
 
 use implement::math::mat::Mat3x1;
 
@@ -14,7 +15,7 @@ pub enum ShapeType {
     COMPLEX,
 }
 
-pub trait IShape {
+pub trait IShape : IVicinity< f64 > {
     fn get_shape_data( & self ) -> Vec< f64 >;
     fn get_type( & self ) -> ShapeType;
     fn get_bound( & self ) -> &IBound;

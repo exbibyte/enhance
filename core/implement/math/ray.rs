@@ -1,5 +1,6 @@
 use interface::i_shape::{ ShapeType, IShape };
 use interface::i_bound::IBound;
+use interface::i_vicinity::IVicinity;
 use interface::i_comparable::IComparableError;
 
 use implement::math::mat::Mat3x1;
@@ -10,6 +11,20 @@ pub struct Ray3 {
     pub _ori: Mat3x1< f64 >,
     pub _dir: Mat3x1< f64 >,
     pub _bound: AxisAlignedBBox,
+    pub _vicinity: f64,
+}
+
+impl Ray3 {
+    pub fn init( origin: &[f64], dir: &[f64] ) -> Ray3 {
+        assert!( origin.len() == 3 );
+        assert!( dir.len() == 3 );
+        Ray3 {
+            _ori: Mat3x1 { _val: [ origin[0], origin[1], origin[2] ] },
+            _dir: Mat3x1 { _val: [ dir[0], dir[1], dir[2] ] },
+            _bound: AxisAlignedBBox::init( ShapeType::RAY, &[ &origin[0..3], &dir[0..3] ].concat() ),
+            _vicinity: 0.000001f64,
+        }
+    }
 }
 
 impl IShape for Ray3 {
@@ -39,11 +54,8 @@ impl IShape for Ray3 {
                     let c = b_dir.minus( &a_dir ).unwrap();
                     let v = a_dir.cross( &b_dir ).unwrap();
 
-                    let error_thresh = 0.0001f64;
-
                     let dot_v_c = v.dot( &c ).unwrap();
-                    if dot_v_c < -error_thresh &&
-                       dot_v_c > error_thresh {
+                    if !self.within_vicinity( dot_v_c, 0f64 ) {
                         //they are not in the same place, so no intersection occurs
                         return ( false, None )
                     }
@@ -56,18 +68,16 @@ impl IShape for Ray3 {
                         let point1 = a_dir;
                         let point2 = b_off.minus( &a_off ).unwrap();
                         let triangle_area = point1.cross( &point2 ).unwrap().magnitude().unwrap();
-                        println!( "triangle area: {}", triangle_area );
-                        if triangle_area < -error_thresh ||
-                           triangle_area > error_thresh
-                        {
+                        // println!( "triangle area: {}", triangle_area );
+                        if !self.within_vicinity( triangle_area, 0f64 ) {
                             //no overlap
-                            println!( "parallel but non-overlapping lines" );
+                            // println!( "parallel but non-overlapping lines" );
                             return ( false, None )
                         } else {
                             //lines are colinear
                             let direction = if d.dot( &a_dir ).unwrap() < 0f64 { -1f64 } else { 1f64 };
                             let distance = direction * d.magnitude().unwrap() / a_dir.magnitude().unwrap();
-                            println!( "colinear lines, distance: {}", distance );
+                            // println!( "colinear lines, distance: {}", distance );
                             if distance < 0f64 {
                                 //intersection at offset of ray a, so clamp t to 0
                                 return ( true, Some( a_off ) )
@@ -87,8 +97,42 @@ impl IShape for Ray3 {
                         }
                     }
                 },
+                ShapeType::POINT => {
+                    let other_shape_data = other.get_shape_data();
+                    let b_off = Mat3x1 { _val: [ other_shape_data[0], other_shape_data[1], other_shape_data[2] ] };
+                    let a_dir = self._dir;
+                    let a_off = self._ori;
+                    //a_dir * t + a_off = b_off
+                    //t = (b_off - a_off) / a_dir
+                    let t = b_off.minus( &a_off ).unwrap().div( &a_dir ).unwrap();
+                    if !self.within_vicinity( t[0], t[1] ) ||
+                       !self.within_vicinity( t[1], t[2] ) {
+                           return ( false, None )
+                    } else {
+                        if t[0] >= 0f64 {
+                            return ( true, Some( a_dir.scale( t[0] ).unwrap().plus( &a_off ).unwrap() ) )
+                        } else {
+                            //the point is behind the ray origin and direction
+                            return ( false, None )
+                        }
+                    }    
+                },
                 _ => { unimplemented!(); },
             }
+        }
+    }
+}
+
+impl IVicinity< f64 > for Ray3 {
+    fn set_vicinity( & mut self, epsilon: f64 ) {
+        self._vicinity = epsilon.abs();
+    }
+    fn within_vicinity( & self, a: f64, b: f64 ) -> bool {
+        if a + self._vicinity >= b &&
+           a - self._vicinity <= b {
+            true
+        } else {
+            false
         }
     }
 }
