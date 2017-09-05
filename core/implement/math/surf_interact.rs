@@ -1,10 +1,13 @@
-use implement::math::vector::Vector4;
+use implement::math::vector::Mat2x1< f64 >;
+use implement::math::vector::Mat3x1< f64 >;
+use implement::math::vector::Mat4x1< f64 >;
 
+///todo
 pub struct SurfInteract {
-    _point: Vector2< f64 >,
-    _dpdu: Vector3< f64 >,
-    _dpdv: Vector3< f64 >,
-    _normal: Vector3< f64 >,
-    _dndu: Vector3< f64 >,
-    _dndv: Vector3< f64 >,
+    _point: Mat2x1< f64 >,
+    _dpdu: Mat3x1< f64 >,
+    _dpdv: Mat3x1< f64 >,
+    _normal: Mat3x1< f64 >,
+    _dndu: Mat3x1< f64 >,
+    _dndv: Mat3x1< f64 >,
 }

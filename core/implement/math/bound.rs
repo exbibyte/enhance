@@ -1,6 +1,8 @@
 use interface::i_bound::BoundType;
 use interface::i_bound::IBound;
 
+#[derive(Debug)]
+#[derive(Clone)]
 pub struct AxisAlignedBBox {
     pub _bound_lower: [ f64; 3 ],
     pub _bound_upper: [ f64; 3 ],
@@ -33,7 +35,6 @@ impl IBound for AxisAlignedBBox {
             },
             _ => { unimplemented!(); },
         }
-        true
     }
     fn get_shortest_separation( & self, other: & IBound ) -> f64 {
         unimplemented!{};

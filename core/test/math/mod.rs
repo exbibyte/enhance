@@ -10,3 +10,5 @@ pub mod test_spline_bezier;
 pub mod test_linearinterp;
 pub mod test_interpolate;
 pub mod test_bound;
+pub mod test_intersect_ray_ray;
+
