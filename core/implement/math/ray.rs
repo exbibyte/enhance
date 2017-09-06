@@ -20,7 +20,7 @@ impl Ray3 {
         assert!( dir.len() == 3 );
         Ray3 {
             _ori: Mat3x1 { _val: [ origin[0], origin[1], origin[2] ] },
-            _dir: Mat3x1 { _val: [ dir[0], dir[1], dir[2] ] },
+            _dir: Mat3x1 { _val: [ dir[0], dir[1], dir[2] ] }.normalize().unwrap(),
             _bound: AxisAlignedBBox::init( ShapeType::RAY, &[ &origin[0..3], &dir[0..3] ].concat() ),
             _vicinity: 0.000001f64,
         }
@@ -116,6 +116,48 @@ impl IShape for Ray3 {
                             return ( false, None )
                         }
                     }    
+                },
+                ShapeType::SPHERE => {
+                    let other_shape_data = other.get_shape_data();
+                    let b_off = Mat3x1 { _val: [ other_shape_data[0], other_shape_data[1], other_shape_data[2] ] };
+                    let b_r = other_shape_data[3];
+
+                    let a_dir = self._dir;
+                    let a_off = self._ori;
+
+                    //sub in the ray equation into sphere equation
+                    // b := projection of relative offset onto ray direction
+                    // c := (minimal possible distance between sphere and ray origin )^2
+                    let relative_offset = a_off.minus( &b_off ).unwrap();
+                    let b = relative_offset.dot( &a_dir ).unwrap();
+                    let c = relative_offset.dot( &relative_offset ).unwrap() - b_r * b_r;
+
+                    if b > 0f64 && c > 0f64 {
+                        //ray is outside of the sphere and points away from sphere
+                        //thus no intersection occurs
+                        return ( false, None )
+                    }
+
+                    let d = b * b - c;
+                    if d < 0f64 {
+                        //ray misses sphere
+                        return ( false, None )
+                    }
+
+                    let t1 = -b - d.sqrt();
+                    let t2 = -b + d.sqrt();
+
+                    let t = if t1 < 0f64 {
+                        t2
+                    } else if t2 < 0f64 {
+                        t1
+                    } else if t1 < t2 {
+                        t1
+                    } else {
+                        t2
+                    };
+                    
+                    return ( true, Some( a_dir.scale( t ).unwrap().plus( &a_off ).unwrap() ) )
                 },
                 _ => { unimplemented!(); },
             }

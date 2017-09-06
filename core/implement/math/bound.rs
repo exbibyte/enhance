@@ -39,6 +39,13 @@ impl AxisAlignedBBox {
                     _bound_upper: [ vals[0], vals[1], vals[2] ],
                 }
             },
+            ShapeType::SPHERE => {
+                assert!( vals.len() == 4 );
+                AxisAlignedBBox {
+                    _bound_lower: [ vals[0] - vals[3], vals[1] - vals[3], vals[2] - vals[3] ],
+                    _bound_upper: [ vals[0] + vals[3], vals[1] + vals[3], vals[2] + vals[3] ],
+                }
+            },
             _ => { unimplemented!(); },
         }
     }

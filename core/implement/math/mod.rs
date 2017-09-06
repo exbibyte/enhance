@@ -9,5 +9,6 @@ pub mod bound;
 ///shape implementations
 pub mod ray;
 pub mod point;
+pub mod sphere;
 ///todo
 pub mod intersect_gjk;
