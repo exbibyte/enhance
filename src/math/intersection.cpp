@@ -155,8 +155,8 @@ bool intersection::intersect_rays( ray const & a, ray const & b, float & t ){
     Vec d = b1_offset - a1_offset;
     if( v.IsEqual( zero, 0.0001 ) ){
 	//check triangle area forms by points on ray a and b
-	Vec point1 = a1_offset + a1;
-	Vec triangle = point1.Cross( b1_offset );
+	Vec point1 = a1;
+	Vec triangle = point1.Cross( b1_offset - a1_offset );
 	float triangle_area = triangle.Magnitude();
 	if( triangle_area < 0 - error || triangle_area > 0 + error ){
 	    //lines are parallel but no overlap
