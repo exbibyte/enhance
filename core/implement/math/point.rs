@@ -1,7 +1,6 @@
 use interface::i_shape::{ ShapeType, IShape };
 use interface::i_bound::IBound;
 use interface::i_vicinity::IVicinity;
-use interface::i_comparable::IComparableError;
 
 use implement::math::mat::Mat3x1;
 use implement::math::bound::AxisAlignedBBox;
@@ -52,6 +51,14 @@ impl IShape for Point3 {
                 },
                 ShapeType::RAY => {
                     //see Ray3 for ray point intersection
+                    other.get_intersect( self )
+                },
+                ShapeType::SPHERE => {
+                    //see sphere for sphere point intersection
+                    other.get_intersect( self )
+                },
+                ShapeType::PLANE => {
+                    //see plane for plane point intersection
                     other.get_intersect( self )
                 },
                 _ => { unimplemented!(); },

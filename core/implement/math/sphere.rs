@@ -64,6 +64,36 @@ impl IShape for Sphere {
                     //see Ray3 for ray sphere intersection
                     return other.get_intersect( self )
                 },
+                ShapeType::POINT => {
+                    let other_shape_data = other.get_shape_data();
+                    let b_off = Mat3x1 { _val: [ other_shape_data[0], other_shape_data[1], other_shape_data[2] ] };
+                    let d = b_off.minus( &self._ori ).unwrap();
+                    for i in 0..3 {
+                        if d[i] > self._radius {
+                            return ( false, None )
+                        }
+                    }
+                    return ( true, Some( b_off ) )
+                },
+                ShapeType::PLANE => {
+                    let other_shape_data = other.get_shape_data();
+                    let b_off = Mat3x1 { _val: [ other_shape_data[0], other_shape_data[1], other_shape_data[2] ] };
+                    let b_nor = Mat3x1 { _val: [ other_shape_data[3], other_shape_data[4], other_shape_data[5] ] };
+                    //x = -plane_normal * t + sphere_center
+                    //dot( plane_normal, x ) = dot( plane_normal, plane_offset ) = k
+                    //substitution:
+                    //dot( plane_normal, -plane_normal * t + sphere_center ) = k
+                    //-t + dot( plane_normal, sphere_center ) = k
+                    //t = dot( plane_normal, sphere_center ) - k
+
+                    let k = b_nor.dot( &b_off ).unwrap();
+                    let t = b_nor.dot( &self._ori ).unwrap() - k;
+                    if t > self._radius {
+                        return ( false, None )
+                    } else {
+                        return ( true, Some( b_nor.scale( -t ).unwrap().plus( &self._ori ).unwrap() ) )
+                    }
+                },
                 _ => { unimplemented!(); },
             }
         }

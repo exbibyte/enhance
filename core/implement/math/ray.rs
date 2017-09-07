@@ -159,6 +159,37 @@ impl IShape for Ray3 {
                     
                     return ( true, Some( a_dir.scale( t ).unwrap().plus( &a_off ).unwrap() ) )
                 },
+                ShapeType::PLANE => {
+                    let other_shape_data = other.get_shape_data();
+                    let b_off = Mat3x1 { _val: [ other_shape_data[0], other_shape_data[1], other_shape_data[2] ] };
+                    let b_nor = Mat3x1 { _val: [ other_shape_data[3], other_shape_data[4], other_shape_data[5] ] };
+                    //ray equation: r(t) = r.offset + r.dir * t
+                    //plane: p(x) = dot(normal, x-p.offset) = 0
+                    //p(x) = -dot(p.normal, p.offset) + dot(p.normal, x) = 0
+                    //substitution:
+                    // p(t) = -dot(p.fofset,p.normal) + dot(p.normal, r.offset + r.dir*t) = 0
+                    //      = -dot(p.fofset,p.normal) + dot(p.normal, r.offset) + t*dot(p.normal, r.dir) = 0
+                    //t = ( dot(p.offset, p.normal) - dot(p.normal, r.offset) )/ dot(p.normal, r.dir )
+                    let constant = b_off.dot( &b_nor ).unwrap();
+                    let numerator = constant - b_nor.dot( &self._ori ).unwrap();
+                    let denominator = b_nor.dot( &self._dir ).unwrap();
+                    if denominator == 0f64 {
+                        //ray direction is colplaner to the plane
+                        if constant == self._ori.dot( &b_nor ).unwrap() {
+                            return ( true, Some( self._ori ) )
+                        } else {
+                            return ( false, None )
+                        }
+                    } else if denominator > 0f64 {
+                        //ray direction is not facing plane normal
+                        return ( false, None )
+                    }
+                    let t = numerator / denominator;
+                    if t < 0f64 {
+                        return ( false, None )
+                    }
+                    return ( true, Some( self._dir.scale( t ).unwrap().plus( &self._ori ).unwrap() ) )
+                },
                 _ => { unimplemented!(); },
             }
         }

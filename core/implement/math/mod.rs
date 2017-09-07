@@ -10,5 +10,6 @@ pub mod bound;
 pub mod ray;
 pub mod point;
 pub mod sphere;
+pub mod plane;
 ///todo
 pub mod intersect_gjk;

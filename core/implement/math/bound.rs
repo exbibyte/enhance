@@ -46,6 +46,13 @@ impl AxisAlignedBBox {
                     _bound_upper: [ vals[0] + vals[3], vals[1] + vals[3], vals[2] + vals[3] ],
                 }
             },
+            ShapeType::PLANE => {
+                assert!( vals.len() == 6 );
+                AxisAlignedBBox {
+                    _bound_lower: [ f64::NEG_INFINITY; 3 ],
+                    _bound_upper: [ f64::INFINITY; 3 ],
+                }
+            },
             _ => { unimplemented!(); },
         }
     }

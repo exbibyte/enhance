@@ -13,7 +13,12 @@ pub mod test_bound;
 pub mod test_intersect_ray_ray;
 pub mod test_intersect_ray_point;
 pub mod test_intersect_ray_sphere;
-pub mod test_intersect_point_point;
+pub mod test_intersect_ray_plane;
 pub mod test_intersect_sphere_sphere;
+pub mod test_intersect_sphere_point;
+pub mod test_intersect_sphere_plane;
+pub mod test_intersect_plane_point;
+pub mod test_intersect_point_point;
+
 
 
