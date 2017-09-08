@@ -43,8 +43,7 @@ fn test_parse_common(){
     hm_keywords.insert( "tri", TestToken::Tri );
     hm_keywords.insert( "numweights", TestToken::Numweights );
     hm_keywords.insert( "weight", TestToken::Weight );
-    
-    let mut count = 0;
+
     let mut idx = 0usize;
     loop {
         let ( tok, _kw_tok, idx_s, idx_e, idx_next ) = md5common::tokenize( &file_content[0..], idx, & mut hm_keywords );
@@ -59,7 +58,6 @@ fn test_parse_common(){
             _ => ()
         }
         idx = idx_next;
-        count += 1;
     }
     
 }

@@ -13,7 +13,7 @@ use interface::i_comparable::IComparableError;
 use implement::math::piecewise::Piecewise;
 
 #[cfg(test)]
-pub fn test_interp_forward< T >( interp: & mut IInterpolate< T, Item=T >, start_val: & T, end_val: & T ) -> () 
+pub fn test_interp_forward< T >( interp: & mut IInterpolate< T, Item=T >, _start_val: & T, end_val: & T ) -> () 
     where T: Debug + IComparableError< f64 >
 {
     

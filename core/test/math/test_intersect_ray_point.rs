@@ -3,7 +3,6 @@ use interface::i_comparable::IComparableError;
 
 use implement::math::ray::Ray3;
 use implement::math::point::Point3;
-use implement::math::mat::Mat3x1;
 
 #[test]
 fn test_intersect_ray_point() {

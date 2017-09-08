@@ -1,7 +1,6 @@
 use interface::i_shape::{ ShapeType, IShape };
 use interface::i_bound::IBound;
 use interface::i_vicinity::IVicinity;
-use interface::i_comparable::IComparableError;
 
 use implement::math::mat::Mat3x1;
 use implement::math::bound::AxisAlignedBBox;

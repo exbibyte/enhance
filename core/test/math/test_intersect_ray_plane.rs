@@ -45,7 +45,9 @@ fn test_intersect_ray_plane() {
         let a = Ray3::init( &[ 1f64, 1f64, 1f64 ], &[ 1f64, 0f64, 1f64 ] );
         let b = Plane::init( &[ 1f64, 1f64, 1f64 ], &[ 0f64, 1f64, 0f64 ] );
         match a.get_intersect( &b ) {
-            ( true, Some(loc) ) => (),
+            ( true, Some(loc) ) => {
+                assert!( loc.is_equal( &a._ori, 0.0001f64 ).unwrap() );
+            },
             _ => panic!("unexpected result for ray sphere intersection" ),
         }
     }
