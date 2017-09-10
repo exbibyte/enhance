@@ -11,11 +11,10 @@ pub mod i_bound;
 pub mod i_interpolate;
 pub mod i_intersect;
 pub mod i_vicinity;
-
+pub mod i_spatial_accel;
 pub mod i_window;
 // pub mod i_rendernode;
 pub mod i_renderpass;
-
 pub mod i_renderobj;
 pub mod i_ads;
 pub mod i_ele;

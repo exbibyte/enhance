@@ -11,5 +11,7 @@ pub mod ray;
 pub mod point;
 pub mod sphere;
 pub mod plane;
+
 ///todo
+pub mod bvh;
 pub mod intersect_gjk;
