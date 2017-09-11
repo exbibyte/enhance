@@ -1,4 +1,5 @@
 use std::f64;
+use std::cmp;
 
 use interface::i_bound::BoundType;
 use interface::i_bound::IBound;
@@ -9,6 +10,14 @@ use interface::i_shape::ShapeType;
 pub struct AxisAlignedBBox {
     pub _bound_lower: [ f64; 3 ],
     pub _bound_upper: [ f64; 3 ],
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+pub enum Axis {
+    X,
+    Y,
+    Z,
 }
 
 impl AxisAlignedBBox {
@@ -56,6 +65,24 @@ impl AxisAlignedBBox {
             _ => { unimplemented!(); },
         }
     }
+    pub fn get_longest_axis( &self ) -> ( Axis, f64 ){
+        let dx = ( Axis::X, self._bound_upper[0] - self._bound_lower[0] );
+        let dy = ( Axis::Y, self._bound_upper[1] - self._bound_lower[1] );
+        let dz = ( Axis::Z, self._bound_upper[2] - self._bound_lower[2] );
+        let longest = [ dx, dy, dz ]
+            .into_iter()
+            .cloned()
+            .max_by( |x, y|
+                      if x.1 < y.1 {
+                          cmp::Ordering::Less
+                      } else if x.1 < y.1 {
+                          cmp::Ordering::Greater
+                      } else {
+                          cmp::Ordering::Equal
+                      }
+            ).unwrap();
+        longest
+    }
 }
 
 impl IBound for AxisAlignedBBox {
@@ -86,7 +113,7 @@ impl IBound for AxisAlignedBBox {
         }
     }
     fn get_shortest_separation( & self, other: & IBound ) -> f64 {
-        unimplemented!{};
+        unimplemented!();
     }
     fn get_bound_data( &self ) -> [f64;32] {
         let mut arr = [0f64;32];
@@ -97,5 +124,44 @@ impl IBound for AxisAlignedBBox {
             arr[i+3] = self._bound_upper[i];
         }
         arr
+    }
+    fn get_union( & mut self, bounds: &[ &IBound ] ) {
+        self._bound_lower = [ f64::INFINITY; 3 ];
+        self._bound_upper = [ f64::NEG_INFINITY; 3 ];
+        for i in bounds {
+            match i.get_type(){
+                BoundType::AxisAlignBox => (),
+                _ => { unimplemented!(); },
+            }
+            let b = i.get_bound_data();
+            let b_lower = &b[0..3];
+            let b_upper = &b[3..6];
+            for j in 0..3 {
+                self._bound_lower[j] = self._bound_lower[j].min( b_lower[j] );
+                self._bound_upper[j] = self._bound_upper[j].max( b_upper[j] );
+            }
+        }
+    }
+    fn get_centroid( & self ) -> [ f64; 3 ] {
+        match self.get_type(){
+            BoundType::AxisAlignBox => {
+                let b = self.get_bound_data();
+                let b_lower = &b[0..3];
+                let b_upper = &b[3..6];
+                return [ ( b_lower[0] + b_upper[0] ) / 2f64,
+                         ( b_lower[1] + b_upper[1] ) / 2f64,
+                         ( b_lower[2] + b_upper[2] ) / 2f64, ]
+            },
+            _ => { unimplemented!(); },
+        }
+    }
+}
+
+impl Default for AxisAlignedBBox {
+    fn default() -> AxisAlignedBBox {
+        AxisAlignedBBox {
+            _bound_lower: [ f64::NEG_INFINITY; 3 ],
+            _bound_upper: [ f64::INFINITY; 3 ],
+        }
     }
 }

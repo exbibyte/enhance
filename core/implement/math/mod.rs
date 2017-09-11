@@ -6,6 +6,7 @@ pub mod spline_bezier;
 pub mod linearinterp;
 pub mod piecewise;
 pub mod bound;
+pub mod bound_sphere;
 ///shape implementations
 pub mod ray;
 pub mod point;
