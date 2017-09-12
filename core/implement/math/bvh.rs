@@ -78,6 +78,7 @@ impl NodeBvh {
         }
 
         //todo: execute alternative branch when number of objects are low
+        //todo: surface area heuristic
         
         //get the longest axis of the bounding box
         let ( ref axis, ref length ) = u.get_longest_axis();
@@ -125,9 +126,22 @@ impl NodeBvh {
         }
 
         println!( "bins: {:?}", bins );
-        
-        let m = bins.iter().enumerate().max_by_key( | &x | x.1 ).unwrap();
-        let split_bin_idx = m.0;
+
+        let sum = bins.iter_mut().fold( 0, | acc, x | {
+            let s = acc + *x;
+            *x += acc;
+            s
+        }
+        );
+        let median = sum / 2;
+
+        let mut split_bin_idx = 0;
+        for (idx, i) in bins.iter().enumerate() {
+            if *i > median {
+                break;
+            }
+            split_bin_idx += 1;
+        }
 
         println!( "split_bin_idx: {}", split_bin_idx );
 
@@ -174,6 +188,9 @@ impl i_spatial_accel::ISpatialAccel for Bvh {
     fn build_all( & mut self, objs: &[ (u64, &IBound) ] ) -> Result< (), & 'static str >
     {
         //initiate top down construction
+        if self._bins == 0 {
+            return Err( "bvh bin count cannot be zero" )
+        }
         self._root.build_node( self._bins, objs )
     }
 }
