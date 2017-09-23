@@ -6,7 +6,7 @@ A very experimental minimalistic 3D rendering and game engine implementing in Ru
 
 3D Model Formats: md5mesh, md5anim, obj, gltf
 
-Rendering backend: OpenGL 3.3+
+Rendering backend: OpenGL 3.3+, Vulkan
 
 # Todos:
 
@@ -15,6 +15,8 @@ Implementation of render backend and frontend
 Rendering acceleration structures
 
 Asset management
+
+Trajectory controller
 
 Multithreading support for front end and some of the back end pipelines
 
