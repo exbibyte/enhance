@@ -14,7 +14,7 @@ Implementation of render backend and frontend
 
 Rendering acceleration structures
 
-Asset management
+Model asset and texture management
 
 Trajectory controller
 
