@@ -25,3 +25,5 @@ Debugging and console input facilities
 Multithreaded task pool
 
 Tesselation and level of detail contoller
+
+Feasibility study of using physically based rendering approach
