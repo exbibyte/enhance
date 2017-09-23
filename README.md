@@ -1,6 +1,6 @@
 # e2r
 
-A very experimental minimalistic 3D rendering and game engine implementing in Rust language. It is very work in process. Parts of the project is being ported over from C++ from another project.
+A very experimental minimalistic 3D rendering engine implementing in Rust language. It is very work in process. Parts of the project is being ported over from C++ from another project.
 
 # To be supported:
 
