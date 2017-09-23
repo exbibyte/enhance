@@ -26,6 +26,8 @@ multithreaded work pool
 
 concurrent pool and datastructures
 
+threadlocal allocator/deallocator
+
 math utility for graphics manipulation such as dual quaternions, projections, interpolators
 
 .obj file, .md5anim, .md5mesh file loader
