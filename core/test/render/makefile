@@ -13,8 +13,9 @@ objects_render_gl = $(wildcard ../../impl/render/gl/intermediate/*.o)
 objects_file = $(wildcard ../../impl/file/intermediate/*.o)
 objects_algo = $(wildcard ../../impl/algo/intermediate/*.o)
 objects_memory = $(wildcard ../../impl/memory/intermediate/*.o)
+objects_math = $(wildcard ../../impl/math/intermediate/*.o)
 
-object_files = $(objects_render) $(objects_render_gl) $(objects_file) $(objects_algo) $(objects_interface) $(objects_memory)
+object_files = $(objects_render) $(objects_render_gl) $(objects_file) $(objects_algo) $(objects_interface) $(objects_memory) $(objects_math)
 
 dir_build = build
 $(shell mkdir -p $(dir_build))

@@ -5,7 +5,8 @@
 #include <math.h>
 
 using namespace std;
-using namespace e2::math;
+
+namespace e2 { namespace math {
 
 dualquat::dualquat(){
     set_identity();
@@ -449,3 +450,4 @@ dualquat scale_float( float s, const dualquat & q ) {
     return d;
 }
 
+} }

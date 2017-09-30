@@ -419,12 +419,8 @@ bool mat_util::invert_rotate_mat4x4(float in[], float out[])
   return true;
 }
 
-bool mat_util::trace_4x4( float in[], float out[] ){
-    out[0] = in[0];
-    out[1] = in[5];
-    out[2] = in[10];
-    out[3] = in[15];
-
+bool mat_util::trace_4x4( float in[], float * out ){
+    *out = in[0] + in[5] + in[10] + in[15];
     return true;
 }
 bool mat_util::perspective( float fov, float aspect, float near, float far, float out[] ){

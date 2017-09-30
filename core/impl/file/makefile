@@ -6,6 +6,8 @@ include_dirs := $(dir $(wildcard ../*/)) $(dir $(wildcard ../../interface/*/))
 
 include_flags = $(foreach d, $(include_dirs), -I$d)
 
+objects_math := $(wildcard ../math/intermediate/*.o)
+
 objects := $(patsubst %.cpp,%.o,$(src_files))
 
 dir_intermediate := ./intermediate
