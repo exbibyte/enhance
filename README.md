@@ -10,6 +10,8 @@ Certain parts of C++ are leveraged such as templates and namespaces. Meanwhile o
 
 The engine is being revised in core modules and multithreading facilities.
 
+Currently, I am not working on this project as I have focused my attention in an alternative implementation in Rust at https://github.com/clearlycloudy/e2r
+
 # Dependencies
 
 GLFW
@@ -23,6 +25,8 @@ shader based rendering
 multithreaded work pool
 
 concurrent pool and datastructures
+
+threadlocal allocator/deallocator
 
 math utility for graphics manipulation such as dual quaternions, projections, interpolators
 
