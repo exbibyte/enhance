@@ -18,6 +18,7 @@ namespace e2 { namespace math {
 
 class simplex_standard {
 public:
+    const double _m_error_delta = 1e-9; //error threshold used for evaluating auxialliary objective function
     int _m_original; //length of the original variables
     int _n; //number of rows
     int _m; //number of columns, including added slack variables
@@ -88,138 +89,182 @@ public:
 	
     static std::pair<int, std::pair<int,int> > compute_next_pivot( simplex_standard & s ){
 	int pivot_col = -1;
+	int pivot_row = -1;
 	// cout << "# pivot" << endl;
 
 	// print( s );
-			
-	for( auto i : s._non_basic ){ //find a column to enter using objective function
-	    if( s._c[i] > 0 ){
-		bool possible = true;
-		for( size_t j = 0; j< s._n; ++j ){ //for each row
-		    if( ( s._a[j][i] < 0 && s._b[j] < 0 ) ||
-			( s._a[j][i] > 0 && s._b[j] > 0 ) )
-		    {
-			possible = true;
-			break;
-		    }
-		}
-		if( possible ){
-		    pivot_col = i;
-		    break;
-		}
-	    }
-	}
-	if( pivot_col == -1 ){ //not possible
-	    return { 0, {-1,-1} }; //optimal
-	}else{
-	    // cout << "pivot col: " << pivot_col << endl;
-	    int pivot_row = -1;
-	    double t_min = std::numeric_limits<double>::max();
+
+	//use devex/steepest approximation rule for pivot selection
+	bool possible = false;
+	double max_increase = std::numeric_limits<double>::min();
+	size_t row_max_increase_overall = -1;
+	size_t col_max_increase_overall = -1;
+	bool has_unbounded_overall = false;
+	bool has_no_solution_overall = false;
+	for( auto i : s._non_basic ){
+	    size_t row_max_increase = -1;
+	    size_t col_max_increase = -1;
 	    bool has_unbounded = false;
-	    for( size_t i = 0; i< s._n; ++i ){ //for each row
-		double k = s._a[i][pivot_col];
-		if( k != 0 ){
-		    double t = s._b[i] / k;
-		    // cout << "row: " << i << ", t: " << t << endl;
-		    if( t < t_min && t >= 0 ){
-			t_min = t;
-			pivot_row = i;
-		    }else if( t < 0 && s._b[i] >= 0 ){ // nagative coeff on left, positive on right
+	    bool has_no_solution = false;
+	    if( s._c[i] > 0 ){
+		double max_increase_for_col = std::numeric_limits<double>::min();
+		for( size_t j = 0; j< s._n; ++j ){ //for each row
+		    if( ( s._a[j][i] < 0 && s._b[j] <= 0 ) ||
+			( s._a[j][i] > 0 && s._b[j] >= 0 ) )
+		    {
+			double increase = s._b[j]/s._a[j][i] * s._c[i];
+			if( max_increase_for_col == std::numeric_limits<double>::min() ){
+			    max_increase_for_col = increase;
+			    row_max_increase = j;
+			}else{
+			    if( increase < max_increase_for_col ){
+				max_increase_for_col = increase;
+				row_max_increase = j;
+			    }
+			}
+		    }else if( s._a[j][i] == 0 ){
+			has_unbounded = true;
+			// cout << "here 1" << endl;
+		    }else if( s._a[j][i] < 0 && s._b[i] >= 0 ){ // negative coeff on left, positive on right
 			has_unbounded = true;
 			// cout << "here 2" << endl;
+		    }else if( s._a[j][i] >= 0 && s._b[i] < 0 ){ // positive coeff on left, negative on right
+			has_no_solution = true;
+			// cout << "here 2" << endl;
 		    }
-		}else{
-		    has_unbounded = true;
-		    // return { 3, {-1,-1} }; //unbounded
 		}
-	    }
-	    if( pivot_row != -1 ){
-		// cout << "new pivot: " << pivot_row << ", " << pivot_col << endl;
-		return { 2, { pivot_row, pivot_col } }; //possible
-	    }else{
-		if( has_unbounded ){
-		    // cout << "here" << endl;
-		    return { 3, {-1,-1} }; //unbounded		
-		} else {
-		    return { 1, {-1,-1} }; //not possible
+		if( max_increase_for_col != std::numeric_limits<double>::min() ){
+		    if( max_increase_for_col > max_increase ){
+			max_increase = max_increase_for_col;
+			col_max_increase = i;
+
+			row_max_increase_overall = row_max_increase;
+			col_max_increase_overall = col_max_increase;
+			possible = true;
+		    }
+		}else {
+		    if( has_no_solution ){
+			has_no_solution_overall = true;
+		    }else{
+			has_unbounded_overall = true;
+		    }
 		}
 	    }
 	}
+	if( possible ){
+	    pivot_col = col_max_increase_overall;
+	    return { 2, { row_max_increase_overall, col_max_increase_overall } }; //possible optmization
+	}
+	if( has_no_solution_overall ){
+	    return { 1, {-1,-1} }; //no solution
+	}
+	if( has_unbounded_overall ){
+	    return { 3, {-1,-1} }; //unbounded	    
+	}
+	return { 0, {-1,-1} }; //optimal
     }
 
     static std::pair<int, std::pair<int,int> > compute_next_pivot_aux( simplex_standard & s ){
-	int pivot_col = -1;
+
 	// cout << "# pivot aux" << endl;
 	// print_aux( s );
 
-	for( auto i : s._non_basic ){ //find a column to enter
-	    // cout << "pivot row constraint: " << s._c_aux[i] << endl;
-	    if( s._c_aux[i] > 0 ){
-		bool possible = true;
-		for( size_t j = 0; j< s._n; ++j ){ //for each row
-		    // cout << "pivot row select: " << s._a[j][i] << ": " <<  s._b[j] << endl;
-		    if( ( s._a[j][i] < 0 && s._b[j] < 0 ) ||
-			( s._a[j][i] > 0 && s._b[j] > 0 ) )
-		    {
-			possible = true;
-			break;
-		    }
-		}
-		if( possible ){
-		    pivot_col = i;
-		    break;
-		}
-	    }
-	}
-
 	if( s._d_aux == 0 ){
 	    return { 0, {-1,-1} }; //aux var met
-	}
+	}		
 	bool aux_var_done = true;
+	int count_aux_var_not_done = 0;
 	for( size_t i = s._m - s._num_aux; i < s._m; ++i ){
 	    if( s._basic.find( i ) != s._basic.end() ){
+		// cout << "aux var " << i << " not done" << endl;
 		aux_var_done = false;
+		++count_aux_var_not_done;
 		break;
 	    }
 	}
 	if( aux_var_done ){
+	    // cout << "aux var done" << endl;
 	    return { 0, {-1,-1} }; //aux var met
-	}
-	if( pivot_col == -1 ){ //not possible
-	    // cout <<" not possible" << endl;
-	    return { 1, {-1,-1} };
 	}else{
-	    // cout << "pivot col: " << pivot_col << endl;
-	    int pivot_row = -1;
-	    double t_min = std::numeric_limits<double>::max();
+	    // cout << count_aux_var_not_done << endl;
+	}
+
+	int pivot_col = -1;
+	int pivot_row = -1;
+
+	//use devex/steepest approximation rule for pivot selection
+	bool possible = false;
+	double max_increase = std::numeric_limits<double>::min();
+	size_t row_max_increase_overall = -1;
+	size_t col_max_increase_overall = -1;
+	bool has_unbounded_overall = false;
+	bool has_no_solution_overall = false;
+	for( auto i : s._non_basic ){
+	    size_t row_max_increase = -1;
+	    size_t col_max_increase = -1;
 	    bool has_unbounded = false;
-	    for( size_t i = 0; i< s._n; ++i ){ //for each row
-		double k = s._a[i][pivot_col];
-		if( k != 0 ){
-		    double t = s._b[i] / k;
-		    // cout << "row: " << i << ", t: " << t << endl;
-		    if( t < t_min && t >= 0 ){
-			t_min = t;
-			pivot_row = i;
-		    }else if( k < 0 && s._b[i] >= 0 ){ // nagative coeff on left, positive on right
+	    bool has_no_solution = false;
+	    if( s._c_aux[i] > 0 ){
+		double max_increase_for_col = std::numeric_limits<double>::min();
+		for( size_t j = 0; j< s._n; ++j ){ //for each row
+		    if( ( s._a[j][i] < 0 && s._b[j] <= 0 ) ||
+			( s._a[j][i] > 0 && s._b[j] >= 0 ) )
+		    {
+			double increase = s._b[j]/s._a[j][i] * s._c_aux[i];
+			if( max_increase_for_col == std::numeric_limits<double>::min() ){
+			    max_increase_for_col = increase;
+			    row_max_increase = j;
+			}else{
+			    if( increase < max_increase_for_col ){
+				max_increase_for_col = increase;
+				row_max_increase = j;
+			    }
+			}
+		    }else if( s._a[j][i] == 0 ){
 			has_unbounded = true;
+			// cout << "here 1" << endl;
+		    }else if( s._a[j][i] < 0 && s._b[i] >= 0 ){ // negative coeff on left, positive on right
+			has_unbounded = true;
+			// cout << "here 2" << endl;
+		    }else if( s._a[j][i] >= 0 && s._b[i] < 0 ){ // positive coeff on left, negative on right
+			has_no_solution = true;
+			// cout << "here 2" << endl;
 		    }
-		}else{
-		    has_unbounded = true;
-		    // return { 3, {-1,-1} }; //unbounded
 		}
-	    }
-	    if( pivot_row != -1 ){
-		// cout << "new pivot: " << pivot_row << ", " << pivot_col << endl;
-		return { 2, { pivot_row, pivot_col } }; //possible
-	    }else{
-		if( has_unbounded ){
-		    return { 3, {-1,-1} }; //unbounded		
-		} else {
-		    return { 1, {-1,-1} }; //not possible
+		if( max_increase_for_col != std::numeric_limits<double>::min() ){
+		    if( max_increase_for_col > max_increase ){
+			max_increase = max_increase_for_col;
+			col_max_increase = i;
+
+			row_max_increase_overall = row_max_increase;
+			col_max_increase_overall = col_max_increase;
+			possible = true;
+		    }
+		}else {
+		    if( has_no_solution ){
+			has_no_solution_overall = true;
+		    }else{
+			has_unbounded_overall = true;
+		    }
 		}
 	    }
 	}
+
+	if( possible ){
+	    pivot_col = col_max_increase_overall;
+	    return { 2, { row_max_increase_overall, col_max_increase_overall } }; //possible optmization
+	}
+	if( has_no_solution_overall ){
+	    return { 1, {-1,-1} }; //no solution
+	}
+	if( has_unbounded_overall ){
+	    return { 3, {-1,-1} }; //unbounded	    
+	}
+	// cout << "d_aux: " << s._d_aux << endl;
+	if( s._d_aux < s._m_error_delta ){
+	    return { 0, {-1,-1} }; //should be optimal, but some aux var is still a basic variable	   
+	}
+	return { 1, {-1,-1} }; //no solution
     }
 
     static bool gaussian_elimination( simplex_standard & s, std::pair<int,int> pivot ){
