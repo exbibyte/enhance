@@ -20,3 +20,4 @@ pub mod i_ads;
 pub mod i_ele;
 pub mod i_component;
 pub mod i_comparable;
+pub mod i_stat_tree;

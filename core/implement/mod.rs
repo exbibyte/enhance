@@ -8,7 +8,7 @@ pub mod render;
 pub mod capability;
 pub mod kernel;
 //pub mod motion;
-// pub mod ds;
+pub mod ds;
 // pub mod math;                   
 // pub mod mt;
 
