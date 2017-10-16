@@ -1,12 +1,12 @@
 # e2r
 
-A very experimental minimalistic 3D rendering and game engine implementing in Rust language. It is very work in process. Parts of the project is being ported over from C++ from another project.
+A very experimental minimalistic 3D rendering engine implementing in Rust language. It is very work in process. Parts of the project is being ported over from C++ from another project.
 
 # To be supported:
 
 3D Model Formats: md5mesh, md5anim, obj, gltf
 
-Rendering backend: OpenGL 3.3+
+Rendering backend: OpenGL 3.3+, Vulkan
 
 # Todos:
 
@@ -14,8 +14,16 @@ Implementation of render backend and frontend
 
 Rendering acceleration structures
 
-Asset management
+Model asset and texture management
+
+Trajectory controller
 
 Multithreading support for front end and some of the back end pipelines
 
 Debugging and console input facilities
+
+Multithreaded task pool
+
+Tesselation and level of detail contoller
+
+Feasibility study of using physically based rendering approach
