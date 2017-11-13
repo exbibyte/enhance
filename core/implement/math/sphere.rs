@@ -97,6 +97,15 @@ impl IShape for Sphere {
             }
         }
     }
+    fn get_support( & self, v: & Mat3x1< f64 > ) -> Option< Mat3x1< f64 > > {
+        if v.magnitude() != Some( 0f64 ) {
+            let v_adjusted = v.normalize().expect( "normalization unsuccessful" ).scale( self._radius ).expect("scale unsuccessful");
+            let o = self._ori.plus( &v_adjusted ).expect( "support operation unsuccessful.");
+            Some( o )
+        } else {
+            None
+        }
+    }
 }
 
 impl IVicinity< f64 > for Sphere {

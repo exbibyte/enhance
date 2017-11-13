@@ -22,4 +22,5 @@ pub trait IShape : IVicinity< f64 > {
     // this shall test for intersection of bounding shapes first before procedding to test intersection using algorithms of higher complexity
     //optionally returns a location of intersection, preferrably closest of such locations
     fn get_intersect( & self, other: & IShape ) -> ( bool, Option< Mat3x1< f64 > > );
+    fn get_support( & self, v: & Mat3x1< f64 > ) -> Option< Mat3x1< f64 > >;
 }

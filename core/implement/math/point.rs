@@ -65,6 +65,9 @@ impl IShape for Point3 {
             }
         }
     }
+    fn get_support( & self, v: & Mat3x1< f64 > ) -> Option< Mat3x1< f64 > > {
+        None
+    }
 }
 
 impl IVicinity< f64 > for Point3 {
