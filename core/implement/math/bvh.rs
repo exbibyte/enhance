@@ -63,7 +63,7 @@ impl NodeBvh {
         for i in objs {
             match i.1.get_type() {
                 BoundType::AxisAlignBox => (),
-                _ => return Err( "unsupported bound type" )
+                _ => { return Err( "unsupported bound type" ) },
             }
         }
         let b = objs.iter().cloned().map( |x| x.1 ).collect::<Vec< &IBound > >();
@@ -203,12 +203,49 @@ impl NodeBvh {
 
         Ok( () )
     }
+    pub fn search< F >( n : & NodeBvh, b: & IBound, mut f : F ) where F : FnMut( u64 ) -> ()
+    {
+        let mut q = vec![ n ];
+        while q.len() > 0 {
+            let l = q.pop().unwrap();
+            if l._bound.intersect( b ) {
+                let mut present_l = true;
+                let mut present_r = true;
+                match l._left {
+                    BvhBranch::CHILD( ref o ) => {
+                        let o_ref : &NodeBvh = o;
+                        q.push( o_ref );
+                    },
+                    _ => present_l = false,
+                }
+                match l._right {
+                    BvhBranch::CHILD( ref o ) => {
+                        let o_ref : &NodeBvh = o;
+                        q.push( o_ref );
+                    },
+                    _ => present_r = false,
+                }
+                if !present_l && !present_r {
+                    f( l._obj );
+                }
+            }
+        }
+    }
 }
 
 impl ISpatialAccel for Bvh {
-    fn query( & self, input: &IBound ) -> Vec< u64 >
+    fn query_intersect( & self, input: &IBound ) -> Result< Vec< u64 >, & 'static str >
     {
-        unimplemented!();
+        match input.get_type() {
+            BoundType::AxisAlignBox => (),
+            _ => { return Err( "unsupported bound type" ) },
+        }
+        let mut out = vec![];
+        {
+            let func_collect = | x | { out.push( x ); () };
+            NodeBvh::search( &self._root, input, func_collect );
+        }
+        Ok( out )
     }
     fn build_all( & mut self, objs: &[ (u64, &IBound) ] ) -> Result< (), & 'static str >
     {

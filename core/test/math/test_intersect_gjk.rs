@@ -50,6 +50,18 @@ fn test_intersect_gjk_query_intersect_positive() {
         let ret = intersect_gjk::query_intersect( &a, &b );
         assert!( ret.expect("gjk return unexpected") );
     }
+    {
+        let a = Sphere::init( &[ 0f64, 5f64, 0f64 ], 10f64 );
+        let b = Sphere::init( &[ 1f64, 1f64, 0f64 ], 2f64 );
+        let ret = intersect_gjk::query_intersect( &a, &b );
+        assert!( ret.expect("gjk return unexpected") );
+    }
+    {
+        let a = Sphere::init( &[ 0f64, -5f64, 0f64 ], 5f64 );
+        let b = Sphere::init( &[ 0f64, 5f64, 0f64 ], 5f64 );
+        let ret = intersect_gjk::query_intersect( &a, &b );
+        assert!( ret.expect("gjk return unexpected") );
+    }   
 }
 
 #[test]
