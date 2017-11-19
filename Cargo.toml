@@ -5,6 +5,7 @@ authors = ["YL <yuan6liu@gmail.com>"]
 description = "experimental rendering enginer in rust"
 repository = "https://github.com/clearlycloudy/e2r/"
 keywords = [ "rendering", "graphics", "engine", "3D", "physics" ]
+license = "BSD-2-Clause"
 exclude = [
 "core/asset/*",
 ]
