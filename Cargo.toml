@@ -3,6 +3,10 @@ name = "e2r"
 version = "0.1.0"
 authors = ["YL <yuan6liu@gmail.com>"]
 
+exclude = [
+"core/asset/*",
+]
+
 [lib]
 name = "e2rcore"
 path = "core/core.rs"
