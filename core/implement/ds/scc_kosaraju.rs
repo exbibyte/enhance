@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-pub fn reverse_graph( rel: &[(i64,i64)], rel_rev: & mut [(i64,i64)] ) {
+pub fn reverse_graph( rel: &[(usize,usize)], rel_rev: & mut [(usize,usize)] ) {
     for (i,v) in rel.iter().enumerate() {
         rel_rev[i] = ( v.1, v.0 );
     }
 }
 
-pub fn adj_list( rel: &[(i64,i64)] ) -> HashMap< i64, HashSet< i64 > > {
+pub fn adj_list( rel: &[(usize,usize)] ) -> HashMap< usize, HashSet< usize > > {
     let mut rev_adj = HashMap::new();
     for i in rel.iter() {
         let exists = rev_adj.contains_key(&i.0);
@@ -29,14 +29,14 @@ pub fn adj_list( rel: &[(i64,i64)] ) -> HashMap< i64, HashSet< i64 > > {
     rev_adj
 }
 
-pub fn visit_post_order( nodes: &[i64], adj: & HashMap< i64, HashSet< i64 > > ) -> Vec<i64> {
-    let mut visited = vec![ false; nodes.len() ];
+pub fn visit_post_order( num_nodes: usize, adj: & HashMap< usize, HashSet< usize > > ) -> Vec<usize> {
+    let mut visited = vec![ false; num_nodes ];
     let mut queue = vec![];
     let mut visit_order = vec![];
-    for i in nodes.iter(){
-        if visited[ *i as usize ] == false {
-            visited[ *i as usize ] = true;
-            queue.push(*i);
+    for i in 0..num_nodes {
+        if visited[ i ] == false {
+            visited[ i ] = true;
+            queue.push(i);
         }
         loop {
             let n = match queue.last() {
@@ -48,8 +48,8 @@ pub fn visit_post_order( nodes: &[i64], adj: & HashMap< i64, HashSet< i64 > > ) 
             let mut found = false;
             if let Some( y ) = adj.get( &n ) {
                 for k in y.iter() {
-                    if visited[*k as usize ] == false {
-                        visited[*k as usize ] = true;
+                    if visited[*k ] == false {
+                        visited[*k ] = true;
                         queue.push(*k);
                         found = true;
                     }
@@ -65,17 +65,18 @@ pub fn visit_post_order( nodes: &[i64], adj: & HashMap< i64, HashSet< i64 > > ) 
     visit_order
 }
 
-pub fn compute( nodes: &[i64], rel: &[(i64,i64)], out: & mut [i64] ) {
-    //computes strongly connected components using Tarjan's algorithm
+pub fn compute( num_nodes: usize, rel: &[(usize,usize)] ) -> Vec< usize > {
+    let mut out = vec![ 0; num_nodes ];
+    //computes strongly connected components using Kosaraju's algorithm
     let adj = adj_list( &rel[..] );
     // println!( "adj: {:?}", adj );
     
-    //get post order of the graph
-    let visit_order = { let mut a = visit_post_order( nodes, &adj ); a.reverse(); a };
+    //get reverse of the post order of the dfs
+    let visit_order = { let mut a = visit_post_order( num_nodes, &adj ); a.reverse(); a };
     // println!( "visit order: {:?}", visit_order );
     
     //get transpose graph
-    let mut rel_rev = vec![ (0i64, 0i64); rel.len() ];
+    let mut rel_rev = vec![ (0usize, 0usize); rel.len() ];
     reverse_graph( rel, & mut rel_rev[..] );
     // println!( "reverse rel: {:?}", rel_rev );
     let rev_adj = adj_list( &rel_rev[..] );
@@ -98,7 +99,7 @@ pub fn compute( nodes: &[i64], rel: &[(i64,i64)], out: & mut [i64] ) {
                 };
                 let mut found = false;
                 if !node_to_component.contains_key( n ) {
-                    node_to_component.insert( *n, component_id as i64 );
+                    node_to_component.insert( *n, component_id );
                     found = true;
                     if let Some( y ) = rev_adj.get( n ) {
                         for k in y.iter() {
@@ -114,6 +115,7 @@ pub fn compute( nodes: &[i64], rel: &[(i64,i64)], out: & mut [i64] ) {
     }
 
     for (k, v) in node_to_component {
-        out[ k as usize ] = v;
+        out[ k ] = v;
     }
+    out
 }
