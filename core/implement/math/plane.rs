@@ -69,7 +69,7 @@ impl IShape for Plane {
             }
         }
     }
-    fn get_support( & self, v: & Mat3x1< f64 > ) -> Option< Mat3x1< f64 > > {
+    fn get_support( & self, _v: & Mat3x1< f64 > ) -> Option< Mat3x1< f64 > > {
         None
     }
 }

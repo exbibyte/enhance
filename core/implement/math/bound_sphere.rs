@@ -20,16 +20,16 @@ impl IBound for BoundSphere {
     fn get_type( & self ) -> BoundType {
         BoundType::Sphere
     }
-    fn intersect( & self, other: & IBound ) -> bool {
+    fn intersect( & self, _other: & IBound ) -> bool {
         unimplemented!();
     }
-    fn get_shortest_separation( & self, other: & IBound ) -> f64 {
+    fn get_shortest_separation( & self, _other: & IBound ) -> f64 {
         unimplemented!();
     }
     fn get_bound_data( &self ) -> [f64;32] {
         unimplemented!();
     }
-    fn get_union( & mut self, bounds: &[ &IBound ] ) {
+    fn get_union( & mut self, _bounds: &[ &IBound ] ) {
         unimplemented!();
     }
     fn get_centroid( & self ) -> [ f64; 3 ] {

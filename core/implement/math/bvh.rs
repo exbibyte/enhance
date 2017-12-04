@@ -88,7 +88,7 @@ impl NodeBvh {
 
         // println!( "axis length: {}", length );
         
-        let c = self._bound.get_centroid();
+        let _c = self._bound.get_centroid();
         let bin_len = length / num_bins as f64;
 
         let mut bin_offsets = vec![];

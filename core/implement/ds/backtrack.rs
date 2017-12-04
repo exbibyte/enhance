@@ -2,18 +2,18 @@ fn make_move( input: &[i32], out: & mut Vec<i32>, index: i32 ){
     out.push( input[ index as usize ] );
 }
 
-fn unmake_move( input: &[i32], out: & mut Vec<i32>, index: i32 ){
+fn unmake_move( _input: &[i32], out: & mut Vec<i32>, _index: i32 ){
     out.pop();
 }
 
 #[allow(dead_code)]
-fn make_candidate( input: &[i32], index: i32 ) -> Vec<i32> {
+fn make_candidate( _input: &[i32], index: i32 ) -> Vec<i32> {
     let candidates = vec![index];
     candidates
 }
 
 #[allow(dead_code)]
-fn is_solution( arr: &[i32], index: i32, total: i32 ) -> bool {
+fn is_solution( _arr: &[i32], index: i32, total: i32 ) -> bool {
     index == total
 }
 

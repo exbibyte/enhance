@@ -4,8 +4,6 @@ use implement::file::md5anim;
 use implement::file::md5rig;
 use implement::file::md5comp;
 
-use std::str;
-
 #[test]
 fn test_parse_md5comp(){
     let file_mesh = md5common::file_open( "core/asset/md5/qshambler.md5mesh" ).expect("md5mesh file open invalid");

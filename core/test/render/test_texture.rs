@@ -18,7 +18,7 @@ pub fn test_texture() {
     let img = image::open( &Path::new( "core/asset/images/texture0.jpg" ) ).unwrap();
     println!( "image dimension: {:?}", img.dimensions() );
     println!( "image type: {:?}", img.color() );
-    let texture0 = texture::Texture::from( &img );
+    // let texture0 = texture::Texture::from( &img );
     //let texture_data = Vec::from( texture0 ); //todo: verify content
 
 

@@ -41,7 +41,7 @@ pub fn process( anim: & md5anim::Md5AnimRoot ) -> Result< PoseCollection, & 'sta
     Ok( pc )
 }
 
-fn process_posejoints( f: & md5anim::Frame, bbox: & md5anim::Bound, hier: & Vec< md5anim::JointHierarchy >, baseframe: & Vec< md5anim::FrameJoint > ) -> Result< PoseJoints, & 'static str > {
+fn process_posejoints( f: & md5anim::Frame, _bbox: & md5anim::Bound, hier: & Vec< md5anim::JointHierarchy >, baseframe: & Vec< md5anim::FrameJoint > ) -> Result< PoseJoints, & 'static str > {
     //hierarchy and baseframe length should be equal
     let mut pj = PoseJoints {
         _joints: vec![],

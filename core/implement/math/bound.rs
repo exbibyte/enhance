@@ -112,7 +112,7 @@ impl IBound for AxisAlignedBBox {
             _ => { unimplemented!(); },
         }
     }
-    fn get_shortest_separation( & self, other: & IBound ) -> f64 {
+    fn get_shortest_separation( & self, _other: & IBound ) -> f64 {
         unimplemented!();
     }
     fn get_bound_data( &self ) -> [f64;32] {

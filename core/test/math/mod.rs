@@ -21,4 +21,4 @@ pub mod test_intersect_plane_point;
 pub mod test_intersect_point_point;
 pub mod test_spatial_accel_bvh;
 pub mod test_intersect_gjk;
-
+pub mod test_sim_anneal;

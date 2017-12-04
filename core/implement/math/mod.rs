@@ -12,7 +12,9 @@ pub mod ray;
 pub mod point;
 pub mod sphere;
 pub mod plane;
-
-///todo
+///spatial accelerators
 pub mod bvh;
+///intersection testers
 pub mod intersect_gjk;
+///probabilistic algorithms
+pub mod sim_anneal;

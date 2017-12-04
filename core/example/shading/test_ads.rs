@@ -1,5 +1,7 @@
 #![feature(use_extern_macros)]
 
+/// example using ads rendering path to render primitives
+
 extern crate gl;
 extern crate glutin;
 extern crate rand;
@@ -29,7 +31,6 @@ use self::e2rcore::implement::render::mesh;
 use self::e2rcore::implement::render::primitive;
 use self::e2rcore::implement::render::texture;
 // use self::e2rcore::implement::render::renderpass_default;
-
 
 use self::e2rcore::implement::kernel::kernel_render::Renderer;
 use self::e2rcore::implement::render::render_commands;
@@ -64,9 +65,6 @@ fn main() {
     util_gl::check_last_op();
 
     let image = vec![200, 200, 150, 0, 0, 255 ];
-    // let w = 2;
-    // let h = 2;
-    // let texture = match kr.load_texture( String::from("texture0"), &image[..], w, h ) {
     let texture_data = Vec::from( texture0 );
     let ( w, h ) = img.dimensions();
     let texture = match kr.load_texture( String::from("texture0"), &texture_data[..], w as _, h as _ ) {
@@ -166,51 +164,49 @@ fn main() {
         unsafe {
             gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-            {
-
-                Renderer::add_obj( & mut kr, "cmd_clear_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupClear::init( draw_group ) ) ).is_ok();
-
-                // primitives and objects start
-                let mut mesh2 = mesh_copy.clone();
-                mesh2._pos.clear();
-                mesh2._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32+delta, -1f32, -1f32 ] },
-                                                 math::mat::Mat3x1 { _val: [ 5f32+delta, -1f32, -1f32 ] },
-                                                 math::mat::Mat3x1 { _val: [-1f32+delta,  1f32, -1f32 ] },
-                                                 math::mat::Mat3x1 { _val: [ 4f32+delta, -1f32, 15f32 ] },
-                                                 math::mat::Mat3x1 { _val: [ 6f32+delta, -1f32, 15f32 ] },
-                                                 math::mat::Mat3x1 { _val: [ 4f32+delta,  1f32, 15f32 ] }, ] );
-                Renderer::add_obj( & mut kr, "mesh_triangles", i_ele::Ele::init( mesh2 ) ).is_ok();
-
-                let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
-                                                      _radius: 5f32 };
-
-                Renderer::add_obj( & mut kr, "box", i_ele::Ele::init( prim_box ) ).is_ok();
-
-                let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
-
-                Renderer::add_obj( & mut kr, "sphere", i_ele::Ele::init( prim_sphere ) ).is_ok();
-
-                //todo: add support for point rendering
-                // let mut prim_point = primitive::Point { _pos: math::mat::Mat3x1 { _val: [ 0f32, 0f32, 5f32 ] },
-                //                                         _radius: 3f32 };
-                
-                // Renderer::add_obj( & mut kr, "point", i_ele::Ele::init( prim_point ) ).is_ok();
-                
-                let l = &lights[0];
-                Renderer::add_obj( & mut kr, "light_ads", i_ele::Ele::init( l.clone() ) ).is_ok();
-                
-                Renderer::add_obj( & mut kr, "camera", i_ele::Ele::init( cam.clone() ) ).is_ok();
-                //primitives and objects end
-
-                Renderer::add_obj( & mut kr, "cmd_bind_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupBind::init( draw_group ) ) ).is_ok();
-
-                Renderer::add_obj( & mut kr, "cmd_set_draw_group_dependent_uniforms", i_ele::Ele::init( render_commands::CmdDrawGroupDependentUniforms::init( draw_group, &[0u64,1u64] ) ) ).is_ok();
-                
-                Renderer::add_obj( & mut kr, "cmd_dispatch_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupDispatch::init( draw_group ) ) ).is_ok();
-
-                delta -= 0.01f32;
-            }
         }
+        Renderer::add_obj( & mut kr, "cmd_clear_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupClear::init( draw_group ) ) ).is_ok();
+
+        // primitives and objects start
+        let mut mesh2 = mesh_copy.clone();
+        mesh2._pos.clear();
+        mesh2._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32+delta, -1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 5f32+delta, -1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [-1f32+delta,  1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 4f32+delta, -1f32, 15f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 6f32+delta, -1f32, 15f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 4f32+delta,  1f32, 15f32 ] }, ] );
+        Renderer::add_obj( & mut kr, "mesh_triangles", i_ele::Ele::init( mesh2 ) ).is_ok();
+
+        let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
+                                           _radius: 5f32 };
+
+        Renderer::add_obj( & mut kr, "box", i_ele::Ele::init( prim_box ) ).is_ok();
+
+        let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
+
+        Renderer::add_obj( & mut kr, "sphere", i_ele::Ele::init( prim_sphere ) ).is_ok();
+
+        //todo: add support for point rendering
+        // let mut prim_point = primitive::Point { _pos: math::mat::Mat3x1 { _val: [ 0f32, 0f32, 5f32 ] },
+        //                                         _radius: 3f32 };
+        
+        // Renderer::add_obj( & mut kr, "point", i_ele::Ele::init( prim_point ) ).is_ok();
+        
+        let l = &lights[0];
+        Renderer::add_obj( & mut kr, "light_ads", i_ele::Ele::init( l.clone() ) ).is_ok();
+        
+        Renderer::add_obj( & mut kr, "camera", i_ele::Ele::init( cam.clone() ) ).is_ok();
+        //primitives and objects end
+
+        Renderer::add_obj( & mut kr, "cmd_bind_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupBind::init( draw_group ) ) ).is_ok();
+
+        Renderer::add_obj( & mut kr, "cmd_set_draw_group_dependent_uniforms", i_ele::Ele::init( render_commands::CmdDrawGroupDependentUniforms::init( draw_group, &[0u64,1u64] ) ) ).is_ok();
+        
+        Renderer::add_obj( & mut kr, "cmd_dispatch_draw_group", i_ele::Ele::init( render_commands::CmdDrawGroupDispatch::init( draw_group ) ) ).is_ok();
+
+        delta -= 0.01f32;
+
         kr.win_ref().swap_buf();
 
         println!("swapped buffer");
