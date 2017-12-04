@@ -5,6 +5,7 @@ use implement::math::mat;
 pub fn perspective( fov: f32, aspect: f32, near: f32, far: f32 ) -> mat::Mat4< f32 > {
     //fov is the full field of view in y-plane, eg: fovy = fov/2
     let half_tan = (fov * f32::consts::PI / 360.0f32).tan();
+    //creates a frustum
     let mut out : mat::Mat4<f32> = Default::default();
     *out.index_mut(0, 0) = 1.0/(aspect*half_tan);
     *out.index_mut(1, 1) = 1.0/half_tan;

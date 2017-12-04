@@ -62,6 +62,9 @@ impl AxisAlignedBBox {
                     _bound_upper: [ f64::INFINITY; 3 ],
                 }
             },
+            ShapeType::FRUSTUM => {
+                unimplemented!();
+            },
             _ => { unimplemented!(); },
         }
     }

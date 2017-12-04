@@ -12,8 +12,11 @@ pub mod ray;
 pub mod point;
 pub mod sphere;
 pub mod plane;
+pub mod frustum;
 ///spatial accelerators
 pub mod bvh;
+pub mod clusterbox;
+pub mod octree;
 ///intersection testers
 pub mod intersect_gjk;
 ///probabilistic algorithms
