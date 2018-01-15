@@ -1,3 +1,4 @@
+///this is useful for a number of cases such as intersection testing and voxel rendering
 use std::boxed::Box;
 use std::f64;
 use std::u64;
@@ -9,49 +10,49 @@ use interface::i_stat_tree::IStatTree;
 use implement::math::bound::AxisAlignedBBox;
 
 #[derive(Debug, Clone)]
-pub struct Octree {
-    _root: NodeOctree,
+pub struct Svo {
+    _root: NodeSvo,
 }
 
-///internal node structure for Octree
+///internal node structure for Svo
 #[derive(Debug, Clone)]
-pub struct NodeOctree {
+pub struct NodeSvo {
     _bound: AxisAlignedBBox,
-    _branches: Vec< OctreeBranch >,
+    _branches: Vec< SvoBranch >,
     _obj: u64, //leaf data
 }
 
 #[derive(Debug, Clone)]
-pub enum OctreeBranch {
-    CHILD(Box< NodeOctree >),
+pub enum SvoBranch {
+    CHILD(Box< NodeSvo >),
     EMPTY,
 }
 
-impl Default for NodeOctree {
-    fn default() -> NodeOctree {
-        NodeOctree {
+impl Default for NodeSvo {
+    fn default() -> NodeSvo {
+        NodeSvo {
             _bound: AxisAlignedBBox {
                 _bound_lower: [ f64::NEG_INFINITY; 3 ],
                 _bound_upper: [ f64::INFINITY; 3 ],
             },
-            _branches: vec![ OctreeBranch::EMPTY; 8 ],
+            _branches: vec![ SvoBranch::EMPTY; 8 ],
             _obj: u64::MAX,
         }
     }
 }
 
-impl NodeOctree {
-    pub fn init_branches( b: AxisAlignedBBox, branches: Vec< OctreeBranch > ) -> NodeOctree {
-        NodeOctree {
+impl NodeSvo {
+    pub fn init_branches( b: AxisAlignedBBox, branches: Vec< SvoBranch > ) -> NodeSvo {
+        NodeSvo {
             _bound: b,
             _branches: branches,
             _obj: u64::MAX,
         }
     }
-    pub fn init_leaf( b: AxisAlignedBBox, o: u64 ) -> NodeOctree {
-        NodeOctree {
+    pub fn init_leaf( b: AxisAlignedBBox, o: u64 ) -> NodeSvo {
+        NodeSvo {
             _bound: b,
-            _branches: vec![ OctreeBranch::EMPTY; 8 ],
+            _branches: vec![ SvoBranch::EMPTY; 8 ],
             _obj: o,
         }
     }
@@ -77,28 +78,28 @@ impl NodeOctree {
 
         unimplemented!();
     }
-    pub fn search< F >( _n : & NodeOctree, _b: & IBound, mut _f : F ) where F : FnMut( u64 ) -> ()
+    pub fn search< F >( _n : & NodeSvo, _b: & IBound, mut _f : F ) where F : FnMut( u64 ) -> ()
     {
         unimplemented!();
     }
 }
 
-impl Octree {
-    pub fn init() -> Octree {
-        Octree {
-            _root: NodeOctree {
+impl Svo {
+    pub fn init() -> Svo {
+        Svo {
+            _root: NodeSvo {
                 _bound: AxisAlignedBBox {
                     _bound_lower: [ f64::NEG_INFINITY; 3 ],
                     _bound_upper: [ f64::INFINITY; 3 ],
                 },
-                _branches: vec![ OctreeBranch::EMPTY; 8 ],
+                _branches: vec![ SvoBranch::EMPTY; 8 ],
                 _obj: u64::MAX,
             },
         }
     }
 }
 
-impl ISpatialAccel for Octree {
+impl ISpatialAccel for Svo {
     fn query_intersect( & self, input: &IBound ) -> Result< Vec< u64 >, & 'static str >
     {
         match input.get_type() {
@@ -108,7 +109,7 @@ impl ISpatialAccel for Octree {
         let mut out = vec![];
         {
             let func_collect = | x | { out.push( x ); () };
-            NodeOctree::search( &self._root, input, func_collect );
+            NodeSvo::search( &self._root, input, func_collect );
         }
         Ok( out )
     }
@@ -118,7 +119,7 @@ impl ISpatialAccel for Octree {
     }
 }
 
-impl IStatTree for Octree {
+impl IStatTree for Svo {
     fn sum_subtree_child_count( & self ) -> Option< u64 > {
         unimplemented!();
     }

@@ -1,4 +1,3 @@
-//todo:
 pub mod i_init;
 pub mod i_pool;
 pub mod i_threadpool;
@@ -21,3 +20,5 @@ pub mod i_ele;
 pub mod i_component;
 pub mod i_comparable;
 pub mod i_stat_tree;
+pub mod i_game_logic;
+pub mod i_renderer;

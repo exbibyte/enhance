@@ -1,4 +1,5 @@
 pub mod commonutil;
+pub mod ds;
 pub mod dsc;
 pub mod memory;
 pub mod math;
@@ -7,9 +8,8 @@ pub mod window;
 pub mod render;
 pub mod capability;
 pub mod kernel;
+pub mod cam;
 //pub mod motion;
-pub mod ds;
-// pub mod math;                   
 // pub mod mt;
 
 

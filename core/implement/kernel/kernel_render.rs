@@ -19,24 +19,9 @@ use implement::render::shader_collection;
 use implement::render::texture_collection;
 use implement::render::router;
 use implement::render::renderdevice_gl;
-// use implement::render::renderpass_default;
-
-
-// pub struct RendererWrap {
-//     pub _renderer: RefCell< Renderer >,
-// }
-
-// impl RendererWrap {
-//     pub fn init() -> RendererWrap {
-//         RendererWrap {
-//             _renderer: RefCell::new( Renderer::init().unwrap() ),
-//         }
-//     }
-// }
-
-
 
 pub struct Renderer {
+    ///todo: factor out windowing from this file
     _win: WinGlutin,
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
     _map_string_to_rp: HashMap< String, usize >,

@@ -21,7 +21,14 @@ pub struct WinGlutin {
     pub _win: WinGlutinWin,
 }
 
-impl IWindow< Event > for WinGlutin {
+pub struct DummySignalRequestType {
+}
+
+impl IWindow for WinGlutin {
+
+    type EventType = glutin::Event;
+    type SignalRequestType = DummySignalRequestType;
+
     fn init( w: u64, h: u64 ) -> WinGlutin {
         let gl_request = glutin::GlRequest::Latest;
         let c = glutin::ContextBuilder::new().with_vsync( true ).with_gl( gl_request );
@@ -45,12 +52,23 @@ impl IWindow< Event > for WinGlutin {
         Ok( () )
     }
     fn handle_events < F > ( & mut self, cb: F ) -> ()
-        where F : FnMut( Event ) -> () {
+        where F : FnMut( Self::EventType ) -> () {
         self._base._eventsloop.poll_events( cb );
         ()
+    }
+    fn handle_events_pass_thru( & mut self ) -> Option< Self::EventType > {
+        //todo: handle specific events as requested via handle_signal_request
+        let mut e = None;
+        self._base._eventsloop.poll_events( |event| {
+            e = Some(event);
+        } );
+        e
     }
     fn swap_buf( & self ) -> () {
         self._win._wingl.swap_buffers().unwrap();
         ()
+    }
+    fn handle_signal_request( & mut self, sig: & [ Self::SignalRequestType ] ) {
+        //todo
     }
 }

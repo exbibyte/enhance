@@ -19,13 +19,13 @@ pub fn compute_discrete< F0, F1, F2 >( domain: &[ f32 ], candidate_generator: F0
         let k = i as f32/ max_iter as f32;
         let t = temperature_function( k ); //output range between [0,1]
         let candidate = candidate_generator( &domain[..], i ); //candidate is the index within the domain slice
-        let r = between.ind_sample(&mut rng);
+        let r = between.ind_sample(&mut rng); //generate from a uniform distribution [0,1]
         let e_current = energy_function( &domain[..], state );
         let e_candidate = energy_function( &domain[..], candidate );
         let e_diff = e_candidate - e_current; // diff is between [-1, 1]
         if e_diff < 0f32 { //candidate energy is lower than current
             state = candidate;
-        }else{ //diff is between [0, 1]
+        } else { //diff is between [0, 1]
             let a = t * e_diff;
             if a > r {
                 state = candidate;                
