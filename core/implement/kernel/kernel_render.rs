@@ -11,8 +11,8 @@ use interface::i_renderobj::RenderDevice;
 use interface::i_renderobj;
 use interface::i_renderpass;
 use interface::i_component;
+use interface::i_renderer::IRenderer;
 
-use implement::window::winglutin::WinGlutin;
 use implement::capability::capability_gl;
 use implement::render::util_gl;
 use implement::render::shader_collection;
@@ -21,8 +21,6 @@ use implement::render::router;
 use implement::render::renderdevice_gl;
 
 pub struct Renderer {
-    ///todo: factor out windowing from this file
-    _win: WinGlutin,
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
     _map_string_to_rp: HashMap< String, usize >,
     pub _shader_collection: RefCell< shader_collection::ShaderCollection >,
@@ -55,34 +53,26 @@ impl Drop for Renderer {
     }
 }
 
+pub struct DummyRenderEventType {
+    //todo
+}
 
-impl Renderer {
-    pub fn init() -> Result< Renderer, & 'static str > {
-        let rk = Renderer {
-            _win: IWindow::init( 500, 500 ),
-            _rp: vec![],
-            _map_string_to_rp: HashMap::new(),
-            _shader_collection: RefCell::new( Default::default() ),
-            _texture_collection: Default::default(),
-            _shader_programs: vec![],
-            _draw_groups: RefCell::new( vec![] ),
-            _vaos: vec![],
-            _vbos: vec![],
-            _objs: RefCell::new( vec![] ),
-            _uniforms: RefCell::new( Default::default() ),
-            _draw_group_uniforms: RefCell::new( vec![] ),
-            _shaders_compiled: vec![],
-            _current_shader_program: 0,
-        };
-        match rk._win.make_current() {
-            Err( e ) => return Err( e ),
-            _ => (),
-        }
-        let cap = capability_gl::query_gl();
-        println!( "{}", cap );
-        Ok( rk )
+impl IRenderer for Renderer {
+
+    type EventRender = DummyRenderEventType;
+
+    fn get_shader_program( & mut self, id: u64 ) -> Option< i64 > {
+        self._shader_collection.borrow_mut().get( id )
     }
-    pub fn load_shader( & mut self, sources: &[ ( &str, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str > {
+    
+    fn init() -> Result< Self, & 'static str > {
+        Renderer::init()
+    }
+    fn process_render_events( & self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
+        // unimplemented!();
+        Ok( () )
+    }
+    fn load_shader( & mut self, sources: &[ ( &str, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str > {
         let mut compiled_shaders = vec![];
         for &(ref src, ref src_type ) in sources.into_iter() {
             let s = match util_gl::load_and_compile_shader( src, *src_type ) {
@@ -114,7 +104,7 @@ impl Renderer {
             Ok( i as u64 )
         }
     }
-    pub fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str > {
+    fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str > {
         let shader_program_internal = self._shader_collection.borrow_mut().get( self._current_shader_program ).unwrap();
         let handle = match util_gl::load_texture( shader_program_internal as _, 0, image, w, h ) {
             Ok( h ) => h,
@@ -126,7 +116,7 @@ impl Renderer {
         };
         Ok( h )
     }
-    pub fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
+    fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
         let mut obj_vao = 0;
         let mut obj_vbo = 0;
         unsafe {
@@ -146,13 +136,13 @@ impl Renderer {
         Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }
     #[allow(unused)]
-    pub fn add_obj( renderer: & mut Renderer, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
+    fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
 
-        let index = renderer._objs.borrow_mut().len();
-        renderer._objs.borrow_mut().push( Box::new( e ) );
+        let index = self._objs.borrow_mut().len();
+        self._objs.borrow_mut().push( Box::new( e ) );
 
         //load component data
-        match renderer._objs.borrow_mut()[index].update_components_from_impl() {
+        match self._objs.borrow_mut()[index].update_components_from_impl() {
             Err( e ) => { return Err( e ) },
             _ => (),
         }
@@ -160,7 +150,7 @@ impl Renderer {
         //detect command to flush and process all data in buffer
         let mut trigger_to_process_objs = false;
         let mut group_id = 0;
-        for j in renderer._objs.borrow_mut()[index]._components.iter() {
+        for j in self._objs.borrow_mut()[index]._components.iter() {
             match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDispatch >() {
                 Some( o ) => {
                     println!("detected trigger for draw group dispatch");
@@ -172,10 +162,33 @@ impl Renderer {
         }
 
         if trigger_to_process_objs {
-            Renderer::process_objs( renderer, group_id )?
+            Renderer::process_objs( self, group_id )?
         }
 
-        Ok( renderer._objs.borrow_mut().len() )  
+        Ok( self._objs.borrow_mut().len() )  
+    }
+}
+
+impl Renderer {
+    pub fn init() -> Result< Renderer, & 'static str > {
+        let rk = Renderer {
+            _rp: vec![],
+            _map_string_to_rp: HashMap::new(),
+            _shader_collection: RefCell::new( Default::default() ),
+            _texture_collection: Default::default(),
+            _shader_programs: vec![],
+            _draw_groups: RefCell::new( vec![] ),
+            _vaos: vec![],
+            _vbos: vec![],
+            _objs: RefCell::new( vec![] ),
+            _uniforms: RefCell::new( Default::default() ),
+            _draw_group_uniforms: RefCell::new( vec![] ),
+            _shaders_compiled: vec![],
+            _current_shader_program: 0,
+        };
+        let cap = capability_gl::query_gl();
+        println!( "{}", cap );
+        Ok( rk )
     }
     pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {       
         println!("objects size: {}", renderer._objs.borrow_mut().len() );
@@ -326,9 +339,6 @@ impl Renderer {
         }
         self._draw_group_uniforms.borrow_mut()[ draw_group ].clear();
         Ok( () )
-    }
-    pub fn win_ref( & mut self ) -> & mut WinGlutin {
-        & mut self._win
     }
 }
 

@@ -6,14 +6,15 @@ use interface::i_renderer::IRenderer;
 
 use implement::window::winglutin::WinGlutin;
 use implement::kernel::kernel;
+use implement::kernel::kernel_render;
 
 pub struct GameLogic {
     //todo
 }
 
 impl IGameLogic for GameLogic {
-    type EventInput = glutin::WindowEvent;
-    type EventRender = DummyRenderEventType;
+    type EventInput = glutin::Event;
+    type EventRender = kernel_render::DummyRenderEventType;
     fn init() -> GameLogic {
         GameLogic {}
     }
@@ -22,20 +23,5 @@ impl IGameLogic for GameLogic {
     }
 }
 
-pub struct Renderer {
-    //todo
-}
 
-impl IRenderer for Renderer {
-    type EventRender = DummyRenderEventType;
-    fn init(){}
-    fn process_render_events( & self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
-        Ok( () )
-    }
-}
-
-pub struct DummyRenderEventType {
-    //todo
-}
-
-type KernelImpl000 = kernel::Kernel < GameLogic, Renderer, WinGlutin, glutin::WindowEvent, DummyRenderEventType >;
+pub type KernelImpl000 = kernel::Kernel < GameLogic, kernel_render::Renderer, WinGlutin, glutin::Event, kernel_render::DummyRenderEventType >;

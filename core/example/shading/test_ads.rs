@@ -22,6 +22,7 @@ use self::glutin::GlContext;
 use self::e2rcore::interface::i_ele;
 use self::e2rcore::interface::i_window::IWindow;
 use self::e2rcore::interface::i_renderobj;
+use self::e2rcore::interface::i_renderer::IRenderer;
 
 use self::e2rcore::implement::render::util_gl;
 use self::e2rcore::implement::math;
@@ -31,6 +32,8 @@ use self::e2rcore::implement::render::mesh;
 use self::e2rcore::implement::render::primitive;
 use self::e2rcore::implement::render::texture;
 // use self::e2rcore::implement::render::renderpass_default;
+
+use self::e2rcore::implement::window::winglutin::WinGlutin;
 
 use self::e2rcore::implement::kernel::kernel_render::Renderer;
 use self::e2rcore::implement::render::render_commands;
@@ -54,6 +57,13 @@ fn main() {
     println!( "image type: {:?}", img.color() );
 
     let texture0 = texture::Texture::from( &img );
+
+    let mut win : WinGlutin = IWindow::init( 500, 500 );
+
+    match win.make_current() {
+        Err( e ) => { panic!( e ); },
+        _ => (),
+    }
     
     let mut kr = Renderer::init().unwrap();
     
@@ -141,7 +151,7 @@ fn main() {
     let mut delta = 0f32;
     while running {
         let mut new_win_dim = None;
-        kr.win_ref().handle_events( |event| {
+        win.handle_events( |event| {
             match event {
                 glutin::Event::WindowEvent{ event, .. } => match event {
                     glutin::WindowEvent::Closed => running = false,
@@ -159,7 +169,7 @@ fn main() {
             }
         } );
         if let Some( ( w, h ) ) = new_win_dim {
-            kr.win_ref()._win._wingl.resize(w, h);
+            win._win._wingl.resize(w, h);
         }
         unsafe {
             gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
@@ -207,7 +217,7 @@ fn main() {
 
         delta -= 0.01f32;
 
-        kr.win_ref().swap_buf();
+        win.swap_buf();
 
         println!("swapped buffer");
     }

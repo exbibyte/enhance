@@ -26,6 +26,10 @@ num = "0.1.40"
 name = "e2r_test_ads"
 path = "core/example/shading/test_ads.rs"
 
+[[bin]]
+name = "e2r_test_ads_2"
+path = "core/example/shading/test_ads_2.rs"
+
 # [[bin]]
 # name = "e2r_test_winglutin"
 # path = "core/example/window/test_winglutin.rs"
