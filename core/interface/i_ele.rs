@@ -4,19 +4,36 @@ use std::any::Any;
 use interface::i_component;
 
 /// # all available functionalities for an object
-pub trait IObjImpl: 'static {
+pub trait IObjImpl: IObjImplClone {
     fn as_any( & self ) -> & Any;
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str >;
 }
 
+pub trait IObjImplClone {
+    fn clone_box( & self ) -> Box< IObjImpl >;
+}
+
+impl< T > IObjImplClone for T where T: 'static + IObjImpl + Clone {
+    fn clone_box( & self ) -> Box< IObjImpl > {
+        Box::new( self.clone() )
+    }
+}
+
+impl Clone for Box< IObjImpl > {
+    fn clone( & self ) -> Box< IObjImpl > {
+        self.clone_box()
+    }
+}
+
 /// # generic encapsulation for a create object
+#[derive(Clone)]
 pub struct Ele {
     pub _impl: Box< IObjImpl >,
     pub _components: Vec< Box< i_component::IComponent > >,
 }
 
 impl Ele {
-    pub fn init< T >( c: T ) -> Ele where T : IObjImpl {
+    pub fn init< T >( c: T ) -> Ele where T : IObjImpl + 'static {
         Ele {
             _impl: Box::new(c),
             _components: vec![],

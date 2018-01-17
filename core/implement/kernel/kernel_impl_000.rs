@@ -14,7 +14,7 @@ pub struct GameLogic {
 
 impl IGameLogic for GameLogic {
     type EventInput = glutin::Event;
-    type EventRender = kernel_render::DummyRenderEventType;
+    type EventRender = kernel_render::Event;
     fn init() -> GameLogic {
         GameLogic {}
     }
@@ -23,5 +23,4 @@ impl IGameLogic for GameLogic {
     }
 }
 
-
-pub type KernelImpl000 = kernel::Kernel < GameLogic, kernel_render::Renderer, WinGlutin, glutin::Event, kernel_render::DummyRenderEventType >;
+pub type KernelImpl000 = kernel::Kernel < GameLogic, kernel_render::Renderer, WinGlutin, glutin::Event, kernel_render::Event >;

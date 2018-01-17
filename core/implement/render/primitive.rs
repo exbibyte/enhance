@@ -383,6 +383,7 @@ impl i_ele::IObjImpl for SphereIcosahedron {
 }
 
 //todo
+#[derive(Clone)]
 pub struct Point {
     pub _pos: mat::Mat3x1< f32 >,
     pub _radius: f32,

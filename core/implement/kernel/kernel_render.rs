@@ -53,29 +53,76 @@ impl Drop for Renderer {
     }
 }
 
-pub struct DummyRenderEventType {
-    //todo
+pub enum Event {
+    ADD_OBJ( i_ele::Ele ),
+    LOAD_SHADER( Vec< ( String, util_gl::ShaderType ) > ),
+    LOAD_TEXTURE( String, Vec< u8 >, usize, usize ),
+    CREATE_DRAW_GROUP( i_renderobj::RenderObjType ),
 }
+
+pub enum EventResult {
+    SHADER_PROGRAM( isize ),
+    TEXTURE_ID( isize ),
+    DRAW_GROUP_ID( isize ),
+}
+
+
 
 impl IRenderer for Renderer {
 
-    type EventRender = DummyRenderEventType;
-
-    fn get_shader_program( & mut self, id: u64 ) -> Option< i64 > {
-        self._shader_collection.borrow_mut().get( id )
-    }
+    type EventRender = Event;
     
     fn init() -> Result< Self, & 'static str > {
         Renderer::init()
     }
-    fn process_render_events( & self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
-        // unimplemented!();
+    fn process_render_events( & mut self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
+        //handle return values from calls
+        let dummy_str = "";
+        for i in e.iter() {
+            match i {
+                & Event::ADD_OBJ( ref x ) => {
+                    self.add_obj( dummy_str, x.clone() );
+                },
+                & Event::LOAD_SHADER( ref x ) => {
+                    self.load_shader( x.as_slice() );
+                },
+                & Event::LOAD_TEXTURE( ref s, ref data, ref w, ref h ) => {
+                    self.load_texture( s.clone(), data.as_slice(), *w, *h );
+                },
+                & Event::CREATE_DRAW_GROUP( ref x ) => {
+                    self.create_draw_group( *x );
+                },
+            }
+        }
         Ok( () )
     }
-    fn load_shader( & mut self, sources: &[ ( &str, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str > {
+}
+
+impl Renderer {
+    pub fn init() -> Result< Renderer, & 'static str > {
+        let rk = Renderer {
+            _rp: vec![],
+            _map_string_to_rp: HashMap::new(),
+            _shader_collection: RefCell::new( Default::default() ),
+            _texture_collection: Default::default(),
+            _shader_programs: vec![],
+            _draw_groups: RefCell::new( vec![] ),
+            _vaos: vec![],
+            _vbos: vec![],
+            _objs: RefCell::new( vec![] ),
+            _uniforms: RefCell::new( Default::default() ),
+            _draw_group_uniforms: RefCell::new( vec![] ),
+            _shaders_compiled: vec![],
+            _current_shader_program: 0,
+        };
+        let cap = capability_gl::query_gl();
+        println!( "{}", cap );
+        Ok( rk )
+    }
+    pub fn load_shader( & mut self, sources: &[ ( String, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str > {
         let mut compiled_shaders = vec![];
         for &(ref src, ref src_type ) in sources.into_iter() {
-            let s = match util_gl::load_and_compile_shader( src, *src_type ) {
+            let s = match util_gl::load_and_compile_shader( (*src).as_str(), *src_type ) {
                 Ok( o ) => o,
                 Err( o ) => {
                     println!( "{}", o );
@@ -104,7 +151,7 @@ impl IRenderer for Renderer {
             Ok( i as u64 )
         }
     }
-    fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str > {
+    pub fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str > {
         let shader_program_internal = self._shader_collection.borrow_mut().get( self._current_shader_program ).unwrap();
         let handle = match util_gl::load_texture( shader_program_internal as _, 0, image, w, h ) {
             Ok( h ) => h,
@@ -116,7 +163,7 @@ impl IRenderer for Renderer {
         };
         Ok( h )
     }
-    fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
+    pub fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str > {
         let mut obj_vao = 0;
         let mut obj_vbo = 0;
         unsafe {
@@ -136,7 +183,7 @@ impl IRenderer for Renderer {
         Ok( ( obj_vao, obj_vbo, self._draw_groups.borrow_mut().len() - 1) )
     }
     #[allow(unused)]
-    fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
+    pub fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str > {
 
         let index = self._objs.borrow_mut().len();
         self._objs.borrow_mut().push( Box::new( e ) );
@@ -166,29 +213,6 @@ impl IRenderer for Renderer {
         }
 
         Ok( self._objs.borrow_mut().len() )  
-    }
-}
-
-impl Renderer {
-    pub fn init() -> Result< Renderer, & 'static str > {
-        let rk = Renderer {
-            _rp: vec![],
-            _map_string_to_rp: HashMap::new(),
-            _shader_collection: RefCell::new( Default::default() ),
-            _texture_collection: Default::default(),
-            _shader_programs: vec![],
-            _draw_groups: RefCell::new( vec![] ),
-            _vaos: vec![],
-            _vbos: vec![],
-            _objs: RefCell::new( vec![] ),
-            _uniforms: RefCell::new( Default::default() ),
-            _draw_group_uniforms: RefCell::new( vec![] ),
-            _shaders_compiled: vec![],
-            _current_shader_program: 0,
-        };
-        let cap = capability_gl::query_gl();
-        println!( "{}", cap );
-        Ok( rk )
     }
     pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {       
         println!("objects size: {}", renderer._objs.borrow_mut().len() );
@@ -339,6 +363,9 @@ impl Renderer {
         }
         self._draw_group_uniforms.borrow_mut()[ draw_group ].clear();
         Ok( () )
+    }
+    pub fn get_shader_program( & mut self, id: u64 ) -> Option< i64 > {
+        self._shader_collection.borrow_mut().get( id )
     }
 }
 

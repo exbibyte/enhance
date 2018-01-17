@@ -36,8 +36,7 @@ use self::e2rcore::implement::render::texture;
 
 use self::e2rcore::implement::window::winglutin::WinGlutin;
 
-use self::e2rcore::implement::kernel::kernel_render::Renderer;
-use self::e2rcore::implement::kernel::kernel_render::DummyRenderEventType;
+use self::e2rcore::implement::kernel::kernel_render;
 use self::e2rcore::implement::render::render_commands;
 
 pub fn file_open( file_path: & str ) -> Option<String> {
@@ -69,7 +68,7 @@ fn main() {
     let mut k = KernelImpl000::init().unwrap();
     k._windowing.make_current();
 
-    k._renderer.push( Renderer::init().unwrap() );
+    k._renderer.push( kernel_render::Renderer::init().unwrap() );
 
     k.run();
 

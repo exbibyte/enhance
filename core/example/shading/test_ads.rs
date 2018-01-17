@@ -70,8 +70,8 @@ fn main() {
     let vs_src = file_open( "core/example/shading/ads.vs" ).expect("vertex shader not retrieved");
     let fs_src = file_open( "core/example/shading/ads.fs" ).expect("fragment shader not retrieved");
     
-    let shader_program_external = kr.load_shader( &[ ( vs_src.as_str(), util_gl::ShaderType::VERTEX ),
-                                                ( fs_src.as_str(), util_gl::ShaderType::FRAGMENT ) ] ).unwrap();
+    let shader_program_external = kr.load_shader( &[ ( vs_src, util_gl::ShaderType::VERTEX ),
+                                                ( fs_src, util_gl::ShaderType::FRAGMENT ) ] ).unwrap();
     util_gl::check_last_op();
 
     let image = vec![200, 200, 150, 0, 0, 255 ];

@@ -5,10 +5,27 @@ use interface::i_renderobj;
 
 use implement::render::renderdevice_gl;
 
-pub trait IComponent: 'static {
+pub trait IComponent: IComponentClone {
     fn as_any( & self ) -> & Any;
 }
 
+pub trait IComponentClone {
+    fn clone_box( & self ) -> Box< IComponent >;
+}
+
+impl< T > IComponentClone for T where T: 'static + IComponent + Clone {
+    fn clone_box( & self ) -> Box< IComponent > {
+        Box::new( self.clone() )
+    }
+}
+
+impl Clone for Box< IComponent > {
+    fn clone( & self ) -> Box< IComponent > {
+        self.clone_box()
+    }
+}
+
+#[derive(Clone)]
 pub struct ComponentRenderBuffer {
     pub _data_dict: HashMap< i_renderobj::BuffDataType, Vec<f32> >,
     // pub _render_prim_type: i_renderobj::RenderObjType,
@@ -29,6 +46,7 @@ impl ComponentRenderBuffer {
     }
 }
 
+#[derive(Clone)]
 pub struct ComponentRenderUniform {
     /// # stores the uniforms values
     pub _data_dict_vf: HashMap< String, Vec<f32> >,

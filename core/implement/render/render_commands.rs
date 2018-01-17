@@ -5,7 +5,7 @@ use interface::i_ele;
 use interface::i_component;
 
 /// # command for resetting draw group content
-
+#[derive(Clone)]
 pub struct CmdDrawGroupClear ( pub i_component::ComponentDrawGroupClear );
 
 impl CmdDrawGroupClear {
@@ -28,6 +28,7 @@ impl i_ele::IObjImpl for CmdDrawGroupClear {
     }
 }
 
+#[derive(Clone)]
 pub struct CmdDrawGroupDependentObjects ( pub i_component::ComponentDrawGroupDependentObjects );
 
 impl CmdDrawGroupDependentObjects {
@@ -50,6 +51,7 @@ impl i_ele::IObjImpl for CmdDrawGroupDependentObjects {
     }
 }
 
+#[derive(Clone)]
 pub struct CmdDrawGroupBind ( pub i_component::ComponentDrawGroupBind );
 
 impl CmdDrawGroupBind {
@@ -72,6 +74,7 @@ impl i_ele::IObjImpl for CmdDrawGroupBind {
     }
 }
 
+#[derive(Clone)]
 pub struct CmdDrawGroupDispatch ( pub i_component::ComponentDrawGroupDispatch );
 
 impl CmdDrawGroupDispatch {
@@ -94,7 +97,7 @@ impl i_ele::IObjImpl for CmdDrawGroupDispatch {
     }
 }
 
-
+#[derive(Clone)]
 pub struct CmdDrawGroupDependentUniforms ( pub i_component::ComponentDrawGroupDependentUniforms );
 
 impl CmdDrawGroupDependentUniforms {

@@ -21,16 +21,16 @@ pub trait IRenderer {
 
     fn init() -> Result< Self, & 'static str > where Self: Sized;
 
-    fn process_render_events( & self, & [ Self::EventRender ] ) -> Result< (), & 'static str >;
+    fn process_render_events( & mut self, & [ Self::EventRender ] ) -> Result< (), & 'static str >;
 
-    fn load_shader( & mut self, sources: &[ ( &str, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str >;
+    // fn load_shader( & mut self, sources: &[ ( &str, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str >;
 
-    fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str >;
+    // fn load_texture( & mut self, description: String, image: &[u8], w: usize, h: usize ) -> Result< ( u64 ), & 'static str >;
 
-    fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str >;
+    // fn create_draw_group( & mut self, prim_type: i_renderobj::RenderObjType ) -> Result< ( gl::types::GLuint, gl::types::GLuint, usize ), & 'static str >;
 
-    fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str >;
+    // fn add_obj( & mut self, name: &str, e: i_ele::Ele ) -> Result< ( usize ), & 'static str >;
     
-    fn get_shader_program( & mut self, id: u64 ) -> Option< i64 >;
+    // fn get_shader_program( & mut self, id: u64 ) -> Option< i64 >;
 }
 
