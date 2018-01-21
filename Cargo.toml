@@ -9,10 +9,10 @@ license = "BSD-2-Clause"
 documentation = "https://docs.rs/e2r/0.5.0/e2r/"
 readme = "README.md"
 exclude = [
-"core/asset/images",
-"core/asset/md5",
-"core/asset/obj",
-"core/asset/blend",
+"core/asset/images/*",
+"core/asset/md5/*",
+"core/asset/obj/*",
+"core/asset/blend/*",
 ]
 
 [lib]
