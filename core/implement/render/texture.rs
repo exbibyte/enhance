@@ -1,7 +1,8 @@
-use std::collections::HashMap;
-
+extern crate pretty_env_logger;
 extern crate image;
 extern crate num;
+
+use std::collections::HashMap;
 
 use self::image::Pixel;
 
@@ -116,7 +117,7 @@ pub fn modulate( normalized: & TextureNormalized, hm: & HashMap<Channel,u8> ) ->
             &( ref c, ref v) => {
                 let val = match hm.get( c ){
                     Some(&a) => a,
-                    _ => { println!("unmatched channel, setting to 0 instead"); 0u8 },
+                    _ => { warn!("unmatched channel, setting to 0 instead"); 0u8 },
                 };
                 t._data.push( (Channel::R, (v * val as f32) as u8 ) );
             },

@@ -9,7 +9,7 @@ pub trait KernelImplHooks < G, R, W, EInput, ERender >
           W: IWindow< EventType = EInput >
 {
     fn init() -> Self;
-    fn init_hooks( & mut self, & mut W, & mut G, & mut Vec< R > );
+    fn init_hooks( & mut self, & mut W, & mut G, & mut Vec< R > ) -> Result< (), & 'static str >;
 }
 
 pub struct Kernel < G, R, W, EInput, ERender, H >
@@ -36,6 +36,9 @@ impl < G, R, W, EInput, ERender, H > Kernel < G, R, W, EInput, ERender, H >
           H: KernelImplHooks< G, R, W, EInput, ERender >,
 {
     pub fn init() -> Result< Self, & 'static str > {
+
+        info!("kernel init." );
+
         let mut k = Kernel {
             _windowing: IWindow::init( 500, 500 ),
             _game_logic: G::init(),
@@ -46,27 +49,29 @@ impl < G, R, W, EInput, ERender, H > Kernel < G, R, W, EInput, ERender, H >
             // _lights: Vec< light::LightAdsPoint >,
             // _cameras: Vec< camera::Cam >,
         };
-
-        k._kernel_hooks.init_hooks( & mut k._windowing, & mut k._game_logic, & mut k._renderer );
+        
+        k._kernel_hooks.init_hooks( & mut k._windowing, & mut k._game_logic, & mut k._renderer )?;
         
         Ok( k )
     }
     pub fn run( & mut self ) -> Result< (), & 'static str > {
+
+        info!( "kernel running." );
+        
         //foever loop and process results until exit conditions are caught
         let mut running = true;
+        
+        // let mut _new_win_dim = Some( ( 500, 500 ) );
 
-        let mut sig_window_close = false;
-        
-        let mut new_win_dim = Some( ( 500, 500 ) );
-        
+        #[allow(unused_mut)]
         let mut sigs_for_window = vec![];
 
         while running {
 
             //process windowing events into buffer
-            self._windowing.make_current();
+            self._windowing.make_current()?;
 
-            self._windowing.per_frame_setup();
+            self._windowing.per_frame_setup()?;
             
             self._windowing.handle_signal_request( sigs_for_window.as_slice() );
             
@@ -93,10 +98,11 @@ impl < G, R, W, EInput, ERender, H > Kernel < G, R, W, EInput, ERender, H >
                 i.process_render_events( & events_render[..] ).is_ok();
             }
 
-            // println!( "kernel running.." );
-
             self._windowing.swap_buf();
         }
+
+        info!( "kernel shutdown." );
+
         Ok( () )
     }
 }

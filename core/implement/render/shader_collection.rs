@@ -26,7 +26,7 @@ impl ShaderCollection {
             None => (),
             Some( ( shader_type, old_handle ) ) => {
                 router::delete_shader_program( old_handle, shader_type )?;
-                println!( "removed old shader program( {} ).", old_handle );
+                trace!( "removed old shader program( {} ).", old_handle );
             }
         }
         self._id_to_descrip.insert( id, descrip.clone() );

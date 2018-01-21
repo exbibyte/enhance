@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::collections::HashMap;
 use std::vec::Vec;
 use std::any::Any;
@@ -62,10 +64,10 @@ impl i_ele::IObjImpl for Cam {
             let model_view_transform = self._view_xform.mul( &model_transform ).unwrap();
             let normal_inv_transpose = model_view_transform.submat_mat3().inverse().unwrap().transpose();
 
-            // println!( "mv: {:?}", model_view_transform );
-            // println!( "mv submat: {:?}", model_view_transform.submat_mat3() );
-            // println!( "mvp: {:?}", mvp_transform );
-            // println!( "normal matrix: {:?}", normal_inv_transpose );
+            trace!( "mv: {:?}", model_view_transform );
+            trace!( "mv submat3: {:?}", model_view_transform.submat_mat3() );
+            trace!( "mvp: {:?}", mvp_transform );
+            trace!( "normal matrix: {:?}", normal_inv_transpose );
 
             let data_map_mat4f : HashMap< String, Vec<f32> > =  [ ( String::from("ModelViewMatrix\0"), &model_view_transform._val[..] ),
                                                                   ( String::from("ProjectionMatrix\0"), &self._proj_xform._val[..] ),
@@ -87,7 +89,7 @@ impl i_ele::IObjImpl for Cam {
                 ..Default::default()
             };
             components.push( Box::new(c) );
-            println!( "load into render buffer: uniform: camera" );
+            trace!( "load into render buffer: uniform: camera" );
         }
         Ok( () )
     }

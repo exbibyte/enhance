@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::collections::HashMap;
 use std::vec::Vec;
 use std::any::Any;
@@ -53,7 +55,7 @@ impl i_ele::IObjImpl for LightAdsPoint {
                 ..Default::default()
             };
             components.push( Box::new(c) );
-            println!( "load into render buffer: uniform: light" );
+            trace!( "load into render buffer: uniform: light" );
         }
         Ok( () )
     }

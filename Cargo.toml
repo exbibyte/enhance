@@ -21,10 +21,8 @@ glutin = ">=0.9.1"
 rand = "0.3"
 image = "0.17.0"
 num = "0.1.40"
-
-[[bin]]
-name = "e2r_test_ads"
-path = "core/example/shading/test_ads.rs"
+log = ">=0.4.1"
+pretty_env_logger = ">=0.2.0"
 
 [[bin]]
 name = "e2r_example_kernel_impl000"
@@ -37,10 +35,6 @@ path = "core/example/example_kernel_impl000.rs"
 # [[bin]]
 # name = "e2r_test_deferred"
 # path = "core/example/shading/test_deferred.rs"
-
-# [[bin]]
-# name = "e2r_core_bin"
-# path = "core/src/driver.rs"
 
 # [[bin]]
 # name = "e2r_sandbox"

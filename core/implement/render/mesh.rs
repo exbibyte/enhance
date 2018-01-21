@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use implement::math::mat::Mat3x1;
 use implement::math::mat::Mat2x1;
 use std::collections::HashMap;
@@ -62,7 +64,7 @@ impl i_ele::IObjImpl for Mesh {
                 _data_dict: data_map,
             };
             components.push( Box::new(c) );
-            println!( "load into render buffer: mesh: vertex count:{}", ele_len / 3 );
+            trace!( "load into render buffer: mesh: vertex count:{}", ele_len / 3 );
         }
         //store uniform data
         {

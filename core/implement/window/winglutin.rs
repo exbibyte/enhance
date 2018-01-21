@@ -4,7 +4,6 @@ extern crate glutin;
 use std::ops::FnMut;
 
 use self::glutin::GlContext;
-use self::glutin::Event;
 
 use interface::i_window::IWindow;
 
@@ -69,8 +68,8 @@ impl IWindow for WinGlutin {
         self._win._wingl.swap_buffers().unwrap();
         ()
     }
-    fn handle_signal_request( & mut self, sig: & [ Self::SignalRequestType ] ) {
-        //todo
+    fn handle_signal_request( & mut self, _sig: & [ Self::SignalRequestType ] ) {
+        unimplemented!();
     }
     fn per_frame_setup( & mut self ) -> Result< (), & 'static str > {
         unsafe {

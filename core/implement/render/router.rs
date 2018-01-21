@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use implement::render::util_gl;
 
 #[derive(Copy)]
@@ -19,7 +21,7 @@ pub fn delete_texture( internal_handle: i64, shader_type: ShaderType ) -> Result
     match shader_type {
         ShaderType::GLSL => {
             match util_gl::delete_texture( internal_handle as _ ) {
-                Err( e ) => { println!( "{}", e ); return Err( &"deleting texture failed" ) },
+                Err( e ) => { error!( "{}", e ); return Err( &"deleting texture failed" ) },
                 _ => (),
             }
         },

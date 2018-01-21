@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::collections::HashMap;
 use std::any::Any;
 
@@ -203,7 +205,7 @@ impl i_ele::IObjImpl for Poly6 {
                 _data_dict: data_map,
             };
             components.push( Box::new(c) );
-            println!( "load into ComponentRenderBuffer: Poly6: vertex count:{}", ele_len / 3 );
+            trace!( "load into ComponentRenderBuffer: Poly6: vertex count:{}", ele_len / 3 );
         }
         //store uniform data
         {
@@ -372,7 +374,7 @@ impl i_ele::IObjImpl for SphereIcosahedron {
                 _data_dict: data_map,
             };
             components.push( Box::new(c) );
-            println!( "load into ComponentRenderBuffer: SphereIcosahedron: vertex count:{}", ele_len / 3 );
+            trace!( "load into ComponentRenderBuffer: SphereIcosahedron: vertex count:{}", ele_len / 3 );
         }
         //store uniform data
         {
@@ -422,7 +424,7 @@ impl i_ele::IObjImpl for Point {
                 _data_dict: data_map,
             };
             components.push( Box::new(c) );
-            println!( "load into ComponentRenderBuffer: Point: vertex count:{}", ele_len / 3 );
+            trace!( "load into ComponentRenderBuffer: Point: vertex count:{}", ele_len / 3 );
         }
         Ok( () )
     }

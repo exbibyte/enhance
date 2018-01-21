@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::vec::Vec;
 use std::any::Any;
 
@@ -23,7 +25,7 @@ impl i_ele::IObjImpl for CmdDrawGroupClear {
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
         let c = self.0.clone();
         components.push( Box::new( c ) );
-        println!( "loaded command: draw group: clear" );
+        trace!( "loaded command: draw group: clear" );
         Ok( () )
     }
 }
@@ -46,7 +48,7 @@ impl i_ele::IObjImpl for CmdDrawGroupDependentObjects {
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
         let c = self.0.clone();
         components.push( Box::new( c ) );
-        println!( "loaded command: draw group: set objects" );
+        trace!( "loaded command: draw group: set objects" );
         Ok( () )
     }
 }
@@ -69,7 +71,7 @@ impl i_ele::IObjImpl for CmdDrawGroupBind {
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
         let c = self.0.clone();
         components.push( Box::new( c ) );
-        println!( "loaded command: draw group: set objects" );
+        trace!( "loaded command: draw group: set objects" );
         Ok( () )
     }
 }
@@ -92,7 +94,7 @@ impl i_ele::IObjImpl for CmdDrawGroupDispatch {
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
         let c = self.0.clone();
         components.push( Box::new( c ) );
-        println!( "loaded command: draw group: set objects" );
+        trace!( "loaded command: draw group: set objects" );
         Ok( () )
     }
 }
@@ -115,7 +117,7 @@ impl i_ele::IObjImpl for CmdDrawGroupDependentUniforms {
     fn update_components( & mut self, components: & mut Vec< Box< i_component::IComponent > > ) -> Result< (), & 'static str > {
         let c = self.0.clone();
         components.push( Box::new( c ) );
-        println!( "loaded command: draw group: set objects" );
+        trace!( "loaded command: draw group: set objects" );
         Ok( () )
     }
 }

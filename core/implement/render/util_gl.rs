@@ -1,4 +1,5 @@
 extern crate gl;
+extern crate pretty_env_logger;
 
 use std::str;
 
@@ -48,14 +49,14 @@ pub fn check_program_link( handle: gl::types::GLuint ) -> Result< (), String > {
         gl::GetProgramiv( handle, gl::LINK_STATUS, & mut status );
         if gl::FALSE as i32 == status {
             let mut log_len = -1;
-            println!("get link status log length");
+            info!("get link status log length");
             gl::GetProgramiv( handle, gl::INFO_LOG_LENGTH, & mut log_len );
-            println!( "log length: {}", log_len );
+            info!( "log length: {}", log_len );
             check_last_op();
             let log = vec![ 0i8; log_len as usize ];
             if log_len > 0 {
                 let mut written = 0;
-                println!("get link status log");
+                info!("get link status log");
                 gl::GetProgramInfoLog( handle, log_len, & mut written, log.as_ptr() as * mut i8 );
                 check_last_op();
                 let log_u8 = log.iter().map(|&x| x as u8 ).collect::<Vec<u8> >();
@@ -81,7 +82,7 @@ pub fn check_last_op() {
             gl::INVALID_FRAMEBUFFER_OPERATION => panic!("invalid_framebuffer_operation"),
             gl::OUT_OF_MEMORY => panic!("out_of_memory"),
             gl::STACK_OVERFLOW => panic!("stack_overflow"),
-            _ => panic!("unknown"),
+            _ => panic!("unknown error"),
         }
     }
 }
@@ -118,11 +119,11 @@ pub fn delete_shader_program( handle: i64 ){
 pub fn query_uniform_float_array( program: gl::types::GLuint, name: String ){
     unsafe {
         let loc = gl::GetUniformLocation( program, name.as_ptr() as * const i8 );
-        println!("uniform location: {:?}", loc );
+        trace!("uniform location: {:?}", loc );
         let mut query_val = vec![0f32;32];
         gl::GetUniformfv( program, loc, query_val.as_mut_ptr() );
         check_last_op();
-        println!("query uniform float array: {:?}", query_val );
+        trace!("query uniform float array: {:?}", query_val );
     }
 }
 

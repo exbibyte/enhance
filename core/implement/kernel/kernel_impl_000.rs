@@ -31,7 +31,7 @@ pub fn file_open( file_path: & str ) -> Option<String> {
     let mut buf_reader = BufReader::new(path);
     let mut contents = String::new();
     match buf_reader.read_to_string( & mut contents ){
-        Err( e ) => { println!("{}", e ); return None },
+        Err( e ) => { error!("{}", e ); return None },
         _ => (),
     }
     Some(contents)
@@ -61,7 +61,6 @@ impl IGameLogic for GameLogic {
         };
         
         //lights
-        let mut lights : Vec< light::LightAdsPoint > = vec![];
         let mut rng = rand::thread_rng();
         for i in 0..50 {
             let pos_x = ( (rng.gen::<u8>() % 100) as f32 / 100f32 ) * 6f32 - 3f32;
@@ -100,12 +99,12 @@ impl IGameLogic for GameLogic {
         if !self._is_init {
             //first time initilization
             
-            println!("game logic: first time initialization.");
+            info!("game logic: first time initialization.");
             
             self._is_init = true;
             let vs_src = file_open( self._path_shader_vs.as_str() ).expect("vertex shader not retrieved");
             let fs_src = file_open( self._path_shader_fs.as_str() ).expect("fragment shader not retrieved");
-            let event_load_shader = kernel_render::Event::LOAD_SHADER(
+            let event_load_shader = kernel_render::Event::LoadShader(
                 vec![
                     ( vs_src, util_gl::ShaderType::VERTEX ),
                     ( fs_src, util_gl::ShaderType::FRAGMENT ),
@@ -113,49 +112,60 @@ impl IGameLogic for GameLogic {
             v.push( event_load_shader );
 
             let img = image::open( &Path::new( "core/asset/images/texture0.jpg" ) ).unwrap();
-            println!( "image dimension: {:?}", img.dimensions() );
-            println!( "image type: {:?}", img.color() );
+            debug!( "image dimension: {:?}", img.dimensions() );
+            debug!( "image type: {:?}", img.color() );
             
             let texture0 = texture::Texture::from( &img );
-            let image = vec![200, 200, 150, 0, 0, 255 ];
             let texture_data = Vec::from( texture0 );
             let ( w, h ) = img.dimensions();
-            let event_load_texture = kernel_render::Event::LOAD_TEXTURE( String::from("texture0"), texture_data, w as _, h as _ );
+            let event_load_texture = kernel_render::Event::LoadTexture( String::from("texture0"), texture_data, w as _, h as _ );
             v.push( event_load_texture );
 
         }
 
         //input events
-        let mut running = true;
+        let mut sig_exit = false;
         let mut new_win_dim = None;
-        println!("events input: {:?}", e );
+        trace!("events input: {:?}", e );
         for input_event in e.iter() {
             match input_event {
                 &glutin::Event::WindowEvent{ ref event, .. } => match event {
                     &glutin::WindowEvent::Closed => {
-                        running = false;
+                        sig_exit = true;
                         break;
                     },
                     &glutin::WindowEvent::Resized(w, h) => new_win_dim = Some( (w,h) ),
-                    &glutin::WindowEvent::KeyboardInput {
-                        input: glutin::KeyboardInput {
-                            state: glutin::ElementState::Pressed,
-                            virtual_keycode: Some( glutin::VirtualKeyCode::Q ),
-                            ..
-                        }, ..
-                    } => {
-                        running = false; //signal to exit
-                        break;
+                    &glutin::WindowEvent::ReceivedCharacter(x) => {
+                        match x {
+                            'q' => {
+                                info!("events input received character: {:?}", x );
+                                sig_exit = true;
+                                break;
+                            },
+                            _ => (),
+                        }
                     },
+                    // &glutin::WindowEvent::KeyboardInput {
+                    //     input: glutin::KeyboardInput {
+                    //         state: glutin::ElementState::Pressed,
+                    //         virtual_keycode: Some( glutin::VirtualKeyCode::Q ),
+                    //         ..
+                    //     }, ..
+                    // } => {
+                    //     info!("events input: {:?}", input_event );
+                    //     sig_exit = true; //signal to exit
+                    //     break;
+                    // },
                     _ => (),
                 },
                 _ => ()
             }
         }
         //todo: make an event for this 
-        // if let Some( ( w, h ) ) = new_win_dim {
-        //     win._win._wingl.resize(w, h);
-        // }
+        if let Some( ( _w, _h ) ) = new_win_dim {
+            unimplemented!();
+            //win._win._wingl.resize(w, h);
+        }
         
         //create some meshes
         //set triangle vert positions and normals
@@ -191,25 +201,25 @@ impl IGameLogic for GameLogic {
                                          math::mat::Mat3x1 { _val: [ 4f32+self._delta, -1f32, 15f32 ] },
                                          math::mat::Mat3x1 { _val: [ 6f32+self._delta, -1f32, 15f32 ] },
                                          math::mat::Mat3x1 { _val: [ 4f32+self._delta,  1f32, 15f32 ] }, ] );
-        v.push( kernel_render::Event::ADD_OBJ( i_ele::Ele::init( mesh2 ) ) );
+        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( mesh2 ) ) );
 
         let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
                                            _radius: 5f32 };
 
-        v.push( kernel_render::Event::ADD_OBJ( i_ele::Ele::init( prim_box ) ) );
+        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( prim_box ) ) );
 
         let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
 
-        v.push( kernel_render::Event::ADD_OBJ( i_ele::Ele::init( prim_sphere ) ) );
+        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( prim_sphere ) ) );
         
         let l = &self._lights[0];
-        v.push( kernel_render::Event::ADD_OBJ( i_ele::Ele::init( l.clone() ) ) );
+        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( l.clone() ) ) );
 
-        v.push( kernel_render::Event::ADD_OBJ( i_ele::Ele::init( self._cameras[0].clone() ) ) );
+        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( self._cameras[0].clone() ) ) );
 
         self._delta += -0.01;
 
-        ( v, !running )
+        ( v, sig_exit )
     }
 }
 
@@ -227,10 +237,12 @@ impl < G, R, W, EInput, ERender > kernel::KernelImplHooks < G, R, W, EInput, ERe
     fn init() -> Self {
         KernelImpl000Hooks {}
     }
-    fn init_hooks( & mut self, windowing: & mut W, game_logic: & mut G, renderers: & mut Vec< R > ) {
-        windowing.make_current();
+    fn init_hooks( & mut self, windowing: & mut W, _game_logic: & mut G, renderers: & mut Vec< R > ) -> Result< (), & 'static str > {
+        windowing.make_current()?;
 
         renderers.push( R::init().unwrap() );
+
+        Ok( () )
     }
 }    
 

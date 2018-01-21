@@ -1,7 +1,8 @@
+extern crate pretty_env_logger;
+extern crate gl;
+
 use std::collections::HashMap;
 use std::vec::Vec;
-
-extern crate gl;
 
 use interface::i_renderobj;
 use implement::render::util_gl;
@@ -97,11 +98,11 @@ impl i_renderobj::RenderDevice for RenderDrawGroup{
             let num_elements = self._buffer_draw.len() / (self._stride as usize / ::std::mem::size_of::<f32>());
             match self._primitive_type {
                 i_renderobj::RenderObjType::TRI => {
-                    println!("draw buffer all: num verts: {}", num_elements );
+                    trace!("draw buffer all: num verts: {}", num_elements );
                     gl::DrawArrays(gl::TRIANGLES, 0, num_elements as _ );
                 },
                 i_renderobj::RenderObjType::POINT => {
-                    println!("draw buffer all: num points: {}", num_elements );
+                    trace!("draw buffer all: num points: {}", num_elements );
                     //todo: add configurable point size
                     gl::PointSize(3f32);
                     gl::DrawArrays(gl::POINTS, 0, num_elements as _ );

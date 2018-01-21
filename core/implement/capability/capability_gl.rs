@@ -23,7 +23,7 @@ impl fmt::Display for CapabilityGL {
         write!( f, "glsl language version: {}.\n", self.glsl_ver )?;
         write!( f, "vendor: {}.\n", self.vendor )?;
         write!( f, "renderer: {}.\n", self.renderer )?;
-        println!( "num extensions: {}", self.extensions.len() );
+        write!( f, "num extensions: {}", self.extensions.len() )?;
         for i in & self.extensions {
             write!( f, "extension: {}.\n", i )?;
         }

@@ -1,3 +1,5 @@
+extern crate pretty_env_logger;
+
 use std::any::Any;
 use std::collections::HashMap;
 
@@ -40,7 +42,7 @@ impl IComponent for ComponentRenderBuffer {
 impl ComponentRenderBuffer {
     /// # this dumps the data to render device
     pub fn flush_into_render_device( & self, rd: & mut i_renderobj::RenderDevice ) -> Result< (), & 'static str > {
-        println!("flushing into render device" );
+        trace!("flushing into render device" );
         rd.store_buff_data( & self._data_dict )?;
         Ok( () )
     }
@@ -76,7 +78,7 @@ impl IComponent for ComponentRenderUniform {
 impl ComponentRenderUniform {
     /// # this dumps the data to uniform manager
     pub fn flush_into_uniform_collection( & self, shader_program: i64, uc: & mut renderdevice_gl::RenderUniformCollection ) -> Result< (), & 'static str > {
-        println!("flushing into uniform collection" );
+        trace!("flushing into uniform collection" );
         for ( ref k, ref v ) in self._data_dict_vf.iter() {
             uc.set_uniform_f( shader_program as _, (*k).as_str(), renderdevice_gl::UniformType::VEC, &v[..] );
         }
@@ -88,7 +90,7 @@ impl ComponentRenderUniform {
         }
         
         for ( ref k, ref v ) in self._data_uniform_group.iter() {
-            println!("uniform group: {}, length: {}.", **k, (**v).len() );
+            trace!("uniform group: {}, length: {}.", **k, (**v).len() );
             uc.set_group( shader_program as _, **k, (**v).clone() ).is_ok();            
         }
 

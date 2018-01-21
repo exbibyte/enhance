@@ -51,7 +51,7 @@ impl TextureCollection {
             None => (),
             Some( ( shader_type, old_handle ) ) => {
                 router::delete_texture( old_handle, shader_type )?;
-                println!( "removed old texture( {} ).", old_handle );
+                trace!( "removed old texture( {} ).", old_handle );
             }
         }
         self._id_to_descrip.insert( id, descrip.clone() );

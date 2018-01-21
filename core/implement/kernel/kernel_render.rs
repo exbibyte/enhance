@@ -1,3 +1,4 @@
+extern crate pretty_env_logger;
 extern crate gl;
 
 use ::std::str;
@@ -6,7 +7,6 @@ use std::collections::HashMap;
 use std::cell::RefCell;   
 
 use interface::i_ele;
-use interface::i_window::IWindow;
 use interface::i_renderobj::RenderDevice;
 use interface::i_renderobj;
 use interface::i_renderpass;
@@ -57,16 +57,16 @@ impl Drop for Renderer {
 }
 
 pub enum Event {
-    ADD_OBJ( i_ele::Ele ),
-    LOAD_SHADER( Vec< ( String, util_gl::ShaderType ) > ),
-    LOAD_TEXTURE( String, Vec< u8 >, usize, usize ),
-    CREATE_DRAW_GROUP( i_renderobj::RenderObjType ),
+    AddObj( i_ele::Ele ),
+    LoadShader( Vec< ( String, util_gl::ShaderType ) > ),
+    LoadTexture( String, Vec< u8 >, usize, usize ),
+    CreateDrawGroup( i_renderobj::RenderObjType ),
 }
 
 pub enum EventResult {
-    SHADER_PROGRAM( isize ),
-    TEXTURE_ID( isize ),
-    DRAW_GROUP_ID( isize ),
+    IdShaderProgram( isize ),
+    IdTexture( isize ),
+    IdDrawGroup( isize ),
 }
 
 impl IRenderer for Renderer {
@@ -79,8 +79,9 @@ impl IRenderer for Renderer {
     fn process_render_events( & mut self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
         //first time initialization
         if !self._is_init {
+            info!("renderer: first time initialization.");
             self._is_init = true;
-            let ( vao, vbo, draw_group ) = self.create_draw_group( i_renderobj::RenderObjType::TRI ).unwrap();
+            let ( _vao, _vbo, draw_group ) = self.create_draw_group( i_renderobj::RenderObjType::TRI ).unwrap();
             self._draw_group = draw_group;
         }
         
@@ -94,17 +95,17 @@ impl IRenderer for Renderer {
         //todo: handle return values from calls
         for i in e.iter() {
             match i {
-                & Event::ADD_OBJ( ref x ) => {
-                    self.add_obj( dummy_str, x.clone() );
+                & Event::AddObj( ref x ) => {
+                    self.add_obj( dummy_str, x.clone() )?;
                 },
-                & Event::LOAD_SHADER( ref x ) => {
-                    self.load_shader( x.as_slice() );
+                & Event::LoadShader( ref x ) => {
+                    self.load_shader( x.as_slice() )?;
                 },
-                & Event::LOAD_TEXTURE( ref s, ref data, ref w, ref h ) => {
-                    self.load_texture( s.clone(), data.as_slice(), *w, *h );
+                & Event::LoadTexture( ref s, ref data, ref w, ref h ) => {
+                    self.load_texture( s.clone(), data.as_slice(), *w, *h )?;
                 },
-                & Event::CREATE_DRAW_GROUP( ref x ) => {
-                    self.create_draw_group( *x );
+                & Event::CreateDrawGroup( ref x ) => {
+                    self.create_draw_group( *x )?;
                 },
             }
             util_gl::check_last_op();
@@ -142,7 +143,7 @@ impl Renderer {
             _draw_group: 0usize,
         };
         let cap = capability_gl::query_gl();
-        println!( "{}", cap );
+        info!( "GL capability: {}", cap );
         Ok( rk )
     }
     pub fn load_shader( & mut self, sources: &[ ( String, util_gl::ShaderType ) ] ) -> Result< ( u64 ), & 'static str > {
@@ -151,7 +152,7 @@ impl Renderer {
             let s = match util_gl::load_and_compile_shader( (*src).as_str(), *src_type ) {
                 Ok( o ) => o,
                 Err( o ) => {
-                    println!( "{}", o );
+                    error!( "{}", o );
                     return Err( "error loading shader" )
                 }
             };
@@ -226,7 +227,7 @@ impl Renderer {
         for j in self._objs.borrow_mut()[index]._components.iter() {
             match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDispatch >() {
                 Some( o ) => {
-                    println!("detected trigger for draw group dispatch");
+                    trace!("detected trigger for draw group dispatch");
                     trigger_to_process_objs = true;
                     group_id = o._group_id;
                 },
@@ -241,7 +242,7 @@ impl Renderer {
         Ok( self._objs.borrow_mut().len() )  
     }
     pub fn process_objs( renderer: & mut Renderer, group_index: usize ) -> Result< (), & 'static str > {       
-        println!("objects size: {}", renderer._objs.borrow_mut().len() );
+        trace!("objects size: {}", renderer._objs.borrow_mut().len() );
         
         for i in renderer._objs.borrow_mut().iter() {
 
@@ -250,7 +251,7 @@ impl Renderer {
                 //downcasting: https://stackoverflow.com/questions/33687447/how-to-get-a-struct-reference-from-a-boxed-trait
                 match j.as_any().downcast_ref::< i_component::ComponentRenderBuffer >() {
                     Some( o ) => {
-                        println!("buffer flushed");
+                        trace!("buffer flushed");
                         match o.flush_into_render_device( & mut renderer._draw_groups.get_mut()[ group_index ] ) {
                             Err( e ) => return Err( e ),
                             _ => { continue; },
@@ -260,7 +261,7 @@ impl Renderer {
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentRenderUniform >() {
                     Some( o ) => {
-                        println!("uniform flushed");
+                        trace!("uniform flushed");
                         let shader_program = renderer._shader_collection.borrow_mut().get( renderer._current_shader_program ).unwrap();
                         match o.flush_into_uniform_collection( shader_program, & mut renderer._uniforms.borrow_mut() ) {
                             Err( e ) => return Err( e ),
@@ -271,7 +272,7 @@ impl Renderer {
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentDrawGroupClear >() {
                     Some( o ) => {
-                        println!("draw group clear");
+                        trace!("draw group clear");
                         renderer.reset_draw_group_data( &[ o._group_id ] ).is_ok();
                         continue;
                     },
@@ -279,7 +280,7 @@ impl Renderer {
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentDrawGroupBind >() {
                     Some( o ) => {
-                        println!("draw group bind");
+                        trace!("draw group bind");
                         renderer.bind_draw_group_data( &[ o._group_id ] ).is_ok();
                         continue;
                     },
@@ -287,7 +288,7 @@ impl Renderer {
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDependentUniforms >() {
                     Some( o ) => {
-                        println!("draw group dependent uniforms");
+                        trace!("draw group dependent uniforms");
                         renderer.set_draw_group_uniforms( o._group_id, &o._uniform_ids[..] ).is_ok();
                         continue;
                     },
@@ -295,7 +296,7 @@ impl Renderer {
                 }
                 match j.as_any().downcast_ref::< i_component::ComponentDrawGroupDispatch >() {
                     Some( o ) => {
-                        println!("draw group dispatch");
+                        trace!("draw group dispatch");
                         let renderer_immut : & Renderer = & * renderer;
                         Renderer::drawcall_draw_group( renderer_immut, &[ o._group_id ] ).is_ok();
                         continue;
@@ -333,7 +334,7 @@ impl Renderer {
     pub fn drawcall_draw_group( renderer: & Renderer, group_indices: &[ usize ] ) -> Result< (), & 'static str > {
         for &i in group_indices {
             for uniform_group in renderer._draw_group_uniforms.borrow()[i].iter() {
-                println!("dispatching uniform group: {}", *uniform_group );
+                trace!("dispatching uniform group: {}", *uniform_group );
                 if i >= renderer._draw_groups.borrow().len() {
                     return Err( "object index out of range" )
                 }
