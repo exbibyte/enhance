@@ -1,11 +1,14 @@
 [package]
 name = "e2r"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["YL <yuan6liu@gmail.com>"]
 description = "experimental rendering engine in rust"
 repository = "https://github.com/clearlycloudy/e2r/"
 keywords = [ "rendering", "graphics", "engine", "3D", "physics" ]
 license = "BSD-2-Clause"
+documentation = "https://docs.rs/treez/0.1.5/treez/"
+readme = "README.md"
+
 exclude = [
 "core/asset/images/",
 "core/asset/md5/",
