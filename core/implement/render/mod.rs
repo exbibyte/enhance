@@ -1,4 +1,5 @@
 // pub mod rendernode;
+pub mod renderer_gl;
 pub mod renderdevice_gl;
 pub mod rendercommon;
 pub mod util_gl;

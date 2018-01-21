@@ -14,7 +14,7 @@ use interface::i_renderer::IRenderer;
 
 use implement::window::winglutin::WinGlutin;
 use implement::kernel::kernel;
-use implement::kernel::kernel_render;
+use implement::render::renderer_gl;
 use implement::render::util_gl;
 use implement::render::texture;
 use implement::render::camera;
@@ -49,7 +49,7 @@ pub struct GameLogic {
 
 impl IGameLogic for GameLogic {
     type EventInput = glutin::Event;
-    type EventRender = kernel_render::Event;
+    type EventRender = renderer_gl::Event;
     fn init() -> GameLogic {
         let mut ret = GameLogic {
             _is_init: false,
@@ -104,7 +104,7 @@ impl IGameLogic for GameLogic {
             self._is_init = true;
             let vs_src = file_open( self._path_shader_vs.as_str() ).expect("vertex shader not retrieved");
             let fs_src = file_open( self._path_shader_fs.as_str() ).expect("fragment shader not retrieved");
-            let event_load_shader = kernel_render::Event::LoadShader(
+            let event_load_shader = renderer_gl::Event::LoadShader(
                 vec![
                     ( vs_src, util_gl::ShaderType::VERTEX ),
                     ( fs_src, util_gl::ShaderType::FRAGMENT ),
@@ -118,7 +118,7 @@ impl IGameLogic for GameLogic {
             let texture0 = texture::Texture::from( &img );
             let texture_data = Vec::from( texture0 );
             let ( w, h ) = img.dimensions();
-            let event_load_texture = kernel_render::Event::LoadTexture( String::from("texture0"), texture_data, w as _, h as _ );
+            let event_load_texture = renderer_gl::Event::LoadTexture( String::from("texture0"), texture_data, w as _, h as _ );
             v.push( event_load_texture );
 
         }
@@ -201,21 +201,21 @@ impl IGameLogic for GameLogic {
                                          math::mat::Mat3x1 { _val: [ 4f32+self._delta, -1f32, 15f32 ] },
                                          math::mat::Mat3x1 { _val: [ 6f32+self._delta, -1f32, 15f32 ] },
                                          math::mat::Mat3x1 { _val: [ 4f32+self._delta,  1f32, 15f32 ] }, ] );
-        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( mesh2 ) ) );
+        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( mesh2 ) ) );
 
         let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
                                            _radius: 5f32 };
 
-        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( prim_box ) ) );
+        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_box ) ) );
 
         let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
 
-        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( prim_sphere ) ) );
+        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_sphere ) ) );
         
         let l = &self._lights[0];
-        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( l.clone() ) ) );
+        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( l.clone() ) ) );
 
-        v.push( kernel_render::Event::AddObj( i_ele::Ele::init( self._cameras[0].clone() ) ) );
+        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( self._cameras[0].clone() ) ) );
 
         self._delta += -0.01;
 
@@ -223,7 +223,7 @@ impl IGameLogic for GameLogic {
     }
 }
 
-pub type KernelImpl000 = kernel::Kernel < GameLogic, kernel_render::Renderer, WinGlutin, glutin::Event, kernel_render::Event, KernelImpl000Hooks >;
+pub type KernelImpl000 = kernel::Kernel < GameLogic, renderer_gl::Renderer, WinGlutin, glutin::Event, renderer_gl::Event, KernelImpl000Hooks >;
 
 
 pub struct KernelImpl000Hooks {}

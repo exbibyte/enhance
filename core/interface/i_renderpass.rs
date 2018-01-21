@@ -1,4 +1,4 @@
-use implement::kernel::kernel_render::Renderer;
+use implement::render::renderer_gl::Renderer;
 
 #[derive(PartialEq)]
 #[derive(Eq)]

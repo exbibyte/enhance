@@ -73,7 +73,7 @@ impl < G, R, W, EInput, ERender, H > Kernel < G, R, W, EInput, ERender, H >
 
             self._windowing.per_frame_setup()?;
             
-            self._windowing.handle_signal_request( sigs_for_window.as_slice() );
+            self._windowing.handle_signal_request( sigs_for_window.as_slice() )?;
             
             let mut events_window : Vec< EInput > = vec![];
             match self._windowing.handle_events_pass_thru() {

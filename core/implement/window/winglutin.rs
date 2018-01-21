@@ -68,8 +68,9 @@ impl IWindow for WinGlutin {
         self._win._wingl.swap_buffers().unwrap();
         ()
     }
-    fn handle_signal_request( & mut self, _sig: & [ Self::SignalRequestType ] ) {
-        unimplemented!();
+    fn handle_signal_request( & mut self, _sig: & [ Self::SignalRequestType ] ) -> Result< (), & 'static str > {
+        //todo
+        Ok( () )
     }
     fn per_frame_setup( & mut self ) -> Result< (), & 'static str > {
         unsafe {
