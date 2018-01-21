@@ -19,6 +19,7 @@ use implement::render::shader_collection;
 use implement::render::texture_collection;
 use implement::render::router;
 use implement::render::renderdevice_gl;
+use implement::render::render_commands;
 
 pub struct Renderer {
     _rp: Vec< Box< i_renderpass::IRenderPass > >,
@@ -35,6 +36,8 @@ pub struct Renderer {
     _shaders_compiled: Vec< gl::types::GLuint >,
     //todo: to be removed
     _current_shader_program: u64,
+    _is_init: bool,
+    _draw_group: usize,
 }
 
 impl Drop for Renderer {
@@ -66,8 +69,6 @@ pub enum EventResult {
     DRAW_GROUP_ID( isize ),
 }
 
-
-
 impl IRenderer for Renderer {
 
     type EventRender = Event;
@@ -76,8 +77,21 @@ impl IRenderer for Renderer {
         Renderer::init()
     }
     fn process_render_events( & mut self, e: & [ Self::EventRender ] ) -> Result< (), & 'static str > {
-        //handle return values from calls
+        //first time initialization
+        if !self._is_init {
+            self._is_init = true;
+            let ( vao, vbo, draw_group ) = self.create_draw_group( i_renderobj::RenderObjType::TRI ).unwrap();
+            self._draw_group = draw_group;
+        }
+        
+        //setup hardcoded draw group for now
+        //todo: remove it and put in a configurable hook
         let dummy_str = "";
+        let draw_group = self._draw_group;
+        self.add_obj( dummy_str, i_ele::Ele::init( render_commands::CmdDrawGroupClear::init( draw_group ) ) ).is_ok();
+
+        //handle events
+        //todo: handle return values from calls
         for i in e.iter() {
             match i {
                 & Event::ADD_OBJ( ref x ) => {
@@ -93,7 +107,17 @@ impl IRenderer for Renderer {
                     self.create_draw_group( *x );
                 },
             }
+            util_gl::check_last_op();
         }
+
+        //some hardcoded draw calls in preparation for rendering
+        //todo: put these in a configurable hook
+        self.add_obj( dummy_str, i_ele::Ele::init( render_commands::CmdDrawGroupBind::init( draw_group ) ) ).is_ok();
+
+        self.add_obj( dummy_str, i_ele::Ele::init( render_commands::CmdDrawGroupDependentUniforms::init( draw_group, &[0u64,1u64] ) ) ).is_ok();
+        
+        self.add_obj( dummy_str, i_ele::Ele::init( render_commands::CmdDrawGroupDispatch::init( draw_group ) ) ).is_ok();
+        
         Ok( () )
     }
 }
@@ -114,6 +138,8 @@ impl Renderer {
             _draw_group_uniforms: RefCell::new( vec![] ),
             _shaders_compiled: vec![],
             _current_shader_program: 0,
+            _is_init: false,
+            _draw_group: 0usize,
         };
         let cap = capability_gl::query_gl();
         println!( "{}", cap );

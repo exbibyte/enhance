@@ -11,4 +11,5 @@ pub trait IWindow {
     fn handle_events_pass_thru( & mut self ) -> Option< Self::EventType >;
     fn swap_buf( & self ) -> ();
     fn handle_signal_request( & mut self, & [ Self::SignalRequestType ] );
+    fn per_frame_setup( & mut self ) -> Result< (), & 'static str >;
 }

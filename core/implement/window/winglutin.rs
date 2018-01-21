@@ -61,6 +61,7 @@ impl IWindow for WinGlutin {
         let mut e = None;
         self._base._eventsloop.poll_events( |event| {
             e = Some(event);
+            ()
         } );
         e
     }
@@ -70,5 +71,12 @@ impl IWindow for WinGlutin {
     }
     fn handle_signal_request( & mut self, sig: & [ Self::SignalRequestType ] ) {
         //todo
+    }
+    fn per_frame_setup( & mut self ) -> Result< (), & 'static str > {
+        unsafe {
+            gl::ClearColor( 0.9, 0.9, 0.9, 1.0 );
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+        }
+        Ok( () )
     }
 }
