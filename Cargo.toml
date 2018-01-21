@@ -7,7 +7,10 @@ repository = "https://github.com/clearlycloudy/e2r/"
 keywords = [ "rendering", "graphics", "engine", "3D", "physics" ]
 license = "BSD-2-Clause"
 exclude = [
-"core/asset/*",
+"core/asset/images/",
+"core/asset/md5/",
+"core/asset/obj/",
+"core/asset/blend/",
 ]
 
 [lib]
@@ -29,17 +32,5 @@ name = "e2r_example_kernel_impl000"
 path = "core/example/example_kernel_impl000.rs"
 
 # [[bin]]
-# name = "e2r_test_winglutin"
-# path = "core/example/window/test_winglutin.rs"
-
-# [[bin]]
 # name = "e2r_test_deferred"
 # path = "core/example/shading/test_deferred.rs"
-
-# [[bin]]
-# name = "e2r_sandbox"
-# path = "sandbox/src/sandbox0.rs"
-
-# [[bin]]
-# name = "e2r_test_recurse"
-# path = "core/example/recursive/main.rs"
