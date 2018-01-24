@@ -1,1 +1,1 @@
-pub mod cam0;
+pub mod camguide;

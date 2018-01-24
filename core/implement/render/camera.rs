@@ -10,6 +10,28 @@ use interface::i_component;
 
 use implement::math;
 
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub enum PropKey {
+    Fov,
+    Aspect,
+    Near,
+    Far,
+    Pos,
+    Up,
+    Focus,
+}
+
+#[derive(Clone)]
+pub enum PropVal {
+    Fov(f32),
+    Aspect(f32),
+    Near(f32),
+    Far(f32),
+    Pos(math::mat::Mat3x1< f32 >),
+    Up(math::mat::Mat3x1< f32 >),
+    Focus(math::mat::Mat3x1< f32 >),
+}
+
 #[derive(Clone)]
 pub struct Cam {
     /// # helper id for the camera

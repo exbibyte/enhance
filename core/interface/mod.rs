@@ -22,3 +22,4 @@ pub mod i_comparable;
 pub mod i_stat_tree;
 pub mod i_game_logic;
 pub mod i_renderer;
+pub mod i_camera;
