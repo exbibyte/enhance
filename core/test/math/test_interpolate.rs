@@ -14,7 +14,7 @@ use implement::math::piecewise::Piecewise;
 
 #[cfg(test)]
 pub fn test_interp_forward< T >( interp: & mut IInterpolate< T, Item=T >, _start_val: & T, end_val: & T ) -> () 
-    where T: Debug + IComparableError< f64 >
+    where T: Debug + IComparableError< f64 > + Clone
 {
     
     #[allow(unused_variables)]
@@ -39,7 +39,7 @@ pub fn test_interp_forward< T >( interp: & mut IInterpolate< T, Item=T >, _start
 
 #[cfg(test)]
 pub fn test_interp_forward_back< T >( interp: & mut IInterpolate< T, Item=T >, start_val: & T, end_val: & T ) -> () 
-    where T: Debug + IComparableError< f64 >
+    where T: Debug + IComparableError< f64 > + Clone
 {
     
     #[allow(unused_variables)]
@@ -81,7 +81,7 @@ pub fn test_interp_forward_back< T >( interp: & mut IInterpolate< T, Item=T >, s
 
 #[cfg(test)]
 pub fn test_iterator< T >( interp: & mut IInterpolate< T, Item=T >, start_val: & T, end_val: & T ) -> ()
-    where T: Debug + IComparableError< f64 >
+    where T: Debug + IComparableError< f64 > + Clone
 {
     for x in interp.enumerate() {
         println!("{}: {:?}", x.0, x.1 );
@@ -99,7 +99,7 @@ pub fn test_iterator< T >( interp: & mut IInterpolate< T, Item=T >, start_val: &
 
 #[cfg(test)]
 pub fn test_reverse_iterator< T >( interp: & mut IInterpolate< T, Item=T >, start_val: & T, end_val: & T ) -> ()
-    where T: Debug + IComparableError< f64 >
+    where T: Debug + IComparableError< f64 > + Clone
 {
     let mut index = 0;
     for x in interp.next() {
@@ -127,7 +127,7 @@ pub fn test_reverse_iterator< T >( interp: & mut IInterpolate< T, Item=T >, star
 
 #[cfg(test)]
 pub fn test_piecewise< I, T >( interps: & mut Piecewise< I, T >, start_val: & T, end_val: & T, piece_count: usize, total_steps: u64 ) -> ()
-    where T: Debug + IComparableError< f64 >,
+    where T: Debug + IComparableError< f64 > + Clone,
           I: IInterpolate< T, Item=T >
 {
     assert!(interps._pieces.len() == piece_count );
@@ -158,7 +158,7 @@ pub fn test_piecewise< I, T >( interps: & mut Piecewise< I, T >, start_val: & T,
 
 #[cfg(test)]
 pub fn test_piecewise_iterator< I, T >( interps: & mut Piecewise< I, T >, start_val: & T, end_val: & T, piece_count: usize, total_steps: u64 ) -> ()
-    where T: Debug + IComparableError< f64 >,
+    where T: Debug + IComparableError< f64 > + Clone,
           I: IInterpolate< T, Item=T >
 {
     assert!( interps._pieces.len() == piece_count );
@@ -184,7 +184,7 @@ pub fn test_piecewise_iterator< I, T >( interps: & mut Piecewise< I, T >, start_
 
 #[cfg(test)]
 pub fn test_piecewise_reset< I, T >( interps: & mut Piecewise< I, T >, start_val: & T, end_val: & T, piece_count: usize, total_steps: u64 ) -> ()
-    where T: Debug + IComparableError< f64 >,
+    where T: Debug + IComparableError< f64 > + Clone,
           I: IInterpolate< T, Item=T >
 {
     assert!(interps._pieces.len() == piece_count );

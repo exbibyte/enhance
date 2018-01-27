@@ -9,7 +9,8 @@ pub mod render;
 pub mod capability;
 pub mod kernel;
 pub mod cam;
-//pub mod motion;
+pub mod motion;
 // pub mod mt;
+pub mod util;
 
 

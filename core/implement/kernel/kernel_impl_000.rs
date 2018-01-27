@@ -169,6 +169,9 @@ impl IGameLogic for GameLogic {
             unimplemented!();
             //win._win._wingl.resize(w, h);
         }
+
+        //todo: process game objects and time steppping
+        //eg: object motion, object states, object interactions, simulations
         
         //create some meshes
         //set triangle vert positions and normals

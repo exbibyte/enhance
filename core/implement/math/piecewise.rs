@@ -2,22 +2,27 @@ use std::cmp;
 use std::marker;
 
 use interface::i_interpolate::*;
+use interface::i_load;
+
+use implement::util::loadqueue;
 
 // #[derive(Debug)]
 #[derive(Clone)]
-pub struct Piecewise< T, V > where T: IInterpolate< V > {
+pub struct Piecewise< T, V > where T: IInterpolate< V >, V : Clone {
     pub _pieces: Vec< T >,
     _current_piece: u64,
     pub _total_steps: u64,
     pub _phantom: marker::PhantomData< V >,
+    pub _load: loadqueue::LoadQueue< V >,
 }
 
-impl < T, V > Piecewise< T, V > where T: IInterpolate< V > {
+impl < T, V > Piecewise< T, V > where T: IInterpolate< V >, V : Clone {
     pub fn init() -> Piecewise< T, V > {
         Piecewise { _pieces: Vec::new(),
                     _current_piece: 0u64,
                     _total_steps: 0u64,
                     _phantom: marker::PhantomData,
+                    _load: Default::default(),
         }
     }
     pub fn add( & mut self, s: T ){
@@ -40,7 +45,7 @@ impl < T, V > Piecewise< T, V > where T: IInterpolate< V > {
 }
 
 #[allow(unused_variables)]
-impl < T, V > IInterpolate< V > for Piecewise< T, V > where T: IInterpolate< V > {
+impl < T, V > IInterpolate< V > for Piecewise< T, V > where T: IInterpolate< V >, V : Clone {
     fn num_steps( & self ) -> u64 {
         self._total_steps
     }
@@ -81,7 +86,7 @@ impl < T, V > IInterpolate< V > for Piecewise< T, V > where T: IInterpolate< V >
 }
 
 /// required trait for IInterpolate
-impl < T, V > Iterator for Piecewise< T, V > where T: IInterpolate< V > {
+impl < T, V > Iterator for Piecewise< T, V > where T: IInterpolate< V >, V : Clone {
     type Item = V;
     fn next( & mut self ) -> Option< V > {
         if self._current_piece as usize >= self._pieces.len() {
@@ -111,8 +116,38 @@ impl < T, V > Iterator for Piecewise< T, V > where T: IInterpolate< V > {
     }
 }
 
-impl < T, V > DoubleEndedIterator for Piecewise< T, V > where T: IInterpolate< V > {
+impl < T, V > DoubleEndedIterator for Piecewise< T, V > where T: IInterpolate< V > , V : Clone {
     fn next_back( & mut self ) -> Option< V > {
         unimplemented!();
     }
 }
+
+
+impl < T, V > i_load::ILoad for Piecewise< T, V > where T: IInterpolate< V >, V : Clone {
+
+    type InputType = V;
+    
+    fn load( & mut self, t: Self::InputType ) -> Result< (), & 'static str > {
+        self._load.load( t )?;
+        Ok( () )
+    }
+    fn apply( & mut self ) -> Result< bool, & 'static str > {
+        
+        let mut count_fetched = 0;
+
+        let mut fetched  = None;
+        
+        self._load.apply( | x: & Self::InputType | { if count_fetched < 1 {
+            fetched = Some( x.clone() );
+            count_fetched += 1;
+            true
+        } else {
+            false
+        } } )?;
+
+        //todo: do something with fetch
+
+        Ok( true )
+    }    
+}
+
