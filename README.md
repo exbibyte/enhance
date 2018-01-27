@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/:license-bsd-blue.svg?style=round-square)](https://github.com/clearlycloudy/enhance/blob/master/LICENSE.txt)
 
+Work is stalled and current focus is on http://github.com/clearlycloudy/e2r
+
 =======
 
 Experimental 3D rendering and engine tools for interactive application development. This is aimed at making customizations for developing 3D applications through a common modular service oriented approach. Overall goal include small footprint, dependency minimization, filter pipelining approach for data processing, and high parallelism.
