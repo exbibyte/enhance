@@ -1,5 +1,3 @@
-use interface::i_load::ILoad;
-
 #[derive(Clone, Debug)]
 pub struct LoadSingle < T > {
     _buf: Option< T >,

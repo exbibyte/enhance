@@ -5,7 +5,9 @@ extern crate pretty_env_logger;
 
 use std::env;
 
-use self::e2rcore::implement::kernel::kernel_impl_000::KernelImpl000;
+use self::e2rcore::interface::i_kernel::IKernel;
+
+use self::e2rcore::implement::kernel::kernel_impl_001::Kernel;
 
 #[allow(unused)]
 fn main() {
@@ -14,7 +16,7 @@ fn main() {
     
     pretty_env_logger::init_custom_env( "LOG_SETTING" );
     
-    let mut k = KernelImpl000::init().unwrap();
+    let mut k = Kernel::new().unwrap();
     k.run();
 
 }

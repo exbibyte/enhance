@@ -1,3 +1,5 @@
+///sample implementation of game logic
+
 extern crate glutin;
 extern crate image;
 extern crate rand;
@@ -8,13 +10,9 @@ use std::io::Read;
 use std::path::Path;
 
 use interface::i_ele;
-use interface::i_window::IWindow;
 use interface::i_game_logic::IGameLogic;
-use interface::i_renderer::IRenderer;
-use interface::i_camera::ICamera;
+// use interface::i_camera::ICamera;
 
-use implement::window::winglutin::WinGlutin;
-use implement::kernel::kernel;
 use implement::render::renderer_gl;
 use implement::render::util_gl;
 use implement::render::texture;
@@ -27,6 +25,7 @@ use implement::math;
 use self::rand::Rng;
 use self::image::GenericImage;
 
+//todo: put this somewhere else
 pub fn file_open( file_path: & str ) -> Option<String> {
     let path = File::open( file_path ).expect("file path open invalid");
     let mut buf_reader = BufReader::new(path);
@@ -96,6 +95,7 @@ impl IGameLogic for GameLogic {
 
         ret
     }
+
     fn process_input_events( & mut self, e: & [ Self::EventInput ] ) -> ( Vec< Self::EventRender >, bool ) {
 
         let mut v = vec![];
@@ -228,27 +228,3 @@ impl IGameLogic for GameLogic {
         ( v, sig_exit )
     }
 }
-
-pub type KernelImpl000 = kernel::Kernel < GameLogic, renderer_gl::Renderer, WinGlutin, glutin::Event, renderer_gl::Event, KernelImpl000Hooks >;
-
-
-pub struct KernelImpl000Hooks {}
-
-impl < G, R, W, EInput, ERender > kernel::KernelImplHooks < G, R, W, EInput, ERender >
-    for KernelImpl000Hooks 
-    where G: IGameLogic< EventInput = EInput, EventRender = ERender >,
-          R: IRenderer< EventRender = ERender >,
-          W: IWindow< EventType = EInput >
-{
-    fn init() -> Self {
-        KernelImpl000Hooks {}
-    }
-    fn init_hooks( & mut self, windowing: & mut W, _game_logic: & mut G, renderers: & mut Vec< R > ) -> Result< (), & 'static str > {
-        windowing.make_current()?;
-
-        renderers.push( R::init().unwrap() );
-
-        Ok( () )
-    }
-}    
-

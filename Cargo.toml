@@ -1,6 +1,6 @@
 [package]
 name = "e2r"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["YL <yuan6liu@gmail.com>"]
 description = "experimental rendering engine in rust"
 repository = "https://github.com/clearlycloudy/e2r/"
@@ -20,19 +20,15 @@ name = "e2rcore"
 path = "core/core.rs"
 
 [dependencies]
-gl = ">=0.6.3"
-libc = ">=0.2.26"
-glutin = ">=0.9.1"
+gl = "0.6.3"
+libc = "0.2.26"
+glutin = "0.9.1"
 rand = "0.3"
 image = "0.17.0"
 num = "0.1.40"
-log = ">=0.4.1"
-pretty_env_logger = ">=0.2.0"
+log = "0.4.1"
+pretty_env_logger = "0.2.0"
 
 [[bin]]
-name = "e2r_example_kernel_impl000"
-path = "core/example/example_kernel_impl000.rs"
-
-# [[bin]]
-# name = "e2r_test_deferred"
-# path = "core/example/shading/test_deferred.rs"
+name = "e2r_example_kernel_impl001"
+path = "core/example/example_kernel_impl001.rs"

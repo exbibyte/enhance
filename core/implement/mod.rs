@@ -12,5 +12,5 @@ pub mod cam;
 pub mod motion;
 // pub mod mt;
 pub mod util;
-
+pub mod logic;
 
