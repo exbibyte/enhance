@@ -7,7 +7,7 @@ pub trait IKernel < W: IWindow,
                     R: IRenderer< EventRender = G::EventRender > >
     : AsMut< W > + AsMut< G > + AsMut< R >
 
-//possible use trait bounds and delegate traits to subfields in concrete implementer when this is supported by Rust (https://github.com/rust-lang/rfcs/pull/1406)
+//possibly use trait bounds and delegate traits to subfields in concrete implementer when this is supported by Rust (https://github.com/rust-lang/rfcs/pull/1406)
     // IWindow +
     // IGameLogic< EventInput = < Self as IWindow >::EventType > +
     // IRenderer< EventRender = < Self as IGameLogic >::EventRender >
@@ -58,7 +58,7 @@ pub trait IKernel < W: IWindow,
             if signal_exit {
                 running = false;
             }
-
+            
             (self.as_mut() as & mut R).process_render_events( & events_render[..] ).is_ok();
 
             (self.as_mut() as & mut W).swap_buf();

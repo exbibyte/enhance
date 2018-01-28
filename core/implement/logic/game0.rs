@@ -127,6 +127,9 @@ impl IGameLogic for GameLogic {
         }
 
         //input events
+
+        // let mut inputs_filered = vec![];
+        
         let mut sig_exit = false;
         let mut new_win_dim = None;
         trace!("events input: {:?}", e );
@@ -170,10 +173,36 @@ impl IGameLogic for GameLogic {
             //win._win._wingl.resize(w, h);
         }
 
-        //todo: process game objects and time steppping
-        //eg: object motion, object states, object interactions, simulations
+        //todo: process game objects and prepare for render
         
-        //create some meshes
+        // //transform filtered inputs and current game states to new game states and report changes
+        // let changed_states = transition_states( &inputs_filered[..], & mut self._states );
+        
+        // //perform computations
+        // while satisfy_compute_constraints() && compute_not_ended() {
+
+        //     //transform game states to computation graph to determine what to update
+        //     let updates_todo = get_computations( & changed_states, & self._states );
+
+        //     let s = schedule( updates_todo );
+
+        //     //apply computations and collect changes
+        //     let changed_states = reduce( map( compute_tasks( s ) ) );
+        // }
+
+        // let render_components = get_renderable_components( self._states );
+
+        // //do some spatial optimization
+        // let render_components_filtered = filter_renderables( relevant_renderables );
+
+        // let render_elements = transform_renderobjs( render_components_filtered );
+
+        // //do further render commands packaging here
+        // let mut render_events = transform_render_events( render_elements );
+
+        // v.append( & mut render_events );
+        
+        //create some meshes for test:
         //set triangle vert positions and normals
         let mut mesh = mesh::Mesh::init( 0 );
         mesh._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32, -1f32, -1f32 ] },
