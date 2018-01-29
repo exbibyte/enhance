@@ -10,7 +10,7 @@ impl Default for XformInput {
 
     fn default() -> Self {
         XformInput {
-            _moving_avg: 1,
+            _moving_avg: 1, //todo
         }
     }
 
@@ -127,7 +127,7 @@ impl< 'a > From< & 'a glutin::Event > for InputFiltered {
                         },
                     }
                 },
-                &glutin::WindowEvent::MouseInput { ref state, ref button, ref _modifiers, .. } => {
+                &glutin::WindowEvent::MouseInput { ref state, ref button, .. } => {
                     let k = match button {
                         &glutin::MouseButton::Left  => {
                             Some( KeyCode::MouseL )
