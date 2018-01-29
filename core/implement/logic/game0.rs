@@ -1,6 +1,5 @@
 ///sample implementation of game logic
 
-extern crate glutin;
 extern crate image;
 extern crate rand;
 
@@ -11,6 +10,7 @@ use std::path::Path;
 
 use interface::i_ele;
 use interface::i_game_logic::IGameLogic;
+use interface::i_ui::{ InputFiltered, KeyCode };
 // use interface::i_camera::ICamera;
 
 use implement::render::renderer_gl;
@@ -49,9 +49,9 @@ pub struct GameLogic {
 }
 
 impl IGameLogic for GameLogic {
-    type EventInput = glutin::Event;
+    type EventInput = InputFiltered;
     type EventRender = renderer_gl::Event;
-    fn init() -> GameLogic {
+    fn new() -> GameLogic {
         let mut ret = GameLogic {
             _is_init: false,
             _lights: vec![],
@@ -124,55 +124,22 @@ impl IGameLogic for GameLogic {
             let event_load_texture = renderer_gl::Event::LoadTexture( String::from("texture0"), texture_data, w as _, h as _ );
             v.push( event_load_texture );
 
+            info!( "press q to quit." );
         }
 
-        //input events
-
-        // let mut inputs_filered = vec![];
-        
         let mut sig_exit = false;
-        let mut new_win_dim = None;
-        trace!("events input: {:?}", e );
-        for input_event in e.iter() {
-            match input_event {
-                &glutin::Event::WindowEvent{ ref event, .. } => match event {
-                    &glutin::WindowEvent::Closed => {
-                        sig_exit = true;
-                        break;
-                    },
-                    &glutin::WindowEvent::Resized(w, h) => new_win_dim = Some( (w,h) ),
-                    &glutin::WindowEvent::ReceivedCharacter(x) => {
-                        match x {
-                            'q' => {
-                                info!("events input received character: {:?}", x );
-                                sig_exit = true;
-                                break;
-                            },
-                            _ => (),
-                        }
-                    },
-                    // &glutin::WindowEvent::KeyboardInput {
-                    //     input: glutin::KeyboardInput {
-                    //         state: glutin::ElementState::Pressed,
-                    //         virtual_keycode: Some( glutin::VirtualKeyCode::Q ),
-                    //         ..
-                    //     }, ..
-                    // } => {
-                    //     info!("events input: {:?}", input_event );
-                    //     sig_exit = true; //signal to exit
-                    //     break;
-                    // },
-                    _ => (),
-                },
-                _ => ()
+
+        //process input events
+        if e.len() > 0 {
+            trace!( "filtered_input: {:?}", e );
+        }
+
+        for i in e.iter() {
+            if let &InputFiltered::Button { key: KeyCode::Q, .. } = i {
+                sig_exit = true;
             }
         }
-        //todo: make an event for this 
-        if let Some( ( _w, _h ) ) = new_win_dim {
-            unimplemented!();
-            //win._win._wingl.resize(w, h);
-        }
-
+        
         //todo: process game objects and prepare for render
         
         // //transform filtered inputs and current game states to new game states and report changes

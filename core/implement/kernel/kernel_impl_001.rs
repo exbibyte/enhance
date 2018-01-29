@@ -1,37 +1,39 @@
 ///sample implementation of kernel
 
-extern crate glutin;
-
 use interface::i_window::IWindow;
 use interface::i_game_logic::IGameLogic;
-// use interface::i_renderer::IRenderer;
 use interface::i_kernel::IKernel;
+use interface::i_ui::IUi;
 
 use implement::logic::game0::GameLogic; //example game logic to test
 use implement::window::winglutin::WinGlutin;
-use implement::render::renderer_gl;
+use implement::render::renderer_gl::Renderer;
+use implement::ui::input_default_glutin::XformInput;
 
 pub struct Kernel {
     pub _windowing: WinGlutin,
+    pub _input: XformInput,
     pub _game_logic: GameLogic,
-    pub _renderer: renderer_gl::Renderer, 
+    pub _renderer: Renderer,
 }
 
 ///use default implementation for run method
-impl IKernel< WinGlutin, GameLogic, renderer_gl::Renderer > for Kernel {
+impl IKernel< WinGlutin, XformInput, GameLogic, Renderer > for Kernel {
     fn new() -> Result< Self, & 'static str > where Self: Sized {
 
         info!("kernel creation." );
 
-        let w = WinGlutin::init( 500, 500 );
+        let w = WinGlutin::new( 500, 500 );
         
         w.make_current()?;
 
-        let r = renderer_gl::Renderer::init().expect("renderer init unsuccessful");
+        //render init need windowing to be already init
+        let r = Renderer::init().expect("renderer init unsuccessful");
 
         let k = Kernel {
             _windowing: w,
-            _game_logic: GameLogic::init(),
+            _input: XformInput::new(),
+            _game_logic: GameLogic::new(),
             _renderer: r,
         };
 
@@ -58,11 +60,16 @@ impl AsMut< GameLogic > for Kernel {
     }
 }
 
-impl AsMut< renderer_gl::Renderer > for Kernel {
-   fn as_mut( & mut self ) -> & mut renderer_gl::Renderer {
+impl AsMut< Renderer > for Kernel {
+   fn as_mut( & mut self ) -> & mut Renderer {
         & mut self._renderer
     }
 
 }
     
- 
+impl AsMut< XformInput > for Kernel {
+   fn as_mut( & mut self ) -> & mut XformInput {
+        & mut self._input
+    }
+
+}

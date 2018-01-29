@@ -1,12 +1,12 @@
 [package]
 name = "e2r"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["YL <yuan6liu@gmail.com>"]
 description = "experimental rendering engine in rust"
 repository = "https://github.com/clearlycloudy/e2r/"
 keywords = [ "rendering", "graphics", "engine", "3D", "physics" ]
 license = "BSD-2-Clause"
-documentation = "https://docs.rs/e2r/0.6.1/e2rcore/"
+documentation = "https://docs.rs/e2r/0.7.0/e2rcore/"
 readme = "README.md"
 exclude = [
 "core/asset/images/*",
@@ -22,7 +22,7 @@ path = "core/core.rs"
 [dependencies]
 gl = "0.6.3"
 libc = "0.2.26"
-glutin = "0.9.1"
+glutin = "0.12.0"
 rand = "0.3"
 image = "0.17.0"
 num = "0.1.40"

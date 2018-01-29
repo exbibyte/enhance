@@ -1,11 +1,13 @@
 use interface::i_window::IWindow;
 use interface::i_game_logic::IGameLogic;
 use interface::i_renderer::IRenderer;
+use interface::i_ui::IUi;
 
 pub trait IKernel < W: IWindow,
-                    G: IGameLogic< EventInput = W::EventType >,
+                    I: IUi< EventInput = W::EventType >,
+                    G: IGameLogic< EventInput = I::EventInputFiltered >,
                     R: IRenderer< EventRender = G::EventRender > >
-    : AsMut< W > + AsMut< G > + AsMut< R >
+    : AsMut< W > + AsMut< I > + AsMut< G > + AsMut< R >
 
 //possibly use trait bounds and delegate traits to subfields in concrete implementer when this is supported by Rust (https://github.com/rust-lang/rfcs/pull/1406)
     // IWindow +
@@ -24,6 +26,7 @@ pub trait IKernel < W: IWindow,
 
     fn deinit_hook( & mut self ) -> Result< (), & 'static str > { Ok( () ) }
 
+    ///default implementation of the main control flow
     fn run( & mut self ) -> Result< (), & 'static str > {
 
         self.init_hook()?;
@@ -52,8 +55,10 @@ pub trait IKernel < W: IWindow,
                 },
                 _ => {},
             }
+
+            let events_inputs_filtered = (self.as_mut() as & mut I).process_input_events( events_window.as_slice() );
             
-            let ( events_render, signal_exit ) : ( Vec<  _ >, bool ) = (self.as_mut() as & mut G).process_input_events( & events_window[..] );
+            let ( events_render, signal_exit ) : ( Vec<  _ >, bool ) = (self.as_mut() as & mut G).process_input_events( events_inputs_filtered.as_slice() );
 
             if signal_exit {
                 running = false;
