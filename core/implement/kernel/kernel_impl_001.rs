@@ -40,7 +40,11 @@ impl IKernel< WinGlutin, XformInput, GameLogic, Renderer > for Kernel {
         Ok( k )
     }
     fn init_hook( & mut self ) -> Result< (), & 'static str > {
+        
         self._windowing.make_current()?;
+        
+        self._game_logic.run_init_hook()?;
+
         Ok( () )
     }
     fn deinit_hook( & mut self ) -> Result< (), & 'static str > {

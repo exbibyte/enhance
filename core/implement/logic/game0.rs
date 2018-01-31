@@ -37,6 +37,37 @@ pub fn file_open( file_path: & str ) -> Option<String> {
     Some(contents)
 }
 
+#[derive(Copy, Clone, Debug)]
+pub struct GameState {
+    _exit: bool,
+    _continue_compute: bool,
+    _time_game: f32,
+    _is_init_run_first_time: bool
+}
+
+impl Default for GameState {
+    fn default() -> GameState {
+        GameState {
+            _exit: false,
+            _continue_compute: true,
+            _time_game: 0.0,
+            _is_init_run_first_time: false,
+        }
+    }
+}
+
+pub struct ComputeUnit {
+
+}
+
+pub struct ComputeSchedule {
+
+}
+
+pub struct RenderObj {
+
+}
+
 pub struct GameLogic {
     //todo
     _is_init: bool,
@@ -46,11 +77,18 @@ pub struct GameLogic {
     _delta: f32, //test parameter for object velocity
     _path_shader_vs: String,
     _path_shader_fs: String,
+    _state: GameState,
 }
 
 impl IGameLogic for GameLogic {
+
     type EventInput = InputFiltered;
     type EventRender = renderer_gl::Event;
+    type GameState = GameState;
+    type ComputeUnit = ComputeUnit;
+    type ComputeSchedule = ComputeSchedule;
+    type RenderObj = RenderObj;
+
     fn new() -> GameLogic {
         let mut ret = GameLogic {
             _is_init: false,
@@ -58,8 +96,11 @@ impl IGameLogic for GameLogic {
             _cameras: vec![],
             // _cameras_wrapper: vec![],
             _delta: 0f32,
-            _path_shader_vs: String::from("core/asset/shader/ads.vs"), //some hard coded paths for now
-            _path_shader_fs: String::from("core/asset/shader/ads.fs"),
+            // _path_shader_vs: String::from("core/asset/shader/ads.vs"), //some hard coded paths for now
+            // _path_shader_fs: String::from("core/asset/shader/ads.fs"),
+            _path_shader_vs: String::new(),
+            _path_shader_fs: String::new(),
+            _state: Default::default(),
         };
         
         //lights
@@ -96,23 +137,100 @@ impl IGameLogic for GameLogic {
         ret
     }
 
-    fn process_input_events( & mut self, e: & [ Self::EventInput ] ) -> ( Vec< Self::EventRender >, bool ) {
+    ///do some initialization
+    fn run_init_hook( & mut self ) -> Result< (), & 'static str > {
+        self._path_shader_vs = String::from("core/asset/shader/ads.vs"); //some hard coded paths for now
+        self._path_shader_fs = String::from("core/asset/shader/ads.fs");
+        Ok( () )
+    }
 
-        let mut v = vec![];
-        if !self._is_init {
-            //first time initilization
-            
+    ///computes changed game state given user inputs and current game state
+    fn transition_states( & mut self, inputs: & [ InputFiltered ] ) -> GameState {
+        //todo
+        
+        let mut state_change = self._state;
+
+        for i in inputs.iter() {
+            match i {
+                &InputFiltered::Button { key: KeyCode::Q, .. } => {
+                    state_change._exit = true;
+                },
+                _ => {},
+            }
+        }
+
+        state_change._continue_compute = true;
+        
+        state_change
+    }
+    fn continue_compute( & mut self, changed_states: & GameState ) -> bool {
+        if changed_states._continue_compute && !changed_states._exit {
+            true
+        } else {
+            false
+        }
+    }
+    fn get_computations( & mut self, changed_game_state: & GameState ) -> Vec< ComputeUnit > {
+        //todo
+        let mut _compute_units = vec![];
+
+        _compute_units
+    }
+    fn schedule_computes( & mut self, computes: Vec< ComputeUnit > ) -> Vec< ComputeSchedule > {
+        //todo
+        let mut _compute_schedule = vec![];
+
+        _compute_schedule
+    }
+    fn apply_changes_after_compute( & mut self, s: & mut GameState ) {
+        //todo
+
+        //just end after one compute for now
+        s._continue_compute = false;
+    }
+    fn get_renderable_components( & mut self, s: & GameState ) -> Vec< RenderObj > {
+        //todo
+        vec![]
+    }
+    fn filter_renderables( & mut self, r: Vec< RenderObj >, s: & GameState ) -> Vec< RenderObj > {
+        //todo
+        vec![]
+    }
+    fn get_render_events( & mut self, r: Vec< RenderObj >, s: & GameState ) -> Vec< <Self as IGameLogic>::EventRender > {
+        let mut render_events = GameLogic::init_run_first_time( self );
+
+        //sample rendering object creation for now
+        let mut d = GameLogic::dummy_block( self );
+
+        render_events.append( & mut d );
+
+        render_events
+    }
+
+    fn should_exit( & mut self, s: & GameState ) -> bool {
+        s._exit
+    }
+}
+
+impl GameLogic {
+
+    fn init_run_first_time( s: & mut GameLogic ) -> Vec< <GameLogic as IGameLogic>::EventRender > {
+
+        let mut render_events = vec![];
+        
+        if !s._state._is_init_run_first_time {
+            s._state._is_init_run_first_time = true;
+
             info!("game logic: first time initialization.");
-            
-            self._is_init = true;
-            let vs_src = file_open( self._path_shader_vs.as_str() ).expect("vertex shader not retrieved");
-            let fs_src = file_open( self._path_shader_fs.as_str() ).expect("fragment shader not retrieved");
+
+            let vs_src = file_open( s._path_shader_vs.as_str() ).expect("vertex shader not retrieved");
+            let fs_src = file_open( s._path_shader_fs.as_str() ).expect("fragment shader not retrieved");
             let event_load_shader = renderer_gl::Event::LoadShader(
                 vec![
                     ( vs_src, util_gl::ShaderType::VERTEX ),
                     ( fs_src, util_gl::ShaderType::FRAGMENT ),
                 ] );
-            v.push( event_load_shader );
+            render_events.push( event_load_shader );
 
             let img = image::open( &Path::new( "core/asset/images/texture0.jpg" ) ).unwrap();
             debug!( "image dimension: {:?}", img.dimensions() );
@@ -122,52 +240,18 @@ impl IGameLogic for GameLogic {
             let texture_data = Vec::from( texture0 );
             let ( w, h ) = img.dimensions();
             let event_load_texture = renderer_gl::Event::LoadTexture( String::from("texture0"), texture_data, w as _, h as _ );
-            v.push( event_load_texture );
+            render_events.push( event_load_texture );
 
             info!( "press q to quit." );
         }
 
-        let mut sig_exit = false;
+        render_events
+    }
+    
+    ///produces some sample objects
+    fn dummy_block( g: & mut GameLogic ) -> Vec< <GameLogic as IGameLogic>::EventRender > {
 
-        //process input events
-        if e.len() > 0 {
-            trace!( "filtered_input: {:?}", e );
-        }
-
-        for i in e.iter() {
-            if let &InputFiltered::Button { key: KeyCode::Q, .. } = i {
-                sig_exit = true;
-            }
-        }
-        
-        //todo: process game objects and prepare for render
-        
-        // //transform filtered inputs and current game states to new game states and report changes
-        // let changed_states = transition_states( &inputs_filered[..], & mut self._states );
-        
-        // //perform computations
-        // while satisfy_compute_constraints() && compute_not_ended() {
-
-        //     //transform game states to computation graph to determine what to update
-        //     let updates_todo = get_computations( & changed_states, & self._states );
-
-        //     let s = schedule( updates_todo );
-
-        //     //apply computations and collect changes
-        //     let changed_states = reduce( map( compute_tasks( s ) ) );
-        // }
-
-        // let render_components = get_renderable_components( self._states );
-
-        // //do some spatial optimization
-        // let render_components_filtered = filter_renderables( relevant_renderables );
-
-        // let render_elements = transform_renderobjs( render_components_filtered );
-
-        // //do further render commands packaging here
-        // let mut render_events = transform_render_events( render_elements );
-
-        // v.append( & mut render_events );
+        let mut render_events = vec![];
         
         //create some meshes for test:
         //set triangle vert positions and normals
@@ -197,30 +281,30 @@ impl IGameLogic for GameLogic {
 
         let mut mesh2 = mesh_copy.clone();
         mesh2._pos.clear();
-        mesh2._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32+self._delta, -1f32, -1f32 ] },
-                                         math::mat::Mat3x1 { _val: [ 5f32+self._delta, -1f32, -1f32 ] },
-                                         math::mat::Mat3x1 { _val: [-1f32+self._delta,  1f32, -1f32 ] },
-                                         math::mat::Mat3x1 { _val: [ 4f32+self._delta, -1f32, 15f32 ] },
-                                         math::mat::Mat3x1 { _val: [ 6f32+self._delta, -1f32, 15f32 ] },
-                                         math::mat::Mat3x1 { _val: [ 4f32+self._delta,  1f32, 15f32 ] }, ] );
-        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( mesh2 ) ) );
+        mesh2._pos.extend_from_slice( &[ math::mat::Mat3x1 { _val: [-1f32+g._state._time_game, -1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 5f32+g._state._time_game, -1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [-1f32+g._state._time_game,  1f32, -1f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 4f32+g._state._time_game, -1f32, 15f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 6f32+g._state._time_game, -1f32, 15f32 ] },
+                                         math::mat::Mat3x1 { _val: [ 4f32+g._state._time_game,  1f32, 15f32 ] }, ] );
+        render_events.push( renderer_gl::Event::AddObj( i_ele::Ele::init( mesh2 ) ) );
 
         let prim_box = primitive::Poly6 { _pos: math::mat::Mat3x1 { _val: [ -5f32, -10f32, 5f32 ] },
                                            _radius: 5f32 };
 
-        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_box ) ) );
+        render_events.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_box ) ) );
 
         let prim_sphere = primitive::SphereIcosahedron::init( math::mat::Mat3x1 { _val: [ -20f32, -10f32, 0f32 ] }, 5f32 );
 
-        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_sphere ) ) );
+        render_events.push( renderer_gl::Event::AddObj( i_ele::Ele::init( prim_sphere ) ) );
         
-        let l = &self._lights[0];
-        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( l.clone() ) ) );
+        let l = &g._lights[0];
+        render_events.push( renderer_gl::Event::AddObj( i_ele::Ele::init( l.clone() ) ) );
 
-        v.push( renderer_gl::Event::AddObj( i_ele::Ele::init( self._cameras[0].clone() ) ) );
+        render_events.push( renderer_gl::Event::AddObj( i_ele::Ele::init( g._cameras[0].clone() ) ) );
 
-        self._delta += -0.01;
+        g._state._time_game += -0.01;
 
-        ( v, sig_exit )
+        render_events
     }
 }

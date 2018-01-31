@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use interface::i_window::IWindow;
 use interface::i_game_logic::IGameLogic;
 use interface::i_renderer::IRenderer;
@@ -7,7 +9,7 @@ pub trait IKernel < W: IWindow,
                     I: IUi< EventInput = W::EventType >,
                     G: IGameLogic< EventInput = I::EventInputFiltered >,
                     R: IRenderer< EventRender = G::EventRender > >
-    : AsMut< W > + AsMut< I > + AsMut< G > + AsMut< R >
+    : AsMut< W > + AsMut< I > + AsMut< G > + AsMut< R > where I::EventInputFiltered : Debug
 
 //possibly use trait bounds and delegate traits to subfields in concrete implementer when this is supported by Rust (https://github.com/rust-lang/rfcs/pull/1406)
     // IWindow +
