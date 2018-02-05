@@ -66,7 +66,7 @@ pub trait IKernel < W: IWindow,
                 running = false;
             }
             
-            (self.as_mut() as & mut R).process_render_events( & events_render[..] ).is_ok();
+            (self.as_mut() as & mut R).process_render_events( events_render.as_slice() ).is_ok();
 
             (self.as_mut() as & mut W).swap_buf();
         }

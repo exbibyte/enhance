@@ -26,3 +26,4 @@ pub mod i_camera;
 pub mod i_load;
 pub mod i_kernel;
 pub mod i_ui;
+pub mod i_scheduler;

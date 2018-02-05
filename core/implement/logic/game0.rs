@@ -12,6 +12,7 @@ use interface::i_ele;
 use interface::i_game_logic::IGameLogic;
 use interface::i_ui::{ InputFiltered, KeyCode };
 // use interface::i_camera::ICamera;
+use interface::i_scheduler::IScheduler;
 
 use implement::render::renderer_gl;
 use implement::render::util_gl;
@@ -56,6 +57,34 @@ impl Default for GameState {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
+pub struct GameStateChangePending {
+}
+
+impl Default for GameStateChangePending {
+    fn default() -> GameStateChangePending {
+        GameStateChangePending {
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct GameStateChangeApply {
+}
+
+impl Default for GameStateChangeApply {
+    fn default() -> GameStateChangeApply {
+        GameStateChangeApply {
+        }
+    }
+}
+
+impl From< ComputeUnit > for GameStateChangeApply {
+    fn from( _c: ComputeUnit ) -> Self {
+        unimplemented!();
+    }
+}
+
 pub struct ComputeUnit {
 
 }
@@ -64,8 +93,35 @@ pub struct ComputeSchedule {
 
 }
 
+impl IScheduler for ComputeSchedule {
+    type Item = ComputeUnit;
+    fn new( _items: &[Self::Item] ) -> ComputeSchedule {
+        unimplemented!();
+    }
+}
+
+impl Iterator for ComputeSchedule {
+    type Item = Vec< ComputeUnit >;
+    fn next( & mut self ) -> Option< Self::Item > {
+        unimplemented!();
+    }
+}
+
+impl From< (GameState, GameStateChangeApply) > for GameState {
+    fn from( (_s, _a): (GameState, GameStateChangeApply) ) -> Self {
+        Default::default()
+    }
+}
+
 pub struct RenderObj {
 
+}
+
+
+impl From< RenderObj > for renderer_gl::Event {
+    fn from( _r: RenderObj ) -> Self {
+        unimplemented!();
+    }
 }
 
 pub struct GameLogic {
@@ -85,6 +141,8 @@ impl IGameLogic for GameLogic {
     type EventInput = InputFiltered;
     type EventRender = renderer_gl::Event;
     type GameState = GameState;
+    type GameStateChangePending = GameStateChangePending;
+    type GameStateChangeApply = GameStateChangeApply;
     type ComputeUnit = ComputeUnit;
     type ComputeSchedule = ComputeSchedule;
     type RenderObj = RenderObj;
@@ -96,8 +154,6 @@ impl IGameLogic for GameLogic {
             _cameras: vec![],
             // _cameras_wrapper: vec![],
             _delta: 0f32,
-            // _path_shader_vs: String::from("core/asset/shader/ads.vs"), //some hard coded paths for now
-            // _path_shader_fs: String::from("core/asset/shader/ads.fs"),
             _path_shader_vs: String::new(),
             _path_shader_fs: String::new(),
             _state: Default::default(),
@@ -145,75 +201,80 @@ impl IGameLogic for GameLogic {
     }
 
     ///computes changed game state given user inputs and current game state
-    fn transition_states( & mut self, inputs: & [ InputFiltered ] ) -> GameState {
+    fn transition_states( & mut self, inputs: & [ InputFiltered ] ) -> GameStateChangePending {
         //todo
         
-        let mut state_change = self._state;
+        // let mut state_change = self._state;
 
         for i in inputs.iter() {
             match i {
                 &InputFiltered::Button { key: KeyCode::Q, .. } => {
-                    state_change._exit = true;
+                    // state_change._exit = true;
                 },
                 _ => {},
             }
         }
 
-        state_change._continue_compute = true;
+        // state_change._continue_compute = true;
         
-        state_change
+        // state_change
+        Default::default()
     }
-    fn continue_compute( & mut self, changed_states: & GameState ) -> bool {
-        if changed_states._continue_compute && !changed_states._exit {
-            true
-        } else {
-            false
-        }
+    fn get_states( & mut self ) -> & Self::GameState {
+        & self._state
     }
-    fn get_computations( & mut self, changed_game_state: & GameState ) -> Vec< ComputeUnit > {
+
+    fn get_states_mut( & mut self ) -> & mut Self::GameState {
+        & mut self._state
+    }
+    fn continue_compute( & mut self ) -> bool {
+        // if changed_states._continue_compute && !changed_states._exit {
+        //     true
+        // } else {
+        //     false
+        // }
+        true
+    }
+    fn get_computations( & mut self, _changed_game_state: & GameStateChangePending ) -> Vec< ComputeUnit > {
         //todo
         let mut _compute_units = vec![];
 
         _compute_units
     }
-    fn schedule_computes( & mut self, computes: Vec< ComputeUnit > ) -> Vec< ComputeSchedule > {
+    fn schedule_computes( & mut self, _computes: Vec< ComputeUnit > ) -> Vec< Self::ComputeSchedule > {
         //todo
         let mut _compute_schedule = vec![];
 
         _compute_schedule
     }
-    fn apply_changes_after_compute( & mut self, s: & mut GameState ) {
-        //todo
-
-        //just end after one compute for now
-        s._continue_compute = false;
-    }
-    fn get_renderable_components( & mut self, s: & GameState ) -> Vec< RenderObj > {
+    fn get_renderable_components( & mut self ) -> Vec< RenderObj > {
         //todo
         vec![]
     }
-    fn filter_renderables( & mut self, r: Vec< RenderObj >, s: & GameState ) -> Vec< RenderObj > {
+    fn filter_renderables( & mut self, _r: Vec< RenderObj > ) -> Vec< RenderObj > {
         //todo
         vec![]
     }
-    fn get_render_events( & mut self, r: Vec< RenderObj >, s: & GameState ) -> Vec< <Self as IGameLogic>::EventRender > {
-        let mut render_events = GameLogic::init_run_first_time( self );
+    //todo: remove this method and move required logic into the game state
+    // fn get_render_events( & mut self, r: Vec< RenderObj > ) -> Vec< <Self as IGameLogic>::EventRender > {
+    //     let mut render_events = GameLogic::init_run_first_time( self );
 
-        //sample rendering object creation for now
-        let mut d = GameLogic::dummy_block( self );
+    //     //sample rendering object creation for now
+    //     let mut d = GameLogic::dummy_block( self );
 
-        render_events.append( & mut d );
+    //     render_events.append( & mut d );
 
-        render_events
-    }
+    //     render_events
+    // }
 
-    fn should_exit( & mut self, s: & GameState ) -> bool {
-        s._exit
+    fn should_exit( & mut self ) -> bool {
+        self._state._exit
     }
 }
 
 impl GameLogic {
 
+    #[allow(dead_code)]
     fn init_run_first_time( s: & mut GameLogic ) -> Vec< <GameLogic as IGameLogic>::EventRender > {
 
         let mut render_events = vec![];
@@ -247,8 +308,10 @@ impl GameLogic {
 
         render_events
     }
+
     
     ///produces some sample objects
+    #[allow(dead_code)]
     fn dummy_block( g: & mut GameLogic ) -> Vec< <GameLogic as IGameLogic>::EventRender > {
 
         let mut render_events = vec![];
